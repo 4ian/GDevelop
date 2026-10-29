@@ -16,9 +16,24 @@ import {
   type GameplayTestToRun,
   type GameplayTestResult,
 } from '../GameplayTests/GameplayTestRunner';
-import Window from '../Utils/Window';
+import Window, { type AppArguments } from '../Utils/Window';
+import UnsavedChangesContext from './UnsavedChangesContext';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import { delay } from '../Utils/Delay';
+import {
+  describeCliEditorFunctions,
+  parseCliEditorFunctionCalls,
+  runCliEditorFunctionCalls,
+  type CliEditorFunctionCall,
+  type CliEditorFunctionCallsReport,
+  type CliEditorFunctionsEditorCallbacks,
+  type CliProjectCreationCallbacks,
+} from './CliEditorFunctions';
 import optionalRequire from '../Utils/OptionalRequire';
 import { type FileMetadata } from '../ProjectsStorage';
+import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
+import { useEditorFunctionsServices } from '../AiGeneration/UseEditorFunctionsServices';
+import { useMcpServers } from './McpServerTools/UseMcpServers';
 
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
@@ -42,18 +57,59 @@ export type SaveProject = (options?: {|
 // Commands registered here are awaited by the CLI dispatcher so the process
 // exits with a meaningful code. Unregistered commands fall back to
 // fire-and-forget via launchCommand.
+/**
+ * The flags of a command, read from the command line - or forwarded with the
+ * command when it's routed to an opened editor.
+ */
+export type CliOptions = {|
+  resultsPath: string | null,
+  // Print the result of the command as JSON on stdout (the logs are then
+  // printed on stderr).
+  json: boolean,
+  // Don't save the project changed by the command.
+  dryRun: boolean,
+  // Only allow the functions that don't modify the project.
+  readOnly: boolean,
+|};
+
+export type RunEditorFunctionCalls = (
+  functionCalls: Array<CliEditorFunctionCall>,
+  options: {| runScriptReadOnly: boolean |}
+) => Promise<CliEditorFunctionCallsReport>;
+
+type CliCommandContext = {|
+  preferences: Preferences,
+  commandArgs: Array<string>,
+  cliOptions: CliOptions,
+  // True when the command was routed to an editor that has the project
+  // opened (instead of opening it headless).
+  isRunInOpenedEditor: boolean,
+  importExtension: ImportExtension,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
+  saveProject: SaveProject,
+  runEditorFunctionCalls: RunEditorFunctionCalls,
+  triggerUnsavedChanges: () => void,
+  // `SERVE_MCP`: lets the tool calls of the MCP server run.
+  onMcpProjectReady: () => void,
+|};
+
 export type CliCommandRunner = (
   project: gdProject,
   i18n: I18nType,
-  context: {|
-    preferences: Preferences,
-    commandArgs: Array<string>,
-    importExtension: ImportExtension,
-    onWillInstallExtension: (extensionNames: Array<string>) => void,
-    onExtensionInstalled: (extensionNames: Array<string>) => void,
-    saveProject: SaveProject,
-  |}
+  context: CliCommandContext
 ) => Promise<void>;
+
+const getCliOptions = (appArguments: AppArguments): CliOptions => ({
+  resultsPath:
+    typeof appArguments['results-path'] === 'string' &&
+    appArguments['results-path']
+      ? appArguments['results-path']
+      : null,
+  json: !!appArguments['json'],
+  dryRun: !!appArguments['dry-run'],
+  readOnly: !!appArguments['read-only'],
+});
 
 const normalizeCommandArgs = (
   arg: string | Array<string> | void
@@ -147,6 +203,113 @@ const writeCliGameplayTestResults = (
 
   fs.writeFileSync(resultsPath, JSON.stringify(outputs, null, 2));
   return resultsPath;
+};
+
+/**
+ * Read an input of a command: inline JSON, `-` for stdin, or a file path.
+ */
+const readCliInput = async (commandArg: string): Promise<string> => {
+  if (commandArg.startsWith('{') || commandArg.startsWith('[')) {
+    return commandArg;
+  }
+  if (commandArg === '-') {
+    if (!ipcRenderer) throw new Error('[CLI] stdin is not available.');
+    return ipcRenderer.invoke('cli-read-stdin');
+  }
+  if (!fs || !path) throw new Error('[CLI] Files are not available.');
+  return fs.readFileSync(path.resolve(commandArg), 'utf8');
+};
+
+/**
+ * Output the result of a command: to the `--results-path` file, and/or as
+ * JSON on stdout with `--json`, or in the logs otherwise.
+ */
+const writeCliCommandResult = async (
+  cliOptions: CliOptions,
+  result: any
+): Promise<void> => {
+  const text = JSON.stringify(result, null, 2);
+  if (cliOptions.resultsPath && fs && path) {
+    const resultsPath = path.resolve(cliOptions.resultsPath);
+    fs.writeFileSync(resultsPath, text);
+    console.info(`[CLI] Results written to: ${resultsPath}`);
+  }
+  if (cliOptions.json && ipcRenderer) {
+    await ipcRenderer.invoke('cli-write-stdout', text + '\n');
+  }
+  if (!cliOptions.resultsPath && !cliOptions.json) {
+    console.info(`[CLI] Results:\n${text}`);
+  }
+};
+
+const runEditorFunctionCallsAndReport = async ({
+  functionCalls,
+  context,
+}: {|
+  functionCalls: Array<CliEditorFunctionCall>,
+  context: CliCommandContext,
+|}): Promise<void> => {
+  const {
+    cliOptions,
+    isRunInOpenedEditor,
+    saveProject,
+    runEditorFunctionCalls,
+    triggerUnsavedChanges,
+  } = context;
+  const report = await runEditorFunctionCalls(functionCalls, {
+    runScriptReadOnly: cliOptions.readOnly,
+  });
+
+  let savedProject = false;
+  if (report.didModifyProject) {
+    if (isRunInOpenedEditor) {
+      // The user saves (or not) the changes in the opened editor.
+      triggerUnsavedChanges();
+    } else if (!cliOptions.dryRun) {
+      const fileMetadata = await saveProject({ skipNewVersionWarning: true });
+      if (!fileMetadata) {
+        await writeCliCommandResult(cliOptions, { ...report, savedProject });
+        throw new Error(
+          '[CLI] The project was changed but could not be saved.'
+        );
+      }
+      savedProject = true;
+    }
+  }
+
+  await writeCliCommandResult(cliOptions, { ...report, savedProject });
+  if (!report.success) {
+    const failedResult = report.results[report.results.length - 1];
+    throw new Error(
+      `"${failedResult ? failedResult.name : ''}" failed${
+        report.notRunCalls.length
+          ? ` (${report.notRunCalls.length} following call(s) not run)`
+          : ''
+      }.`
+    );
+  }
+};
+
+const readOnlyFunctionCallsGuard = (
+  functionCalls: Array<CliEditorFunctionCall>,
+  cliOptions: CliOptions
+) => {
+  if (!cliOptions.readOnly) return;
+  const modifyingFunctionNames = describeCliEditorFunctions()
+    .filter(description => description.modifiesProject)
+    .map(description => description.name);
+  const modifyingCall = functionCalls.find(
+    functionCall =>
+      functionCall.name !== 'run_script' &&
+      modifyingFunctionNames.includes(functionCall.name)
+  );
+  if (modifyingCall) {
+    throw new Error(
+      `[CLI] "${
+        modifyingCall.name
+      }" modifies the project, which --read-only forbids.`
+    );
+  }
 };
 
 const runners: { [commandName: string]: CliCommandRunner } = {
@@ -283,12 +446,73 @@ const runners: { [commandName: string]: CliCommandRunner } = {
       throw new Error(`${failedCount} gameplay test(s) failed.`);
     }
   },
+  LIST_EDITOR_FUNCTIONS: async (project, i18n, { cliOptions }) => {
+    await writeCliCommandResult(cliOptions, {
+      functions: describeCliEditorFunctions(),
+    });
+  },
+
+  // Run editor functions calls (the same as the GDevelop AI uses), given as
+  // JSON: `--cmd-args calls.json` (or inline JSON, or `-` for stdin).
+  RUN_EDITOR_FUNCTIONS: async (project, i18n, context) => {
+    const { commandArgs, cliOptions } = context;
+    if (commandArgs.length === 0) {
+      throw new Error(
+        '[CLI] RUN_EDITOR_FUNCTIONS requires the calls (a JSON file, inline JSON or - for stdin) via --cmd-args.'
+      );
+    }
+    const functionCalls: Array<CliEditorFunctionCall> = [];
+    for (const commandArg of commandArgs) {
+      const calls = parseCliEditorFunctionCalls(
+        JSON.parse(await readCliInput(commandArg))
+      );
+      functionCalls.push(...calls);
+    }
+    readOnlyFunctionCallsGuard(functionCalls, cliOptions);
+    await runEditorFunctionCallsAndReport({ functionCalls, context });
+  },
+
+  // Run a JavaScript file calling the editor functions, like the scripts of
+  // the GDevelop AI edit (or, with `--read-only`, explorer) agent:
+  // `await inspect_variables({ variable_scope: 'global' })`.
+  RUN_EDITOR_SCRIPT: async (project, i18n, context) => {
+    const { commandArgs } = context;
+    if (commandArgs.length !== 1) {
+      throw new Error(
+        '[CLI] RUN_EDITOR_SCRIPT requires one script (a .js file or - for stdin) via --cmd-args.'
+      );
+    }
+    const jsCode = await readCliInput(commandArgs[0]);
+    await runEditorFunctionCallsAndReport({
+      functionCalls: [
+        {
+          name: 'run_script',
+          arguments: { title: 'CLI script', js_code: jsCode },
+        },
+      ],
+      context,
+    });
+  },
+
+  // Serve the editor functions to an AI agent with the Model Context
+  // Protocol, until the agent stops (see `--mcp`). The server itself is set
+  // up as soon as the editor is loaded (see `useCliCommandRunner`): this only
+  // lets the tool calls run, now that the project is ready.
+  SERVE_MCP: async (project, i18n, { onMcpProjectReady }) => {
+    if (!ipcRenderer) throw new Error('[CLI] SERVE_MCP requires Electron.');
+    onMcpProjectReady();
+    console.info(`[CLI] MCP server ready for "${project.getName()}".`);
+    // The main process exits the app when the agent closes stdin.
+    await new Promise(() => {});
+  },
 };
 
 export const getAwaitableCliRunner = (commandName: string): ?CliCommandRunner =>
   runners[commandName] || null;
 
 const CLI_PROJECT_LOAD_TIMEOUT_MS = 120_000;
+const CLI_LOGIN_SETTLE_TIMEOUT_MS = 30_000;
+
 const FIRE_AND_FORGET_GRACE_MS = 1500;
 
 const exitApp = (exitCode: number) => {
@@ -308,6 +532,8 @@ type RunCliCommandIpcPayload = {|
   commandName: string,
   commandArgs: string | Array<string> | void,
   fileIdentifier: ?string,
+  // The flags given with the command (see `CliCommandHandoff.js`).
+  commandOptions?: AppArguments,
 |};
 
 const ensureProjectExtensionsReadyForCli = async (
@@ -344,6 +570,10 @@ type RunCliCommandOptions = {|
   i18n: I18nType,
   commandName: string,
   commandArgs: Array<string>,
+  cliOptions: CliOptions,
+  isRunInOpenedEditor: boolean,
+  runEditorFunctionCalls: RunEditorFunctionCalls,
+  triggerUnsavedChanges: () => void,
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
   commandPaletteRef: {| current: ?CommandPaletteInterface |},
   preferences: Preferences,
@@ -355,6 +585,11 @@ type RunCliCommandOptions = {|
   // applied to the preferences, so the command runner can rely on `preferences`
   // as the single source of truth without racing the project load.
   ensureProjectSettingsApplied: () => Promise<void>,
+  // Resolves once the user found at startup is logged in (or when there is
+  // none): the editor services (the asset store, the events generation...)
+  // need the user, and a command can start before the login is done.
+  ensureLoginSettled: () => Promise<void>,
+  onMcpProjectReady: () => void,
   onFinished: (exitCode: number) => void,
 |};
 
@@ -363,6 +598,10 @@ const runCliCommand = async ({
   i18n,
   commandName,
   commandArgs,
+  cliOptions,
+  isRunInOpenedEditor,
+  runEditorFunctionCalls,
+  triggerUnsavedChanges,
   eventsFunctionsExtensionsState,
   commandPaletteRef,
   preferences,
@@ -371,6 +610,8 @@ const runCliCommand = async ({
   onExtensionInstalled,
   saveProject,
   ensureProjectSettingsApplied,
+  ensureLoginSettled,
+  onMcpProjectReady,
   onFinished,
 }: RunCliCommandOptions): Promise<void> => {
   try {
@@ -386,16 +627,22 @@ const runCliCommand = async ({
     // the preferences, so commands (e.g. the diagnostic-error export block)
     // read the project's own settings rather than a stale global value.
     await ensureProjectSettingsApplied();
+    await ensureLoginSettled();
 
     const awaitableRunner = getAwaitableCliRunner(commandName);
     if (awaitableRunner) {
       await awaitableRunner(project, i18n, {
         preferences,
         commandArgs,
+        cliOptions,
+        isRunInOpenedEditor,
         importExtension,
         onWillInstallExtension,
         onExtensionInstalled,
         saveProject,
+        runEditorFunctionCalls,
+        triggerUnsavedChanges,
+        onMcpProjectReady,
       });
       console.info(`[CLI] Command "${commandName}" finished successfully.`);
       onFinished(0);
@@ -424,7 +671,13 @@ const runCliCommand = async ({
 type Props = {|
   project: ?gdProject,
   i18n: I18nType,
+  fileMetadata: ?FileMetadata,
   fileIdentifier: ?string,
+  storageProviderName: ?string,
+  resourceManagementProps: ResourceManagementProps,
+  // What the editor functions notify (to refresh the opened editors) or wait
+  // for (to close the editors of what they delete).
+  editorFunctionsEditorCallbacks: CliEditorFunctionsEditorCallbacks,
   commandPaletteRef: {| current: ?CommandPaletteInterface |},
   importExtension: ImportExtension,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
@@ -434,23 +687,116 @@ type Props = {|
   // applied to the preferences, so the command runner can rely on `preferences`
   // as the single source of truth without racing the project load.
   ensureProjectSettingsApplied: () => Promise<void>,
+  // To create the project an agent connected to the editor works on.
+  projectCreationCallbacks: CliProjectCreationCallbacks,
 |};
 
 export const useCliCommandRunner = ({
   project,
   i18n,
+  fileMetadata,
   fileIdentifier,
+  storageProviderName,
+  resourceManagementProps,
+  editorFunctionsEditorCallbacks,
   commandPaletteRef,
   importExtension,
   onWillInstallExtension,
   onExtensionInstalled,
   saveProject,
   ensureProjectSettingsApplied,
+  projectCreationCallbacks,
 }: Props) => {
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
   );
   const preferences = React.useContext(PreferencesContext);
+  const { triggerUnsavedChanges } = React.useContext(UnsavedChangesContext);
+  const { loginState } = React.useContext(AuthenticatedUserContext);
+  const loginStateRef = React.useRef(loginState);
+  loginStateRef.current = loginState;
+  const ensureLoginSettled = React.useCallback(async () => {
+    const startTime = Date.now();
+    while (
+      loginStateRef.current === 'loggingIn' &&
+      Date.now() - startTime < CLI_LOGIN_SETTLE_TIMEOUT_MS
+    ) {
+      await delay(200);
+    }
+  }, []);
+  const editorFunctionsServices = useEditorFunctionsServices({
+    project,
+    i18n,
+    fileMetadata,
+    resourceManagementProps,
+    onWillInstallExtension,
+    onExtensionInstalled,
+  });
+
+  // Not memoized by MainFrame: the latest ones are read when the calls run.
+  const editorFunctionsEditorCallbacksRef = React.useRef(
+    editorFunctionsEditorCallbacks
+  );
+  editorFunctionsEditorCallbacksRef.current = editorFunctionsEditorCallbacks;
+
+  const runEditorFunctionCalls = React.useCallback(
+    (
+      functionCalls: Array<CliEditorFunctionCall>,
+      { runScriptReadOnly }: {| runScriptReadOnly: boolean |}
+    ): Promise<CliEditorFunctionCallsReport> => {
+      if (!project) throw new Error('No project is opened.');
+      return runCliEditorFunctionCalls({
+        project,
+        i18n,
+        functionCalls,
+        runScriptReadOnly,
+        collaborators: {
+          ...editorFunctionsEditorCallbacksRef.current,
+          services: editorFunctionsServices,
+          eventsFunctionsExtensionsState,
+          onWillInstallExtension,
+          onExtensionInstalled,
+          onExtensionsRegenerated: triggerUnsavedChanges,
+        },
+      });
+    },
+    [
+      project,
+      i18n,
+      editorFunctionsServices,
+      eventsFunctionsExtensionsState,
+      onWillInstallExtension,
+      onExtensionInstalled,
+      triggerUnsavedChanges,
+    ]
+  );
+
+  // The MCP server runs for the whole session: it must use the latest
+  // callbacks (the editor services need the user profile, fetched after the
+  // startup), not the ones captured when the command started.
+  const runEditorFunctionCallsRef = React.useRef(runEditorFunctionCalls);
+  runEditorFunctionCallsRef.current = runEditorFunctionCalls;
+  const saveProjectRef = React.useRef(saveProject);
+  saveProjectRef.current = saveProject;
+  const latestRunEditorFunctionCalls: RunEditorFunctionCalls = React.useCallback(
+    (functionCalls, options) =>
+      runEditorFunctionCallsRef.current(functionCalls, options),
+    []
+  );
+  const latestSaveProject: SaveProject = React.useCallback(
+    options => saveProjectRef.current(options),
+    []
+  );
+
+  const { onMcpProjectReady } = useMcpServers({
+    i18n,
+    project,
+    fileIdentifier,
+    storageProviderName,
+    projectCreationCallbacks,
+    runEditorFunctionCalls: latestRunEditorFunctionCalls,
+    saveProject: latestSaveProject,
+  });
 
   React.useEffect(
     () => {
@@ -481,14 +827,20 @@ export const useCliCommandRunner = ({
         i18n,
         commandName,
         commandArgs: getCommandArgs(),
+        cliOptions: getCliOptions(appArguments),
+        isRunInOpenedEditor: false,
+        runEditorFunctionCalls: latestRunEditorFunctionCalls,
+        triggerUnsavedChanges,
+        onMcpProjectReady,
         eventsFunctionsExtensionsState,
         commandPaletteRef,
         preferences,
         importExtension,
         onWillInstallExtension,
         onExtensionInstalled,
-        saveProject,
+        saveProject: latestSaveProject,
         ensureProjectSettingsApplied,
+        ensureLoginSettled,
         onFinished: exitCode => {
           if (!keepOpen) exitApp(exitCode);
         },
@@ -503,8 +855,12 @@ export const useCliCommandRunner = ({
       importExtension,
       onWillInstallExtension,
       onExtensionInstalled,
-      saveProject,
+      latestSaveProject,
       ensureProjectSettingsApplied,
+      ensureLoginSettled,
+      latestRunEditorFunctionCalls,
+      triggerUnsavedChanges,
+      onMcpProjectReady,
     ]
   );
 
@@ -518,6 +874,7 @@ export const useCliCommandRunner = ({
           commandName,
           commandArgs,
           fileIdentifier: routedFileIdentifier,
+          commandOptions,
         }: RunCliCommandIpcPayload
       ) => {
         if (
@@ -536,14 +893,20 @@ export const useCliCommandRunner = ({
           i18n,
           commandName,
           commandArgs: normalizeCommandArgs(commandArgs),
+          cliOptions: getCliOptions(commandOptions || {}),
+          isRunInOpenedEditor: true,
+          runEditorFunctionCalls: latestRunEditorFunctionCalls,
+          triggerUnsavedChanges,
+          onMcpProjectReady,
           eventsFunctionsExtensionsState,
           commandPaletteRef,
           preferences,
           importExtension,
           onWillInstallExtension,
           onExtensionInstalled,
-          saveProject,
+          saveProject: latestSaveProject,
           ensureProjectSettingsApplied,
+          ensureLoginSettled,
           onFinished: () => {},
         });
       };
@@ -562,8 +925,12 @@ export const useCliCommandRunner = ({
       importExtension,
       onWillInstallExtension,
       onExtensionInstalled,
-      saveProject,
+      latestSaveProject,
       ensureProjectSettingsApplied,
+      ensureLoginSettled,
+      latestRunEditorFunctionCalls,
+      triggerUnsavedChanges,
+      onMcpProjectReady,
     ]
   );
 

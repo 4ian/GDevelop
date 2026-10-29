@@ -1050,6 +1050,133 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
     expect(variablesContainer.get('MyVariable2').getAsNumber()).to.be(789);
     expect(variablesContainer.getFromIndex(1).getAsNumber()).to.be(789);
   });
+
+  it('keeps the project data up-to-date when objects are hot-reloaded several times', async () => {
+    const projectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1' }],
+          objects: [createSpriteData({ name: 'MyObject', image: 'ResourceA' })],
+        }),
+      ],
+    });
+    const runtimeGame = new gdjs.RuntimeGame(projectData);
+    const hotReloader = new gdjs.HotReloader(runtimeGame);
+    await runtimeGame.loadFirstAssetsAndStartBackgroundLoading(
+      'Scene1',
+      () => {}
+    );
+    runtimeGame._sceneStack.push('Scene1');
+    const scene = runtimeGame.getSceneStack().getCurrentScene();
+    if (!scene) throw new Error("Couldn't set a current scene for testing.");
+
+    // Like the in-game editor does when an object is edited.
+    hotReloader.hotReloadRuntimeSceneObjects(
+      [createSpriteData({ name: 'MyObject', image: 'ResourceB' })],
+      scene
+    );
+    hotReloader.hotReloadRuntimeSceneObjects(
+      [createSpriteData({ name: 'MyObject', image: 'ResourceC' })],
+      scene
+    );
+
+    const instances = scene.getInstancesOf('MyObject');
+    expect(instances.length).to.be(1);
+    expect(getSpriteCurrentFrameImage(instances[0])).to.be('ResourceC');
+
+    const createdInstance = scene.createObject('MyObject');
+    if (!createdInstance)
+      throw new Error("Couldn't create an instance for testing.");
+    expect(getSpriteCurrentFrameImage(createdInstance)).to.be('ResourceC');
+
+    // Like the in-game editor does when it switches back to the scene.
+    const sceneAndExtensionsData =
+      runtimeGame.getSceneAndExtensionsData('Scene1');
+    if (!sceneAndExtensionsData)
+      throw new Error("Couldn't find the scene data for testing.");
+    const reloadedScene = new gdjs.RuntimeScene(runtimeGame);
+    reloadedScene.loadFromScene(sceneAndExtensionsData);
+    const reloadedInstances = reloadedScene.getInstancesOf('MyObject');
+    expect(reloadedInstances.length).to.be(1);
+    expect(getSpriteCurrentFrameImage(reloadedInstances[0])).to.be('ResourceC');
+  });
+
+  it('keeps the project data up-to-date when custom objects are hot-reloaded several times', async () => {
+    /**
+     * @param {number} myProperty
+     * @returns {ObjectData & gdjs.CustomObjectConfiguration}
+     */
+    const createCustomObjectData = (myProperty) => ({
+      ...defaultCustomObject,
+      content: { MyProperty: myProperty },
+    });
+    /**
+     * @param {gdjs.RuntimeObject} instance
+     * @returns {number}
+     */
+    const getMyProperty = (instance) => {
+      if (
+        !(
+          instance instanceof
+          gdjs.evtsExt__MyExtension__MyCustomObject.MyCustomObject
+        )
+      ) {
+        throw new Error("Couldn't instantiate a custom object for testing.");
+      }
+      return instance._getMyProperty();
+    };
+
+    const projectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1', name: 'MyCustomObject' }],
+          objects: [createCustomObjectData(1)],
+        }),
+      ],
+      eventsBasedObjects: [
+        createEventsBasedObjectData({ name: 'MyCustomObject' }),
+      ],
+    });
+    const runtimeGame = new gdjs.RuntimeGame(projectData);
+    const hotReloader = new gdjs.HotReloader(runtimeGame);
+    await runtimeGame.loadFirstAssetsAndStartBackgroundLoading(
+      'Scene1',
+      () => {}
+    );
+    runtimeGame._sceneStack.push('Scene1');
+    const scene = runtimeGame.getSceneStack().getCurrentScene();
+    if (!scene) throw new Error("Couldn't set a current scene for testing.");
+
+    // Like the in-game editor does when an object is edited.
+    hotReloader.hotReloadRuntimeSceneObjects(
+      [createCustomObjectData(2)],
+      scene
+    );
+    hotReloader.hotReloadRuntimeSceneObjects(
+      [createCustomObjectData(3)],
+      scene
+    );
+
+    const instances = scene.getInstancesOf('MyCustomObject');
+    expect(instances.length).to.be(1);
+    expect(getMyProperty(instances[0])).to.be(3);
+
+    const createdInstance = scene.createObject('MyCustomObject');
+    if (!createdInstance)
+      throw new Error("Couldn't create an instance for testing.");
+    expect(getMyProperty(createdInstance)).to.be(3);
+
+    // Like the in-game editor does when it switches back to the scene.
+    const sceneAndExtensionsData =
+      runtimeGame.getSceneAndExtensionsData('Scene1');
+    if (!sceneAndExtensionsData)
+      throw new Error("Couldn't find the scene data for testing.");
+    const reloadedScene = new gdjs.RuntimeScene(runtimeGame);
+    reloadedScene.loadFromScene(sceneAndExtensionsData);
+    const reloadedInstances = reloadedScene.getInstancesOf('MyCustomObject');
+    expect(reloadedInstances.length).to.be(1);
+    expect(getMyProperty(reloadedInstances[0])).to.be(3);
+  });
 });
 
 describe('gdjs.HotReloader._hotReloadVariablesContainer', () => {

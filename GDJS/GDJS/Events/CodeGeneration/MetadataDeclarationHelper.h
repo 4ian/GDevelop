@@ -27,6 +27,7 @@ class AbstractFunctionMetadata;
 class InstructionOrExpressionContainerMetadata;
 class AbstractEventsBasedEntity;
 class NamedPropertyDescriptor;
+class PropertiesContainer;
 class ParameterMetadata;
 class InstructionMetadata;
 class ExpressionMetadata;
@@ -125,6 +126,12 @@ public:
 private:
   static const gd::String &
   GetExtensionIconUrl(const gd::PlatformExtension &extension);
+
+  /**
+   * Return the property groups, in the order of the folders of the properties.
+   */
+  static std::vector<gd::String>
+  GetPropertyGroups(const gd::PropertiesContainer &properties);
 
   static const gd::String &
   GetEntityIconUrl(const gd::PlatformExtension &extension,

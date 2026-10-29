@@ -12,6 +12,31 @@ namespace gdjs {
     effectName: string;
   };
 
+  /**
+   * @returns 4 if the canvas is antialiased and the GPU can multisample
+   * half-float render targets 4 times (some can't), 0 otherwise.
+   */
+  const getHalfFloatRenderTargetSamples = (
+    threeRenderer: THREE.WebGLRenderer
+  ): integer => {
+    const gl = threeRenderer.getContext();
+    const contextAttributes = gl.getContextAttributes();
+    if (
+      !contextAttributes ||
+      !contextAttributes.antialias ||
+      typeof WebGL2RenderingContext === 'undefined' ||
+      !(gl instanceof WebGL2RenderingContext)
+    ) {
+      return 0;
+    }
+    const supportedSamples: Int32Array | null = gl.getInternalformatParameter(
+      gl.RENDERBUFFER,
+      gl.RGBA16F,
+      gl.SAMPLES
+    );
+    return supportedSamples && supportedSamples.includes(4) ? 4 : 0;
+  };
+
   const FRUSTUM_EDGES: Array<[number, number]> = [
     // near plane edges
     [0, 1],
@@ -235,6 +260,9 @@ namespace gdjs {
     private _postProcessingPasses: PostProcessingPass[] = [];
     // The antialiasing (if any) and output passes, after the effects.
     private _threeFinalPasses: THREE_ADDONS.Pass[] = [];
+    // The multisampling of the render target in which the scene is rendered
+    // with post-processing, like the canvas, so that effects keep its antialiasing.
+    private _renderTargetSamples = 0;
     private _basis: Basis | null = null;
     private static matrix4: THREE.Matrix4 | null = null;
 
@@ -413,6 +441,7 @@ namespace gdjs {
       pass.setSize(renderTarget.width, renderTarget.height);
       this._postProcessingPasses.push({ pass, effectName });
       this.updatePostProcessingPassesOrder();
+      this._updateSceneRenderPass();
     }
 
     removePostProcessingPass(pass: THREE_ADDONS.Pass) {
@@ -420,6 +449,7 @@ namespace gdjs {
         (postProcessingPass) => postProcessingPass.pass !== pass
       );
       this.updatePostProcessingPassesOrder();
+      this._updateSceneRenderPass();
     }
 
     /**
@@ -499,9 +529,17 @@ namespace gdjs {
         return;
       }
       let sceneRenderPass: THREE_ADDONS.Pass = this._threeRenderPass;
+      // To keep the antialiasing of the canvas, the scene is rendered in a
+      // multisampled render target owned by a pass. The render targets of the
+      // composer are only written by full-screen passes: multisampling them
+      // would resolve them after each effect.
       if (this._customRenderPass) {
         sceneRenderPass = this._customRenderPass;
-      } else if (this._sceneDepthTextureUsersCount > 0) {
+        this._setRenderTargetSamples(this._customRenderPass.beautyRenderTarget);
+      } else if (
+        this._sceneDepthTextureUsersCount > 0 ||
+        (this._renderTargetSamples > 0 && this._postProcessingPasses.length > 0)
+      ) {
         if (!this._sceneDepthRenderPass) {
           this._sceneDepthRenderPass = new THREE_ADDONS.SceneDepthRenderPass(
             this._threeScene,
@@ -509,14 +547,32 @@ namespace gdjs {
           );
         }
         sceneRenderPass = this._sceneDepthRenderPass;
+        this._setRenderTargetSamples(this._sceneDepthRenderPass.renderTarget);
+        // The depth is only copied from the samples when an effect reads it.
+        this._sceneDepthRenderPass.renderTarget.resolveDepthBuffer =
+          this._sceneDepthTextureUsersCount > 0;
       }
-      if (this._threeEffectComposer.passes[0] === sceneRenderPass) {
+      const previousSceneRenderPass = this._threeEffectComposer.passes[0];
+      if (previousSceneRenderPass === sceneRenderPass) {
         return;
+      }
+      if (previousSceneRenderPass === this._sceneDepthRenderPass) {
+        // Free the render target until the pass is used again.
+        this._sceneDepthRenderPass.renderTarget.dispose();
       }
       // The pass was not resized with the composer while it was not in it.
       const renderTarget = this._threeEffectComposer.renderTarget1;
       sceneRenderPass.setSize(renderTarget.width, renderTarget.height);
       this._threeEffectComposer.passes[0] = sceneRenderPass;
+    }
+
+    private _setRenderTargetSamples(renderTarget: THREE.WebGLRenderTarget) {
+      if (renderTarget.samples === this._renderTargetSamples) {
+        return;
+      }
+      renderTarget.samples = this._renderTargetSamples;
+      // Recreate the WebGL buffers with the new number of samples.
+      renderTarget.dispose();
     }
 
     /**
@@ -590,6 +646,8 @@ namespace gdjs {
             const drawingBufferSize = threeRenderer.getDrawingBufferSize(
               new THREE.Vector2()
             );
+            this._renderTargetSamples =
+              getHalfFloatRenderTargetSamples(threeRenderer);
             this._threeEffectComposer = new THREE_ADDONS.EffectComposer(
               threeRenderer,
               new THREE.WebGLRenderTarget(
@@ -603,7 +661,12 @@ namespace gdjs {
               this._threeCamera
             );
             this._threeEffectComposer.addPass(this._threeRenderPass);
-            if (game.getAntialiasingMode() !== 'none') {
+            // SMAA can't smooth thin details (like grass): it's only used
+            // when the canvas is not multisampled (on mobile, if disabled).
+            if (
+              game.getAntialiasingMode() !== 'none' &&
+              this._renderTargetSamples === 0
+            ) {
               this._threeFinalPasses.push(new THREE_ADDONS.SMAAPass());
             }
             const outputPass = new THREE_ADDONS.OutputPass();

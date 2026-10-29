@@ -2,7 +2,10 @@ const { protocol } = require('electron');
 const fs = require('fs');
 const path = require('path');
 
-const developmentServerBaseUrl = 'http://localhost:3000';
+// Another dev server (for example one started on another port for a second
+// checkout, or to run CLI commands while the usual one is in use).
+const developmentServerBaseUrl =
+  process.env.GDEVELOP_DEV_SERVER_URL || 'http://localhost:3000';
 const appPublicFolderBaseUrl = path.join(__dirname + '/../www');
 
 /**

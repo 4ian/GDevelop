@@ -2,6 +2,20 @@
 import Window from '../Utils/Window';
 import { shouldBlockOnDiagnosticErrorsForCli } from './LocalCliCommandRunner';
 
+// Transitively imported, but shipped as untransformed ESM that Jest cannot
+// load.
+jest.mock('three/src/math/MathUtils', () => ({
+  generateUUID: () => 'mock-uuid',
+}));
+// The real PixiResourcesLoader transitively imports ESM-only packages that
+// Jest cannot parse: replace it with the test mock.
+jest.mock('../ObjectsRendering/PixiResourcesLoader', () => {
+  const {
+    PixiResourcesLoaderMock,
+  } = require('../fixtures/TestPixiResourcesLoader');
+  return { __esModule: true, default: PixiResourcesLoaderMock };
+});
+
 jest.mock('../Utils/Window', () => {
   const originalModule = jest.requireActual<any>('../Utils/Window');
   originalModule.default.getArguments = jest.fn(() => ({}));

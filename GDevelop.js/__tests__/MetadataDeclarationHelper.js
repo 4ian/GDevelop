@@ -1335,6 +1335,102 @@ describe('MetadataDeclarationHelper', () => {
     project.delete();
   });
 
+  it('declares the property groups of a behavior in the order of their folders', () => {
+    const extension = new gd.PlatformExtension();
+    const project = new gd.Project();
+
+    const eventExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const eventBehavior = eventExtension
+      .getEventsBasedBehaviors()
+      .insertNew('MyBehavior', 0);
+    const properties = eventBehavior.getPropertyDescriptors();
+    const rootFolder = properties.getRootFolder();
+    properties.insertNewPropertyInFolder(
+      'Speed',
+      rootFolder.insertNewFolder('Movement', 0),
+      0
+    );
+    properties.insertNewPropertyInFolder(
+      'Color',
+      rootFolder.insertNewFolder('Appearance', 1),
+      0
+    );
+    properties.insertNewPropertyInFolder('Ungrouped', rootFolder, 2);
+    const sharedProperties = eventBehavior.getSharedPropertyDescriptors();
+    sharedProperties.insertNewPropertyInFolder(
+      'Gravity',
+      sharedProperties.getRootFolder().insertNewFolder('World', 0),
+      0
+    );
+
+    const behaviorMethodMangledNames = new gd.MapStringString();
+    gd.MetadataDeclarationHelper.generateBehaviorMetadata(
+      project,
+      extension,
+      eventExtension,
+      eventBehavior,
+      behaviorMethodMangledNames
+    );
+    behaviorMethodMangledNames.delete();
+
+    const behaviorMetadata = extension.getBehaviorMetadata('MyBehavior');
+    expect(behaviorMetadata.getPropertyGroups().toJSArray()).toEqual([
+      'Movement',
+      'Appearance',
+      'World',
+    ]);
+
+    extension.delete();
+    project.delete();
+  });
+
+  it('declares the property groups of an object in the order of their folders', () => {
+    const extension = new gd.PlatformExtension();
+    const project = new gd.Project();
+
+    const eventExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const eventsBasedObject = eventExtension
+      .getEventsBasedObjects()
+      .insertNew('MyObject', 0);
+    const properties = eventsBasedObject.getPropertyDescriptors();
+    const rootFolder = properties.getRootFolder();
+    properties.insertNewPropertyInFolder(
+      'Text',
+      rootFolder.insertNewFolder('Content', 0),
+      0
+    );
+    properties.insertNewPropertyInFolder(
+      'Color',
+      rootFolder.insertNewFolder('Appearance', 0),
+      0
+    );
+
+    const objectMethodMangledNames = new gd.MapStringString();
+    gd.MetadataDeclarationHelper.generateObjectMetadata(
+      project,
+      extension,
+      eventExtension,
+      eventsBasedObject,
+      objectMethodMangledNames
+    );
+    objectMethodMangledNames.delete();
+
+    const objectMetadata = extension.getObjectMetadata('MyObject');
+    expect(objectMetadata.getPropertyGroups().toJSArray()).toEqual([
+      'Appearance',
+      'Content',
+    ]);
+
+    extension.delete();
+    project.delete();
+  });
+
   it('can create metadata for object actions', () => {
     const extension = new gd.PlatformExtension();
     const project = new gd.Project();

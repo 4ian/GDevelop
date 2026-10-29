@@ -121,6 +121,15 @@ gd::BehaviorMetadata &MetadataDeclarationHelper::DeclareBehaviorMetadata(
   if (eventsBasedBehavior.IsPrivate())
     behaviorMetadata.SetPrivate();
 
+  for (const auto &group :
+       GetPropertyGroups(eventsBasedBehavior.GetPropertyDescriptors())) {
+    behaviorMetadata.AddPropertyGroup(group);
+  }
+  for (const auto &group :
+       GetPropertyGroups(eventsBasedBehavior.GetSharedPropertyDescriptors())) {
+    behaviorMetadata.AddPropertyGroup(group);
+  }
+
   return behaviorMetadata;
 }
 
@@ -148,6 +157,10 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
           .SetAssetStoreTag(eventsBasedObject.GetAssetStoreTag())
           .AddDefaultBehavior("ResizableCapability::ResizableBehavior")
           .AddDefaultBehavior("FlippableCapability::FlippableBehavior");
+  for (const auto &group :
+       GetPropertyGroups(eventsBasedObject.GetPropertyDescriptors())) {
+    objectMetadata.AddPropertyGroup(group);
+  }
   if (!eventsBasedObject.IsInnerAreaFollowingParentSize()) {
     objectMetadata
           .AddDefaultBehavior("ScalableCapability::ScalableBehavior");
@@ -1868,6 +1881,19 @@ gd::ObjectMetadata &MetadataDeclarationHelper::GenerateObjectMetadata(
   UpdateCustomObjectDefaultBehaviors(project, objectMetadata);
 
   return objectMetadata;
+}
+
+std::vector<gd::String> MetadataDeclarationHelper::GetPropertyGroups(
+    const gd::PropertiesContainer &properties) {
+  std::vector<gd::String> groups;
+  const auto &rootFolder = properties.GetRootFolder();
+  for (std::size_t i = 0; i < rootFolder.GetChildrenCount(); ++i) {
+    const auto &child = rootFolder.GetChildAt(i);
+    if (child.IsFolder()) {
+      groups.push_back(child.GetFolderName());
+    }
+  }
+  return groups;
 }
 
 gd::String MetadataDeclarationHelper::GetFunctionGroup(

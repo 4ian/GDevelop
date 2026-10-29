@@ -338,6 +338,19 @@ class GD_CORE_API BehaviorMetadata : public InstructionOrExpressionContainerMeta
   }
 
   /**
+   * \brief Add a group of properties. Editors show the added groups first, in
+   * this order, then the other groups sorted alphabetically.
+   */
+  BehaviorMetadata &AddPropertyGroup(const gd::String& group) {
+    propertyGroups.push_back(group);
+    return *this;
+  }
+
+  const std::vector<gd::String>& GetPropertyGroups() const {
+    return propertyGroups;
+  }
+
+  /**
    * \brief Return the associated gd::Behavior, handling behavior contents.
    *
    * \note Returns a dumb Behavior for events based behaviors as CustomBehavior
@@ -417,6 +430,7 @@ class GD_CORE_API BehaviorMetadata : public InstructionOrExpressionContainerMeta
   bool isRelevantForChildObjects = true;
   bool isActivatedByDefaultInEditor = false;
   gd::String openFullEditorLabel;
+  std::vector<gd::String> propertyGroups;
 
   // TODO: Nitpicking: convert these to std::unique_ptr to clarify ownership.
   std::shared_ptr<gd::Behavior> instance;

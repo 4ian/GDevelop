@@ -452,8 +452,12 @@ const CustomObjectPropertiesEditor = (props: Props): React.Node => {
         visibility: 'All',
         layersContainer: null,
         shouldDisabledFieldsWithMixedValues: false,
+        propertyGroups: gd.MetadataProvider.getObjectMetadata(
+          project.getCurrentPlatform(),
+          customObjectConfiguration.getType()
+        ).getPropertyGroups(),
       }),
-    [customObjectConfiguration, customObjectEventsBasedObject, object]
+    [customObjectConfiguration, customObjectEventsBasedObject, object, project]
   );
 
   return (

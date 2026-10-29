@@ -545,6 +545,8 @@ type CommonProps = {|
   visibility?: 'All' | 'Basic' | 'Advanced' | 'Deprecated',
   showcaseNonDefaultValues?: boolean,
   hideResourceProperties?: boolean,
+  /** The groups to show first, in this order (from the object or behavior metadata). */
+  propertyGroups?: ?gdVectorString,
 |};
 
 export const effectPropertiesMapToSchema = ({
@@ -618,6 +620,7 @@ const propertiesMapToSchema = ({
   showcaseNonDefaultValues,
   hideResourceProperties,
   shouldDisabledFieldsWithMixedValues,
+  propertyGroups,
 }: {
   ...CommonProps,
   getPropertyValue: (instance: Instance, propertyName: string) => string,
@@ -639,6 +642,7 @@ const propertiesMapToSchema = ({
     showcaseNonDefaultValues,
     hideResourceProperties,
     shouldDisabledFieldsWithMixedValues,
+    propertyGroups,
     getNumberValue: (instance: Instance, propertyName: string): number => {
       // Consider a missing value as 0 to avoid propagating NaN.
       return parseFloat(getPropertyValue(instance, propertyName)) || 0;
@@ -676,6 +680,7 @@ const adaptablePropertiesMapToSchema = ({
   setStringValue,
   setBooleanValue,
   shouldDisabledFieldsWithMixedValues,
+  propertyGroups,
 }: {|
   ...CommonProps,
   properties: gdMapStringPropertyDescriptor,
@@ -774,10 +779,7 @@ const adaptablePropertiesMapToSchema = ({
         if (
           rowProperties.every(
             property => property.getGroup() === rowProperties[0].getGroup()
-          ) &&
-          // Resource selectors are wide (text field + thumbnail), so always
-          // give them a full line instead of squeezing them in a row.
-          !rowProperties.some(property => property.getType() === 'resource')
+          )
         ) {
           const rowFields: Field[] = [];
           for (
@@ -815,11 +817,19 @@ const adaptablePropertiesMapToSchema = ({
             }
           }
           if (rowFields.length === rowProperties.length) {
-            field = {
-              name: rowPropertyNames.join('-'),
-              type: 'row',
-              children: rowFields,
-            };
+            // Resource selectors are wide (text field + thumbnail), so always
+            // give them a full line instead of squeezing them in a row.
+            if (
+              rowProperties.some(property => property.getType() === 'resource')
+            ) {
+              fields.push(...rowFields);
+            } else {
+              field = {
+                name: rowPropertyNames.join('-'),
+                type: 'row',
+                children: rowFields,
+              };
+            }
             rowPropertyNames.forEach(propertyName => {
               alreadyHandledProperties.add(propertyName);
             });
@@ -829,7 +839,7 @@ const adaptablePropertiesMapToSchema = ({
         }
       }
     }
-    if (!field) {
+    if (!field && !alreadyHandledProperties.has(name)) {
       field = createField(
         name,
         property,
@@ -857,9 +867,15 @@ const adaptablePropertiesMapToSchema = ({
   });
   // A group name can contain a sub-group, like "Collision filtering > If static":
   // its fields are shown in a titled section inside the group. Sub-groups keep
-  // the order of their first property.
+  // the order of their first property, after the fields of the group itself
+  // (otherwise these fields would look like they belong to the sub-group above them).
   const fieldsByTopGroups = new Map<string, Array<Field>>();
-  for (const [groupName, fields] of fieldsByGroups) {
+  const groupsThenSubgroups = [...fieldsByGroups].sort(
+    ([a], [b]) =>
+      Number(a.includes(subgroupSeparator)) -
+      Number(b.includes(subgroupSeparator))
+  );
+  for (const [groupName, fields] of groupsThenSubgroups) {
     const separatorIndex = groupName.indexOf(subgroupSeparator);
     const topGroupName =
       separatorIndex === -1 ? groupName : groupName.slice(0, separatorIndex);
@@ -893,8 +909,15 @@ const adaptablePropertiesMapToSchema = ({
     return defaultGroupField;
   }
   // Create a group for the default one too because it would look weird with the indentation.
-  const groupNames = [...fieldsByTopGroups.keys()].sort((a, b) =>
-    a.localeCompare(b)
+  const orderedGroupNames = propertyGroups ? propertyGroups.toJSArray() : [];
+  const getGroupPosition = (groupName: string): number => {
+    // The default group stays first.
+    if (!groupName) return -1;
+    const position = orderedGroupNames.indexOf(groupName);
+    return position === -1 ? orderedGroupNames.length : position;
+  };
+  const groupNames = [...fieldsByTopGroups.keys()].sort(
+    (a, b) => getGroupPosition(a) - getGroupPosition(b) || a.localeCompare(b)
   );
   return groupNames.map(groupName => ({
     name: groupName,

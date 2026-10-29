@@ -96,6 +96,7 @@ export const CompactBehaviorPropertiesEditor = ({
         layersContainer,
         visibility: 'All',
         shouldDisabledFieldsWithMixedValues: true,
+        propertyGroups: behaviorMetadata.getPropertyGroups(),
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps

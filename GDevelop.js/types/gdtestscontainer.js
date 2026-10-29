@@ -8,6 +8,7 @@ declare class gdTestsContainer {
   removeTest(name: string): void;
   clearTests(): void;
   moveTest(oldIndex: number, newIndex: number): void;
+  getRootFolder(): gdTestFolderOrTest;
   getTestsCount(): number;
   getTestPosition(test: gdTest): number;
   delete(): void;

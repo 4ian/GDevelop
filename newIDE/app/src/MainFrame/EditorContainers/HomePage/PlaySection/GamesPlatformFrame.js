@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
+import PreferencesContext from '../../../Preferences/PreferencesContext';
 import { homepageMobileMenuHeight } from '../HomePageMenuBar';
 import Paper from '../../../../UI/Paper';
 import { type IframePosition } from './UseGamesPlatformFrame';
@@ -40,6 +41,7 @@ const GamesPlatformFrame = ({
 }: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const paletteType = gdevelopTheme.palette.type;
+  const { language } = React.useContext(PreferencesContext).values;
 
   // Use a ref to store the initial game id, as we don't want to trigger a re-render
   // when the game id changes.
@@ -52,6 +54,8 @@ const GamesPlatformFrame = ({
     gdGamesHost
   );
   if (gameId.current) url.searchParams.set('theme', paletteType);
+  // gd.games is displayed in the language of the editor, when it supports it.
+  url.searchParams.set('language', language);
 
   const src = loaded ? url.toString() : '';
 

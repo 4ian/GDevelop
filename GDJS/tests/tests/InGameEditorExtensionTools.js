@@ -15,11 +15,6 @@ describe('Tools of extensions in the in-game editor', function () {
     runtimeGame = null;
     gameContainer = null;
     clock = null;
-    for (const side of ['left', 'right', 'top']) {
-      document.documentElement.style.removeProperty(
-        '--in-game-editor-visible-area-' + side
-      );
-    }
   });
 
   /** @type {LayoutData} */

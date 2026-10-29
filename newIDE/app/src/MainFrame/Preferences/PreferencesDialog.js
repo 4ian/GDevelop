@@ -609,7 +609,7 @@ const PreferencesDialog = ({
           {
             id: 'live-mcp-server',
             label: i18n._(
-              t`Let AI agents (Claude Code, Cursor...) connect to the editor and edit the opened project`
+              t`Let AI agents (Claude Code, Cursor...) connect to the editor and edit the opened project (experimental)`
             ),
             renderControl: () =>
               renderToggle(liveMcpServerStatus.enabled, enabled => {

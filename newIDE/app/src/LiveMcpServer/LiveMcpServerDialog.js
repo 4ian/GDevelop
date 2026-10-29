@@ -125,6 +125,12 @@ const LiveMcpServerDialog = ({
       ]}
     >
       <ColumnStackLayout noMargin>
+        <AlertMessage kind="warning">
+          <Trans>
+            This is an experimental feature: it may change, and some tools may
+            not work as expected with every agent.
+          </Trans>
+        </AlertMessage>
         <Text noMargin>
           <Trans>
             AI agents like Claude Code, Cursor or Codex can connect to GDevelop

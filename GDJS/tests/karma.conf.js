@@ -123,8 +123,6 @@ module.exports = function (config) {
       // which is resolved relatively to the page, not to the script.
       '/jolt-physics.wasm.js': `/base/${gdjsRuntimePath}/Extensions/Physics3DBehavior/jolt-physics.wasm.js`,
       '/jolt-physics.wasm.wasm': `/base/${gdjsRuntimePath}/Extensions/Physics3DBehavior/jolt-physics.wasm.wasm`,
-      // Loaded by the tests of the in-game editor only (see below).
-      '/in-game-editor.js': `/base/${gdjsRuntimePath}/InGameEditor/InGameEditor.js`,
     },
     files: [
       './GDJS/tests/node_modules/expect.js/index.js',
@@ -256,12 +254,7 @@ module.exports = function (config) {
       `${gdjsRuntimePath}/Extensions/3D/N8AOEffect.js`,
       `${gdjsRuntimePath}/Extensions/3D/DirectionalLight.js`,
       `${gdjsRuntimePath}/Extensions/3D/Scene3DTools.js`,
-      // Loaded only by the tests of the in-game editor, as it replaces the
-      // objects of unknown types.
-      {
-        pattern: `${gdjsRuntimePath}/InGameEditor/InGameEditor.js`,
-        included: false,
-      },
+      `${gdjsRuntimePath}/InGameEditor/InGameEditor.js`,
       {
         pattern: `${gdjsRuntimePath}/Extensions/Physics3DBehavior/jolt-physics.wasm.js`,
         watched: true,

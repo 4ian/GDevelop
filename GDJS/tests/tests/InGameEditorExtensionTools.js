@@ -8,16 +8,6 @@ describe('Tools of extensions in the in-game editor', function () {
   /** @type {sinon.SinonFakeTimers | null} */
   let clock = null;
 
-  before(async () => {
-    await new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = '/in-game-editor.js';
-      script.onload = resolve;
-      script.onerror = reject;
-      document.head.appendChild(script);
-    });
-  });
-
   afterEach(() => {
     if (runtimeGame) runtimeGame.dispose(true);
     if (gameContainer) gameContainer.remove();
@@ -25,11 +15,6 @@ describe('Tools of extensions in the in-game editor', function () {
     runtimeGame = null;
     gameContainer = null;
     clock = null;
-    for (const side of ['left', 'right', 'top']) {
-      document.documentElement.style.removeProperty(
-        '--in-game-editor-visible-area-' + side
-      );
-    }
   });
 
   /** @type {LayoutData} */

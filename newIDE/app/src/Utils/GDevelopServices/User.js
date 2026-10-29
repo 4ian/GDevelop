@@ -10,6 +10,7 @@ import Reddit from '../../UI/CustomSvgIcons/Reddit';
 import Snapchat from '../../UI/CustomSvgIcons/Snapchat';
 import TikTok from '../../UI/CustomSvgIcons/TikTok';
 import Twitter from '../../UI/CustomSvgIcons/Twitter';
+import Bluesky from '../../UI/CustomSvgIcons/Bluesky';
 import YouTube from '../../UI/CustomSvgIcons/YouTube';
 import GitHub from '../../UI/CustomSvgIcons/GitHub';
 import { GDevelopUserApi } from './ApiConfigs';
@@ -37,6 +38,7 @@ export type CommunityLinkType =
   | 'personalWebsiteLink'
   | 'personalWebsite2Link'
   | 'twitterUsername'
+  | 'blueskyUsername'
   | 'facebookUsername'
   | 'youtubeUsername'
   | 'tiktokUsername'
@@ -49,6 +51,7 @@ export type CommunityLinks = {|
   personalWebsiteLink?: string,
   personalWebsite2Link?: string,
   twitterUsername?: string,
+  blueskyUsername?: string,
   facebookUsername?: string,
   youtubeUsername?: string,
   tiktokUsername?: string,
@@ -820,6 +823,11 @@ export const communityLinksConfig = {
   facebookUsername: {
     icon: (<Facebook />: React.Node),
     prefix: 'https://facebook.com/',
+    maxLength: 50,
+  },
+  blueskyUsername: {
+    icon: (<Bluesky />: React.Node),
+    prefix: 'https://bsky.app/profile/',
     maxLength: 50,
   },
   youtubeUsername: {

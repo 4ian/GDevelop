@@ -2375,6 +2375,7 @@ namespace gdjs {
         this._selectionControls2D.remove();
         this._selectionControls = this._selectionControls3D;
       }
+      this._editorGrid.setVisible(false);
       this._editorGrid.setSettings(this._instancesEditorSettings);
     }
 
@@ -5362,6 +5363,8 @@ namespace gdjs {
     isVisible = true;
     normal: 'Z' | 'Y' | 'X' = 'Z';
     position = new THREE.Vector3();
+    divisionsCount = 10;
+    editorMode: '3d-editor' | '2d-editor' = '3d-editor';
 
     isForcefullyHidden = true;
     gridWidth: float = 0;
@@ -5396,6 +5399,18 @@ namespace gdjs {
       this.gridAlpha = instancesEditorSettings.gridAlpha;
       this.isSnappingEnabledByDefault = instancesEditorSettings.snap;
       this.gridType = instancesEditorSettings.gridType;
+      this.divisionsCount = 10;
+      this.editorMode = instancesEditorSettings.editorMode;
+      this.rebuildGrid();
+    }
+
+    setDivisionsCount(divisionsCount: integer): void {
+      // Make sure the there is a line at the center.
+      divisionsCount = Math.ceil(divisionsCount / 2) * 2;
+      if (this.divisionsCount === divisionsCount) {
+        return;
+      }
+      this.divisionsCount = divisionsCount;
       this.rebuildGrid();
     }
 
@@ -5403,13 +5418,21 @@ namespace gdjs {
       this.gridHelper.removeFromParent();
       this.gridHelper.dispose();
       this.gridHelper = new THREE.GridHelper(
-        10,
-        10,
+        this.divisionsCount,
+        this.divisionsCount,
         this.gridColor,
         this.gridColor
       );
       this.gridHelper.material.transparent = true;
       this.gridHelper.material.opacity = this.gridAlpha;
+      this.gridHelper.material.fog = false;
+      if (this.editorMode === '2d-editor') {
+        this.gridHelper.material.depthTest = false;
+        this.gridHelper.renderOrder = Number.MAX_SAFE_INTEGER;
+      } else {
+        this.gridHelper.material.depthTest = true;
+        this.gridHelper.renderOrder = 0;
+      }
       this.gridHelper.rotation.order = 'ZYX';
       this.updateVisibility();
       this.updateLocation();
@@ -7679,18 +7702,16 @@ namespace gdjs {
     }
 
     update(): void {
-      const selectedObjects = this.editor.getSelectedObjects();
-      if (selectedObjects.length === 0) {
-        this.remove();
+      const currentScene = this.editor.getCurrentScene();
+      if (!currentScene) {
         return;
       }
-      const cameraLayer = this.editor._getCameraLayer(
-        selectedObjects[0].getLayer()
-      );
-      if (!cameraLayer) {
+      const topLayer =
+        currentScene._orderedLayers[currentScene._orderedLayers.length - 1];
+      if (!topLayer) {
         return;
       }
-      const runtimeLayerRender = cameraLayer ? cameraLayer.getRenderer() : null;
+      const runtimeLayerRender = topLayer ? topLayer.getRenderer() : null;
       const threeCamera = runtimeLayerRender
         ? runtimeLayerRender.getThreeCamera()
         : null;
@@ -7700,19 +7721,37 @@ namespace gdjs {
       if (!threeCamera || !threeScene) {
         return;
       }
-      threeScene.add(this.selectionHandle);
-      this._isShown = true;
 
       // Update the grid.
       const editorGrid = this.editor.getEditorGrid();
       editorGrid.setNormal('Z');
-      editorGrid.setPosition(
-        this.selectionHandle.getCenterX(),
-        this.selectionHandle.getCenterY(),
-        0
-      );
+      const game = this.editor.getRuntimeGame();
+      let cameraCenter: FloatPoint | null = [
+        game.getGameResolutionWidth() / 2,
+        game.getGameResolutionHeight() / 2,
+      ];
+      cameraCenter = this.editor._getProjectedPoint(cameraCenter);
+      if (cameraCenter) {
+        editorGrid.setPosition(cameraCenter[0], cameraCenter[1], 0);
+      }
       editorGrid.setTreeScene(threeScene);
       editorGrid.setVisible(true);
+      editorGrid.setDivisionsCount(
+        Math.floor(
+          Math.max(
+            game.getGameResolutionWidth() / editorGrid.gridHeight,
+            game.getGameResolutionHeight() / editorGrid.gridWidth
+          )
+        ) + 1
+      );
+
+      const selectedObjects = this.editor.getSelectedObjects();
+      if (selectedObjects.length === 0) {
+        this.remove();
+        return;
+      }
+      threeScene.add(this.selectionHandle);
+      this._isShown = true;
     }
 
     remove(): void {
@@ -8248,7 +8287,7 @@ namespace gdjs {
         const hasRotatedInstance = areAnyInstancesNotStraight(
           editor.getSelectedObjects() as Array<gdjs.RuntimeObject>
         );
-        const proportional = isShiftPressed(inputManager);;
+        const proportional = isShiftPressed(inputManager);
 
         // Applying a rotation then a scaling can result to
         // an affine transformation with a shear transformation - which we don't want.

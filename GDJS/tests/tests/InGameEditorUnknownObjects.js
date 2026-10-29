@@ -50,34 +50,23 @@ describe('Objects of unknown types in the in-game editor', function () {
     return runtimeScene;
   };
 
-  it('shows a placeholder for an object whose type does not exist', () => {
+  it('shows a placeholder for missing objects and object types', () => {
     const runtimeScene = createScene({ isInGameEdition: true });
 
-    const instance = runtimeScene.createObject('MyUnknownTypeObject');
-
-    expect(instance).to.be.a(gdjs.RuntimeObject3D);
+    expect(runtimeScene.createObject('MyUnknownTypeObject')).to.be.a(
+      gdjs.RuntimeObject3D
+    );
+    expect(runtimeScene.createObject('MyMissingObject')).to.be.a(
+      gdjs.RuntimeObject3D
+    );
   });
 
-  it('shows a placeholder for an object that does not exist', () => {
-    const runtimeScene = createScene({ isInGameEdition: true });
-
-    const instance = runtimeScene.createObject('MyMissingObject');
-
-    expect(instance).to.be.a(gdjs.RuntimeObject3D);
-  });
-
-  it('creates an empty object for an object whose type does not exist in a game', () => {
+  it("doesn't show a placeholder in a game", () => {
     const runtimeScene = createScene({ isInGameEdition: false });
 
     const instance = runtimeScene.createObject('MyUnknownTypeObject');
-
     if (!instance) throw new Error("Couldn't create an instance for testing.");
     expect(instance.constructor).to.be(gdjs.RuntimeObject);
-  });
-
-  it("doesn't create an object that does not exist in a game", () => {
-    const runtimeScene = createScene({ isInGameEdition: false });
-
     expect(runtimeScene.createObject('MyMissingObject')).to.be(null);
   });
 });

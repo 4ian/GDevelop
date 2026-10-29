@@ -20,6 +20,9 @@ import { prepareAiUserContent } from './PrepareAiUserContent';
 
 const gd: libGDevelop = global.gd;
 
+export const notLoggedInErrorMessage =
+  'Not logged in to GDevelop: this uses the GDevelop online services, ask the user to log in to their GDevelop account in the editor.';
+
 type UseGenerateEventsReturnType = {
   generateEvents: ({
     eventsDescription: string | null,
@@ -28,7 +31,7 @@ type UseGenerateEventsReturnType = {
     extensionNamesList: string,
     objectsList: string,
     placementHint: string | null,
-    relatedAiRequestId: string,
+    relatedAiRequestId: string | null,
     scope: ToolScope,
     functionName: string | null,
     sceneName: string,
@@ -67,11 +70,11 @@ export const useGenerateEvents = ({
       objectsList: string,
       existingEventsJson: string | null,
       placementHint: string | null,
-      relatedAiRequestId: string,
+      relatedAiRequestId: string | null,
       estimatedComplexity: number | null,
     |}): Promise<EventsGenerationResult> => {
       if (!project) throw new Error('No project is opened.');
-      if (!profile) throw new Error('User should be authenticated.');
+      if (!profile) throw new Error(notLoggedInErrorMessage);
 
       const simplifiedProjectBuilder = makeSimplifiedProjectBuilder(gd);
       const simplifiedProjectJson = JSON.stringify(

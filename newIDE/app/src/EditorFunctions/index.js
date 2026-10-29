@@ -474,7 +474,7 @@ export type EventsGenerationOptions = {|
   objectsList: string,
   existingEventsJson: string | null,
   placementHint: string | null,
-  relatedAiRequestId: string,
+  relatedAiRequestId: string | null,
   estimatedComplexity: number | null,
 |};
 
@@ -7739,12 +7739,6 @@ const addSceneEvents: EditorFunction = {
       };
     };
 
-    if (!relatedAiRequestId) {
-      return makeGenericFailure(
-        'No related AI request ID found for events generation.'
-      );
-    }
-
     // A refused call (unknown scene or function, extension of the store...)
     // regenerates nothing: the target is checked first.
     const checkedEventsTarget = resolveEventsTarget();
@@ -7964,8 +7958,24 @@ const addSceneEvents: EditorFunction = {
           'No events description/events script provided for some event batches. Provide one for each event(s) to generate.'
         );
       }
+      // Outside the GDevelop AI (no AI request), the events scripts are only
+      // compiled: no agent writes events from a description.
+      if (
+        !relatedAiRequestId &&
+        parsedEventBatches.some(
+          batch => !batch.eventScript && batch.placementRelation !== 'delete'
+        )
+      ) {
+        return makeGenericFailure(
+          'Without the GDevelop AI, events are only compiled from `event_script`: give one for each batch (an `events_description` alone is not handled).'
+        );
+      }
     } else if (!eventsDescription) {
       return makeGenericFailure('No events description provided.');
+    } else if (!relatedAiRequestId) {
+      return makeGenericFailure(
+        'Without the GDevelop AI, events are only compiled from `event_script` batches: use `event_batches`.'
+      );
     }
 
     try {

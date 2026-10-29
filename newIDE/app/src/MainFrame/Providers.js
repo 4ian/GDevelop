@@ -45,6 +45,7 @@ import { MarketingPlansStoreStateProvider } from '../MarketingPlans/MarketingPla
 import { CourseStoreStateProvider } from '../Course/CourseStoreContext';
 import { Resource3DPreviewProvider } from '../ResourcesList/ResourcePreview/Resource3DPreviewContext';
 import { AiRequestProvider } from '../AiGeneration/AiRequestContext';
+import { LiveMcpServerProvider } from '../LiveMcpServer/LiveMcpServerContext';
 
 type Props = {|
   authentication: Authentication,
@@ -129,11 +130,13 @@ const Providers = ({
                                                                       <PrivateAssetsAuthorizationProvider>
                                                                         <Resource3DPreviewProvider>
                                                                           <AiRequestProvider>
-                                                                            {children(
-                                                                              {
-                                                                                i18n,
-                                                                              }
-                                                                            )}
+                                                                            <LiveMcpServerProvider>
+                                                                              {children(
+                                                                                {
+                                                                                  i18n,
+                                                                                }
+                                                                              )}
+                                                                            </LiveMcpServerProvider>
                                                                           </AiRequestProvider>
                                                                         </Resource3DPreviewProvider>
                                                                       </PrivateAssetsAuthorizationProvider>

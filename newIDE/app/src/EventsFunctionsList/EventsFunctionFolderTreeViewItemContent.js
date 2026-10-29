@@ -26,7 +26,10 @@ import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import newNameGenerator from '../Utils/NewNameGenerator';
-import { getOrCreateChildFolder, removeSubFolders } from '../Utils/Folders';
+import {
+  getOrCreateChildFolder,
+  removeFolderAndSubFolders,
+} from '../Utils/Folders';
 
 const gd: libGDevelop = global.gd;
 
@@ -506,8 +509,7 @@ export class EventsFunctionFolderTreeViewItemContent
     if (functionsToDelete.length === 0) {
       // Folder is empty or contains only empty folders.
       setSelectedFunctionFolderOrFunction(null);
-      removeSubFolders(this.functionFolder);
-      this.functionFolder.getParent().removeFolderChild(this.functionFolder);
+      removeFolderAndSubFolders(this.functionFolder);
       forceUpdateList();
       return;
     }
@@ -537,8 +539,7 @@ export class EventsFunctionFolderTreeViewItemContent
     for (const functionToDelete of functionsToDelete) {
       eventsFunctionsContainer.removeEventsFunction(functionToDelete.getName());
     }
-    removeSubFolders(this.functionFolder);
-    this.functionFolder.getParent().removeFolderChild(this.functionFolder);
+    removeFolderAndSubFolders(this.functionFolder);
     this._onProjectItemModified();
   }
 

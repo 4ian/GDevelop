@@ -6,6 +6,9 @@ interface FolderOrItem {
   isFolder(): boolean;
   removeFolderChild(childToRemove: any): void;
 }
+interface FolderWithParent extends FolderOrItem {
+  getParent(): FolderOrItem;
+}
 interface FolderOrItemForGetOrCreate {
   getOrCreateChildFolder(name: string): any;
 }
@@ -30,4 +33,13 @@ export const removeSubFolders = (folder: FolderOrItem): void => {
       folder.removeFolderChild(child);
     }
   }
+};
+
+/**
+ * Remove a folder from its parent, with its sub folders. The folder must not
+ * hold any item anymore: it can only be removed once empty.
+ */
+export const removeFolderAndSubFolders = (folder: FolderWithParent): void => {
+  removeSubFolders(folder);
+  folder.getParent().removeFolderChild(folder);
 };

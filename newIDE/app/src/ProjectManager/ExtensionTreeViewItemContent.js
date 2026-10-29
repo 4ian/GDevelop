@@ -15,6 +15,7 @@ import {
   type TreeItemProps,
   extensionsRootFolderId,
 } from '.';
+import { type ProjectItemFolderOrItem } from './ProjectItemFolders';
 import { isExtensionNameTaken } from './EventFunctionExtensionNameVerifier';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 
@@ -64,6 +65,10 @@ export class ExtensionTreeViewItemContent implements TreeViewItemContent {
 
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
     return itemContent.getId() === extensionsRootFolderId;
+  }
+
+  getFolderOrItem(): ?ProjectItemFolderOrItem {
+    return null;
   }
 
   getRootId(): string {

@@ -147,6 +147,7 @@ import {
 } from './UpdaterTools';
 import ChangelogDialogContainer from './Changelog/ChangelogDialogContainer';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+import { type ShowConfirmDeleteDialogOptions } from '../UI/Alert/AlertContext';
 import { getNotNullTranslationFunction } from '../Utils/i18n/getTranslationFunction';
 import { type I18n } from '@lingui/core';
 import { t } from '@lingui/macro';
@@ -1791,94 +1792,228 @@ const MainFrame = (props: Props): React.MixedElement => {
     [openProjectManager]
   );
 
-  const deleteLayout = (layout: gdLayout) => {
-    const { currentProject } = state;
-    const { i18n } = props;
-    if (!currentProject) return;
-
-    const answer = Window.showConfirmDialog(
-      i18n._(
-        t`Are you sure you want to remove this scene? This can't be undone.`
-      )
+  /**
+   * Ask before removing project items, like the objects list: one sentence for
+   * a single item, for several items or for a folder and its content.
+   */
+  const confirmItemsRemoval = ({
+    count,
+    folderName,
+    single,
+    several,
+    folder,
+  }: {|
+    count: number,
+    folderName: ?string,
+    single: ShowConfirmDeleteDialogOptions,
+    several: ShowConfirmDeleteDialogOptions,
+    folder: ShowConfirmDeleteDialogOptions,
+  |}): Promise<boolean> =>
+    showDeleteConfirmation(
+      folderName != null ? folder : count === 1 ? single : several
     );
-    if (!answer) return;
 
-    onWillDeleteScene({ scene: layout }).then(() => {
-      if (currentProject.getFirstLayout() === layout.getName())
-        currentProject.setFirstLayout('');
-      currentProject.removeLayout(layout.getName());
-      _onProjectItemModified();
+  /** Where the removed items come from, to say it when confirming. */
+  type ItemsRemovalOptions = {| folderName?: string |};
+
+  /** Resolves to true once removed, false if the user did not confirm. */
+  const deleteLayouts = async (
+    layouts: Array<gdLayout>,
+    { folderName }: ItemsRemovalOptions = {}
+  ): Promise<boolean> => {
+    const { currentProject } = state;
+    if (!currentProject || layouts.length === 0) return false;
+
+    const names = layouts.map(layout => layout.getName());
+    const answer = await confirmItemsRemoval({
+      count: names.length,
+      folderName,
+      single: {
+        title: t`Remove scene`,
+        message: t`Are you sure you want to remove this scene? This can't be undone.`,
+      },
+      several: {
+        title: t`Remove scenes`,
+        message: t`Are you sure you want to remove these ${
+          names.length
+        } scenes? This can't be undone.`,
+      },
+      folder: {
+        title: t`Remove folder and scenes`,
+        message: t`Are you sure you want to remove this folder and all its content (scenes ${names.join(
+          ', '
+        )})? This can't be undone.`,
+      },
     });
+    if (!answer) return false;
+
+    // One after the other: each scene closes its own editors first.
+    return layouts
+      .reduce(
+        (previousDeletion, layout) =>
+          previousDeletion
+            .then(() => onWillDeleteScene({ scene: layout }))
+            .then(() => {
+              if (currentProject.getFirstLayout() === layout.getName())
+                currentProject.setFirstLayout('');
+              currentProject.removeLayout(layout.getName());
+            }),
+        Promise.resolve()
+      )
+      .then(() => {
+        _onProjectItemModified();
+        return true;
+      });
   };
 
-  const deleteExternalLayout = (externalLayout: gdExternalLayout) => {
-    const { currentProject } = state;
-    const { i18n } = props;
-    if (!currentProject) return;
+  /** Resolves to true once removed, false if the user did not confirm. */
+  const deleteExternalLayouts = async (
+    externalLayouts: Array<gdExternalLayout>,
+    { folderName }: ItemsRemovalOptions = {}
+  ): Promise<boolean> => {
+    if (!state.currentProject || externalLayouts.length === 0) return false;
 
-    const answer = Window.showConfirmDialog(
-      i18n._(
-        t`Are you sure you want to remove this external layout? This can't be undone.`
-      )
+    const names = externalLayouts.map(externalLayout =>
+      externalLayout.getName()
     );
-    if (!answer) return;
-
-    setState(state => ({
-      ...state,
-      editorTabs: closeExternalLayoutTabs(state.editorTabs, externalLayout),
-    })).then(state => {
-      if (state.currentProject)
-        state.currentProject.removeExternalLayout(externalLayout.getName());
-      _onProjectItemModified();
+    const answer = await confirmItemsRemoval({
+      count: names.length,
+      folderName,
+      single: {
+        title: t`Remove external layout`,
+        message: t`Are you sure you want to remove this external layout? This can't be undone.`,
+      },
+      several: {
+        title: t`Remove external layouts`,
+        message: t`Are you sure you want to remove these ${
+          names.length
+        } external layouts? This can't be undone.`,
+      },
+      folder: {
+        title: t`Remove folder and external layouts`,
+        message: t`Are you sure you want to remove this folder and all its content (external layouts ${names.join(
+          ', '
+        )})? This can't be undone.`,
+      },
     });
-  };
+    if (!answer) return false;
 
-  const deleteExternalEvents = (externalEvents: gdExternalEvents) => {
-    const { i18n } = props;
-    if (!state.currentProject) return;
-
-    const answer = Window.showConfirmDialog(
-      i18n._(
-        t`Are you sure you want to remove these external events? This can't be undone.`
-      )
-    );
-    if (!answer) return;
-
-    setState(state => ({
+    return setState(state => ({
       ...state,
-      editorTabs: closeExternalEventsTabs(state.editorTabs, externalEvents),
-    })).then(state => {
-      if (state.currentProject)
-        state.currentProject.removeExternalEvents(externalEvents.getName());
-      _onProjectItemModified();
-    });
-  };
-
-  const deleteGameplayTest = (scope: GameplayTestScope, test: gdTest) => {
-    const { i18n } = props;
-    const { currentProject } = state;
-    if (!currentProject) return;
-
-    const answer = Window.showConfirmDialog(
-      i18n._(
-        t`Are you sure you want to remove this gameplay test? This can't be undone.`
-      )
-    );
-    if (!answer) return;
-
-    const testName = test.getName();
-    setState(state => ({
-      ...state,
-      editorTabs: closeGameplayTestTabs(
-        state.editorTabs,
-        getGameplayTestProjectItemName(scope, testName)
+      editorTabs: externalLayouts.reduce(
+        (editorTabs, externalLayout) =>
+          closeExternalLayoutTabs(editorTabs, externalLayout),
+        state.editorTabs
       ),
     })).then(state => {
-      if (!state.currentProject) return;
-      const testsContainer = getTestsContainer(state.currentProject, scope);
-      if (testsContainer) testsContainer.removeTest(testName);
+      const { currentProject } = state;
+      if (currentProject)
+        names.forEach(name => currentProject.removeExternalLayout(name));
       _onProjectItemModified();
+      return true;
     });
+  };
+
+  /** Resolves to true once removed, false if the user did not confirm. */
+  const deleteExternalEventsList = async (
+    externalEventsList: Array<gdExternalEvents>,
+    { folderName }: ItemsRemovalOptions = {}
+  ): Promise<boolean> => {
+    if (!state.currentProject || externalEventsList.length === 0) return false;
+
+    const names = externalEventsList.map(externalEvents =>
+      externalEvents.getName()
+    );
+    const answer = await confirmItemsRemoval({
+      count: names.length,
+      folderName,
+      single: {
+        title: t`Remove external events`,
+        message: t`Are you sure you want to remove these external events? This can't be undone.`,
+      },
+      several: {
+        title: t`Remove external events`,
+        message: t`Are you sure you want to remove these ${
+          names.length
+        } external events? This can't be undone.`,
+      },
+      folder: {
+        title: t`Remove folder and external events`,
+        message: t`Are you sure you want to remove this folder and all its content (external events ${names.join(
+          ', '
+        )})? This can't be undone.`,
+      },
+    });
+    if (!answer) return false;
+
+    return setState(state => ({
+      ...state,
+      editorTabs: externalEventsList.reduce(
+        (editorTabs, externalEvents) =>
+          closeExternalEventsTabs(editorTabs, externalEvents),
+        state.editorTabs
+      ),
+    })).then(state => {
+      const { currentProject } = state;
+      if (currentProject)
+        names.forEach(name => currentProject.removeExternalEvents(name));
+      _onProjectItemModified();
+      return true;
+    });
+  };
+
+  /** Resolves to true once removed, false if the user did not confirm. */
+  const deleteGameplayTests = async (
+    scope: GameplayTestScope,
+    tests: Array<gdTest>,
+    { folderName }: ItemsRemovalOptions = {}
+  ): Promise<boolean> => {
+    if (!state.currentProject || tests.length === 0) return false;
+
+    const testNames = tests.map(test => test.getName());
+    const answer = await confirmItemsRemoval({
+      count: testNames.length,
+      folderName,
+      single: {
+        title: t`Remove gameplay test`,
+        message: t`Are you sure you want to remove this gameplay test? This can't be undone.`,
+      },
+      several: {
+        title: t`Remove gameplay tests`,
+        message: t`Are you sure you want to remove these ${
+          testNames.length
+        } gameplay tests? This can't be undone.`,
+      },
+      folder: {
+        title: t`Remove folder and gameplay tests`,
+        message: t`Are you sure you want to remove this folder and all its content (gameplay tests ${testNames.join(
+          ', '
+        )})? This can't be undone.`,
+      },
+    });
+    if (!answer) return false;
+
+    return setState(state => ({
+      ...state,
+      editorTabs: testNames.reduce(
+        (editorTabs, testName) =>
+          closeGameplayTestTabs(
+            editorTabs,
+            getGameplayTestProjectItemName(scope, testName)
+          ),
+        state.editorTabs
+      ),
+    })).then(state => {
+      if (!state.currentProject) return false;
+      const testsContainer = getTestsContainer(state.currentProject, scope);
+      if (testsContainer)
+        testNames.forEach(testName => testsContainer.removeTest(testName));
+      _onProjectItemModified();
+      return true;
+    });
+  };
+  const deleteGameplayTest = (scope: GameplayTestScope, test: gdTest) => {
+    deleteGameplayTests(scope, [test]);
   };
 
   const renameGameplayTest = (
@@ -6289,12 +6424,12 @@ const MainFrame = (props: Props): React.MixedElement => {
           onOpenLayout={(name, options) => openLayout(name, options)}
           onOpenExternalLayout={openExternalLayout}
           onOpenEventsFunctionsExtension={openEventsFunctionsExtension}
-          onDeleteLayout={deleteLayout}
-          onDeleteExternalLayout={deleteExternalLayout}
+          onDeleteLayouts={deleteLayouts}
+          onDeleteExternalLayouts={deleteExternalLayouts}
           onDeleteEventsFunctionsExtension={deleteEventsFunctionsExtension}
-          onDeleteExternalEvents={deleteExternalEvents}
-          onDeleteGameplayTest={(test: gdTest) =>
-            deleteGameplayTest({ type: 'project' }, test)
+          onDeleteExternalEventsList={deleteExternalEventsList}
+          onDeleteGameplayTests={(tests: Array<gdTest>, options) =>
+            deleteGameplayTests({ type: 'project' }, tests, options)
           }
           onRenameLayout={renameLayout}
           onRenameExternalLayout={renameExternalLayout}

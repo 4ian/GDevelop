@@ -2086,7 +2086,10 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                             selectedItems={selectedItems}
                             onSelectItems={(items, removedItems) => {
                               const itemToSelect = items[0];
-                              if (!itemToSelect) return;
+                              if (!itemToSelect) {
+                                setSelectedItems([]);
+                                return;
+                              }
                               if (itemToSelect.isRoot) return;
                               // A selection stays in one section: a Ctrl+click
                               // or Shift+click range reaching another section

@@ -6,21 +6,6 @@ describe('gdjs.InGameEditor.raycast', function () {
   /** @type {HTMLDivElement | null} */
   let gameContainer = null;
 
-  before(async () => {
-    await new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = '/in-game-editor.js';
-      script.onload = resolve;
-      script.onerror = reject;
-      document.head.appendChild(script);
-    });
-  });
-
-  after(() => {
-    // The in-game editor replaces the objects of unknown types.
-    gdjs.registerObject('', gdjs.RuntimeObject);
-  });
-
   afterEach(() => {
     if (runtimeGame) runtimeGame.dispose(true);
     if (gameContainer) gameContainer.remove();

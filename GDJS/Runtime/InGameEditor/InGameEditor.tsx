@@ -6933,7 +6933,7 @@ namespace gdjs {
       this._renderer.onDestroyed();
     }
   }
-  gdjs.registerObject('', UnknownRuntimeObject);
+  gdjs.registerObject(gdjs.inGameEditorUnknownObjectType, UnknownRuntimeObject);
 
   class UnknownRuntimeObjectRenderer extends gdjs.RuntimeObject3DRenderer {
     private _threeObject: THREE.Mesh;

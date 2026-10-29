@@ -6,9 +6,15 @@
 namespace gdjs {
   const logger = new gdjs.Logger('RuntimeInstanceContainer');
 
+  /**
+   * The type of the placeholder object registered by the in-game editor, used
+   * instead of the object types that don't exist.
+   */
+  export const inGameEditorUnknownObjectType = 'InGameEditor::UnknownObject';
+
   const unknownObjectData = {
     name: '',
-    type: '',
+    type: inGameEditorUnknownObjectType,
     variables: [],
     behaviors: [],
     effects: [],
@@ -45,6 +51,8 @@ namespace gdjs {
     /** Contains the objects data stored in the project */
     _objects: Hashtable<ObjectData>;
     _objectsCtor: Hashtable<typeof RuntimeObject>;
+    /** The in-game editor shows a placeholder for the object types that don't exist. */
+    private _isInGameEdition: boolean;
 
     _layers: Hashtable<RuntimeLayer>;
     _orderedLayers: RuntimeLayer[]; // TODO: should this be a single structure with _layers, to enforce its usage?
@@ -71,7 +79,8 @@ namespace gdjs {
       this._objectsCtor = new Hashtable();
       this._layers = new Hashtable();
       this._orderedLayers = [];
-      if (runtimeGame.isInGameEdition()) {
+      this._isInGameEdition = runtimeGame.isInGameEdition();
+      if (this._isInGameEdition) {
         // Register an UnknownRuntimeObject to use when the object doesn't exist.
         this.registerObject(unknownObjectData);
       }
@@ -278,7 +287,14 @@ namespace gdjs {
       this._instances.put(objectData.name, []);
 
       // Cache the constructor
-      const Ctor = gdjs.getObjectConstructor(objectData.type);
+      let objectType = objectData.type;
+      if (this._isInGameEdition && !gdjs.objectsTypes.containsKey(objectType)) {
+        logger.warn(
+          `Object type "${objectType}" was not found - using a placeholder object as a fallback.`
+        );
+        objectType = inGameEditorUnknownObjectType;
+      }
+      const Ctor = gdjs.getObjectConstructor(objectType);
       this._objectsCtor.put(objectData.name, Ctor);
 
       // Also prepare a cache for recycled instances, if the object supports it.

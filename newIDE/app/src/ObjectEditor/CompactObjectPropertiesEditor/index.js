@@ -28,7 +28,13 @@ import Add from '../../UI/CustomSvgIcons/Add';
 import Trash from '../../UI/CustomSvgIcons/Trash';
 import Edit from '../../UI/CustomSvgIcons/ShareExternal';
 import { useManageObjectBehaviors } from '../../BehaviorsEditor';
-import { getAllVisibleBehaviorNames } from '../../Utils/Behavior';
+import {
+  getAllVisibleBehaviorNames,
+  isObjectSynchronizedOverNetwork,
+  multiplayerObjectBehaviorType,
+} from '../../Utils/Behavior';
+import NetworkSynchronized from '../../UI/CustomSvgIcons/NetworkSynchronized';
+import NetworkNotSynchronized from '../../UI/CustomSvgIcons/NetworkNotSynchronized';
 import Object3d from '../../UI/CustomSvgIcons/Object3d';
 import Object2d from '../../UI/CustomSvgIcons/Object2d';
 import { mapFor } from '../../Utils/MapFor';
@@ -304,6 +310,7 @@ export const CompactObjectPropertiesEditor = ({
   const allVisibleBehaviors = allVisibleBehaviorNames.map(behaviorName =>
     object.getBehavior(behaviorName)
   );
+  const isSynchronizedOverNetwork = isObjectSynchronizedOverNetwork(object);
   const {
     openNewBehaviorDialog,
     newBehaviorDialog,
@@ -824,8 +831,31 @@ export const CompactObjectPropertiesEditor = ({
                         ) : null
                       }
                       title={behavior.getName()}
-                      titleBarButtons={
-                        isBehaviorListLocked
+                      titleBarButtons={[
+                        ...(isSynchronizedOverNetwork &&
+                        behaviorTypeName !== multiplayerObjectBehaviorType
+                          ? [
+                              {
+                                id: 'behavior-network-synchronization',
+                                icon: behavior.isSynchronizedOverNetwork()
+                                  ? NetworkSynchronized
+                                  : NetworkNotSynchronized,
+                                label: behavior.isSynchronizedOverNetwork()
+                                  ? t`Synchronized with other players`
+                                  : t`Not synchronized: only the owner's game runs it`,
+                                onClick: () => {
+                                  behavior.setSynchronizedOverNetwork(
+                                    !behavior.isSynchronizedOverNetwork()
+                                  );
+                                  if (unsavedChanges)
+                                    unsavedChanges.triggerUnsavedChanges();
+                                  onObjectsModified([object]);
+                                  forceUpdate();
+                                },
+                              },
+                            ]
+                          : []),
+                        ...(isBehaviorListLocked
                           ? []
                           : [
                               {
@@ -836,8 +866,8 @@ export const CompactObjectPropertiesEditor = ({
                                   removeBehavior(behavior.getName());
                                 },
                               },
-                            ]
-                      }
+                            ]),
+                      ]}
                     />
                   );
                 })}

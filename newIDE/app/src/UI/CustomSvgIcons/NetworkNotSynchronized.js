@@ -3,21 +3,19 @@ import SvgIcon from '@material-ui/core/SvgIcon';
 
 export default React.memo(
   React.forwardRef((props, ref) => (
-    <SvgIcon {...props} ref={ref} width="24" height="24" viewBox="0 0 24 24">
+    <SvgIcon {...props} ref={ref} width="16" height="16" viewBox="0 0 16 16">
       <g
         stroke="currentColor"
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth="1.5"
+        strokeWidth="1"
         fill="none"
       >
-        <rect x="1.25" y="10.25" width="9.5" height="7" rx="1.5" />
-        <path d="M6 17.25v2.5m-2 0h4" />
-        <rect x="13.25" y="10.25" width="9.5" height="7" rx="1.5" />
-        <path d="M18 17.25v2.5m-2 0h4" />
-        <path d="M6 7.75C6 5.6 7.4 4.1 9.25 3.55" />
-        <path d="M14.75 3.55C16.6 4.1 18 5.6 18 7.75" />
-        <path d="M10.75 5.75l2.5-4" />
+        <rect x="1.5" y="8" width="5.5" height="6" rx="1.25" />
+        <rect x="9" y="8" width="5.5" height="6" rx="1.25" />
+        <path d="M4.25 6C4.25 4.5 5.1 3.3 6.3 2.8" />
+        <path d="M9.7 2.8C10.9 3.3 11.75 4.5 11.75 6" />
+        <path d="M7.25 5l1.5-3" />
       </g>
     </SvgIcon>
   ))

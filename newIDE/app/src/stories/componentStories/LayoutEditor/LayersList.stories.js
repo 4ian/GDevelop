@@ -36,6 +36,10 @@ export const Default = (): React.Node => {
           onLayersVisibilityInEditorChanged={action(
             'onLayersVisibilityInEditorChanged'
           )}
+          areCollisionsShownInEditor={false}
+          onToggleCollisionsShownInEditor={action(
+            'onToggleCollisionsShownInEditor'
+          )}
           onEditLayer={action('onEditLayer')}
           onRemoveLayer={(layerName, cb) => {
             cb(true);
@@ -72,6 +76,10 @@ export const SmallWidthAndHeight = (): React.Node => {
           onLayersModified={action('onLayersModified')}
           onLayersVisibilityInEditorChanged={action(
             'onLayersVisibilityInEditorChanged'
+          )}
+          areCollisionsShownInEditor={false}
+          onToggleCollisionsShownInEditor={action(
+            'onToggleCollisionsShownInEditor'
           )}
           onEditLayer={action('onEditLayer')}
           onRemoveLayer={(layerName, cb) => {

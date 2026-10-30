@@ -51,6 +51,43 @@ namespace gdjs {
           showCustomPoints
         );
       };
+
+      /**
+       * Enable or disable the 3D debug draw of collision shapes.
+       * @param instanceContainer - The current container.
+       * @param enableDebugDraw - true to enable the 3D debug draw, false to disable it.
+       * @param color - Wireframe color string (format "R;G;B").
+       * @param depthTest - true to enable depth testing on the wireframe.
+       */
+      export const enableDebugDraw3D = function (
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        enableDebugDraw: boolean,
+        color: string,
+        depthTest: boolean
+      ) {
+        const rgb = (color || '0;255;0').split(';');
+        const colorHex = gdjs.rgbToHexNumber(
+          parseInt(rgb[0], 10) || 0,
+          parseInt(rgb[1], 10) || 0,
+          parseInt(rgb[2], 10) || 0
+        );
+        instanceContainer.enableDebugDraw3D(enableDebugDraw, colorHex, depthTest);
+      };
+
+      /**
+       * Toggle the 3D debug draw of collision shapes, reusing the last color
+       * and depth test settings (defaulting to green / depth test on).
+       * @param instanceContainer - The current container.
+       */
+      export const toggleDebugDraw3D = function (
+        instanceContainer: gdjs.RuntimeInstanceContainer
+      ) {
+        instanceContainer.enableDebugDraw3D(
+          !instanceContainer._debugDraw3DEnabled,
+          instanceContainer._debugDraw3DColorHex,
+          instanceContainer._debugDraw3DDepthTest
+        );
+      };
     }
   }
 }

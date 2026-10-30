@@ -393,6 +393,10 @@ const MosaicEditorsDisplay: React.ComponentType<{
             onLayersVisibilityInEditorChanged={
               props.onLayersVisibilityInEditorChanged
             }
+            areCollisionsShownInEditor={props.areCollisionsShownInEditor}
+            onToggleCollisionsShownInEditor={
+              props.onToggleCollisionsShownInEditor
+            }
             onRemoveLayer={props.onRemoveLayer}
             onLayerRenamed={props.onLayerRenamed}
             onCreateLayer={forceUpdatePropertiesEditor}

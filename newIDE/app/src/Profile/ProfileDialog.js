@@ -25,7 +25,7 @@ import Text from '../UI/Text';
 import Link from '../UI/Link';
 import CreditsStatusBanner from '../Credits/CreditsStatusBanner';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
-import InvoicesDialog from './InvoicesDialog';
+import PurchasesDialog from './PurchasesDialog';
 import { isNativeMobileApp } from '../Utils/Platform';
 
 type Props = {|
@@ -38,7 +38,9 @@ const ProfileDialog = ({ onClose }: Props) => {
   const badgesSeenNotificationTimeoutRef = React.useRef<?TimeoutID>(null);
   const badgesSeenNotificationSentRef = React.useRef<boolean>(false);
   const { isMobile } = useResponsiveWindowSize();
-  const [isInvoicesDialogOpen, setIsInvoicesDialogOpen] = React.useState(false);
+  const [isPurchasesDialogOpen, setIsPurchasesDialogOpen] = React.useState(
+    false
+  );
 
   const isUserLoading = authenticatedUser.loginState !== 'done';
   const userAchievementsContainerRef = React.useRef<?HTMLDivElement>(null);
@@ -240,18 +242,19 @@ const ProfileDialog = ({ onClose }: Props) => {
               <Line alignItems="center" justifyContent="space-between">
                 <Column noMargin>
                   <Text size="block-title">
-                    <Trans>Invoices</Trans>
+                    <Trans>Purchases</Trans>
                   </Text>
                   <Text size="body" noMargin>
                     <Trans>
-                      Download the invoices of your subscription and purchases.
+                      Download the invoices of your subscription and purchases,
+                      and find the links of the gifts you bought.
                     </Trans>
                   </Text>
                 </Column>
                 <FlatButton
-                  label={<Trans>See invoices</Trans>}
+                  label={<Trans>See purchases</Trans>}
                   primary
-                  onClick={() => setIsInvoicesDialogOpen(true)}
+                  onClick={() => setIsPurchasesDialogOpen(true)}
                 />
               </Line>
             )}
@@ -285,8 +288,8 @@ const ProfileDialog = ({ onClose }: Props) => {
           />
         </Column>
       )}
-      {isInvoicesDialogOpen && (
-        <InvoicesDialog onClose={() => setIsInvoicesDialogOpen(false)} />
+      {isPurchasesDialogOpen && (
+        <PurchasesDialog onClose={() => setIsPurchasesDialogOpen(false)} />
       )}
     </Dialog>
   );

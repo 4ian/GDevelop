@@ -16,7 +16,6 @@ import {
 } from '../../UI/Layout';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import { selectMessageByLocale } from '../../Utils/i18n/MessageByLocale';
-import { renderProductPrice } from '../../AssetStore/ProductPriceTag';
 import {
   getProductsIncludedInBundle,
   getUserProductPurchaseUsageType,
@@ -28,6 +27,8 @@ import { SubscriptionContext } from '../../Profile/Subscription/SubscriptionCont
 import { BundleStoreContext } from '../../AssetStore/Bundles/BundleStoreContext';
 import { sendBundleBuyClicked } from '../../Utils/Analytics/EventSender';
 import BundlePurchaseDialog from '../../AssetStore/Bundles/BundlePurchaseDialog';
+import GiftPurchaseDialog from '../Gift/GiftPurchaseDialog';
+import BuyAsGiftButton from '../Gift/BuyAsGiftButton';
 import {
   getEstimatedSavingsFormatted,
   renderEstimatedTotalPriceFormatted,
@@ -45,6 +46,8 @@ import { getSummaryLines } from './Utils';
 import { SectionRow } from '../../MainFrame/EditorContainers/HomePage/SectionContainer';
 
 const styles = {
+  // Halfway between the default and the large spacing, to match the rest of the section.
+  mobileGiftButtonContainer: { marginTop: 8 },
   title: { overflowWrap: 'anywhere', textWrap: 'wrap' },
   image: { width: 300, aspectRatio: '16 / 9' },
   imageContainer: {
@@ -96,6 +99,10 @@ const BundlePageHeader = ({
     purchasingBundleListingData,
     setPurchasingBundleListingData,
   ] = React.useState<?BundleListingData>(null);
+  const [
+    isGiftPurchaseDialogOpen,
+    setIsGiftPurchaseDialogOpen,
+  ] = React.useState<boolean>(false);
   const { isMobile, isMediumScreen } = useResponsiveWindowSize();
   const isMobileOrMediumScreen = isMobile || isMediumScreen;
   const shouldUseOrSimulateAppStoreProduct =
@@ -112,6 +119,11 @@ const BundlePageHeader = ({
     [bundlePurchases, bundleListingData, bundleListingDatas, receivedBundles]
   );
   const isAlreadyReceived = !!userBundlePurchaseUsageType;
+  // Products no longer sold (archived, or replaced by another offer) can't be offered.
+  const isListedInStore =
+    !!bundleListingData &&
+    !!bundleListingDatas &&
+    bundleListingDatas.some(({ id }) => id === bundleListingData.id);
 
   const productListingDatasIncludedInBundle = React.useMemo(
     () =>
@@ -180,13 +192,19 @@ const BundlePageHeader = ({
 
       if (isAlreadyReceived) {
         return (
-          <Line noMargin>
+          <LineStackLayout noMargin>
             <FlatButton
               primary
               label={<Trans>Activate my subscription</Trans>}
               onClick={() => openRedeemCodeDialog()}
             />
-          </Line>
+            {isListedInStore && (
+              <BuyAsGiftButton
+                onClick={() => setIsGiftPurchaseDialogOpen(true)}
+                simulateAppStoreProduct={simulateAppStoreProduct}
+              />
+            )}
+          </LineStackLayout>
         );
       }
 
@@ -203,11 +221,13 @@ const BundlePageHeader = ({
     },
     [
       isAlreadyReceived,
+      isListedInStore,
       redemptionCodesIncludedInBundle,
       bundleListingData,
       productListingDatasIncludedInBundle,
       isMobile,
       openRedeemCodeDialog,
+      simulateAppStoreProduct,
     ]
   );
 
@@ -243,17 +263,6 @@ const BundlePageHeader = ({
     ]
   );
 
-  const productPrice = React.useMemo(
-    () =>
-      renderProductPrice({
-        i18n,
-        productListingData: bundleListingData,
-        usageType: 'default',
-        plainText: true,
-      }),
-    [i18n, bundleListingData]
-  );
-
   const onClickBuy = React.useCallback(
     async () => {
       if (!bundle) return;
@@ -282,6 +291,49 @@ const BundlePageHeader = ({
     },
     [bundle, bundleListingData, isAlreadyReceived]
   );
+
+  // On desktop and tablets, the prices and the buttons are on the same line.
+  const discountedPriceAndPurchaseButtons =
+    bundleListingData &&
+    estimatedTotalPriceFormatted &&
+    estimatedSavingsFormatted ? (
+      <ColumnStackLayout noMargin alignItems="flex-end">
+        <LineStackLayout noMargin alignItems="center">
+          <Text noMargin color="secondary" size="block-title">
+            <span style={styles.discountedPrice}>
+              {estimatedTotalPriceFormatted}
+            </span>
+          </Text>
+          {bundleListingData.visibleUntil && (
+            <Chip
+              label={
+                <Trans>
+                  {estimatedSavingsFormatted.savingsPercentageFormatted} OFF
+                </Trans>
+              }
+              style={styles.discountChip}
+            />
+          )}
+          <PurchaseProductButtons
+            i18n={i18n}
+            productListingData={bundleListingData}
+            selectedUsageType="default"
+            onUsageTypeChange={() => {}}
+            simulateAppStoreProduct={simulateAppStoreProduct}
+            isAlreadyReceived={isAlreadyReceived}
+            onClickBuy={onClickBuy}
+            onClickBuyWithCredits={() => {}}
+          />
+          {isListedInStore && (
+            <BuyAsGiftButton
+              onClick={() => setIsGiftPurchaseDialogOpen(true)}
+              simulateAppStoreProduct={simulateAppStoreProduct}
+            />
+          )}
+        </LineStackLayout>
+        {!shouldUseOrSimulateAppStoreProduct && <SecureCheckout />}
+      </ColumnStackLayout>
+    ) : null;
 
   return (
     <I18n>
@@ -316,60 +368,7 @@ const BundlePageHeader = ({
                     ) : (
                       <Skeleton height={24} width={100} />
                     )}
-                    {estimatedTotalPriceFormatted &&
-                    estimatedSavingsFormatted &&
-                    productPrice ? (
-                      <LineStackLayout justifyContent="flex-end" noMargin>
-                        <Column noMargin alignItems="flex-end">
-                          <LineStackLayout>
-                            <Text noMargin color="secondary" size="block-title">
-                              <span style={styles.discountedPrice}>
-                                {estimatedTotalPriceFormatted}
-                              </span>
-                            </Text>
-                            {bundleListingData.visibleUntil && (
-                              <Chip
-                                label={
-                                  <Trans>
-                                    {
-                                      estimatedSavingsFormatted.savingsPercentageFormatted
-                                    }{' '}
-                                    OFF
-                                  </Trans>
-                                }
-                                style={styles.discountChip}
-                              />
-                            )}
-                          </LineStackLayout>
-                          <Text noMargin size="block-title">
-                            {productPrice}
-                          </Text>
-                        </Column>
-                        <ColumnStackLayout noMargin alignItems="center">
-                          <PurchaseProductButtons
-                            i18n={i18n}
-                            productListingData={bundleListingData}
-                            selectedUsageType="default"
-                            onUsageTypeChange={() => {}}
-                            simulateAppStoreProduct={simulateAppStoreProduct}
-                            isAlreadyReceived={isAlreadyReceived}
-                            onClickBuy={onClickBuy}
-                            onClickBuyWithCredits={() => {}}
-                            customLabel={
-                              <Trans>
-                                Buy now and save{' '}
-                                {
-                                  estimatedSavingsFormatted.savingsPriceFormatted
-                                }
-                              </Trans>
-                            }
-                          />
-                          {!shouldUseOrSimulateAppStoreProduct && (
-                            <SecureCheckout />
-                          )}
-                        </ColumnStackLayout>
-                      </LineStackLayout>
-                    ) : (
+                    {discountedPriceAndPurchaseButtons || (
                       <Column noMargin justifyContent="flex-end">
                         <Skeleton height={24} width={100} />
                         <Skeleton height={24} width={100} />
@@ -429,9 +428,10 @@ const BundlePageHeader = ({
           {!isAlreadyReceived && isMobileOrMediumScreen && bundleListingData && (
             <SectionRow>
               <Paper background="medium" style={{ padding: 16 }}>
-                {estimatedTotalPriceFormatted &&
-                estimatedSavingsFormatted &&
-                productPrice ? (
+                {!isMobile && discountedPriceAndPurchaseButtons ? (
+                  discountedPriceAndPurchaseButtons
+                ) : estimatedTotalPriceFormatted &&
+                  estimatedSavingsFormatted ? (
                   <ResponsiveLineStackLayout justifyContent="flex-end" noMargin>
                     <LineStackLayout
                       alignItems="center"
@@ -455,37 +455,46 @@ const BundlePageHeader = ({
                           {estimatedTotalPriceFormatted}
                         </span>
                       </Text>
-                      <Text noMargin size="block-title">
-                        {productPrice}
-                      </Text>
                     </LineStackLayout>
                     <ColumnStackLayout noMargin alignItems="center">
-                      <PurchaseProductButtons
-                        i18n={i18n}
-                        productListingData={bundleListingData}
-                        selectedUsageType="default"
-                        onUsageTypeChange={() => {}}
-                        simulateAppStoreProduct={simulateAppStoreProduct}
-                        isAlreadyReceived={isAlreadyReceived}
-                        onClickBuy={onClickBuy}
-                        onClickBuyWithCredits={() => {}}
-                        fullWidth
-                        customLabel={
-                          <Trans>
-                            Buy now and save{' '}
-                            {
-                              (
-                                getEstimatedSavingsFormatted({
-                                  i18n,
-                                  bundleListingData,
-                                  productListingDatasIncludedInBundle,
-                                  redemptionCodesIncludedInBundle,
-                                }) || {}
-                              ).savingsPriceFormatted
-                            }
-                          </Trans>
-                        }
-                      />
+                      <ResponsiveLineStackLayout
+                        noMargin
+                        alignItems="center"
+                        justifyContent="center"
+                      >
+                        <PurchaseProductButtons
+                          i18n={i18n}
+                          productListingData={bundleListingData}
+                          selectedUsageType="default"
+                          onUsageTypeChange={() => {}}
+                          simulateAppStoreProduct={simulateAppStoreProduct}
+                          isAlreadyReceived={isAlreadyReceived}
+                          onClickBuy={onClickBuy}
+                          onClickBuyWithCredits={() => {}}
+                          fullWidth
+                        />
+                        {!shouldUseOrSimulateAppStoreProduct &&
+                          isListedInStore && (
+                            <div
+                              style={
+                                isMobile
+                                  ? styles.mobileGiftButtonContainer
+                                  : undefined
+                              }
+                            >
+                              <Line noMargin justifyContent="center">
+                                <BuyAsGiftButton
+                                  onClick={() =>
+                                    setIsGiftPurchaseDialogOpen(true)
+                                  }
+                                  simulateAppStoreProduct={
+                                    simulateAppStoreProduct
+                                  }
+                                />
+                              </Line>
+                            </div>
+                          )}
+                      </ResponsiveLineStackLayout>
                       {!shouldUseOrSimulateAppStoreProduct && (
                         <SecureCheckout />
                       )}
@@ -507,6 +516,13 @@ const BundlePageHeader = ({
               onClose={() => setPurchasingBundleListingData(null)}
               fastCheckout={fastCheckout}
               onCloseAfterPurchaseDone={onCloseAfterPurchaseDone}
+            />
+          )}
+          {isGiftPurchaseDialogOpen && bundleListingData && (
+            <GiftPurchaseDialog
+              productListingData={bundleListingData}
+              usageType="default"
+              onClose={() => setIsGiftPurchaseDialogOpen(false)}
             />
           )}
         </Column>

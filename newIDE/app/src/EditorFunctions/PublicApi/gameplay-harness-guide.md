@@ -9,6 +9,10 @@
 - All step/navigation calls MUST be awaited, or the script will exit after
   one frame.
 - Do not use `setTimeout` or `setInterval` — use `stepFrames`/`stepUntil`.
+- Stepped frames are NOT drawn: they run the game logic (and what it reads
+  from the rendering, like 3D raycasts), and the game is only drawn to take
+  a screenshot — so tests are fast, even in big 3D scenes. Never lower the
+  resolution, hide objects or disable effects to speed a test up.
 - The test ends when the script returns, throws, hits a failed assertion,
   reaches the frame budget (default 20 000) or the wall-clock timeout
   (default 30s).
@@ -25,8 +29,12 @@
 interface Harness {
   // NAVIGATION / STEPPING
   /** Load a scene fresh. Call before using getObjects on scene objects.
-   * skipCreatingInstances starts the scene EMPTY (use spawn/loadExternalLayout). */
-  goToScene(sceneName: string, options?: { skipCreatingInstances?: boolean }): Promise<void>;
+   * skipCreatingInstances starts the scene EMPTY (use spawn/loadExternalLayout).
+   * delayBeforeFirstFrameMs: wall-clock time between the creation of the
+   * scene and its first frame, as when a big scene is long to load on a
+   * player's device (the wall-clock timers of the game fire meanwhile). */
+  goToScene(sceneName: string, options?: { skipCreatingInstances?: boolean,
+    delayBeforeFirstFrameMs?: number }): Promise<void>;
   /** Step N frames. onFrame runs after each frame: use it for reactive input. */
   stepFrames(count: number, options?: { dtMs?: number, onFrame?: (c: {frame: number}) => void }): Promise<void>;
   /** Step until condition() is true, at most maxFrames. Returns whether met.
@@ -67,8 +75,10 @@ interface Harness {
   getGameResolutionWidth(): number;
   getGameResolutionHeight(): number;
   /** Change the game resolution, as if the game window was resized, to test
-   * layouts made for other screen sizes. Step at least one frame before asserting
-   * positions or taking a screenshot. */
+   * layouts made for other screen sizes: the game shows MORE of the scene and
+   * UI layers keep their size. Step at least one frame before asserting
+   * positions or taking a screenshot. For a bigger or smaller IMAGE of the
+   * same view, use `takeScreenshot(label, { width })` instead. */
   setGameResolutionSize(width: number, height: number): void;
   releaseAllInputs(): void;
 
@@ -189,9 +199,46 @@ interface Harness {
   assert(condition: boolean, message: string): void;
   /** Record a failure and throw immediately. */
   fail(message: string): void;
-  /** Downscaled screenshot returned in the result (max 5 per run). DOM
-   * overlays (text inputs...) do not appear in screenshots. */
-  takeScreenshot(label?: string): Promise<void>;
+  /** Draw the game and add a screenshot to the result (downscaled to 768px
+   * unless `width`/`height` - the game drawn at this size, every layer at its
+   * place, same aspect ratio as the game - or `fullResolution`).
+   * `hideLayers`/`onlyObjects` (ids or names; lights and layer effects kept)
+   * and `transparentBackground` (PNG cut-out, no sky) are for this screenshot
+   * only. Kept: the first one and the last ones (4 by default, see
+   * setMaxScreenshots); the dropped ones are listed in `droppedScreenshots`.
+   * DOM overlays (text inputs...) do not appear in screenshots. */
+  takeScreenshot(label?: string, options?: { width?: number, height?: number,
+    fullResolution?: boolean, hideLayers?: string[],
+    onlyObjects?: Array<number | string>, transparentBackground?: boolean,
+    format?: 'jpeg' | 'png' }): Promise<void>;
+  /** Keep more screenshots in the result: 1 to 20. */
+  setMaxScreenshots(count: number): void;
+  /** Place the camera of a layer (default ''): angle is the yaw,
+   * rotationX 0 looks down and 90 at the horizon. Restored after the next
+   * screenshot unless keepAfterScreenshot. The game can move it again on
+   * the next frame (a camera following the player): set it right before
+   * takeScreenshot. */
+  setCamera(camera: { layer?: string, x?: number, y?: number, z?: number,
+    angle?: number, rotationX?: number, rotationY?: number, zoom?: number,
+    keepAfterScreenshot?: boolean }): void;
+  /** Place the 3D camera of a layer at `from`, looking at `to` (a point or
+   * an instance id). Restored after the next screenshot like setCamera. */
+  lookAt(options: { from: { x: number, y: number, z: number },
+    to: { x: number, y: number, z: number } | number, layer?: string,
+    keepAfterScreenshot?: boolean }): void;
+  /** The box of what is DRAWN for a 3D instance (its model), in scene
+   * coordinates, whatever the origin of the model - or null if the instance
+   * is not drawn in 3D. To check that something stands on the ground or
+   * does not float. */
+  getRenderedBounds(id: number): { minX: number, minY: number, minZ: number,
+    maxX: number, maxY: number, maxZ: number } | null;
+  /** 'onScreenshot' (default): frames are not drawn, only screenshots.
+   * 'everyFrame': every frame is drawn - only to measure the rendering. */
+  setRenderingMode(mode: 'onScreenshot' | 'everyFrame'): void;
+  getRenderingMode(): 'onScreenshot' | 'everyFrame';
+  /** Seed Math.random until the end of the test: the game makes the same
+   * random choices at every run. */
+  setRandomSeed(seed: number): void;
   /** Profile frames between start and stop. Returns a flat, JSON-safe
    * summary - ALSO attached to the test result as `result.profiles`, so
    * do NOT console.log it (it would be truncated). Sections (events,
@@ -555,6 +602,17 @@ line between them), and assert the arranged-for object stayed put. Prefer
 what the level already contains over spawning a copy of it (the level's
 own hazard is often closer than anything a test can place).
 
+## Screenshots and store art
+
+Compose a screenshot instead of changing the game: `lookAt` (or
+`setCamera`) right before `takeScreenshot`, `hideLayers` for the UI or a
+first-person weapon, `onlyObjects` + `transparentBackground` for a cut-out
+of a character (a PNG with transparency, no color keying), `width: 1920`
+for a big image. Everything is put back after the screenshot. To check
+that a 3D model stands on the ground, compare `getRenderedBounds(id).minZ`
+with the ground, not the position of the object (the origin of a model
+can be anywhere).
+
 ## Performance testing
 
 Wrap the interesting frames with `startProfiling()` / `stopProfiling()`:
@@ -565,3 +623,37 @@ frame numbers) to find WHEN a spike happened and correlate with the
 test result as `result.profiles` — do NOT `console.log` it (it would be
 truncated); log at most a one-line conclusion. Assert on the profile values
 or on `result.performance.avgStepMs` (logic time per frame, wall-clock).
+Frames are not drawn by default: call `setRenderingMode('everyFrame')`
+first to measure the rendering too.
+
+## Helpers added by extensions
+
+Only in the projects using these extensions:
+
+### Multiplayer games: `harness.multiplayer`
+
+Simulates a lobby game and the other players, without network. Everything else goes through the real code of the multiplayer extension (message handling, network sync, ownership): never stub `gdjs.multiplayer` or `gdjs.multiplayerMessageManager` in a test. Messages from other players are delivered at the beginning of the next stepped frame.
+
+```typescript
+interface Harness {
+  multiplayer: {
+    /** The game believes a lobby game runs: the current player is `playerNumber`, the host is player 1 (or `playerNumber` with `isHost`), the other `players` join (a frame is stepped for each). "Lobby game has just started" is then true during the next frame. The other players acknowledge what must be (custom messages, ownership changes, destructions) unless `acknowledgeMessages: false`. */
+    startLobbyGame(options: { playerNumber: number; isHost: boolean; players: Array<{ playerNumber: number; username?: string }>; acknowledgeMessages?: boolean }): Promise<void>;
+    /** Create an instance owned by another player (0 = host) as its first network update does: it gets a network id. Steps 1-3 frames, returns its id. */
+    addRemoteInstance(objectName: string, options: { owner: number; x: number; y: number; z?: number; angle?: number; variables?: { [name: string]: any } }): Promise<number>;
+    /** Receive an update of an instance owned by another player: `{ x, y, z, a (angle), var: [...] }`, only what changed. */
+    receiveUpdate(instanceId: number, partialSyncData: object): void;
+    /** Receive a custom message ("Send message to other players") from another player. */
+    receiveCustomMessage(name: string, data: string, fromPlayerNumber: number): void;
+    /** What the game sent: `type` is 'updateInstance', 'changeInstanceOwner', 'destroyInstance', 'customMessage', 'ackCustomMessage', 'updateScene', 'updateGame', 'heartbeat'...; `name` is the custom message name or the object name. `data` of an instance update: `{ x, y, z, a, beh: { [behaviorName]: ... }, var: [...] }`. */
+    getSentMessages(filter?: { type?: string; name?: string }): Array<{ frame: number; type: string; name: string | null; instanceId?: number | null; owner?: number; to: number[]; data: any }>;
+  };
+}
+```
+
+Rules:
+
+- Test the instances of the current player and the copies of the other players' instances separately: the game must move its own player, and only apply the updates received for the others (`addRemoteInstance` + `receiveUpdate`).
+- A player's objects are usually created at runtime by that player: on the host, create the other players' bodies with `addRemoteInstance`, not with `spawn`. An object owned by a given player by default is ignored when another player creates it (`addRemoteInstance` throws why): objects are owned by the host by default.
+- Check what is sent to the others with `getSentMessages`, e.g. that a control behavior is not in `data.beh` of the 'updateInstance' messages of the player (a behavior is not synchronized when its "synchronized over the network" setting is off). Messages are sent at a wall-clock rate: assert what they contain, never how many there are.
+- Test as a player who is not the host too (`isHost: false`): the simulated host plays the same scenes and gives their instances their network ids, like a real host. For a scene long to load on this player's device, use `goToScene(name, { delayBeforeFirstFrameMs: 2000 })`.

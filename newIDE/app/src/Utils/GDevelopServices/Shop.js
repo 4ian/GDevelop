@@ -159,6 +159,12 @@ export type BundleListingData = {|
   listing: 'BUNDLE',
 |};
 
+/** The products that can be bought for someone else. */
+export type GiftableProductListingData =
+  | PrivateAssetPackListingData
+  | PrivateGameTemplateListingData
+  | BundleListingData;
+
 export type PurchasePaymentDetails = {|
   total: number | null,
   currency?: string,
@@ -169,7 +175,8 @@ export type Purchase = {|
   usageType: string,
   productId: string,
   buyerId: string,
-  receiverId: string,
+  /** Not set for a gift (or a purchase made without an account) until it's claimed. */
+  receiverId?: string,
   createdAt: string,
   cancelledAt?: string,
   stripeCheckoutSessionId?: string,
@@ -181,6 +188,11 @@ export type Purchase = {|
   creditsAmount?: number,
   productType: ProductType,
   paymentDetails?: PurchasePaymentDetails | null,
+  /** Bought for someone else, who receives it by using the claimable token. */
+  isGift?: boolean,
+  /** Only sent to the buyer of a gift, or to the receiver of a purchase made without an account. */
+  claimableToken?: string,
+  claimedAt?: string,
 |};
 
 type ProductLicenseType = 'personal' | 'commercial' | 'unlimited' | 'default';
@@ -318,6 +330,36 @@ export const listListedBundles = async (): Promise<
     data: response.data,
     endpointName: '/bundle of Shop API',
   });
+};
+
+/** Returns any product, even archived, like the one given by a gift link. */
+export const getProduct = async (
+  productId: string
+): Promise<GiftableProductListingData> => {
+  const response = await client.get(`/product/${productId}`);
+  return ensureObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/product/{id} of Shop API',
+  });
+};
+
+/** The link the receiver of a gift opens to get it on their account. */
+export const getGiftClaimUrl = (purchase: {
+  id: string,
+  productId: string,
+  claimableToken?: string,
+  ...
+}): string | null => {
+  const { claimableToken } = purchase;
+  if (!claimableToken) return null;
+
+  const url = new URL('https://editor.gdevelop.io');
+  url.searchParams.set('initial-dialog', 'signup');
+  url.searchParams.set('purchase-id', purchase.id);
+  url.searchParams.set('claimable-token', claimableToken);
+  url.searchParams.set('product-id', purchase.productId);
+  return url.toString();
 };
 
 export const getListedBundle = async ({
@@ -528,6 +570,7 @@ export const getPurchaseCheckoutUrl = ({
   userEmail,
   password,
   language,
+  isGift,
 }: {|
   productId: string,
   priceName: string,
@@ -535,6 +578,7 @@ export const getPurchaseCheckoutUrl = ({
   userEmail: string,
   password?: string,
   language: string,
+  isGift?: boolean,
 |}): string => {
   const url = new URL(
     `${GDevelopShopApi.baseUrl}/purchase/action/redirect-to-checkout`
@@ -546,6 +590,7 @@ export const getPurchaseCheckoutUrl = ({
   url.searchParams.set('customerEmail', userEmail);
   if (password) url.searchParams.set('password', password);
   url.searchParams.set('language', language);
+  if (isGift) url.searchParams.set('isGift', 'true');
 
   return url.toString();
 };
@@ -557,6 +602,7 @@ export const getStripeCheckoutUrl = ({
   priceName,
   userEmail,
   password,
+  isGift,
 }: {|
   userId?: string,
   userUuid?: string,
@@ -564,6 +610,7 @@ export const getStripeCheckoutUrl = ({
   priceName: string,
   userEmail?: string,
   password?: string,
+  isGift?: boolean,
 |}): string => {
   const url = new URL(
     `${GDevelopShopApi.baseUrl}/purchase/action/redirect-to-stripe-checkout`
@@ -575,6 +622,7 @@ export const getStripeCheckoutUrl = ({
   if (userId) url.searchParams.set('userId', userId);
   if (userEmail) url.searchParams.set('customerEmail', userEmail);
   if (password) url.searchParams.set('password', password);
+  if (isGift) url.searchParams.set('isGift', 'true');
 
   return url.toString();
 };

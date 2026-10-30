@@ -28,6 +28,8 @@ import { SubscriptionContext } from '../../Profile/Subscription/SubscriptionCont
 import { BundleStoreContext } from '../../AssetStore/Bundles/BundleStoreContext';
 import { sendBundleBuyClicked } from '../../Utils/Analytics/EventSender';
 import BundlePurchaseDialog from '../../AssetStore/Bundles/BundlePurchaseDialog';
+import GiftPurchaseDialog from '../Gift/GiftPurchaseDialog';
+import BuyAsGiftButton from '../Gift/BuyAsGiftButton';
 import {
   getEstimatedSavingsFormatted,
   renderEstimatedTotalPriceFormatted,
@@ -96,6 +98,10 @@ const BundlePageHeader = ({
     purchasingBundleListingData,
     setPurchasingBundleListingData,
   ] = React.useState<?BundleListingData>(null);
+  const [
+    isGiftPurchaseDialogOpen,
+    setIsGiftPurchaseDialogOpen,
+  ] = React.useState<boolean>(false);
   const { isMobile, isMediumScreen } = useResponsiveWindowSize();
   const isMobileOrMediumScreen = isMobile || isMediumScreen;
   const shouldUseOrSimulateAppStoreProduct =
@@ -186,6 +192,10 @@ const BundlePageHeader = ({
               label={<Trans>Activate my subscription</Trans>}
               onClick={() => openRedeemCodeDialog()}
             />
+            <BuyAsGiftButton
+              onClick={() => setIsGiftPurchaseDialogOpen(true)}
+              simulateAppStoreProduct={simulateAppStoreProduct}
+            />
           </Line>
         );
       }
@@ -208,6 +218,7 @@ const BundlePageHeader = ({
       productListingDatasIncludedInBundle,
       isMobile,
       openRedeemCodeDialog,
+      simulateAppStoreProduct,
     ]
   );
 
@@ -367,6 +378,10 @@ const BundlePageHeader = ({
                           {!shouldUseOrSimulateAppStoreProduct && (
                             <SecureCheckout />
                           )}
+                          <BuyAsGiftButton
+                            onClick={() => setIsGiftPurchaseDialogOpen(true)}
+                            simulateAppStoreProduct={simulateAppStoreProduct}
+                          />
                         </ColumnStackLayout>
                       </LineStackLayout>
                     ) : (
@@ -489,6 +504,10 @@ const BundlePageHeader = ({
                       {!shouldUseOrSimulateAppStoreProduct && (
                         <SecureCheckout />
                       )}
+                      <BuyAsGiftButton
+                        onClick={() => setIsGiftPurchaseDialogOpen(true)}
+                        simulateAppStoreProduct={simulateAppStoreProduct}
+                      />
                     </ColumnStackLayout>
                   </ResponsiveLineStackLayout>
                 ) : (
@@ -507,6 +526,13 @@ const BundlePageHeader = ({
               onClose={() => setPurchasingBundleListingData(null)}
               fastCheckout={fastCheckout}
               onCloseAfterPurchaseDone={onCloseAfterPurchaseDone}
+            />
+          )}
+          {isGiftPurchaseDialogOpen && bundleListingData && (
+            <GiftPurchaseDialog
+              productListingData={bundleListingData}
+              usageType="default"
+              onClose={() => setIsGiftPurchaseDialogOpen(false)}
             />
           )}
         </Column>

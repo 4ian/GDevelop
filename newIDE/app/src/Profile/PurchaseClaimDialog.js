@@ -3,7 +3,7 @@ import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
 import {
   claimPurchase,
-  type BundleListingData,
+  type GiftableProductListingData,
 } from '../Utils/GDevelopServices/Shop';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import AuthenticatedUserContext from './AuthenticatedUserContext';
@@ -22,7 +22,7 @@ import { getNewestRedemptionCodeForBundle } from '../Utils/GDevelopServices/Usag
 import ActivateSubscriptionPromptDialog from './ActivateSubscriptionPromptDialog';
 
 export type ClaimedProductOptions = {|
-  productListingData: BundleListingData, // Add more product types in the future.
+  productListingData: GiftableProductListingData,
   purchaseId: string,
   claimableToken: string,
 |};
@@ -58,6 +58,8 @@ const PurchaseClaimDialog = ({
     profile,
     onPurchaseSuccessful,
     onRefreshBundlePurchases,
+    onRefreshAssetPackPurchases,
+    onRefreshGameTemplatePurchases,
   } = React.useContext(AuthenticatedUserContext);
   const { openRedeemCodeDialog } = React.useContext(SubscriptionContext);
   const [isActivating, setIsActivating] = React.useState(false);
@@ -98,6 +100,12 @@ const PurchaseClaimDialog = ({
           message = t`This purchase has already been activated.`;
         } else if (
           extractedStatusAndCode &&
+          extractedStatusAndCode.status === 400 &&
+          extractedStatusAndCode.code === 'purchase/cancelled'
+        ) {
+          message = t`This purchase was cancelled and cannot be activated anymore.`;
+        } else if (
+          extractedStatusAndCode &&
           extractedStatusAndCode.status === 403
         ) {
           if (extractedStatusAndCode.code === 'purchase/cannot-claim') {
@@ -115,7 +123,7 @@ const PurchaseClaimDialog = ({
           extractedStatusAndCode.status === 409
         ) {
           if (extractedStatusAndCode.code === 'purchase/already-owned') {
-            message = t`This account already owns this product, you cannot activate it again.`;
+            message = t`This account already owns this product. The link stays valid: you can send it to someone else so they can activate it.`;
           }
         } else if (
           extractedStatusAndCode &&
@@ -133,7 +141,16 @@ const PurchaseClaimDialog = ({
       }
 
       try {
-        if (updatedPurchase.productType === 'BUNDLE') {
+        if (updatedPurchase.productType === 'ASSET_PACK') {
+          await onRefreshAssetPackPurchases();
+        } else if (updatedPurchase.productType === 'GAME_TEMPLATE') {
+          await onRefreshGameTemplatePurchases();
+        }
+
+        if (
+          updatedPurchase.productType === 'BUNDLE' &&
+          productListingData.productType === 'BUNDLE'
+        ) {
           await onRefreshBundlePurchases();
 
           // Check if bundle has redemption codes and prompt for activation
@@ -181,6 +198,8 @@ const PurchaseClaimDialog = ({
       claimableToken,
       showAlert,
       onRefreshBundlePurchases,
+      onRefreshAssetPackPurchases,
+      onRefreshGameTemplatePurchases,
       onPurchaseSuccessful,
       onClose,
       isPurchaseActivated,
@@ -208,14 +227,11 @@ const PurchaseClaimDialog = ({
     return null;
   }
 
-  const productType = productListingData
-    ? productListingData.productType
-    : 'product';
-  const productName = productListingData ? productListingData.name : '';
+  const productName = productListingData.name;
 
   const dialogContents = isPurchaseActivated
     ? {
-        subtitle: <Trans>Your {productType} has been activated!</Trans>,
+        subtitle: <Trans>{productName} has been activated!</Trans>,
         content: (
           <Line justifyContent="center" alignItems="center" noMargin>
             <Text>
@@ -227,8 +243,7 @@ const PurchaseClaimDialog = ({
     : {
         subtitle: (
           <Trans>
-            The {productType} {productName} will be linked to your account{' '}
-            {profile.email}
+            {productName} will be linked to your account {profile.email}
           </Trans>
         ),
         content: null,
@@ -291,21 +306,23 @@ const PurchaseClaimDialog = ({
           </Column>
         </ResponsiveLineStackLayout>
       </Dialog>
-      {showActivatePrompt && redemptionCodeToActivate && productListingData && (
-        <ActivateSubscriptionPromptDialog
-          bundleListingData={productListingData}
-          onActivateNow={() => {
-            setShowActivatePrompt(false);
-            openRedeemCodeDialog({
-              codeToPrefill: redemptionCodeToActivate,
-              autoSubmit: true,
-            });
-          }}
-          onClose={() => {
-            setShowActivatePrompt(false);
-          }}
-        />
-      )}
+      {showActivatePrompt &&
+        redemptionCodeToActivate &&
+        productListingData.productType === 'BUNDLE' && (
+          <ActivateSubscriptionPromptDialog
+            bundleListingData={productListingData}
+            onActivateNow={() => {
+              setShowActivatePrompt(false);
+              openRedeemCodeDialog({
+                codeToPrefill: redemptionCodeToActivate,
+                autoSubmit: true,
+              });
+            }}
+            onClose={() => {
+              setShowActivatePrompt(false);
+            }}
+          />
+        )}
     </>
   );
 };

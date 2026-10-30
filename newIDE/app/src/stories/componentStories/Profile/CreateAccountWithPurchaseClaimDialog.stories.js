@@ -4,6 +4,7 @@ import { action } from '@storybook/addon-actions';
 import paperDecorator from '../../PaperDecorator';
 import CreateAccountWithPurchaseClaimDialog from '../../../Profile/CreateAccountWithPurchaseClaimDialog';
 import { fakeBundleListingData } from '../../../fixtures/GDevelopServicesTestData';
+import { type ClaimedProductOptions } from '../../../Profile/PurchaseClaimDialog';
 
 export default {
   title: 'Profile/CreateAccountWithPurchaseClaimDialog',
@@ -11,7 +12,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-const claimedProductOptions = {
+const claimedProductOptions: ClaimedProductOptions = {
   productListingData: fakeBundleListingData,
   purchaseId: 'purchase-123',
   claimableToken: 'token-123',

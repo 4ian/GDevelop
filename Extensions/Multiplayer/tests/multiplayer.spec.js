@@ -4,10 +4,10 @@ describe('Multiplayer', () => {
   const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
   /**
-   * @param {{name: string}} settings
+   * @param {{name: string, instances?: InstanceData[]}} settings
    * @returns {SceneAndExtensionsData}
    */
-  const getFakeSceneAndExtensionData = ({ name }) => ({
+  const getFakeSceneAndExtensionData = ({ name, instances }) => ({
     sceneData: {
       layers: [
         {
@@ -52,11 +52,31 @@ describe('Multiplayer', () => {
           variables: [],
         },
       ],
-      instances: [],
+      instances: instances || [],
       variables: [],
       usedResources: [],
     },
     usedExtensionsWithVariablesData: [],
+  });
+
+  /**
+   * @param {{persistentUuid: string, x: number, y: number}} settings
+   * @returns {InstanceData}
+   */
+  const createFakeSpriteInstanceData = ({ persistentUuid, x, y }) => ({
+    persistentUuid,
+    name: 'MySpriteObject',
+    layer: '',
+    x,
+    y,
+    angle: 0,
+    zOrder: 0,
+    customSize: false,
+    width: 0,
+    height: 0,
+    numberProperties: [],
+    stringProperties: [],
+    initialVariables: [],
   });
 
   /**
@@ -2373,6 +2393,274 @@ describe('Multiplayer', () => {
 
       // It is activated as it is not synchronized.
       expect(p2DummyBehaviorOriginal._activated).to.be(true);
+    });
+  });
+
+  describe('Instances placed in the scene', () => {
+    /** @type {sinon.SinonFakeTimers} */
+    let clock;
+    beforeEach(() => {
+      clock = sinon.useFakeTimers();
+    });
+    afterEach(() => {
+      clock.restore();
+    });
+
+    const sceneLoadingDurationInMs = 3000;
+
+    /**
+     * Load a scene with instances placed in it, and let time pass as if
+     * the scene was long to load (assets, 3D models, shaders...).
+     * @param {{instances: InstanceData[], sceneNetworkId: string | null}} settings
+     */
+    const loadSceneSlowly = ({ instances, sceneNetworkId }) => {
+      const runtimeGame = gdjs.getPixiRuntimeGame();
+      const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
+      // Players other than the host know the scene network ID before loading it,
+      // as they load the scene because the host told them to.
+      runtimeScene.networkId = sceneNetworkId;
+      runtimeScene.loadFromScene(
+        getFakeSceneAndExtensionData({ name: 'Scene1', instances })
+      );
+      clock.tick(sceneLoadingDurationInMs);
+      return runtimeScene;
+    };
+
+    /**
+     * @param {gdjs.RuntimeScene} runtimeScene
+     * @param {string} persistentUuid
+     */
+    const getInstanceByPersistentUuid = (runtimeScene, persistentUuid) =>
+      runtimeScene
+        .getObjects('MySpriteObject')
+        .find((object) => object.persistentUuid === persistentUuid) || null;
+
+    const sceneNetworkId = 'fake-hardcoded-scene-network-id';
+    const placedInstances = [
+      createFakeSpriteInstanceData({
+        persistentUuid: 'instance-for-player-1',
+        x: 100,
+        y: 100,
+      }),
+      createFakeSpriteInstanceData({
+        persistentUuid: 'instance-for-player-2',
+        x: 500,
+        y: 500,
+      }),
+    ];
+
+    it('keeps an instance placed in a slow to load scene, if it gets a network ID in its first frame', () => {
+      const { switchToPeer, initiateGameWithPlayers } =
+        createMultiplayerManagersMock();
+      const allConnectedPlayers = [
+        { playerNumber: 1, peerId: 'player-1', isHost: true },
+        { playerNumber: 2, peerId: 'player-2' },
+      ];
+      initiateGameWithPlayers(allConnectedPlayers);
+      switchToPeer({ playerNumber: 2, allConnectedPlayers });
+
+      const p2RuntimeScene = loadSceneSlowly({
+        instances: placedInstances,
+        sceneNetworkId,
+      });
+      const p2Instance = getInstanceByPersistentUuid(
+        p2RuntimeScene,
+        'instance-for-player-2'
+      );
+      if (!p2Instance) throw new Error('Instance not found.');
+
+      // Take the ownership of the instance at the beginning of the scene.
+      p2RuntimeScene.renderAndStepWithEventsFunction(1000 / 60, () => {
+        /** @type {gdjs.MultiplayerObjectRuntimeBehavior | null} */
+        // @ts-ignore - We know this returns a MultiplayerObjectRuntimeBehavior
+        const behavior = p2Instance.getBehavior('MultiplayerObject');
+        if (!behavior) throw new Error('No MultiplayerObject behavior found.');
+        behavior.takeObjectOwnership();
+      });
+      clock.tick(1000);
+      p2RuntimeScene.renderAndStep(1000 / 60);
+
+      expect(
+        getInstanceByPersistentUuid(p2RuntimeScene, 'instance-for-player-2')
+      ).to.be(p2Instance);
+    });
+
+    it('still deletes an instance that has no network ID a bit after its first frame', () => {
+      const { switchToPeer, initiateGameWithPlayers } =
+        createMultiplayerManagersMock();
+      const allConnectedPlayers = [
+        { playerNumber: 1, peerId: 'player-1', isHost: true },
+        { playerNumber: 2, peerId: 'player-2' },
+      ];
+      initiateGameWithPlayers(allConnectedPlayers);
+      switchToPeer({ playerNumber: 2, allConnectedPlayers });
+
+      // The host owns these instances but never sends any update about them:
+      // they are duplicates that will never be synchronized.
+      const p2RuntimeScene = loadSceneSlowly({
+        instances: placedInstances,
+        sceneNetworkId,
+      });
+      expect(p2RuntimeScene.getObjects('MySpriteObject').length).to.be(2);
+
+      p2RuntimeScene.renderAndStep(1000 / 60);
+      clock.tick(400);
+      p2RuntimeScene.renderAndStep(1000 / 60);
+      expect(p2RuntimeScene.getObjects('MySpriteObject').length).to.be(2);
+
+      clock.tick(200);
+      p2RuntimeScene.renderAndStep(1000 / 60);
+      expect(p2RuntimeScene.getObjects('MySpriteObject').length).to.be(0);
+    });
+
+    it('does not try to delete again an instance deleted before the end of the delay', () => {
+      const { switchToPeer, initiateGameWithPlayers } =
+        createMultiplayerManagersMock();
+      const allConnectedPlayers = [
+        { playerNumber: 1, peerId: 'player-1', isHost: true },
+        { playerNumber: 2, peerId: 'player-2' },
+      ];
+      initiateGameWithPlayers(allConnectedPlayers);
+      switchToPeer({ playerNumber: 2, allConnectedPlayers });
+
+      const p2RuntimeScene = loadSceneSlowly({
+        instances: placedInstances,
+        sceneNetworkId,
+      });
+      p2RuntimeScene.renderAndStep(1000 / 60);
+      const p2Instance = getInstanceByPersistentUuid(
+        p2RuntimeScene,
+        'instance-for-player-1'
+      );
+      if (!p2Instance) throw new Error('Instance not found.');
+      const deleteFromSceneSpy = sinon.spy(p2Instance, 'deleteFromScene');
+
+      p2Instance.deleteFromScene();
+      p2RuntimeScene.renderAndStep(1000 / 60);
+      clock.tick(1000);
+
+      expect(deleteFromSceneSpy.callCount).to.be(1);
+    });
+
+    it('does not delete instances when the lobby game is not running', () => {
+      const { switchToPeer, initiateGameWithPlayers } =
+        createMultiplayerManagersMock();
+      const allConnectedPlayers = [
+        { playerNumber: 1, peerId: 'player-1', isHost: true },
+        { playerNumber: 2, peerId: 'player-2' },
+      ];
+      initiateGameWithPlayers(allConnectedPlayers);
+      switchToPeer({ playerNumber: 2, allConnectedPlayers });
+      gdjs.multiplayer._isLobbyGameRunning = false;
+
+      const runtimeScene = loadSceneSlowly({
+        instances: placedInstances,
+        sceneNetworkId,
+      });
+      runtimeScene.renderAndStep(1000 / 60);
+      clock.tick(1000);
+      runtimeScene.renderAndStep(1000 / 60);
+
+      expect(runtimeScene.getObjects('MySpriteObject').length).to.be(2);
+    });
+
+    it('keeps the instances placed in a slow to load scene on every player, owned by the host or by a player', () => {
+      const { switchToPeer, initiateGameWithPlayers } =
+        createMultiplayerManagersMock();
+      const allConnectedPlayers = [
+        { playerNumber: 1, peerId: 'player-1', isHost: true },
+        { playerNumber: 2, peerId: 'player-2' },
+      ];
+      initiateGameWithPlayers(allConnectedPlayers);
+
+      /**
+       * The events of the scene: at the beginning, each player takes the ownership
+       * of "their" instance and moves it to a spawn point.
+       * @param {gdjs.RuntimeScene} runtimeScene
+       * @param {{persistentUuid: string, spawnX: number, spawnY: number}} settings
+       */
+      const takeOwnershipAndMoveToSpawnPoint = (
+        runtimeScene,
+        { persistentUuid, spawnX, spawnY }
+      ) => {
+        const instance = getInstanceByPersistentUuid(
+          runtimeScene,
+          persistentUuid
+        );
+        if (!instance) throw new Error('Instance not found.');
+        /** @type {gdjs.MultiplayerObjectRuntimeBehavior | null} */
+        // @ts-ignore - We know this returns a MultiplayerObjectRuntimeBehavior
+        const behavior = instance.getBehavior('MultiplayerObject');
+        if (!behavior) throw new Error('No MultiplayerObject behavior found.');
+        behavior.takeObjectOwnership();
+        instance.setPosition(spawnX, spawnY);
+      };
+
+      // The host loads the scene. It only creates the scene network ID
+      // in the first frame, when it sends the scene stack to other players.
+      switchToPeer({ playerNumber: 1, allConnectedPlayers });
+      const p1RuntimeScene = loadSceneSlowly({
+        instances: placedInstances,
+        sceneNetworkId: null,
+      });
+      p1RuntimeScene.networkId = sceneNetworkId;
+      p1RuntimeScene.renderAndStepWithEventsFunction(1000 / 60, () =>
+        takeOwnershipAndMoveToSpawnPoint(p1RuntimeScene, {
+          persistentUuid: 'instance-for-player-1',
+          spawnX: 120,
+          spawnY: 130,
+        })
+      );
+
+      // The player loads the scene, as asked by the host.
+      switchToPeer({ playerNumber: 2, allConnectedPlayers });
+      const p2RuntimeScene = loadSceneSlowly({
+        instances: placedInstances,
+        sceneNetworkId,
+      });
+      const p2PlacedInstances = p2RuntimeScene.getObjects('MySpriteObject');
+      expect(p2PlacedInstances.length).to.be(2);
+      const [p2InstanceForPlayer1, p2InstanceForPlayer2] = p2PlacedInstances;
+      p2RuntimeScene.renderAndStepWithEventsFunction(1000 / 60, () =>
+        takeOwnershipAndMoveToSpawnPoint(p2RuntimeScene, {
+          persistentUuid: 'instance-for-player-2',
+          spawnX: 520,
+          spawnY: 530,
+        })
+      );
+
+      // Let the games run for a while.
+      for (let i = 0; i < 10; i++) {
+        clock.tick(100);
+        switchToPeer({ playerNumber: 1, allConnectedPlayers });
+        p1RuntimeScene.renderAndStep(1000 / 60);
+        switchToPeer({ playerNumber: 2, allConnectedPlayers });
+        p2RuntimeScene.renderAndStep(1000 / 60);
+      }
+
+      // The player kept the instances placed in the scene, synchronized with the host.
+      expect(p2RuntimeScene.getObjects('MySpriteObject')).to.eql([
+        p2InstanceForPlayer1,
+        p2InstanceForPlayer2,
+      ]);
+      expect(p2InstanceForPlayer1.getX()).to.be(120);
+      expect(p2InstanceForPlayer1.getY()).to.be(130);
+      expect(p2InstanceForPlayer2.getX()).to.be(520);
+      expect(p2InstanceForPlayer2.getY()).to.be(530);
+
+      // The host has the same instances, without duplicates.
+      const p1Instances = p1RuntimeScene.getObjects('MySpriteObject');
+      expect(p1Instances.length).to.be(2);
+      const p1InstanceForPlayer2 = getInstanceByPersistentUuid(
+        p1RuntimeScene,
+        'instance-for-player-2'
+      );
+      if (!p1InstanceForPlayer2) throw new Error('Instance not found.');
+      expect(p1InstanceForPlayer2.networkId).to.be(
+        p2InstanceForPlayer2.networkId
+      );
+      expect(p1InstanceForPlayer2.getX()).to.be(520);
+      expect(p1InstanceForPlayer2.getY()).to.be(530);
     });
   });
 

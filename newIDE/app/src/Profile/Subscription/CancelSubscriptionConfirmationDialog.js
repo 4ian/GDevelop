@@ -234,37 +234,37 @@ const CancelSubscriptionConfirmationDialog = ({
       ]}
       flexColumnBody
     >
-      <ColumnStackLayout noMargin>
-        <I18n>
-          {({ i18n }) => (
-            <Text>
-              {subscription && subscription.endOfPeriodAt ? (
-                <Trans>
-                  You will keep your premium features until{' '}
-                  {i18n.date(subscription.endOfPeriodAt)}. After that, you will
-                  lose:
-                </Trans>
-              ) : (
-                <Trans>
-                  You will keep your premium features until the end of the
-                  period you already paid for. After that, you will lose:
-                </Trans>
-              )}
-            </Text>
+      {isLoading ? (
+        <PlaceholderLoader />
+      ) : (
+        <ColumnStackLayout noMargin>
+          <I18n>
+            {({ i18n }) => (
+              <Text>
+                {subscription && subscription.endOfPeriodAt ? (
+                  <Trans>
+                    You will keep your premium features until{' '}
+                    {i18n.date(subscription.endOfPeriodAt)}. After that, you
+                    will lose:
+                  </Trans>
+                ) : (
+                  <Trans>
+                    You will keep your premium features until the end of the
+                    period you already paid for. After that, you will lose:
+                  </Trans>
+                )}
+              </Text>
+            )}
+          </I18n>
+          {userSubscriptionPlanEvenIfLegacy && (
+            <SubscriptionPlanTableSummary
+              subscriptionPlanWithPricingSystems={
+                userSubscriptionPlanEvenIfLegacy
+              }
+              comparedSubscriptionPlanWithPricingSystems={freeSubscriptionPlan}
+              hideFullTableLink
+            />
           )}
-        </I18n>
-        {userSubscriptionPlanEvenIfLegacy && (
-          <SubscriptionPlanTableSummary
-            subscriptionPlanWithPricingSystems={
-              userSubscriptionPlanEvenIfLegacy
-            }
-            comparedSubscriptionPlanWithPricingSystems={freeSubscriptionPlan}
-            hideFullTableLink
-          />
-        )}
-        {isLoading ? (
-          <PlaceholderLoader />
-        ) : (
           <ColumnStackLayout noMargin>
             {unclaimedProductListingDatas &&
               unclaimedProductListingDatas.length > 0 && (
@@ -291,8 +291,8 @@ const CancelSubscriptionConfirmationDialog = ({
                 </ColumnStackLayout>
               )}
           </ColumnStackLayout>
-        )}
-      </ColumnStackLayout>
+        </ColumnStackLayout>
+      )}
     </Dialog>
   );
 };

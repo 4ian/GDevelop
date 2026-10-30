@@ -53,6 +53,8 @@ const ClaimableProductsDialog = ({
     passwordPromptDialog,
   } = useRedeemProduct();
 
+  const hasMultipleProducts = productListingDatas.length > 1;
+
   const openInStore = (
     productListingData:
       | PrivateAssetPackListingData
@@ -74,7 +76,13 @@ const ClaimableProductsDialog = ({
 
   return (
     <Dialog
-      title={<Trans>Your free products of the month</Trans>}
+      title={
+        hasMultipleProducts ? (
+          <Trans>Your free products of the month</Trans>
+        ) : (
+          <Trans>Your free product of the month</Trans>
+        )
+      }
       actions={[
         <FlatButton
           key="close"
@@ -86,7 +94,11 @@ const ClaimableProductsDialog = ({
       secondaryActions={[
         <Checkbox
           key="do-not-show-again"
-          label={<Trans>Don't show this again</Trans>}
+          label={
+            <Trans>
+              Don't show this dialog for the next months' free products
+            </Trans>
+          }
           checked={!values.autoDisplayClaimableProductsDialog}
           onCheck={(e, checked) =>
             setAutoDisplayClaimableProductsDialog(!checked)
@@ -95,14 +107,22 @@ const ClaimableProductsDialog = ({
       ]}
       open
       onRequestClose={onClose}
-      maxWidth="md"
+      maxWidth={hasMultipleProducts ? 'md' : 'sm'}
       flexColumnBody
     >
       <Text>
-        <Trans>
-          Thanks to your subscription, you can claim these products for free
-          this month. They are yours to keep, even after your subscription ends.
-        </Trans>
+        {hasMultipleProducts ? (
+          <Trans>
+            Thanks to your subscription, you can claim these products for free
+            this month. They are yours to keep, even after your subscription
+            ends.
+          </Trans>
+        ) : (
+          <Trans>
+            Thanks to your subscription, you can claim this product for free
+            this month. It is yours to keep, even after your subscription ends.
+          </Trans>
+        )}
       </Text>
       <ResponsiveLineStackLayout noMargin expand>
         {productListingDatas.map(productListingData => {

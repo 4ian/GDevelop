@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { I18n } from '@lingui/react';
 import { Trans } from '@lingui/macro';
 import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
@@ -18,7 +19,8 @@ import {
 } from '../../Utils/GDevelopServices/Shop';
 import { type SubscriptionPlanWithPricingSystems } from '../../Utils/GDevelopServices/Usage';
 import AuthenticatedUserContext from '../AuthenticatedUserContext';
-import useRedeemProduct from '../../AssetStore/UseRedeemProduct';
+import RouterContext from '../../MainFrame/RouterContext';
+import SubscriptionPlanTableSummary from './SubscriptionDialog/SubscriptionPlanTableSummary';
 
 type ProductListingData =
   | PrivateAssetPackListingData
@@ -32,6 +34,7 @@ const styles = {
     borderRadius: 4,
     flexShrink: 0,
   },
+  upcomingProduct: { opacity: 0.5 },
 };
 
 const getNextMonthStartDate = (): Date => {
@@ -44,29 +47,30 @@ const getMonth = (date: Date): string =>
 
 type Props = {|
   userSubscriptionPlanEvenIfLegacy: ?SubscriptionPlanWithPricingSystems,
+  freeSubscriptionPlan: ?SubscriptionPlanWithPricingSystems,
   onConfirm: () => void,
   onClose: () => void,
+  onOpenStore: () => void,
 |};
 
 /**
- * Asks to confirm the cancellation, showing the free products the user
- * has not claimed yet and, for monthly subscriptions, the ones of next month.
+ * Asks to confirm the cancellation, showing the benefits that will be lost,
+ * the free products the user has not claimed yet and, for monthly subscriptions,
+ * the ones of next month.
  */
 const CancelSubscriptionConfirmationDialog = ({
   userSubscriptionPlanEvenIfLegacy,
+  freeSubscriptionPlan,
   onConfirm,
   onClose,
+  onOpenStore,
 }: Props): React.Node => {
   const {
     subscription,
     receivedAssetPacks,
     receivedGameTemplates,
   } = React.useContext(AuthenticatedUserContext);
-  const {
-    onWillRedeemProduct,
-    redeemingProductId,
-    passwordPromptDialog,
-  } = useRedeemProduct();
+  const { addRouteArguments } = React.useContext(RouterContext);
   const [
     unclaimedProductListingDatas,
     setUnclaimedProductListingDatas,
@@ -155,52 +159,54 @@ const CancelSubscriptionConfirmationDialog = ({
     []
   );
 
-  const isReceived = (productListingData: ProductListingData) =>
-    (productListingData.productType === 'GAME_TEMPLATE'
-      ? receivedGameTemplates || []
-      : receivedAssetPacks || []
-    ).some(receivedProduct => receivedProduct.id === productListingData.id);
+  const openInStore = (productListingData: ProductListingData) => {
+    addRouteArguments(
+      productListingData.productType === 'GAME_TEMPLATE'
+        ? {
+            'initial-dialog': 'store',
+            'game-template': productListingData.id,
+          }
+        : {
+            'initial-dialog': 'store',
+            'asset-pack': productListingData.id,
+          }
+    );
+    onOpenStore();
+  };
 
   const renderProduct = (
     productListingData: ProductListingData,
     canClaim: boolean
   ) => (
-    <LineStackLayout noMargin alignItems="center" key={productListingData.id}>
-      <ImageWithFallback
-        style={styles.thumbnail}
-        src={productListingData.thumbnailUrls[0]}
-        alt={productListingData.name}
-      />
-      <ColumnStackLayout noMargin expand>
-        <Text noMargin>{productListingData.name}</Text>
-        <Text noMargin color="secondary" size="body-small">
-          {productListingData.productType === 'GAME_TEMPLATE' ? (
-            <Trans>Game template</Trans>
-          ) : (
-            <Trans>Asset pack</Trans>
-          )}
-        </Text>
-      </ColumnStackLayout>
-      {canClaim &&
-        (isReceived(productListingData) ? (
-          <Text noMargin color="secondary">
-            <Trans>Claimed</Trans>
+    <div
+      key={productListingData.id}
+      style={canClaim ? undefined : styles.upcomingProduct}
+    >
+      <LineStackLayout noMargin alignItems="center">
+        <ImageWithFallback
+          style={styles.thumbnail}
+          src={productListingData.thumbnailUrls[0]}
+          alt={productListingData.name}
+        />
+        <ColumnStackLayout noMargin expand>
+          <Text noMargin>{productListingData.name}</Text>
+          <Text noMargin color="secondary" size="body-small">
+            {productListingData.productType === 'GAME_TEMPLATE' ? (
+              <Trans>Game template</Trans>
+            ) : (
+              <Trans>Asset pack</Trans>
+            )}
           </Text>
-        ) : (
+        </ColumnStackLayout>
+        {canClaim && (
           <RaisedButton
             primary
-            label={
-              redeemingProductId === productListingData.id ? (
-                <Trans>Please wait</Trans>
-              ) : (
-                <Trans>Claim for free</Trans>
-              )
-            }
-            disabled={!!redeemingProductId}
-            onClick={() => onWillRedeemProduct(productListingData)}
+            label={<Trans>Claim it in the store</Trans>}
+            onClick={() => openInStore(productListingData)}
           />
-        ))}
-    </LineStackLayout>
+        )}
+      </LineStackLayout>
+    </div>
   );
 
   const isLoading =
@@ -228,41 +234,65 @@ const CancelSubscriptionConfirmationDialog = ({
       ]}
       flexColumnBody
     >
-      <Text>
-        <Trans>
-          By canceling your subscription, you will lose all your premium
-          features at the end of the period you already paid for.
-        </Trans>
-      </Text>
-      {isLoading ? (
-        <PlaceholderLoader />
-      ) : (
-        <>
-          {unclaimedProductListingDatas &&
-            unclaimedProductListingDatas.length > 0 && (
-              <ColumnStackLayout noMargin>
-                <Text size="sub-title" noMargin>
-                  <Trans>You have not claimed this month's free products</Trans>
-                </Text>
-                {unclaimedProductListingDatas.map(productListingData =>
-                  renderProduct(productListingData, true)
-                )}
-              </ColumnStackLayout>
-            )}
-          {nextMonthProductListingDatas &&
-            nextMonthProductListingDatas.length > 0 && (
-              <ColumnStackLayout noMargin>
-                <Text size="sub-title" noMargin>
-                  <Trans>Coming next month, free for subscribers</Trans>
-                </Text>
-                {nextMonthProductListingDatas.map(productListingData =>
-                  renderProduct(productListingData, false)
-                )}
-              </ColumnStackLayout>
-            )}
-        </>
-      )}
-      {passwordPromptDialog}
+      <ColumnStackLayout noMargin>
+        <I18n>
+          {({ i18n }) => (
+            <Text>
+              {subscription && subscription.endOfPeriodAt ? (
+                <Trans>
+                  You will keep your premium features until{' '}
+                  {i18n.date(subscription.endOfPeriodAt)}. After that, you will
+                  lose:
+                </Trans>
+              ) : (
+                <Trans>
+                  You will keep your premium features until the end of the
+                  period you already paid for. After that, you will lose:
+                </Trans>
+              )}
+            </Text>
+          )}
+        </I18n>
+        {userSubscriptionPlanEvenIfLegacy && (
+          <SubscriptionPlanTableSummary
+            subscriptionPlanWithPricingSystems={
+              userSubscriptionPlanEvenIfLegacy
+            }
+            comparedSubscriptionPlanWithPricingSystems={freeSubscriptionPlan}
+            hideFullTableLink
+          />
+        )}
+        {isLoading ? (
+          <PlaceholderLoader />
+        ) : (
+          <ColumnStackLayout noMargin>
+            {unclaimedProductListingDatas &&
+              unclaimedProductListingDatas.length > 0 && (
+                <ColumnStackLayout noMargin>
+                  <Text size="sub-title" noMargin>
+                    <Trans>
+                      You have not claimed this month's free products
+                    </Trans>
+                  </Text>
+                  {unclaimedProductListingDatas.map(productListingData =>
+                    renderProduct(productListingData, true)
+                  )}
+                </ColumnStackLayout>
+              )}
+            {nextMonthProductListingDatas &&
+              nextMonthProductListingDatas.length > 0 && (
+                <ColumnStackLayout noMargin>
+                  <Text size="sub-title" noMargin>
+                    <Trans>Coming next month, free for subscribers</Trans>
+                  </Text>
+                  {nextMonthProductListingDatas.map(productListingData =>
+                    renderProduct(productListingData, false)
+                  )}
+                </ColumnStackLayout>
+              )}
+          </ColumnStackLayout>
+        )}
+      </ColumnStackLayout>
     </Dialog>
   );
 };

@@ -13,10 +13,13 @@ import {
   subscriptionForGoldUser,
 } from '../../../../fixtures/GDevelopServicesTestData';
 import {
+  fakeFreeSubscriptionPlanWithPricingSystems,
   fakeGoldMonthlyPricingSystem,
   fakeGoldSubscriptionPlanWithPricingSystems,
   fakeGoldYearlyPricingSystem,
 } from '../../../../fixtures/GDevelopServicesTestData/FakeSubscriptionPlans';
+import { type SubscriptionPlanWithPricingSystems } from '../../../../Utils/GDevelopServices/Usage';
+import { type MessageByLocale } from '../../../../Utils/i18n/MessageByLocale';
 import { client as shopApiClient } from '../../../../Utils/GDevelopServices/Shop';
 import {
   claimableAssetPackListingData,
@@ -86,6 +89,11 @@ const monthlyGoldAuthenticatedUser: AuthenticatedUser = {
   subscription: {
     ...subscriptionForGoldUser,
     pricingSystemId: fakeGoldMonthlyPricingSystem.id,
+    endOfPeriodAt: new Date(
+      new Date().getFullYear(),
+      new Date().getMonth() + 1,
+      0
+    ).getTime(),
   },
   receivedGameTemplates: [],
 };
@@ -98,6 +106,65 @@ const yearlyGoldAuthenticatedUser: AuthenticatedUser = {
   },
 };
 
+const featureNamesByLocale: { [featureName: string]: MessageByLocale } = {
+  FREE_CREDITS: { en: 'GDevelop credits' },
+  PUBLISH_IOS: { en: 'Publish on iOS' },
+  REMOVE_MANDATORY_LOGO: { en: 'Remove the GDevelop logo' },
+  CLAIM_PREMIUM_ASSET_PACKS: {
+    en: 'Free premium asset pack and game template',
+  },
+};
+
+const goldPlan: SubscriptionPlanWithPricingSystems = {
+  ...fakeGoldSubscriptionPlanWithPricingSystems,
+  featureNamesByLocale,
+  fullFeatures: [
+    {
+      featureName: 'FREE_CREDITS',
+      pillarName: 'GAME_CREATION',
+      descriptionByLocale: { en: '1000 per month' },
+      displayInSummary: true,
+    },
+    {
+      featureName: 'PUBLISH_IOS',
+      pillarName: 'PUBLICATION',
+      enabled: 'yes',
+      displayInSummary: true,
+    },
+    {
+      featureName: 'REMOVE_MANDATORY_LOGO',
+      pillarName: 'PUBLICATION',
+      enabled: 'yes',
+      displayInSummary: true,
+    },
+    {
+      featureName: 'CLAIM_PREMIUM_ASSET_PACKS',
+      pillarName: 'ASSETS',
+      descriptionByLocale: { en: '1 of each per month' },
+      displayInSummary: true,
+    },
+  ],
+};
+
+const freePlan: SubscriptionPlanWithPricingSystems = {
+  ...fakeFreeSubscriptionPlanWithPricingSystems,
+  featureNamesByLocale,
+  fullFeatures: [
+    { featureName: 'FREE_CREDITS', pillarName: 'GAME_CREATION', enabled: 'no' },
+    { featureName: 'PUBLISH_IOS', pillarName: 'PUBLICATION', enabled: 'no' },
+    {
+      featureName: 'REMOVE_MANDATORY_LOGO',
+      pillarName: 'PUBLICATION',
+      enabled: 'no',
+    },
+    {
+      featureName: 'CLAIM_PREMIUM_ASSET_PACKS',
+      pillarName: 'ASSETS',
+      enabled: 'no',
+    },
+  ],
+};
+
 const DialogWithUser = ({
   authenticatedUser,
 }: {|
@@ -105,11 +172,11 @@ const DialogWithUser = ({
 |}) => (
   <AuthenticatedUserContext.Provider value={authenticatedUser}>
     <CancelSubscriptionConfirmationDialog
-      userSubscriptionPlanEvenIfLegacy={
-        fakeGoldSubscriptionPlanWithPricingSystems
-      }
+      userSubscriptionPlanEvenIfLegacy={goldPlan}
+      freeSubscriptionPlan={freePlan}
       onConfirm={action('onConfirm')}
       onClose={action('onClose')}
+      onOpenStore={action('onOpenStore')}
     />
   </AuthenticatedUserContext.Provider>
 );

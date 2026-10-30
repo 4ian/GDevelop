@@ -16,16 +16,6 @@ import useAlertDialog from '../../../UI/Alert/useAlertDialog';
 import PreferencesContext from '../../../MainFrame/Preferences/PreferencesContext';
 import PasswordPromptDialog from '../../../AssetStore/PasswordPromptDialog';
 
-const cancelConfirmationTexts = {
-  level: 'normal',
-  dialogTexts: {
-    title: t`Cancel your subscription?`,
-    message: t`By canceling your subscription, you will lose all your premium features at the end of the period you already paid for. Continue?`,
-    confirmButtonLabel: t`Continue`,
-    dismissButtonLabel: t`Keep subscription`,
-    maxWidth: 'sm',
-  },
-};
 // When changing subscription, the existing one is kept until the payment for the
 // new one is completed: it's then replaced by the new one (and cancelled at the payment
 // provider by the backend). Nothing is cancelled if the user does not complete the payment.
@@ -70,6 +60,8 @@ type BuyUpdateOrCancelPlanState = {|
     i18n: I18nType,
     subscriptionPlanPricingSystem: SubscriptionPlanPricingSystem | null
   ) => Promise<void>,
+  cancelConfirmationDialogOpen: boolean,
+  setCancelConfirmationDialogOpen: (open: boolean) => void,
   cancelReasonDialogOpen: boolean,
   setCancelReasonDialogOpen: (open: boolean) => void,
   passwordPromptDialog: React.Node,
@@ -90,6 +82,10 @@ export const useBuyUpdateOrCancelPlan = ({
   const { subscription, profile } = authenticatedUser;
   const preferences = React.useContext(PreferencesContext);
   const { showConfirmation, showDeleteConfirmation } = useAlertDialog();
+  const [
+    cancelConfirmationDialogOpen,
+    setCancelConfirmationDialogOpen,
+  ] = React.useState(false);
   const [cancelReasonDialogOpen, setCancelReasonDialogOpen] = React.useState(
     false
   );
@@ -159,13 +155,7 @@ export const useBuyUpdateOrCancelPlan = ({
 
     if (!subscriptionPlanPricingSystem) {
       // Cancelling the existing subscription.
-      const answer = await showConfirmation(
-        // $FlowFixMe[incompatible-type]
-        cancelConfirmationTexts.dialogTexts
-      );
-      if (!answer) return;
-
-      setCancelReasonDialogOpen(true);
+      setCancelConfirmationDialogOpen(true);
       return;
     }
 
@@ -214,6 +204,8 @@ export const useBuyUpdateOrCancelPlan = ({
 
   return {
     buyUpdateOrCancelPlan,
+    cancelConfirmationDialogOpen,
+    setCancelConfirmationDialogOpen,
     cancelReasonDialogOpen,
     setCancelReasonDialogOpen,
     passwordPromptDialog: checkoutOptionsWaitingForPassword ? (

@@ -81,7 +81,7 @@ export type ProductListingData = {|
   visibleUntil?: string,
 |};
 
-type RedeemCondition = {
+export type RedeemCondition = {
   reason: 'subscription',
   condition: string,
   usageType: string,
@@ -122,6 +122,7 @@ export type PrivateGameTemplateListingData = {|
   ...StripeAndPaypalSellableAttributes,
   ...AppStoreProductAttributes,
   ...CreditsClaimableAttributes,
+  ...RedeemableAttributes,
   productType: 'GAME_TEMPLATE',
   listing: 'GAME_TEMPLATE',
   /** The id of the game published on gd.games showcasing this template. */
@@ -753,26 +754,27 @@ export const canRedeemProduct = ({
   return { canRedeem: false };
 };
 
-export const getCalloutToGetSubscriptionOrClaimAssetPack = ({
+export const getCalloutToGetSubscriptionOrClaimProduct = ({
   subscription,
-  privateAssetPackListingData,
+  productListingData,
   isAlreadyReceived,
 }: {|
   subscription: ?Subscription,
-  privateAssetPackListingData: PrivateAssetPackListingData,
+  productListingData:
+    | PrivateAssetPackListingData
+    | PrivateGameTemplateListingData,
   isAlreadyReceived: boolean,
 |}): ?{|
   message: React.Node,
   actionLabel: ?React.Node,
-  canRedeemAssetPack: boolean,
+  canRedeemProduct: boolean,
 |} => {
-  if (isAlreadyReceived || !privateAssetPackListingData.redeemConditions)
-    return null;
+  if (isAlreadyReceived || !productListingData.redeemConditions) return null;
   if (subscription && subscription.benefitsFromEducationPlan) return null;
 
-  const applicableRedeemConditions = privateAssetPackListingData.redeemConditions.filter(
+  const applicableRedeemConditions = productListingData.redeemConditions.filter(
     redeemCondition => {
-      return privateAssetPackListingData.prices.some(
+      return productListingData.prices.some(
         price =>
           price.usageType === redeemCondition.usageType &&
           redeemCondition.reason === 'subscription'
@@ -790,7 +792,11 @@ export const getCalloutToGetSubscriptionOrClaimAssetPack = ({
   });
 
   const actionLabel = redemptionCheck.canRedeem ? (
-    <Trans>Claim this pack</Trans>
+    productListingData.productType === 'GAME_TEMPLATE' ? (
+      <Trans>Claim this template</Trans>
+    ) : (
+      <Trans>Claim this pack</Trans>
+    )
   ) : !subscription || !subscription.planId ? (
     <Trans>Get a Sub</Trans>
   ) : redemptionCheck.canUpgrade ? (
@@ -800,7 +806,7 @@ export const getCalloutToGetSubscriptionOrClaimAssetPack = ({
   if (firstApplicableRedeemCondition.usageType === 'commercial') {
     return {
       actionLabel,
-      canRedeemAssetPack: redemptionCheck.canRedeem,
+      canRedeemProduct: redemptionCheck.canRedeem,
       // TODO: Adapt message to redeem condition
       message: (
         <Trans>
@@ -812,7 +818,7 @@ export const getCalloutToGetSubscriptionOrClaimAssetPack = ({
   if (firstApplicableRedeemCondition.usageType === 'personal') {
     return {
       actionLabel,
-      canRedeemAssetPack: redemptionCheck.canRedeem,
+      canRedeemProduct: redemptionCheck.canRedeem,
       // TODO: Adapt message to redeem condition
       message: (
         <Trans>Personal license for claim with Gold or Pro subscription</Trans>
@@ -822,7 +828,7 @@ export const getCalloutToGetSubscriptionOrClaimAssetPack = ({
   if (firstApplicableRedeemCondition.usageType === 'unlimited') {
     return {
       actionLabel,
-      canRedeemAssetPack: redemptionCheck.canRedeem,
+      canRedeemProduct: redemptionCheck.canRedeem,
       // TODO: Adapt message to redeem condition
       message: (
         <Trans>
@@ -834,13 +840,87 @@ export const getCalloutToGetSubscriptionOrClaimAssetPack = ({
   }
 };
 
-export const redeemPrivateAssetPack = async ({
-  privateAssetPackListingData,
+/**
+ * The products given away to subscribers this month and the next one.
+ */
+export type GivenAwayProduct = {|
+  /** Formatted as YYYY-MM. */
+  month: string,
+  productType: 'ASSET_PACK' | 'GAME_TEMPLATE',
+  productId: string,
+|};
+
+export const listGivenAwayProducts = async (): Promise<
+  Array<GivenAwayProduct>
+> => {
+  const response = await client.get('/given-away-product');
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/given-away-product of Shop API',
+  });
+};
+
+/**
+ * The products a subscriber can claim right now and has not received yet.
+ */
+export const getClaimableProductListingDatas = ({
+  subscription,
+  privateAssetPackListingDatas,
+  privateGameTemplateListingDatas,
+  receivedAssetPacks,
+  receivedGameTemplates,
+}: {|
+  subscription: ?Subscription,
+  privateAssetPackListingDatas: ?Array<PrivateAssetPackListingData>,
+  privateGameTemplateListingDatas: ?Array<PrivateGameTemplateListingData>,
+  receivedAssetPacks: ?$ReadOnlyArray<{ +id: string, ... }>,
+  receivedGameTemplates: ?$ReadOnlyArray<{ +id: string, ... }>,
+|}): Array<PrivateAssetPackListingData | PrivateGameTemplateListingData> => {
+  const claimableProductListingDatas: Array<
+    PrivateAssetPackListingData | PrivateGameTemplateListingData
+  > = [];
+  const claimableAssetPackListingData = (
+    privateAssetPackListingDatas || []
+  ).find(
+    listingData =>
+      !!listingData.redeemConditions &&
+      !(receivedAssetPacks || []).some(
+        assetPack => assetPack.id === listingData.id
+      )
+  );
+  if (claimableAssetPackListingData)
+    claimableProductListingDatas.push(claimableAssetPackListingData);
+  const claimableGameTemplateListingData = (
+    privateGameTemplateListingDatas || []
+  ).find(
+    listingData =>
+      !!listingData.redeemConditions &&
+      !(receivedGameTemplates || []).some(
+        gameTemplate => gameTemplate.id === listingData.id
+      )
+  );
+  if (claimableGameTemplateListingData)
+    claimableProductListingDatas.push(claimableGameTemplateListingData);
+
+  return claimableProductListingDatas.filter(productListingData => {
+    const callout = getCalloutToGetSubscriptionOrClaimProduct({
+      subscription,
+      productListingData,
+      isAlreadyReceived: false,
+    });
+    return !!callout && callout.canRedeemProduct;
+  });
+};
+
+export const redeemProduct = async ({
+  productListingData,
   getAuthorizationHeader,
   userId,
   password,
 }: {|
-  privateAssetPackListingData: PrivateAssetPackListingData,
+  productListingData:
+    | PrivateAssetPackListingData
+    | PrivateGameTemplateListingData,
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
   password: string,
@@ -851,7 +931,7 @@ export const redeemPrivateAssetPack = async ({
   };
   if (password) payload.password = password;
   await client.post(
-    `/product/${privateAssetPackListingData.id}/action/redeem`,
+    `/product/${productListingData.id}/action/redeem`,
     payload,
     {
       headers: { Authorization: authorizationHeader },

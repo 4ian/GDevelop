@@ -60,6 +60,15 @@ type ClaimableAssetPackNotification = {
   },
 };
 
+type ClaimableGameTemplateNotification = {
+  ...NotificationBaseAttributes,
+  type: 'claimable-game-template',
+  data: {
+    privateGameTemplateId: string,
+    privateGameTemplateName: string,
+  },
+};
+
 type TeamInvitationNotification = {
   ...NotificationBaseAttributes,
   type: 'team-invitation',
@@ -96,6 +105,7 @@ export type Notification =
   | CreditsDropNotification
   | FreeTrialAboutToExpireNotification
   | ClaimableAssetPackNotification
+  | ClaimableGameTemplateNotification
   | OneGameFeedbackReceivedNotification
   | MultipleGameFeedbackReceivedNotification
   | GameSessionsAchievementNotification

@@ -28,6 +28,7 @@ import { formatPriceWithCurrency, getPlanIcon } from '../PlanSmallCard';
 import { selectMessageByLocale } from '../../../Utils/i18n/MessageByLocale';
 import FlatButton from '../../../UI/FlatButton';
 import CancelReasonDialog from '../CancelReasonDialog';
+import CancelSubscriptionConfirmationDialog from '../CancelSubscriptionConfirmationDialog';
 import { useBuyUpdateOrCancelPlan } from './useBuyUpdateOrCancelPlan';
 import { uniq } from 'lodash';
 
@@ -111,6 +112,8 @@ export default function SubscriptionDialog({
 
   const {
     buyUpdateOrCancelPlan,
+    cancelConfirmationDialogOpen,
+    setCancelConfirmationDialogOpen,
     cancelReasonDialogOpen,
     setCancelReasonDialogOpen,
     passwordPromptDialog,
@@ -495,6 +498,18 @@ export default function SubscriptionDialog({
             </Dialog>
           )}
           {passwordPromptDialog}
+          {cancelConfirmationDialogOpen && (
+            <CancelSubscriptionConfirmationDialog
+              userSubscriptionPlanEvenIfLegacy={
+                userSubscriptionPlanEvenIfLegacy
+              }
+              onConfirm={() => {
+                setCancelConfirmationDialogOpen(false);
+                setCancelReasonDialogOpen(true);
+              }}
+              onClose={() => setCancelConfirmationDialogOpen(false)}
+            />
+          )}
           {cancelReasonDialogOpen && (
             <CancelReasonDialog
               onClose={() => {

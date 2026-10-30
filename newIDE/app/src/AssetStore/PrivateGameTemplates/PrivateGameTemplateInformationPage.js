@@ -65,6 +65,7 @@ import PrivateGameTemplatePurchaseDialog from './PrivateGameTemplatePurchaseDial
 import GiftPurchaseDialog from '../Gift/GiftPurchaseDialog';
 import BuyAsGiftButton from '../Gift/BuyAsGiftButton';
 import PasswordPromptDialog from '../PasswordPromptDialog';
+import ClaimProductCallout from '../ClaimProductCallout';
 import PublicProfileContext from '../../Profile/PublicProfileContext';
 import { LARGE_WIDGET_SIZE } from '../../MainFrame/EditorContainers/HomePage/CardWidget';
 import { BundleStoreContext } from '../Bundles/BundleStoreContext';
@@ -628,6 +629,10 @@ const PrivateGameTemplateInformationPage = ({
                           </Link>
                         </Text>
                       </LineStackLayout>
+                      <ClaimProductCallout
+                        productListingData={privateGameTemplateListingData}
+                        isAlreadyReceived={isAlreadyReceived}
+                      />
                       <LineStackLayout
                         noMargin
                         justifyContent="space-between"

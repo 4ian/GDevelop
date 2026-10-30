@@ -261,29 +261,35 @@ describe('Multiplayer gameplay test helpers (harness.multiplayer)', () => {
     const result = await runTestScript(`
       ${startAsPlayer2Source}
       await harness.goToScene('MultiplayerTestScene');
-      const crate = harness.getObjects('Crate')[0];
+      const crate = harness.getRuntimeObject('Crate');
       await harness.stepFrames(3);
       // Longer than the delay after which the extension deletes the
       // synchronized instances without network id.
       await new Promise((resolve) => setTimeout(resolve, 600));
       await harness.stepFrames(1);
-      const crates = harness.getObjects('Crate');
-      harness.assert(crates.length === 1 && crates[0].id === crate.id, 'The crate is kept.');
-      harness.assert(!!harness.getRuntimeObject(crate.id).networkId, 'The crate has a network id.');
+      const crates = harness.getCurrentRuntimeScene().getObjects('Crate');
+      harness.assert(crates.length === 1 && crates[0] === crate, 'The crate is kept.');
+      harness.assert(!!crate.networkId, 'The crate has a network id.');
+      harness.assert(!harness.getEventLog().some((event) => event.cause === 'networkSync'), 'The scene was not replaced by the host.');
     `);
 
     expectPassed(result);
   }).timeout(5000);
 
-  it('reproduces the instances placed in the scene deleted when the scene is slow to load', async () => {
+  it('keeps the instances placed in the scene when the scene is slow to load, for a player who is not the host', async () => {
     const result = await runTestScript(`
       ${startAsPlayer2Source}
-      await harness.goToScene('MultiplayerTestScene');
-      const crate = harness.getObjects('Crate')[0];
-      await harness.multiplayer.simulateSlowSceneLoad(600);
+      // Longer than the delay after which the extension deletes the
+      // synchronized instances without network id.
+      await harness.goToScene('MultiplayerTestScene', { delayBeforeFirstFrameMs: 600 });
+      const crate = harness.getRuntimeObject('Crate');
       await harness.stepFrames(3);
-      harness.assert(!harness.getRuntimeObject(crate.id), 'The crate placed in the scene was deleted.');
-      harness.assert(harness.getObjects('Crate').length === 1, 'The crate of the host was created again from its update.');
+      await new Promise((resolve) => setTimeout(resolve, 600));
+      await harness.stepFrames(1);
+      const crates = harness.getCurrentRuntimeScene().getObjects('Crate');
+      harness.assert(crates.length === 1 && crates[0] === crate, 'The crate placed in the scene is kept.');
+      harness.assert(!!crate.networkId, 'The crate has a network id.');
+      harness.assert(!harness.getEventLog().some((event) => event.cause === 'networkSync'), 'The scene was not replaced by the host.');
     `);
 
     expectPassed(result);

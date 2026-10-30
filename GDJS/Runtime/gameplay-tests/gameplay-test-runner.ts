@@ -577,6 +577,8 @@ namespace gdjs {
      * still bounded, so a dead network cannot hang a run forever. */
     const DEFAULT_LOADING_TIMEOUT_MS = 300000;
     const DEFAULT_MAX_FRAMES = 20000;
+    /** The longest `delayBeforeFirstFrameMs` of `goToScene`. */
+    const MAX_DELAY_BEFORE_FIRST_FRAME_MS = 60000;
     /** How long frames are stepped before yielding once to the browser:
      * the game visibly plays (a rendered frame per refresh), stop/progress
      * messages flow, while keeping near-full stepping throughput. */
@@ -1665,11 +1667,29 @@ namespace gdjs {
 
       /**
        * Load and start the given scene, replacing any running scene.
+       *
+       * `delayBeforeFirstFrameMs` lets this wall-clock time pass between the
+       * creation of the scene and its first frame, as when a big scene is
+       * long to load on the device of a player: the wall-clock timers of the
+       * game and of its extensions fire meanwhile.
        */
       async goToScene(
         sceneName: string,
-        options?: { skipCreatingInstances?: boolean }
+        options?: {
+          skipCreatingInstances?: boolean;
+          delayBeforeFirstFrameMs?: float;
+        }
       ): Promise<void> {
+        const delayBeforeFirstFrameMs =
+          (options && options.delayBeforeFirstFrameMs) || 0;
+        if (
+          !(delayBeforeFirstFrameMs >= 0) ||
+          delayBeforeFirstFrameMs > MAX_DELAY_BEFORE_FIRST_FRAME_MS
+        ) {
+          throw new Error(
+            `delayBeforeFirstFrameMs expects a number of milliseconds between 0 and ${MAX_DELAY_BEFORE_FIRST_FRAME_MS}.`
+          );
+        }
         if (!this._runtimeGame.hasScene(sceneName)) {
           throw new Error(
             `The scene "${sceneName}" does not exist in the game.`
@@ -1700,6 +1720,11 @@ namespace gdjs {
                   : undefined,
               })
             );
+          if (delayBeforeFirstFrameMs > 0) {
+            await new Promise((resolve) =>
+              setTimeout(resolve, delayBeforeFirstFrameMs)
+            );
+          }
           // Step one frame so the scene is fully initialized ("beginning of
           // scene" events have run) before the test continues.
           await this.stepFrames(1);

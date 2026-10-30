@@ -15,8 +15,6 @@ interface Harness {
     receiveCustomMessage(name: string, data: string, fromPlayerNumber: number): void;
     /** What the game sent: `type` is 'updateInstance', 'changeInstanceOwner', 'destroyInstance', 'customMessage', 'ackCustomMessage', 'updateScene', 'updateGame', 'heartbeat'...; `name` is the custom message name or the object name. `data` of an instance update: `{ x, y, z, a, beh: { [behaviorName]: ... }, var: [...] }`. */
     getSentMessages(filter?: { type?: string; name?: string }): Array<{ frame: number; type: string; name: string | null; instanceId?: number | null; owner?: number; to: number[]; data: any }>;
-    /** Right after `goToScene`: let wall-clock time pass as when the scene is long to load on this player's device (instances owned by the host and placed in the scene, still without network id after 500ms, are deleted by the extension). */
-    simulateSlowSceneLoad(durationMs: number): Promise<void>;
   };
 }
 ```
@@ -25,5 +23,5 @@ Rules:
 
 - Test the instances of the current player and the copies of the other players' instances separately: the game must move its own player, and only apply the updates received for the others (`addRemoteInstance` + `receiveUpdate`).
 - A player's objects are usually created at runtime by that player: on the host, create the other players' bodies with `addRemoteInstance`, not with `spawn`. An object owned by a given player by default is ignored when another player creates it (`addRemoteInstance` throws why): objects are owned by the host by default.
-- Check what is sent to the others with `getSentMessages`, e.g. that a control behavior is not in `data.beh` of the 'updateInstance' messages of the player. Messages are sent at a wall-clock rate: assert what they contain, never how many there are.
-- Test as a player who is not the host too (`isHost: false`): the simulated host plays the same scenes and gives their instances their network ids, like a real host.
+- Check what is sent to the others with `getSentMessages`, e.g. that a control behavior is not in `data.beh` of the 'updateInstance' messages of the player (a behavior is not synchronized when its "synchronized over the network" setting is off). Messages are sent at a wall-clock rate: assert what they contain, never how many there are.
+- Test as a player who is not the host too (`isHost: false`): the simulated host plays the same scenes and gives their instances their network ids, like a real host. For a scene long to load on this player's device, use `goToScene(name, { delayBeforeFirstFrameMs: 2000 })`.

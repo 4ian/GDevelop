@@ -761,6 +761,40 @@ describe('gdjs.gameplayTests', () => {
     expect(result.status).to.be('passed');
   });
 
+  it('waits between the creation of a scene and its first frame when asked', async () => {
+    const result = await runTestScript(
+      makeRuntimeGame(),
+      `
+      const events = [];
+      setTimeout(() => events.push('timer'), 100);
+      const scene = await (async () => {
+        await harness.goToScene('Scene 1', { delayBeforeFirstFrameMs: 300 });
+        return harness.getCurrentRuntimeScene();
+      })();
+      events.push('first frame stepped at ' + scene.getTimeManager().getTimeFromStart());
+      harness.assert(events[0] === 'timer', 'The timers fire before the first frame: ' + JSON.stringify(events));
+      `,
+      { timeoutMs: 200 }
+    );
+
+    expect(result.errors).to.eql([]);
+    expect(result.status).to.be('passed');
+    // Waited as loading, outside of the timeout budget.
+    expect(result.loadingMs >= 280).to.be(true);
+  });
+
+  it('refuses a negative delay before the first frame of a scene', async () => {
+    const result = await runTestScript(
+      makeRuntimeGame(),
+      `await harness.goToScene('Scene 1', { delayBeforeFirstFrameMs: -1 });`
+    );
+
+    expect(result.status).to.be('error');
+    expect(result.errors[0]).to.contain(
+      'delayBeforeFirstFrameMs expects a number of milliseconds between 0 and 60000.'
+    );
+  });
+
   it('lets a test change its timeout budget', async () => {
     const result = await runTestScript(
       makeRuntimeGame(),

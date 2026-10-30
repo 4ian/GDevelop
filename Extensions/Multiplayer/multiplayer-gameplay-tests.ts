@@ -450,24 +450,6 @@ namespace gdjs {
         });
     }
 
-    /**
-     * Let `durationMs` of wall-clock time pass without stepping any frame
-     * nor receiving any message, as when a scene is long to load on the
-     * device of the player. Call it right after `goToScene`: when the game
-     * is not the host, the frame giving the scene its network id is stepped
-     * first. The wall-clock timers of the extension fire meanwhile, like the
-     * one deleting the synchronized instances that received no network id
-     * within 500ms - such as the instances placed in the scene, owned by
-     * the host, before the first update of the host arrives.
-     */
-    async simulateSlowSceneLoad(durationMs: float): Promise<void> {
-      const lobby = this._getLobby();
-      if (!lobby.isHost && !this._harness.getCurrentRuntimeScene().networkId) {
-        await this._harness.stepFrames(1);
-      }
-      await new Promise((resolve) => setTimeout(resolve, durationMs));
-    }
-
     private _getLobby(): SimulatedLobby {
       if (!this._lobby) {
         throw new Error(
@@ -621,15 +603,20 @@ namespace gdjs {
 
     /**
      * When the game is not the host, the simulated host plays the same
-     * scenes: it gives them their network id (with the scene stack it
-     * sends, applied by the game at the beginning of the next frame), and
-     * sends the first update of the instances it owns that are placed in
-     * the scene, received one frame later. They are then matched with the
-     * ones of the game (by their position) and get their network id.
+     * scenes: it sends its scene stack (with the network ids the scenes got
+     * when they were created, see `_giveNetworkIdToCreatedScene`), and the
+     * first update of the instances it owns that are placed in the scene,
+     * received one frame later. They are then matched with the ones of the
+     * game (by their position) and get their network id.
      */
     private _simulateHostOfScene(runtimeScene: gdjs.RuntimeScene): void {
       const lobby = this._getLobby();
-      if (lobby.isHost || this._scenesAnnouncedByHost.has(runtimeScene)) {
+      if (
+        lobby.isHost ||
+        // Like a real host, it only sends updates once the game started.
+        !gdjs.multiplayer.isLobbyGameRunning() ||
+        this._scenesAnnouncedByHost.has(runtimeScene)
+      ) {
         return;
       }
       this._scenesAnnouncedByHost.add(runtimeScene);
@@ -663,6 +650,16 @@ namespace gdjs {
           framesAfterSceneNetworkId: 1,
         });
       }
+    }
+
+    /**
+     * When the game is not the host, a scene is entered by following the
+     * host: the scene stack sent by the host gives the scene its network id
+     * as it is created (see `SceneStack.applyUpdateFromNetworkSyncDataIfAny`).
+     */
+    private _giveNetworkIdToCreatedScene(runtimeScene: gdjs.RuntimeScene) {
+      if (this._getLobby().isHost || runtimeScene.networkId) return;
+      runtimeScene.networkId = gdjs.makeUuid().substring(0, 8);
     }
 
     /** Give the game the messages of the other players. */
@@ -750,6 +747,9 @@ namespace gdjs {
           messagesList.clear();
         }
       };
+      const giveNetworkIdToCreatedScene = (runtimeScene: gdjs.RuntimeScene) =>
+        this._giveNetworkIdToCreatedScene(runtimeScene);
+      gdjs.callbacksRuntimeSceneLoaded.push(giveNetworkIdToCreatedScene);
       gdjs.callbacksRuntimeScenePreEvents.unshift(deliverIncomingMessages);
       gdjs.callbacksRuntimeScenePostEvents.push(clearMessages);
 
@@ -766,6 +766,10 @@ namespace gdjs {
           deliverIncomingMessages
         );
         removeCallback(gdjs.callbacksRuntimeScenePostEvents, clearMessages);
+        removeCallback(
+          gdjs.callbacksRuntimeSceneLoaded,
+          giveNetworkIdToCreatedScene
+        );
         gdjs.multiplayer.endLobbyGameWithoutLobby();
         playerAuthentication.getUsername = originalGetUsername;
         playerAuthentication.getUserId = originalGetUserId;

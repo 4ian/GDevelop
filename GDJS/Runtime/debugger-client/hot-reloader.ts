@@ -183,6 +183,11 @@ namespace gdjs {
         }
         const reloadedScriptElement = document.createElement('script');
         reloadedScriptElement.src = srcFilename + '?timestamp=' + Date.now();
+        // Like the scripts of index.html: without it, a script from another
+        // origin (like the runtime of the browser previews) has an
+        // "about:blank" base URL, so its relative dynamic imports
+        // (like the Jolt physics library) can't be resolved.
+        reloadedScriptElement.crossOrigin = 'anonymous';
         reloadedScriptElement.onload = () => {
           resolve();
         };

@@ -1760,6 +1760,10 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (objects.length === 0) {
       return;
     }
+    // Objects from the asset store can come with behaviors needing shared
+    // data (like the 3D physics), which must be in the scene before it's
+    // previewed or reloaded in the in-game editor.
+    this.updateBehaviorsSharedData();
     // Run the per-object-type additional work for every created object (for
     // instance, a lighting layer is created for a light object): bulk paste
     // and duplicate can create several objects at once.

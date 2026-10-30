@@ -64,6 +64,8 @@ import PasswordPromptDialog from '../PasswordPromptDialog';
 import Window from '../../Utils/Window';
 import RaisedButton from '../../UI/RaisedButton';
 import PrivateAssetPackPurchaseDialog from './PrivateAssetPackPurchaseDialog';
+import GiftPurchaseDialog from '../Gift/GiftPurchaseDialog';
+import BuyAsGiftButton from '../Gift/BuyAsGiftButton';
 import PublicProfileContext from '../../Profile/PublicProfileContext';
 import { LARGE_WIDGET_SIZE } from '../../MainFrame/EditorContainers/HomePage/CardWidget';
 import { BundleStoreContext } from '../Bundles/BundleStoreContext';
@@ -212,6 +214,10 @@ const PrivateAssetPackInformationPage = ({
   ] = React.useState<?PrivateAssetPackListingData>(null);
   const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
   const [assetPack, setAssetPack] = React.useState<?PrivateAssetPack>(null);
+  const [
+    isGiftPurchaseDialogOpen,
+    setIsGiftPurchaseDialogOpen,
+  ] = React.useState<boolean>(false);
   const [isFetching, setIsFetching] = React.useState<boolean>(false);
   const [isRedeemingProduct, setIsRedeemingProduct] = React.useState<boolean>(
     false
@@ -755,6 +761,12 @@ const PrivateAssetPackInformationPage = ({
                           )}
                         </ColumnStackLayout>
                       )}
+                      {!errorText && (
+                        <BuyAsGiftButton
+                          onClick={() => setIsGiftPurchaseDialogOpen(true)}
+                          simulateAppStoreProduct={simulateAppStoreProduct}
+                        />
+                      )}
                     </ColumnStackLayout>
                   </div>
                 </ResponsiveLineStackLayout>
@@ -860,6 +872,13 @@ const PrivateAssetPackInformationPage = ({
               }
               usageType={selectedUsageType}
               onClose={() => setPurchasingPrivateAssetPackListingData(null)}
+            />
+          )}
+          {isGiftPurchaseDialogOpen && (
+            <GiftPurchaseDialog
+              productListingData={privateAssetPackListingData}
+              usageType={selectedUsageType}
+              onClose={() => setIsGiftPurchaseDialogOpen(false)}
             />
           )}
         </>

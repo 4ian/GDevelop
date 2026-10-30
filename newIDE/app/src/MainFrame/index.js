@@ -1426,7 +1426,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       // the URL to a resource with a name in the old project is not re-used
       // for another resource with the same name in the new project.
       ResourcesLoader.burstAllUrlsCache();
-      PixiResourcesLoader.burstCache();
+      await PixiResourcesLoader.burstCache();
       burstResource3DPreviewCache();
 
       // Set the on-disk path before exposing the project via state so that
@@ -2263,13 +2263,20 @@ const MainFrame = (props: Props): React.MixedElement => {
         // Hot-reloads are triggered right away from a 3D editor.
         // Which means this call won't do any hot-reload when switching between
         // 2 3D editors but only switch the scene.
-        notifyChangesToInGameEditor({
-          shouldReloadProjectData: false,
-          shouldReloadLibraries: false,
-          shouldReloadResources: false,
-          shouldHardReload: false,
-          reasons: ['switched-tab-while-using-3d-editor'],
+        //
+        // When switching to a tab using the 2D editor, the mode is still the
+        // one of the previous tab until this tab sets it: wait for it, so that
+        // its scene is not loaded for nothing in the 3D editor.
+        const timeoutId = setTimeout(() => {
+          notifyChangesToInGameEditor({
+            shouldReloadProjectData: false,
+            shouldReloadLibraries: false,
+            shouldReloadResources: false,
+            shouldHardReload: false,
+            reasons: ['switched-tab-while-using-3d-editor'],
+          });
         });
+        return () => clearTimeout(timeoutId);
       } else {
         // Switch the 3D editor to the same scene as the 2D one.
         // It allows to keep the 3D editor up to date for a fast switch

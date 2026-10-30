@@ -50,6 +50,33 @@ export type SpineDataOrLoadingError = {|
 
 type ResourcePromise<T> = { [resourceName: string]: Promise<T> };
 
+/**
+ * Release the GPU memory of a 3D model, and the decoded images of its
+ * textures: they would otherwise stay in memory until garbage collected.
+ */
+// $FlowFixMe[value-as-type]
+const dispose3DModel = (model: THREE.THREE_ADDONS.GLTF) => {
+  model.scene.traverse(object => {
+    if (object.geometry) object.geometry.dispose();
+    const materials = Array.isArray(object.material)
+      ? object.material
+      : object.material
+      ? [object.material]
+      : [];
+    for (const material of materials) {
+      for (const key in material) {
+        const texture = material[key];
+        if (!texture || !texture.isTexture) continue;
+        texture.dispose();
+        const image = texture.image;
+        if (typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap)
+          image.close();
+      }
+      material.dispose();
+    }
+  });
+};
+
 let loadedBitmapFonts = {};
 let loadedFontFamilies = {};
 
@@ -68,6 +95,11 @@ const loadedOrLoadingPixiTextures = (() => {
   return {
     clear() {
       entriesByResourceName = {};
+    },
+    getAllEntries(): Array<LoadedTexture> {
+      return Object.keys(entriesByResourceName).map(
+        resourceName => entriesByResourceName[resourceName]
+      );
     },
     get(resourceName: string): LoadedTexture | void {
       return entriesByResourceName[resourceName];
@@ -341,7 +373,29 @@ const getEmbedderResources = (
  * This internally uses ResourcesLoader to get the URL of the resources.
  */
 export default class PixiResourcesLoader {
-  static burstCache() {
+  /**
+   * Forget and unload everything that was loaded (typically, when a project is closed).
+   *
+   * Just dropping the references is not enough: PIXI.Assets (and PIXI.utils caches)
+   * keep the textures, and so their decoded images, alive - which would accumulate
+   * the textures of every project opened during the session.
+   */
+  static async burstCache(): Promise<void> {
+    const pixiTextureEntries = loadedOrLoadingPixiTextures.getAllEntries();
+    const threeTexturePromises = Object.keys(loadedOrLoadingThreeTextures).map(
+      key => loadedOrLoadingThreeTextures[key]
+    );
+    const threeMaterialPromises = Object.keys(
+      loadedOrLoadingThreeMaterials
+    ).map(key => loadedOrLoadingThreeMaterials[key]);
+    const threeModelPromises = Object.keys(loadedOrLoading3DModelPromises).map(
+      key => loadedOrLoading3DModelPromises[key]
+    );
+    const spineAliases = [
+      ...Object.keys(spineAtlasPromises),
+      ...Object.keys(spineDataPromises),
+    ];
+
     loadedBitmapFonts = {};
     loadedFontFamilies = {};
     loadedOrLoadingPixiTextures.clear();
@@ -352,6 +406,73 @@ export default class PixiResourcesLoader {
     spineDataPromises = {};
     ongoingResourceReloads = null;
     pendingResourceReloadPromises = {};
+
+    const logUnloadError = (error: Error) => {
+      console.warn('Error while unloading a resource (ignored):', error);
+    };
+
+    // Several resources can share the same texture (same file): unload it once.
+    const unloadedPixiTextures = new Set<any>();
+    const pixiTextureUnloadPromises = pixiTextureEntries.map(
+      async ({ pixiTexture, loadedFromUrl }) => {
+        if (
+          !pixiTexture ||
+          pixiTexture === invalidTexture ||
+          pixiTexture === loadingTexture ||
+          unloadedPixiTextures.has(pixiTexture)
+        )
+          return;
+        unloadedPixiTextures.add(pixiTexture);
+
+        if (
+          loadedFromUrl &&
+          PIXI.Assets.cache.has(loadedFromUrl) &&
+          PIXI.Assets.cache.get(loadedFromUrl) === pixiTexture
+        ) {
+          // Loaded with PIXI.Assets.load: let it remove it from its cache.
+          await PIXI.Assets.unload(loadedFromUrl);
+        } else if (!pixiTexture.destroyed) {
+          // Created with PIXI.Texture.from (videos, textures loaded synchronously):
+          // destroying the base texture removes it from PIXI.utils caches.
+          pixiTexture.destroy(true);
+        }
+      }
+    );
+
+    // Three.js textures, materials and models are only cached here (already
+    // emptied above): release them when they are loaded, without waiting for
+    // it, as some of them may never finish loading (e.g. a failed image).
+    threeTexturePromises.forEach(promise =>
+      promise.then(threeTexture => threeTexture.dispose(), logUnloadError)
+    );
+    threeMaterialPromises.forEach(promise =>
+      promise.then(material => material.dispose(), logUnloadError)
+    );
+    threeModelPromises.forEach(promise =>
+      promise.then(model => {
+        if (model !== invalidModel) dispose3DModel(model);
+      }, logUnloadError)
+    );
+
+    // Wait for PIXI.Assets to forget the unloaded files, so that a file used
+    // by the next project (e.g. from the asset store) is loaded again instead
+    // of reusing a texture being destroyed.
+    await Promise.all([
+      ...pixiTextureUnloadPromises.map(promise =>
+        promise.catch(logUnloadError)
+      ),
+      ...spineAliases.map(alias =>
+        PIXI.Assets.unload(alias).catch(logUnloadError)
+      ),
+    ]);
+
+    if (spineAliases.length > 0) {
+      for (const cacheKey of Object.keys(Spine.skeletonCache)) {
+        delete Spine.skeletonCache[cacheKey];
+      }
+      // See _doReloadResource: PIXI.Assets.resolver keeps data passed to `PIXI.Assets.add`.
+      PIXI.Assets.resolver.prefer();
+    }
   }
 
   static async _reloadEmbedderResources(

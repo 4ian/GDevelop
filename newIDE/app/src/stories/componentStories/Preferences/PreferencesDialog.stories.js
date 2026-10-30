@@ -76,6 +76,8 @@ const StatefulPreferencesProvider = ({
     setCodeEditorThemeName: value => setValue('codeEditorThemeName', value),
     setAutoDownloadUpdates: value => setValue('autoDownloadUpdates', value),
     setAutoDisplayChangelog: value => setValue('autoDisplayChangelog', value),
+    setAutoDisplayClaimableProductsDialog: value =>
+      setValue('autoDisplayClaimableProductsDialog', value),
     setEventsSheetShowObjectThumbnails: value =>
       setValue('eventsSheetShowObjectThumbnails', value),
     setEventsSheetUseAssignmentOperators: value =>

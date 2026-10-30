@@ -24,6 +24,7 @@ const notificationTypeToIcon = {
   'one-game-feedback-received': <Annotation />,
   'multiple-game-feedback-received': <Annotation />,
   'claimable-asset-pack': <Cart />,
+  'claimable-game-template': <Cart />,
   'game-sessions-achievement': <Gaming />,
   'team-invitation': <Users />,
 };
@@ -90,6 +91,14 @@ const getNotificationPrimaryTextByType = (
     return (
       <Trans>
         The asset pack {notification.data.privateAssetPackName} is now
+        available, go claim it in the shop!
+      </Trans>
+    );
+  }
+  if (notification.type === 'claimable-game-template') {
+    return (
+      <Trans>
+        The game template {notification.data.privateGameTemplateName} is now
         available, go claim it in the shop!
       </Trans>
     );
@@ -186,6 +195,16 @@ const getNotificationClickCallback = ({
       addRouteArguments({
         'initial-dialog': 'store',
         'asset-pack': notification.data.privateAssetPackId,
+      });
+      onMarkNotificationAsSeen();
+      onCloseNotificationList();
+    };
+  }
+  if (notification.type === 'claimable-game-template') {
+    return () => {
+      addRouteArguments({
+        'initial-dialog': 'store',
+        'game-template': notification.data.privateGameTemplateId,
       });
       onMarkNotificationAsSeen();
       onCloseNotificationList();

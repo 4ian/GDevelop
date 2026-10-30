@@ -46,6 +46,16 @@ const notifications: Notification[] = [
     },
   },
   {
+    id: 'notification-id-22',
+    userId,
+    createdAt: now - 3 * ONE_HOUR,
+    type: 'claimable-game-template',
+    data: {
+      privateGameTemplateId: 'game-template-id',
+      privateGameTemplateName: 'Action Platformer Pixel',
+    },
+  },
+  {
     id: 'notification-id-2',
     userId,
     createdAt: now - 4 * ONE_HOUR,

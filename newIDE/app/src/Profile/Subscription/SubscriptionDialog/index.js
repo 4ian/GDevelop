@@ -501,11 +501,23 @@ export default function SubscriptionDialog({
               userSubscriptionPlanEvenIfLegacy={
                 userSubscriptionPlanEvenIfLegacy
               }
+              freeSubscriptionPlan={
+                availableSubscriptionPlansWithPrices
+                  ? availableSubscriptionPlansWithPrices.find(
+                      subscriptionPlanWithPricingSystems =>
+                        subscriptionPlanWithPricingSystems.id === 'free'
+                    )
+                  : null
+              }
               onConfirm={() => {
                 setCancelConfirmationDialogOpen(false);
                 setCancelReasonDialogOpen(true);
               }}
               onClose={() => setCancelConfirmationDialogOpen(false)}
+              onOpenStore={() => {
+                setCancelConfirmationDialogOpen(false);
+                onClose();
+              }}
             />
           )}
           {cancelReasonDialogOpen && (

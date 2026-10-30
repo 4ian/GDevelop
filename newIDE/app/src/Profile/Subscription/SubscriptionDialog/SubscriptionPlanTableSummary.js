@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 import Text from '../../../UI/Text';
 import { Column, LargeSpacer, Line } from '../../../UI/Grid';
 import {
@@ -44,14 +45,65 @@ const SubscriptionPlanTableSummary = ({
   displayedFeatures,
   hideFullTableLink,
   actionLabel,
+  comparedSubscriptionPlanWithPricingSystems,
 }: {|
   subscriptionPlanWithPricingSystems: SubscriptionPlanWithPricingSystems,
   displayedFeatures?: Array<string>,
   hideFullTableLink?: boolean,
   actionLabel?: React.Node,
+  /** Displayed in a column before the plan, for the same features. */
+  comparedSubscriptionPlanWithPricingSystems?: ?SubscriptionPlanWithPricingSystems,
 |}): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
+
+  const renderFeatureValue = (feature: {
+    +enabled?: ?('yes' | 'no'),
+    +unlimited?: ?boolean,
+    +description?: ?string,
+    ...
+  }) =>
+    feature.enabled === 'yes' ? (
+      <CheckCircleFilled
+        style={{
+          ...styles.bulletIcon,
+          color: gdevelopTheme.message.valid,
+        }}
+      />
+    ) : feature.enabled === 'no' ? (
+      <CircledClose style={styles.bulletIcon} />
+    ) : feature.unlimited ? (
+      <div
+        style={{
+          ...styles.unlimitedContainer,
+          backgroundColor: gdevelopTheme.message.valid,
+        }}
+      >
+        <Text noMargin color="inherit">
+          ∞ <Trans>Unlimited</Trans>
+        </Text>
+      </div>
+    ) : (
+      <Text>{feature.description}</Text>
+    );
+
+  const renderComparedFeatureValue = (
+    i18n: I18nType,
+    comparedPlan: SubscriptionPlanWithPricingSystems,
+    featureName: string
+  ) => {
+    const comparedFeature = comparedPlan.fullFeatures.find(
+      feature => feature.featureName === featureName
+    );
+    if (!comparedFeature) return renderFeatureValue({ enabled: 'no' });
+    return renderFeatureValue({
+      enabled: comparedFeature.enabled,
+      unlimited: comparedFeature.unlimited,
+      description: comparedFeature.descriptionByLocale
+        ? selectMessageByLocale(i18n, comparedFeature.descriptionByLocale)
+        : null,
+    });
+  };
 
   return (
     <I18n>
@@ -63,6 +115,16 @@ const SubscriptionPlanTableSummary = ({
             }}
           >
             <Line alignItems="center" justifyContent="flex-end" noMargin>
+              {comparedSubscriptionPlanWithPricingSystems && (
+                <div style={styles.tableRightItemContainer}>
+                  <Text size="sub-title" color="secondary">
+                    {selectMessageByLocale(
+                      i18n,
+                      comparedSubscriptionPlanWithPricingSystems.nameByLocale
+                    )}
+                  </Text>
+                </div>
+              )}
               <div style={styles.tableRightItemContainer}>
                 <Text size="sub-title">
                   {selectMessageByLocale(
@@ -101,30 +163,17 @@ const SubscriptionPlanTableSummary = ({
                     <Text style={styles.bulletText}>
                       {summarizedFeature.displayedFeatureName}
                     </Text>
+                    {comparedSubscriptionPlanWithPricingSystems && (
+                      <div style={styles.tableRightItemContainer}>
+                        {renderComparedFeatureValue(
+                          i18n,
+                          comparedSubscriptionPlanWithPricingSystems,
+                          summarizedFeature.featureName
+                        )}
+                      </div>
+                    )}
                     <div style={styles.tableRightItemContainer}>
-                      {summarizedFeature.enabled === 'yes' ? (
-                        <CheckCircleFilled
-                          style={{
-                            ...styles.bulletIcon,
-                            color: gdevelopTheme.message.valid,
-                          }}
-                        />
-                      ) : summarizedFeature.enabled === 'no' ? (
-                        <CircledClose style={styles.bulletIcon} />
-                      ) : summarizedFeature.unlimited ? (
-                        <div
-                          style={{
-                            ...styles.unlimitedContainer,
-                            backgroundColor: gdevelopTheme.message.valid,
-                          }}
-                        >
-                          <Text noMargin color="inherit">
-                            ∞ <Trans>Unlimited</Trans>
-                          </Text>
-                        </div>
-                      ) : (
-                        <Text>{summarizedFeature.description}</Text>
-                      )}
+                      {renderFeatureValue(summarizedFeature)}
                     </div>
                   </Line>
                 </div>

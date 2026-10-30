@@ -150,11 +150,7 @@ CustomObjectConfiguration::GetInitialInstanceProperties(
     const gd::InitialInstance &initialInstance) {
   std::map<gd::String, gd::PropertyDescriptor> properties;
   if (!animations.HasNoAnimations()) {
-    properties["animation"] =
-        gd::PropertyDescriptor(
-            gd::String::From(initialInstance.GetRawDoubleProperty("animation")))
-            .SetLabel(_("Animation"))
-            .SetType("number");
+    properties["animation"] = GetStartingAnimationProperty(initialInstance);
   }
   return properties;
 }

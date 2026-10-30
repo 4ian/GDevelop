@@ -610,7 +610,14 @@ const CompactPropertiesEditor = ({
       }
 
       if (!compactSelectField) return null;
-      if (field.renderLeftIcon || field.hideLabel) return compactSelectField;
+      if (field.renderLeftIcon) return compactSelectField;
+      if (field.hideLabel) {
+        return (
+          <div key={field.name} style={styles.container}>
+            {compactSelectField}
+          </div>
+        );
+      }
 
       return (
         <CompactPropertiesEditorRowField

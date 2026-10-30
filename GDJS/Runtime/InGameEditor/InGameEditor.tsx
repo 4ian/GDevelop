@@ -1027,6 +1027,94 @@ namespace gdjs {
     return false;
   };
 
+  const getUnrotatedInstanceAABB = (
+    instance: gdjs.RuntimeObject,
+    unrotatedAABB: AABB3D
+  ): AABB3D => {
+    const minX = instance.getDrawableX();
+    const minY = instance.getDrawableY();
+    const maxX = minX + instance.getWidth();
+    const maxY = minY + instance.getHeight();
+    let minZ = 0;
+    let maxZ = 0;
+    if (is3D(instance)) {
+      minZ = instance.getDrawableZ ? instance.getDrawableZ() : instance.getZ();
+      maxZ = minZ + instance.getDepth();
+    }
+    unrotatedAABB.min[0] = minX;
+    unrotatedAABB.min[1] = minY;
+    unrotatedAABB.min[2] = minZ;
+    unrotatedAABB.max[0] = maxX;
+    unrotatedAABB.max[1] = maxY;
+    unrotatedAABB.max[2] = maxZ;
+    return unrotatedAABB;
+  };
+
+  const getInstanceAABB = (
+    instance: gdjs.RuntimeObject,
+    bounds: AABB3D
+  ): AABB3D => {
+    const angle = (instance.getAngle() * Math.PI) / 180;
+    //@ts-ignore
+    const isFlippedX = instance.isFlippedX && instance.isFlippedX();
+    //@ts-ignore
+    const isFlippedY = instance.isFlippedY && instance.isFlippedY();
+    const unrotatedAABB = getUnrotatedInstanceAABB(instance, bounds);
+    if (angle === 0 && !isFlippedX && !isFlippedY) {
+      return unrotatedAABB;
+    }
+
+    // Compute the rotated rectangle of the instance, so we can then
+    // compute the new, unrotated AABB out of it.
+
+    const rotatedRectangle = new gdjs.Polygon();
+    {
+      const unrotatedLeft = unrotatedAABB.min[0];
+      const unrotatedTop = unrotatedAABB.min[1];
+      const unrotatedRight = unrotatedAABB.max[0];
+      const unrotatedBottom = unrotatedAABB.max[1];
+
+      rotatedRectangle.vertices.push([unrotatedLeft, unrotatedTop]);
+      rotatedRectangle.vertices.push([unrotatedLeft, unrotatedBottom]);
+      rotatedRectangle.vertices.push([unrotatedRight, unrotatedBottom]);
+      rotatedRectangle.vertices.push([unrotatedRight, unrotatedTop]);
+
+      let centerX = instance.getCenterXInScene();
+      let centerY = instance.getCenterYInScene();
+      rotatedRectangle.move(-centerX, -centerY);
+      for (const vertex of rotatedRectangle.vertices) {
+        if (isFlippedX) {
+          vertex[0] = -vertex[0];
+        }
+        if (isFlippedY) {
+          vertex[1] = -vertex[1];
+        }
+      }
+      rotatedRectangle.rotate(angle);
+      rotatedRectangle.move(centerX, centerY);
+    }
+
+    // Compute the new, unrotated AABB from the rotated rectangle of the instance.
+    let left = Number.MAX_VALUE;
+    let right = -Number.MAX_VALUE;
+    let top = Number.MAX_VALUE;
+    let bottom = -Number.MAX_VALUE;
+    for (const vertex of rotatedRectangle.vertices) {
+      left = Math.min(left, vertex[0]);
+      right = Math.max(right, vertex[0]);
+      top = Math.min(top, vertex[1]);
+      bottom = Math.max(bottom, vertex[1]);
+    }
+
+    // Add the 3D coordinates, for which rotation is not considered
+    // (but could be if we have a full 3D editor one day).
+    bounds.min[0] = left;
+    bounds.min[1] = top;
+    bounds.max[0] = right;
+    bounds.max[1] = bottom;
+    return bounds;
+  };
+
   class ObjectMover3D {
     private editor: InGameEditor;
     private _changeHappened = false;
@@ -1448,7 +1536,7 @@ namespace gdjs {
         min: [0, 0, 0],
         max: [0, 0, 0],
       };
-      this._getUnrotatedInstanceAABB(instance, unrotatedAABB);
+      getUnrotatedInstanceAABB(instance, unrotatedAABB);
       this._unrotatedInstanceAABBs.set(instance, unrotatedAABB);
       return unrotatedAABB;
     }
@@ -1461,96 +1549,9 @@ namespace gdjs {
         min: [0, 0, 0],
         max: [0, 0, 0],
       };
-      this._getInstanceAABB(instance, aabb);
+      getInstanceAABB(instance, aabb);
       this._instanceAABBs.set(instance, aabb);
       return aabb;
-    }
-
-    _getUnrotatedInstanceAABB(
-      instance: gdjs.RuntimeObject,
-      unrotatedAABB: AABB3D
-    ): AABB3D {
-      const minX = instance.getDrawableX();
-      const minY = instance.getDrawableY();
-      const maxX = minX + instance.getWidth();
-      const maxY = minY + instance.getHeight();
-      let minZ = 0;
-      let maxZ = 0;
-      if (is3D(instance)) {
-        minZ = instance.getDrawableZ
-          ? instance.getDrawableZ()
-          : instance.getZ();
-        maxZ = minZ + instance.getDepth();
-      }
-      unrotatedAABB.min[0] = minX;
-      unrotatedAABB.min[1] = minY;
-      unrotatedAABB.min[2] = minZ;
-      unrotatedAABB.max[0] = maxX;
-      unrotatedAABB.max[1] = maxY;
-      unrotatedAABB.max[2] = maxZ;
-      return unrotatedAABB;
-    }
-
-    _getInstanceAABB(instance: gdjs.RuntimeObject, bounds: AABB3D): AABB3D {
-      const angle = (instance.getAngle() * Math.PI) / 180;
-      //@ts-ignore
-      const isFlippedX = instance.isFlippedX && instance.isFlippedX();
-      //@ts-ignore
-      const isFlippedY = instance.isFlippedY && instance.isFlippedY();
-      const unrotatedAABB = this._getUnrotatedInstanceAABB(instance, bounds);
-      if (angle === 0 && !isFlippedX && !isFlippedY) {
-        return unrotatedAABB;
-      }
-
-      // Compute the rotated rectangle of the instance, so we can then
-      // compute the new, unrotated AABB out of it.
-
-      const rotatedRectangle = new gdjs.Polygon();
-      {
-        const unrotatedLeft = unrotatedAABB.min[0];
-        const unrotatedTop = unrotatedAABB.min[1];
-        const unrotatedRight = unrotatedAABB.max[0];
-        const unrotatedBottom = unrotatedAABB.max[1];
-
-        rotatedRectangle.vertices.push([unrotatedLeft, unrotatedTop]);
-        rotatedRectangle.vertices.push([unrotatedLeft, unrotatedBottom]);
-        rotatedRectangle.vertices.push([unrotatedRight, unrotatedBottom]);
-        rotatedRectangle.vertices.push([unrotatedRight, unrotatedTop]);
-
-        let centerX = instance.getCenterXInScene();
-        let centerY = instance.getCenterYInScene();
-        rotatedRectangle.move(-centerX, -centerY);
-        for (const vertex of rotatedRectangle.vertices) {
-          if (isFlippedX) {
-            vertex[0] = -vertex[0];
-          }
-          if (isFlippedY) {
-            vertex[1] = -vertex[1];
-          }
-        }
-        rotatedRectangle.rotate(angle);
-        rotatedRectangle.move(centerX, centerY);
-      }
-
-      // Compute the new, unrotated AABB from the rotated rectangle of the instance.
-      let left = Number.MAX_VALUE;
-      let right = -Number.MAX_VALUE;
-      let top = Number.MAX_VALUE;
-      let bottom = -Number.MAX_VALUE;
-      for (const vertex of rotatedRectangle.vertices) {
-        left = Math.min(left, vertex[0]);
-        right = Math.max(right, vertex[0]);
-        top = Math.min(top, vertex[1]);
-        bottom = Math.max(bottom, vertex[1]);
-      }
-
-      // Add the 3D coordinates, for which rotation is not considered
-      // (but could be if we have a full 3D editor one day).
-      bounds.min[0] = left;
-      bounds.min[1] = top;
-      bounds.max[0] = right;
-      bounds.max[1] = bottom;
-      return bounds;
     }
 
     _getOrCreateInstanceOriginPosition(
@@ -1971,10 +1972,20 @@ namespace gdjs {
      * Return the layer which contains the objects.
      * @see _getCameraLayer
      */
-    private getEditorLayer(layerName: string): gdjs.RuntimeLayer | null {
+    getEditorLayer(layerName: string): gdjs.RuntimeLayer | null {
       return this._editedInstanceContainer
         ? this._editedInstanceContainer.getLayer(layerName)
         : null;
+    }
+
+    getTopLayer(): gdjs.RuntimeLayer | null {
+      const currentScene = this._currentScene;
+      if (!currentScene) {
+        return null;
+      }
+      return currentScene._orderedLayers[
+        currentScene._orderedLayers.length - 1
+      ];
     }
 
     /**
@@ -2350,6 +2361,12 @@ namespace gdjs {
       this._instancesEditorSettings = instancesEditorSettings;
       this._editorGrid.setSettings(instancesEditorSettings);
       this.applyInstancesEditorSettings();
+    }
+
+    getEditorMode(): '2d-editor' | '3d-editor' {
+      return this._instancesEditorSettings
+        ? this._instancesEditorSettings.editorMode
+        : '3d-editor';
     }
 
     updateInstancesEditorSettings(
@@ -3307,14 +3324,17 @@ namespace gdjs {
           object === objectUnderCursor && !this._isTransformControlsHovered;
         const isInSelection = selectedObjects.includes(object);
         if (!isInSelection && !isHovered) {
-          box.removeFromParent();
+          box.setVisible(false);
           this._selectionBoxes.delete(object);
         } else {
           const isLocked = this.isInstanceLocked(object);
 
           const color =
             instanceWireframeColor[
-              (isLocked || !is3D(object) ? instanceStateFlag.locked : 0) |
+              (isLocked ||
+              (!is3D(object) && this.getEditorMode() !== '2d-editor')
+                ? instanceStateFlag.locked
+                : 0) |
                 (isInSelection ? instanceStateFlag.selected : 0) |
                 (isHovered ? instanceStateFlag.hovered : 0)
             ] || '#aaaaaa';
@@ -3332,17 +3352,12 @@ namespace gdjs {
       if (this._selectionBoxes.has(object)) {
         return;
       }
-      const currentScene = this._currentScene;
-      if (!currentScene) return;
 
-      const objectLayer = this.getEditorLayer(object.getLayer());
-      if (!objectLayer) return;
-
-      const threeGroup = objectLayer.getRenderer().getThreeGroup();
-      if (!threeGroup) return;
-
-      const objectBoxHelper = new ObjectSelectionBoxHelper(object);
-      threeGroup.add(objectBoxHelper.container);
+      const objectBoxHelper =
+        this.getEditorMode() === '2d-editor'
+          ? new ObjectSelectionBoxHelper2D(this, object)
+          : new ObjectSelectionBoxHelper3D(this, object);
+      objectBoxHelper.setVisible(true);
       this._selectionBoxes.set(object, objectBoxHelper);
     }
 
@@ -3356,7 +3371,7 @@ namespace gdjs {
 
         // Cleanup selection boxes
         this._selectionBoxes.forEach((box) => {
-          box.removeFromParent();
+          box.setVisible(false);
         });
         this._selectionBoxes.clear();
       }
@@ -4155,12 +4170,11 @@ namespace gdjs {
     _recastFromCursor(
       objects: Array<THREE.Object3D>
     ): Array<THREE.Intersection> {
-      const currentScene = this._currentScene;
-      if (!currentScene) {
+      // TODO Using the top layer only works for selection controls.
+      const topLayer = this.getTopLayer();
+      if (!topLayer) {
         return [];
       }
-      const topLayer =
-        currentScene._orderedLayers[currentScene._orderedLayers.length - 1];
       const runtimeLayerRender = topLayer.getRenderer();
       const threeCamera = runtimeLayerRender.getThreeCamera();
       if (!threeCamera) {
@@ -6890,13 +6904,22 @@ namespace gdjs {
     return marker;
   };
 
-  class ObjectSelectionBoxHelper {
+  interface ObjectSelectionBoxHelper {
+    update(): void;
+    setVisible(visible: boolean): void;
+    setLayer(layer: number): void;
+    setColor(color: THREE.ColorRepresentation): void;
+  }
+  class ObjectSelectionBoxHelper3D implements ObjectSelectionBoxHelper {
+    editor: gdjs.InGameEditor;
     object: gdjs.RuntimeObject;
     dummyObject3DForObject2D: THREE.Object3D | null = null;
     boxHelper: THREE.BoxHelper;
     container: THREE.Group;
+    isVisible: boolean = false;
 
-    constructor(object: gdjs.RuntimeObject) {
+    constructor(editor: gdjs.InGameEditor, object: gdjs.RuntimeObject) {
+      this.editor = editor;
       this.object = object;
 
       let threeObject = object.get3DRendererObject();
@@ -6922,7 +6945,7 @@ namespace gdjs {
       this.container.add(this.boxHelper);
     }
 
-    update() {
+    update(): void {
       const worldScale = this.object
         .getRuntimeScene()
         .getRenderer3DWorldScale();
@@ -6944,17 +6967,98 @@ namespace gdjs {
       this.boxHelper.update();
     }
 
-    removeFromParent() {
-      this.container.removeFromParent();
+    setVisible(visible: boolean): void {
+      if (visible === this.isVisible) {
+        return;
+      }
+      this.isVisible = visible;
+      if (visible) {
+        const currentScene = this.editor.getCurrentScene();
+        if (!currentScene) return;
+
+        const objectLayer = this.editor.getEditorLayer(this.object.getLayer());
+        if (!objectLayer) return;
+
+        const threeGroup = objectLayer.getRenderer().getThreeGroup();
+        if (!threeGroup) return;
+        threeGroup.add(this.container);
+      } else {
+        this.container.removeFromParent();
+      }
     }
 
     setLayer(layer: number): void {
       this.boxHelper.layers.set(layer);
     }
 
-    setColor(color: THREE.ColorRepresentation) {
+    setColor(color: THREE.ColorRepresentation): void {
       this.boxHelper.material.color.set(color);
       this.boxHelper.material.needsUpdate = true;
+    }
+  }
+
+  class ObjectSelectionBoxHelper2D implements ObjectSelectionBoxHelper {
+    editor: gdjs.InGameEditor;
+    object: gdjs.RuntimeObject;
+    area: ThreeSquare;
+    isVisible: boolean = false;
+
+    constructor(editor: gdjs.InGameEditor, object: gdjs.RuntimeObject) {
+      this.editor = editor;
+      this.object = object;
+      this.area = new ThreeSquare(0x6868e8, 0.3, 0x6868e8, 0.8);
+    }
+
+    update(): void {
+      const worldScale = this.object
+        .getRuntimeScene()
+        .getRenderer3DWorldScale();
+      this.area.scale.set(worldScale, -worldScale, worldScale);
+
+      const aabb: AABB3D = {
+        min: [0, 0, 0],
+        max: [0, 0, 0],
+      };
+      getInstanceAABB(this.object, aabb);
+      let minX = aabb.min[0];
+      let minY = aabb.min[1];
+      let maxX = aabb.max[0];
+      let maxY = aabb.max[1];
+      this.area.position.x = (minX + maxX) / 2;
+      this.area.position.y = (minY + maxY) / 2;
+      this.area.scale.x = maxX - minX;
+      this.area.scale.y = maxY - minY;
+    }
+
+    setVisible(visible: boolean): void {
+      if (visible === this.isVisible) {
+        return;
+      }
+      this.isVisible = visible;
+      if (visible) {
+        const currentScene = this.editor.getCurrentScene();
+        if (!currentScene) return;
+
+        const objectLayer = this.editor.getTopLayer();
+        if (!objectLayer) return;
+
+        const threeGroup = objectLayer.getRenderer().getThreeGroup();
+        if (!threeGroup) return;
+        threeGroup.add(this.area);
+      } else {
+        this.area.removeFromParent();
+      }
+    }
+
+    setLayer(layer: number): void {
+      for (const child of this.area.children) {
+        child.layers.set(layer);
+      }
+    }
+
+    setColor(color: THREE.ColorRepresentation): void {
+      this.area.setStrokeColor(color);
+      this.area.setFillColor(color);
     }
   }
 
@@ -7706,8 +7810,7 @@ namespace gdjs {
       if (!currentScene) {
         return;
       }
-      const topLayer =
-        currentScene._orderedLayers[currentScene._orderedLayers.length - 1];
+      const topLayer = this.editor.getTopLayer();
       if (!topLayer) {
         return;
       }
@@ -7893,8 +7996,8 @@ namespace gdjs {
 
       this.area.position.x = centerX;
       this.area.position.y = centerY;
-      this.area.scale.x = aabb.max[0] - aabb.min[0];
-      this.area.scale.y = aabb.max[1] - aabb.min[1];
+      this.area.scale.x = maxX - minX;
+      this.area.scale.y = maxY - minY;
 
       let cameraFactor;
       let cameraForward;
@@ -7986,8 +8089,10 @@ namespace gdjs {
       if (!currentScene) {
         return;
       }
-      const topLayer =
-        currentScene._orderedLayers[currentScene._orderedLayers.length - 1];
+      const topLayer = editor.getTopLayer();
+      if (!topLayer) {
+        return;
+      }
       const runtimeLayerRender = topLayer.getRenderer();
       const threeCamera = runtimeLayerRender.getThreeCamera();
       const threeScene = runtimeLayerRender.getThreeScene();
@@ -8397,6 +8502,16 @@ namespace gdjs {
   }
 
   class ThreeSquare extends THREE.Object3D {
+    private contourLine: THREE.LineSegments<
+      THREE.BufferGeometry,
+      THREE.LineBasicMaterial
+    > | null = null;
+    private fillMesh: THREE.Mesh<
+      THREE.PlaneGeometry,
+      THREE.MeshBasicMaterial,
+      THREE.Object3DEventMap
+    > | null = null;
+
     constructor(
       fillColor: THREE.ColorRepresentation | null,
       fillOpacity: number,
@@ -8406,60 +8521,129 @@ namespace gdjs {
       super();
 
       if (fillColor) {
-        const fillMesh = new THREE.Mesh(
-          new THREE.PlaneGeometry(),
-          new THREE.MeshBasicMaterial({
-            color: fillColor,
-            opacity: fillOpacity,
-            toneMapped: false,
-            depthTest: false,
-            transparent: true,
-          })
-        );
-        fillMesh.renderOrder = Number.MAX_SAFE_INTEGER;
-        this.add(fillMesh);
+        this.fillMesh = this.getOrCreateFillMesh(fillColor, fillOpacity);
       }
       if (strokeColor) {
-        const indices = new Uint16Array([0, 1, 1, 2, 2, 3, 3, 0]);
-        const positions = new Float32Array([
-          -0.5,
-          -0.5,
-          0, //
-          0.5,
-          -0.5,
-          0, //
-          0.5,
-          0.5,
-          0, //
-          -0.5,
-          0.5,
-          0, //
-        ]);
-
-        const geometry = new THREE.BufferGeometry();
-        geometry.setIndex(new THREE.BufferAttribute(indices, 1));
-        geometry.setAttribute(
-          'position',
-          new THREE.BufferAttribute(positions, 3)
+        this.contourLine = this.getOrCreateCountourLine(
+          strokeColor,
+          strokeOpacity
         );
-
-        const contourLine = new THREE.LineSegments<
-          THREE.BufferGeometry,
-          THREE.LineBasicMaterial
-        >(
-          geometry,
-          new THREE.LineBasicMaterial({
-            color: strokeColor,
-            opacity: strokeOpacity,
-            toneMapped: false,
-            depthTest: false,
-            transparent: true,
-          })
-        );
-
-        contourLine.renderOrder = Number.MAX_SAFE_INTEGER;
-        this.add(contourLine);
       }
+    }
+
+    private getOrCreateFillMesh(
+      fillColor: THREE.ColorRepresentation | null = null,
+      fillOpacity: float = 0
+    ): THREE.Mesh<
+      THREE.PlaneGeometry,
+      THREE.MeshBasicMaterial,
+      THREE.Object3DEventMap
+    > {
+      if (this.fillMesh) {
+        return this.fillMesh;
+      }
+      const fillMesh = new THREE.Mesh(
+        new THREE.PlaneGeometry(),
+        new THREE.MeshBasicMaterial({
+          color: fillColor || new THREE.Color(1, 1, 1),
+          opacity: fillOpacity,
+          toneMapped: false,
+          depthTest: false,
+          transparent: true,
+        })
+      );
+      fillMesh.renderOrder = Number.MAX_SAFE_INTEGER;
+      this.add(fillMesh);
+      return fillMesh;
+    }
+
+    private getOrCreateCountourLine(
+      strokeColor: THREE.ColorRepresentation | null = null,
+      strokeOpacity: float = 0
+    ): THREE.LineSegments<THREE.BufferGeometry, THREE.LineBasicMaterial> {
+      if (this.contourLine) {
+        return this.contourLine;
+      }
+      const indices = new Uint16Array([0, 1, 1, 2, 2, 3, 3, 0]);
+      const positions = new Float32Array([
+        -0.5,
+        -0.5,
+        0, //
+        0.5,
+        -0.5,
+        0, //
+        0.5,
+        0.5,
+        0, //
+        -0.5,
+        0.5,
+        0, //
+      ]);
+
+      const geometry = new THREE.BufferGeometry();
+      geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+      geometry.setAttribute(
+        'position',
+        new THREE.BufferAttribute(positions, 3)
+      );
+
+      const contourLine = new THREE.LineSegments<
+        THREE.BufferGeometry,
+        THREE.LineBasicMaterial
+      >(
+        geometry,
+        new THREE.LineBasicMaterial({
+          color: strokeColor || new THREE.Color(1, 1, 1),
+          opacity: strokeOpacity,
+          toneMapped: false,
+          depthTest: false,
+          transparent: true,
+        })
+      );
+
+      contourLine.renderOrder = Number.MAX_SAFE_INTEGER;
+      this.add(contourLine);
+      return contourLine;
+    }
+
+    setStrokeColor(strokeColor: THREE.ColorRepresentation | null): void {
+      if (!strokeColor) {
+        if (this.contourLine) {
+          this.contourLine.material.dispose();
+          this.contourLine.removeFromParent();
+          this.contourLine = null;
+        }
+        return;
+      }
+      const contourLine = this.getOrCreateCountourLine();
+      contourLine.material.color = new THREE.Color(strokeColor);
+      contourLine.material.needsUpdate = true;
+    }
+
+    setStrokeOpacity(strokeOpacity: float): void {
+      const contourLine = this.getOrCreateCountourLine();
+      contourLine.material.opacity = strokeOpacity;
+      contourLine.material.needsUpdate = true;
+    }
+
+    setFillColor(fillColor: THREE.ColorRepresentation | null): void {
+      if (!fillColor) {
+        if (this.fillMesh) {
+          this.fillMesh.material.dispose();
+          this.fillMesh.removeFromParent();
+          this.fillMesh = null;
+        }
+        return;
+      }
+      const fillMesh = this.getOrCreateFillMesh();
+      fillMesh.material.color = new THREE.Color(fillColor);
+      fillMesh.material.needsUpdate = true;
+    }
+
+    setFillOpacity(fillOpacity: float): void {
+      const fillMesh = this.getOrCreateFillMesh();
+      fillMesh.material.opacity = fillOpacity;
+      fillMesh.material.needsUpdate = true;
     }
   }
 

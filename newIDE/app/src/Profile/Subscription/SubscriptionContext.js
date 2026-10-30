@@ -207,6 +207,10 @@ type SubscriptionState = {|
     codeToPrefill?: string,
     autoSubmit?: boolean,
   |}) => void,
+  /**
+   * True while the user is choosing, paying or confirming a subscription.
+   */
+  isSubscriptionDialogOpen: boolean,
 |};
 
 export const SubscriptionContext: React.Context<SubscriptionState> = React.createContext<SubscriptionState>(
@@ -217,6 +221,7 @@ export const SubscriptionContext: React.Context<SubscriptionState> = React.creat
     getCouponCode: () => null,
     clearCouponCode: () => {},
     openRedeemCodeDialog: () => {},
+    isSubscriptionDialogOpen: false,
   }
 );
 
@@ -443,6 +448,8 @@ export const SubscriptionProvider = ({
       getCouponCode,
       clearCouponCode,
       openRedeemCodeDialog,
+      isSubscriptionDialogOpen:
+        subscriptionPendingDialogOpen || !!analyticsMetadata,
     }),
     [
       getSubscriptionPlansWithPricingSystems,
@@ -451,6 +458,8 @@ export const SubscriptionProvider = ({
       getCouponCode,
       clearCouponCode,
       openRedeemCodeDialog,
+      subscriptionPendingDialogOpen,
+      analyticsMetadata,
     ]
   );
 

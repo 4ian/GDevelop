@@ -51,6 +51,7 @@ export type Subscription = {|
 
   cancelAtPeriodEnd?: boolean,
   cancelReasons?: CancelReasons,
+  endOfPeriodAt?: number,
 
   purchaselyPlan?: string,
 

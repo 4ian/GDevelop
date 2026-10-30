@@ -28,6 +28,7 @@ import { formatPriceWithCurrency, getPlanIcon } from '../PlanSmallCard';
 import { selectMessageByLocale } from '../../../Utils/i18n/MessageByLocale';
 import FlatButton from '../../../UI/FlatButton';
 import CancelReasonDialog from '../CancelReasonDialog';
+import CancelSubscriptionConfirmationDialog from '../CancelSubscriptionConfirmationDialog';
 import { useBuyUpdateOrCancelPlan } from './useBuyUpdateOrCancelPlan';
 import { uniq } from 'lodash';
 
@@ -111,6 +112,8 @@ export default function SubscriptionDialog({
 
   const {
     buyUpdateOrCancelPlan,
+    cancelConfirmationDialogOpen,
+    setCancelConfirmationDialogOpen,
     cancelReasonDialogOpen,
     setCancelReasonDialogOpen,
   } = useBuyUpdateOrCancelPlan({
@@ -492,6 +495,30 @@ export default function SubscriptionDialog({
                 </Trans>
               </Text>
             </Dialog>
+          )}
+          {cancelConfirmationDialogOpen && (
+            <CancelSubscriptionConfirmationDialog
+              userSubscriptionPlanEvenIfLegacy={
+                userSubscriptionPlanEvenIfLegacy
+              }
+              freeSubscriptionPlan={
+                availableSubscriptionPlansWithPrices
+                  ? availableSubscriptionPlansWithPrices.find(
+                      subscriptionPlanWithPricingSystems =>
+                        subscriptionPlanWithPricingSystems.id === 'free'
+                    )
+                  : null
+              }
+              onConfirm={() => {
+                setCancelConfirmationDialogOpen(false);
+                setCancelReasonDialogOpen(true);
+              }}
+              onClose={() => setCancelConfirmationDialogOpen(false)}
+              onOpenStore={() => {
+                setCancelConfirmationDialogOpen(false);
+                onClose();
+              }}
+            />
           )}
           {cancelReasonDialogOpen && (
             <CancelReasonDialog

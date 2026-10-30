@@ -208,7 +208,7 @@ const BehaviorConfigurationEditor = React.forwardRef<
                     tooltip={
                       isSynchronizedOverNetwork
                         ? t`Synchronized with other players`
-                        : t`Not synchronized: only the owner's game runs it`
+                        : t`Not synchronized: when this behavior is enabled, disabled or changed, other players are not affected. Useful for behaviors handling the player inputs.`
                     }
                     onClick={ev => {
                       ev.stopPropagation();

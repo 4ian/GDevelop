@@ -13,7 +13,10 @@ import {
 import { type McpOpenedProject } from './McpServerTool';
 import { useMcpServerTools } from './UseMcpServerTools';
 import { cloudStorageProviderInternalName } from '../../ProjectsStorage/CloudStorageProvider/CloudStoageProviderInternalName';
-import { sendMcpToolCalled } from '../../Utils/Analytics/EventSender';
+import {
+  sendMcpAgentConnected,
+  sendMcpToolCalled,
+} from '../../Utils/Analytics/EventSender';
 import { getIDEVersion } from '../../Version';
 import Window from '../../Utils/Window';
 import optionalRequire from '../../Utils/OptionalRequire';
@@ -71,6 +74,8 @@ export const useMcpServers = ({
       getServerVersion: getIDEVersion,
       isReadOnly: false,
       onToolCalled: report => sendMcpToolCalled({ ...report, transport }),
+      onAgentConnected: report =>
+        sendMcpAgentConnected({ ...report, transport }),
       runEditorFunctionCalls,
       saveProject: async () =>
         !!(await saveProject({ skipNewVersionWarning: true })),

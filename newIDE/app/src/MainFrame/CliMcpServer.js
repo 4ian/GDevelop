@@ -75,12 +75,20 @@ export type McpToolCallReport = {|
   durationMs: number,
 |};
 
+export type McpAgentConnectedReport = {|
+  clientName: string | null,
+  clientVersion: string | null,
+  isReadOnly: boolean,
+  hasOpenedProject: boolean | null,
+|};
+
 export type CliMcpServerHandlers = {|
   getServerVersion: () => string,
   // Absent when the project can't change during the session (`--mcp` opens
   // the one given in the arguments).
   getOpenedProject?: () => ?McpOpenedProject,
   onToolCalled?: (report: McpToolCallReport) => void,
+  onAgentConnected?: (report: McpAgentConnectedReport) => void,
   // Added to the docs tools, which are always there.
   serverTools?: Array<McpServerTool>,
   // Only the functions not modifying the project are exposed, and scripts
@@ -458,6 +466,20 @@ export const handleMcpMessage = async (
         ? handlers.getOpenedProject()
         : undefined;
       if (openedProject) session.knownProject = openedProject;
+      if (handlers.onAgentConnected) {
+        handlers.onAgentConnected({
+          clientName: session.clientName,
+          clientVersion:
+            params &&
+            params.clientInfo &&
+            typeof params.clientInfo.version === 'string'
+              ? params.clientInfo.version
+              : null,
+          isReadOnly: handlers.isReadOnly,
+          hasOpenedProject:
+            openedProject === undefined ? null : !!openedProject,
+        });
+      }
       return {
         jsonrpc: '2.0',
         id,

@@ -71,6 +71,34 @@ describe('CliMcpServer', () => {
     expect(result.instructions).toContain('always:');
   });
 
+  it('reports the agent connecting', async () => {
+    const onAgentConnected = jest.fn<any, void>();
+    await handleMcpMessage(
+      {
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'initialize',
+        params: {
+          protocolVersion: '2025-03-26',
+          capabilities: {},
+          clientInfo: { name: 'claude-code', version: '2.1.0' },
+        },
+      },
+      {
+        ...makeFakeCliMcpServerHandlers(),
+        getOpenedProject: () => null,
+        onAgentConnected,
+      }
+    );
+
+    expect(onAgentConnected).toHaveBeenCalledWith({
+      clientName: 'claude-code',
+      clientVersion: '2.1.0',
+      isReadOnly: false,
+      hasOpenedProject: false,
+    });
+  });
+
   it('does not answer notifications', async () => {
     expect(
       await handleMcpMessage(

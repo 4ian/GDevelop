@@ -1009,3 +1009,14 @@ export const sendMcpToolCalled = (metadata: {|
 |}) => {
   recordEvent('mcp-tool-called', metadata);
 };
+
+export const sendMcpAgentConnected = (metadata: {|
+  clientName: string | null,
+  clientVersion: string | null,
+  transport: 'http' | 'stdio',
+  isReadOnly: boolean,
+  // Null for `--mcp`, where the project is the one given in the arguments.
+  hasOpenedProject: boolean | null,
+|}) => {
+  recordEvent('mcp-agent-connected', metadata);
+};

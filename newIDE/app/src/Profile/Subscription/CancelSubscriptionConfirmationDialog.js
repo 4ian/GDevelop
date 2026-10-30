@@ -218,18 +218,18 @@ const CancelSubscriptionConfirmationDialog = ({
       open
       maxWidth="sm"
       onRequestClose={onClose}
-      onApply={onClose}
+      onApply={onConfirm}
       actions={[
         <FlatButton
-          key="continue"
-          label={<Trans>Continue</Trans>}
-          onClick={onConfirm}
-        />,
-        <DialogPrimaryButton
           key="keep"
-          primary
           label={<Trans>Keep subscription</Trans>}
           onClick={onClose}
+        />,
+        <DialogPrimaryButton
+          key="continue"
+          primary
+          label={<Trans>Continue cancellation</Trans>}
+          onClick={onConfirm}
         />,
       ]}
       flexColumnBody

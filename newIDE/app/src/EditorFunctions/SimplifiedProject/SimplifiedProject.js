@@ -18,6 +18,8 @@ import {
 export type SimplifiedBehavior = {|
   behaviorName: string,
   behaviorType: string,
+  // Only for objects synchronized with other players (multiplayer).
+  isSynchronizedOverNetwork?: boolean,
 |};
 
 export type SimplifiedVariable = {|
@@ -263,14 +265,16 @@ export const makeSimplifiedProjectBuilder = (
     const behaviors = object
       .getAllBehaviorNames()
       .toJSArray()
-      .map(behaviorName => {
-        const behavior = object.getBehavior(behaviorName);
+      .map(
+        (behaviorName): SimplifiedBehavior | null => {
+          const behavior = object.getBehavior(behaviorName);
 
-        return {
-          behaviorName: behavior.getName(),
-          behaviorType: behavior.getTypeName(),
-        };
-      })
+          return {
+            behaviorName: behavior.getName(),
+            behaviorType: behavior.getTypeName(),
+          };
+        }
+      )
       .filter(Boolean);
 
     const simplifiedObject: SimplifiedObject = {

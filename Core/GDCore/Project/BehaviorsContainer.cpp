@@ -71,8 +71,12 @@ bool BehaviorsContainer::HasBehaviorNamed(const gd::String &name) const {
 gd::Behavior *BehaviorsContainer::AddNewBehavior(const gd::Project &project,
                                                  const gd::String &type,
                                                  const gd::String &name) {
-  auto initializeAndAdd = [this,
-                           &name](std::unique_ptr<gd::Behavior> behavior) {
+  auto initializeAndAdd = [this, &name](
+                              std::unique_ptr<gd::Behavior> behavior,
+                              bool isSynchronizedOverNetworkByDefault) {
+    behavior->SetSynchronizedOverNetworkByDefault(
+        isSynchronizedOverNetworkByDefault);
+    behavior->SetSynchronizedOverNetwork(isSynchronizedOverNetworkByDefault);
     if (isOverriding) {
       // We don't call the Initialize method for behavior overridings because they
       // should have no property value initially.
@@ -87,7 +91,9 @@ gd::Behavior *BehaviorsContainer::AddNewBehavior(const gd::Project &project,
 
   if (project.HasEventsBasedBehavior(type)) {
     return initializeAndAdd(
-        gd::make_unique<CustomBehavior>(name, project, type));
+        gd::make_unique<CustomBehavior>(name, project, type),
+        project.GetEventsBasedBehavior(type)
+            .IsSynchronizedOverNetworkByDefault());
   } else {
     const gd::BehaviorMetadata &behaviorMetadata =
         gd::MetadataProvider::GetBehaviorMetadata(project.GetCurrentPlatform(),
@@ -98,11 +104,12 @@ gd::Behavior *BehaviorsContainer::AddNewBehavior(const gd::Project &project,
       // It's probably an events-based behavior that was removed.
       // Create a custom behavior to preserve the properties values.
       return initializeAndAdd(
-          gd::make_unique<CustomBehavior>(name, project, type));
+          gd::make_unique<CustomBehavior>(name, project, type), true);
     }
     std::unique_ptr<gd::Behavior> behavior(behaviorMetadata.Get().Clone());
     behavior->SetName(name);
-    return initializeAndAdd(std::move(behavior));
+    return initializeAndAdd(std::move(behavior),
+                            behaviorMetadata.IsSynchronizedByDefault());
   }
 }
 
@@ -149,6 +156,12 @@ void BehaviorsContainer::UnserializeFrom(gd::Project &project,
 
     bool isFolded = behaviorElement.GetBoolAttribute("isFolded", false);
     behavior->SetFolded(isFolded);
+
+    if (behaviorElement.HasAttribute("isSynchronizedOverNetwork") ||
+        behaviorElement.HasChild("isSynchronizedOverNetwork")) {
+      behavior->SetSynchronizedOverNetwork(
+          behaviorElement.GetBoolAttribute("isSynchronizedOverNetwork"));
+    }
   }
 }
 
@@ -171,10 +184,18 @@ void BehaviorsContainer::SerializeTo(SerializerElement &element) const {
                                          // name properties, remove them.
     behaviorElement.RemoveChild("name");
     behaviorElement.RemoveChild("isFolded");
+    behaviorElement.RemoveChild("isSynchronizedOverNetwork");
+    behaviorElement.RemoveAttribute("isSynchronizedOverNetwork");
     behaviorElement.SetAttribute("type", behavior.GetTypeName());
     behaviorElement.SetAttribute("name", behavior.GetName());
     if (behavior.IsFolded())
       behaviorElement.SetAttribute("isFolded", true);
+    // Only stored when changed, so that the default from the metadata
+    // is used otherwise (and can be changed by a new version of the behavior).
+    if (behavior.IsSynchronizedOverNetwork() !=
+        behavior.IsSynchronizedOverNetworkByDefault())
+      behaviorElement.SetAttribute("isSynchronizedOverNetwork",
+                                   behavior.IsSynchronizedOverNetwork());
 
     // Compatibility with projects saved with the removed Quick Customization:
     // the content can contain its former visibilities, remove them.

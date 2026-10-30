@@ -1915,6 +1915,33 @@ describe('libGD.js', function () {
       behavior.delete();
       project.delete();
     });
+
+    it('can be set as not synchronized over the network', function () {
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      const layout = project.insertNewLayout('Scene', 0);
+      const object = layout
+        .getObjects()
+        .insertNewObject(project, 'Sprite', 'MyObject', 0);
+      const behavior = object.addNewBehavior(
+        project,
+        'PlatformBehavior::PlatformerObjectBehavior',
+        'PlatformerObject'
+      );
+      expect(behavior.isSynchronizedOverNetwork()).toBe(true);
+      expect(behavior.isSynchronizedOverNetworkByDefault()).toBe(true);
+
+      behavior.setSynchronizedOverNetwork(false);
+      expect(behavior.isSynchronizedOverNetwork()).toBe(false);
+      const element = new gd.SerializerElement();
+      object.serializeTo(element);
+      const serializedObject = JSON.parse(gd.Serializer.toJSON(element));
+      element.delete();
+      expect(serializedObject.behaviors[0].isSynchronizedOverNetwork).toBe(
+        false
+      );
+
+      project.delete();
+    });
   });
 
   describe('gd.BehaviorsSharedData', function () {
@@ -5151,6 +5178,18 @@ describe('libGD.js', function () {
       expect(eventsBasedBehavior.getName()).toBe('My name');
       expect(eventsBasedBehavior.getFullName()).toBe('My descriptive name');
       expect(eventsBasedBehavior.getDescription()).toBe('My description');
+    });
+
+    it('can be set as not synchronized over the network by default', function () {
+      const eventsBasedBehavior = new gd.EventsBasedBehavior();
+      expect(eventsBasedBehavior.isSynchronizedOverNetworkByDefault()).toBe(
+        true
+      );
+      eventsBasedBehavior.setSynchronizedOverNetworkByDefault(false);
+      expect(eventsBasedBehavior.isSynchronizedOverNetworkByDefault()).toBe(
+        false
+      );
+      eventsBasedBehavior.delete();
     });
   });
 

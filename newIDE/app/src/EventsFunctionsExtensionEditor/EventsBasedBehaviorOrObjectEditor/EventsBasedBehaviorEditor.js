@@ -177,6 +177,17 @@ export default function EventsBasedBehaviorEditor({
                   )
             }
           />
+          <CompactToggleField
+            label={i18n._(t`Synchronized over the network by default`)}
+            checked={eventsBasedBehavior.isSynchronizedOverNetworkByDefault()}
+            onCheck={checked => {
+              eventsBasedBehavior.setSynchronizedOverNetworkByDefault(checked);
+              onChange();
+            }}
+            markdownDescription={i18n._(
+              t`For multiplayer objects. Uncheck for behaviors reacting to the inputs of the player (keyboard, mouse or touch "mappers"): their state won't be sent to other players, so they can stay deactivated on the objects owned by other players.`
+            )}
+          />
           {eventsBasedBehavior
             .getEventsFunctions()
             .getEventsFunctionsCount() === 0 && (

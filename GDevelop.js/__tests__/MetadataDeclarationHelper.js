@@ -433,6 +433,52 @@ describe('MetadataDeclarationHelper', () => {
     project.delete();
   });
 
+  it('can create metadata for behaviors not synchronized by default', () => {
+    const extension = new gd.PlatformExtension();
+    const project = new gd.Project();
+
+    const eventExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const synchronizedEventBehavior = eventExtension
+      .getEventsBasedBehaviors()
+      .insertNew('MyBehavior', 0);
+    const notSynchronizedEventBehavior = eventExtension
+      .getEventsBasedBehaviors()
+      .insertNew('MyKeyboardMapper', 1);
+    notSynchronizedEventBehavior.setSynchronizedOverNetworkByDefault(false);
+
+    const behaviorMethodMangledNames = new gd.MapStringString();
+    gd.MetadataDeclarationHelper.generateBehaviorMetadata(
+      project,
+      extension,
+      eventExtension,
+      synchronizedEventBehavior,
+      behaviorMethodMangledNames
+    );
+    gd.MetadataDeclarationHelper.generateBehaviorMetadata(
+      project,
+      extension,
+      eventExtension,
+      notSynchronizedEventBehavior,
+      behaviorMethodMangledNames
+    );
+    behaviorMethodMangledNames.delete();
+
+    expect(
+      extension.getBehaviorMetadata('MyBehavior').isSynchronizedByDefault()
+    ).toBe(true);
+    expect(
+      extension
+        .getBehaviorMetadata('MyKeyboardMapper')
+        .isSynchronizedByDefault()
+    ).toBe(false);
+
+    extension.delete();
+    project.delete();
+  });
+
   it('can create metadata for behavior conditions', () => {
     const extension = new gd.PlatformExtension();
     const project = new gd.Project();

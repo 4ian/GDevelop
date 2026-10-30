@@ -940,6 +940,10 @@ interface Behavior {
     void SetFolded(boolean folded);
 
     boolean IsDefaultBehavior();
+
+    boolean IsSynchronizedOverNetwork();
+    void SetSynchronizedOverNetwork(boolean isSynchronizedOverNetwork);
+    boolean IsSynchronizedOverNetworkByDefault();
 };
 
 [JSImplementation=Behavior]
@@ -2443,6 +2447,9 @@ interface BehaviorMetadata {
     boolean IsActivatedByDefaultInEditor();
     [Ref] BehaviorMetadata MarkAsActivatedByDefaultInEditor();
 
+    boolean IsSynchronizedByDefault();
+    [Ref] BehaviorMetadata SetNotSynchronizedByDefault();
+
     [Ref] BehaviorMetadata SetOpenFullEditorLabel([Const] DOMString label);
     [Const, Ref] DOMString GetOpenFullEditorLabel();
 
@@ -3674,6 +3681,9 @@ interface EventsBasedBehavior {
 
     [Ref] EventsBasedBehavior SetObjectType([Const] DOMString fullName);
     [Const, Ref] DOMString GetObjectType();
+
+    boolean IsSynchronizedOverNetworkByDefault();
+    [Ref] EventsBasedBehavior SetSynchronizedOverNetworkByDefault(boolean isSynchronizedOverNetworkByDefault);
 
     [Ref] PropertiesContainer GetSharedPropertyDescriptors();
 

@@ -38,6 +38,8 @@ declare class gdBehaviorMetadata {
   markAsIrrelevantForChildObjects(): gdBehaviorMetadata;
   isActivatedByDefaultInEditor(): boolean;
   markAsActivatedByDefaultInEditor(): gdBehaviorMetadata;
+  isSynchronizedByDefault(): boolean;
+  setNotSynchronizedByDefault(): gdBehaviorMetadata;
   setOpenFullEditorLabel(label: string): gdBehaviorMetadata;
   getOpenFullEditorLabel(): string;
   addPropertyGroup(group: string): gdBehaviorMetadata;

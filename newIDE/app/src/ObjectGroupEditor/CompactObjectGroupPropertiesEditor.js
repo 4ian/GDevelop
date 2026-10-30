@@ -35,7 +35,13 @@ import { IconContainer } from '../UI/IconContainer';
 import RemoveIcon from '../UI/CustomSvgIcons/Remove';
 import { mapVector } from '../Utils/MapFor';
 import getObjectByName from '../Utils/GetObjectByName';
-import { getAllVisibleBehaviorNames } from '../Utils/Behavior';
+import {
+  getAllVisibleBehaviorNames,
+  isObjectSynchronizedOverNetwork,
+  multiplayerObjectBehaviorType,
+} from '../Utils/Behavior';
+import NetworkSynchronized from '../UI/CustomSvgIcons/NetworkSynchronized';
+import NetworkNotSynchronized from '../UI/CustomSvgIcons/NetworkNotSynchronized';
 import { EmptyPlaceholder } from '../UI/EmptyPlaceholder';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 
@@ -225,6 +231,8 @@ export const CompactObjectGroupPropertiesEditor: React.ComponentType<{
 
     // Behaviors:
     const allVisibleBehaviorNames = getAllVisibleBehaviorNames(objects);
+    const areObjectsSynchronizedOverNetwork =
+      objects.length > 0 && objects.every(isObjectSynchronizedOverNetwork);
     const {
       openNewBehaviorDialog,
       newBehaviorDialog,
@@ -472,8 +480,33 @@ export const CompactObjectGroupPropertiesEditor: React.ComponentType<{
                               ) : null
                             }
                             title={behaviors[0].getName()}
-                            titleBarButtons={
-                              isBehaviorListLocked
+                            titleBarButtons={[
+                              ...(areObjectsSynchronizedOverNetwork &&
+                              behaviorTypeName !== multiplayerObjectBehaviorType
+                                ? [
+                                    {
+                                      id: 'behavior-network-synchronization',
+                                      icon: behaviors[0].isSynchronizedOverNetwork()
+                                        ? NetworkSynchronized
+                                        : NetworkNotSynchronized,
+                                      label: behaviors[0].isSynchronizedOverNetwork()
+                                        ? t`Synchronized with other players`
+                                        : t`Not synchronized: when this behavior is enabled, disabled or changed, other players are not affected. Useful for behaviors handling the player inputs.`,
+                                      onClick: () => {
+                                        const isSynchronizedOverNetwork = !behaviors[0].isSynchronizedOverNetwork();
+                                        behaviors.forEach(behavior =>
+                                          behavior.setSynchronizedOverNetwork(
+                                            isSynchronizedOverNetwork
+                                          )
+                                        );
+                                        if (unsavedChanges)
+                                          unsavedChanges.triggerUnsavedChanges();
+                                        forceUpdate();
+                                      },
+                                    },
+                                  ]
+                                : []),
+                              ...(isBehaviorListLocked
                                 ? []
                                 : [
                                     {
@@ -484,8 +517,8 @@ export const CompactObjectGroupPropertiesEditor: React.ComponentType<{
                                         removeBehavior(behaviorName);
                                       },
                                     },
-                                  ]
-                            }
+                                  ]),
+                            ]}
                           />
                         );
                       })}

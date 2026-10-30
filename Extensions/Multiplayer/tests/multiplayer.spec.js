@@ -51,6 +51,29 @@ describe('Multiplayer', () => {
           animations: [],
           variables: [],
         },
+        {
+          type: 'Sprite',
+          name: 'MyPlayerCharacter',
+          behaviors: [
+            {
+              name: 'MultiplayerObject',
+              type: 'Multiplayer::MultiplayerObjectBehavior',
+              playerNumber: 0,
+              actionOnPlayerDisconnect: 'Destroy',
+            },
+            {
+              // A behavior moving the object from the inputs of the player,
+              // that must only be activated on the game of the owner.
+              name: 'InputMapper',
+              type: 'MyDummyExtension::DummyBehavior',
+              isSynchronizedOverNetwork: false,
+            },
+          ],
+          effects: [],
+          // @ts-expect-error ts-migrate(2322) FIXME: Type '{ type: string; name: string; behaviors: nev... Remove this comment to see the full error message
+          animations: [],
+          variables: [],
+        },
       ],
       instances: instances || [],
       variables: [],
@@ -2393,6 +2416,70 @@ describe('Multiplayer', () => {
 
       // It is activated as it is not synchronized.
       expect(p2DummyBehaviorOriginal._activated).to.be(true);
+    });
+
+    it('keeps a behavior deactivated on other players if set as not synchronized in the editor', async () => {
+      const { switchToPeer, initiateGameWithPlayers } =
+        createMultiplayerManagersMock();
+
+      const allConnectedPlayers = [
+        { playerNumber: 1, peerId: 'player-1', isHost: true },
+        { playerNumber: 2, peerId: 'player-2' },
+      ];
+      initiateGameWithPlayers(allConnectedPlayers);
+
+      /**
+       * @param {gdjs.RuntimeScene} runtimeScene
+       * @returns {gdjs.RuntimeBehavior}
+       */
+      const getInputMapperBehavior = (runtimeScene) => {
+        const objects = runtimeScene.getObjects('MyPlayerCharacter');
+        if (!objects || objects.length !== 1)
+          throw new Error('Expected exactly one MyPlayerCharacter instance.');
+        const behavior = objects[0].getBehavior('InputMapper');
+        if (!behavior) throw new Error('No InputMapper behavior found.');
+        return behavior;
+      };
+
+      // Player 2 creates its character and takes its ownership.
+      switchToPeer({ playerNumber: 2, allConnectedPlayers });
+      const p2RuntimeScene = makeTestRuntimeSceneWithNetworkId();
+      const p2Character = p2RuntimeScene.createObject('MyPlayerCharacter');
+      /** @type {gdjs.MultiplayerObjectRuntimeBehavior | null} */
+      // @ts-ignore - We know this returns a MultiplayerObjectRuntimeBehavior
+      const p2MultiplayerBehavior =
+        p2Character.getBehavior('MultiplayerObject');
+      if (!p2MultiplayerBehavior)
+        throw new Error('No MultiplayerObject behavior found.');
+      p2MultiplayerBehavior.takeObjectOwnership();
+      expect(
+        getInputMapperBehavior(p2RuntimeScene).isSyncedOverNetwork()
+      ).to.be(false);
+      p2RuntimeScene.renderAndStep(1000 / 60);
+
+      // The host receives the character, and deactivates its input mapper
+      // as it does not own the character.
+      switchToPeer({ playerNumber: 1, allConnectedPlayers });
+      const p1RuntimeScene = makeTestRuntimeSceneWithNetworkId();
+      p1RuntimeScene.renderAndStep(1000 / 60);
+      getInputMapperBehavior(p1RuntimeScene).activate(false);
+
+      // Player 2 moves its character, with its input mapper activated.
+      for (let i = 0; i < 3; i++) {
+        switchToPeer({ playerNumber: 2, allConnectedPlayers });
+        p2Character.setX(p2Character.getX() + 10);
+        await delay(20);
+        p2RuntimeScene.renderAndStep(1000 / 60);
+        expect(getInputMapperBehavior(p2RuntimeScene).activated()).to.be(true);
+
+        switchToPeer({ playerNumber: 1, allConnectedPlayers });
+        p1RuntimeScene.renderAndStep(1000 / 60);
+      }
+
+      // The host copy of the character moved, but its input mapper was not re-activated.
+      const p1Characters = p1RuntimeScene.getObjects('MyPlayerCharacter');
+      expect(p1Characters[0].getX()).to.be(30);
+      expect(getInputMapperBehavior(p1RuntimeScene).activated()).to.be(false);
     });
   });
 

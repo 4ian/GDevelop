@@ -720,6 +720,21 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
   }
 
   {
+    extension
+        ->AddBehavior("MyInputMapperBehavior",
+                      "Dummy input mapper behavior",
+                      "MyInputMapperBehavior",
+                      "A dummy behavior not synchronized by default",
+                      "Group",
+                      "Icon.png",
+                      "MyInputMapperBehavior",
+                      gd::make_unique<gd::Behavior>(
+                          "Behavior", "MyExtension::MyInputMapperBehavior"),
+                      gd::make_unique<gd::BehaviorsSharedData>())
+        .SetNotSynchronizedByDefault();
+  }
+
+  {
     auto& behavior = extension->AddBehavior(
         "BehaviorWithRequiredBehaviorProperty",
         "BehaviorWithRequiredBehaviorProperty",

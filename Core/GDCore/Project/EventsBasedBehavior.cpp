@@ -20,6 +20,9 @@ EventsBasedBehavior::EventsBasedBehavior()
 void EventsBasedBehavior::SerializeTo(SerializerElement& element) const {
   AbstractEventsBasedEntity::SerializeTo(element);
   element.SetAttribute("objectType", objectType);
+  if (!isSynchronizedOverNetworkByDefault) {
+    element.SetBoolAttribute("isSynchronizedOverNetworkByDefault", false);
+  }
   if (!sharedPropertyDescriptors.empty()) {
     sharedPropertyDescriptors.SerializeElementsTo(
         "propertyDescriptor", element.AddChild("sharedPropertyDescriptors"));
@@ -32,6 +35,8 @@ void EventsBasedBehavior::UnserializeFrom(gd::Project& project,
                                           const SerializerElement& element) {
   AbstractEventsBasedEntity::UnserializeFrom(project, element);
   objectType = element.GetStringAttribute("objectType");
+  isSynchronizedOverNetworkByDefault =
+      element.GetBoolAttribute("isSynchronizedOverNetworkByDefault", true);
   // Shared properties are only serialized when there are some.
   sharedPropertyDescriptors.UnserializeElementsFrom(
       "propertyDescriptor", element.HasChild("sharedPropertyDescriptors")

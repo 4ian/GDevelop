@@ -173,3 +173,146 @@ describe('change_behavior_property (property warnings and shared properties)', (
     ).toBe('20');
   });
 });
+
+describe('change_behavior_property (network synchronization)', () => {
+  let project: gdProject;
+  let testScene: gdLayout;
+
+  beforeEach(() => {
+    makeTestExtensions(gd);
+    // $FlowFixMe[invalid-constructor]
+    project = new gd.ProjectHelper.createNewGDJSProject();
+    testScene = project.insertNewLayout('TestScene', 0);
+  });
+
+  afterEach(() => {
+    project.delete();
+  });
+
+  /**
+   * The Multiplayer extension is not loaded in tests, but only the type of
+   * the behavior is used to know if an object is synchronized over the network.
+   */
+  const addPlayerObject = ({
+    name,
+    isMultiplayer,
+  }: {|
+    name: string,
+    isMultiplayer: boolean,
+  |}): gdObject => {
+    const testSceneObjects = testScene.getObjects();
+    const object = testSceneObjects.insertNewObject(
+      project,
+      'Sprite',
+      name,
+      testSceneObjects.getObjectsCount()
+    );
+    if (isMultiplayer) {
+      object.addNewBehavior(
+        project,
+        'Multiplayer::MultiplayerObjectBehavior',
+        'MultiplayerObject'
+      );
+    }
+    object.addNewBehavior(
+      project,
+      'FakeBehavior::FakeBehavior',
+      'KeyboardMapper'
+    );
+    return object;
+  };
+
+  it('sets a behavior as not synchronized over the network', async () => {
+    const player = addPlayerObject({ name: 'Player', isMultiplayer: true });
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_behavior_property.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          behavior_name: 'KeyboardMapper',
+          changed_properties: [
+            { property_name: 'isSynchronizedOverNetwork', new_value: 'false' },
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.message).toBe(
+      'Done.\n' +
+        'Set "isSynchronizedOverNetwork" on behavior "KeyboardMapper" = "false".'
+    );
+    expect(
+      player.getBehavior('KeyboardMapper').isSynchronizedOverNetwork()
+    ).toBe(false);
+  });
+
+  it('sets it on every object of a group, and warns about objects without the multiplayer behavior', async () => {
+    const player1 = addPlayerObject({ name: 'Player1', isMultiplayer: true });
+    const player2 = addPlayerObject({ name: 'Player2', isMultiplayer: false });
+    const group = testScene
+      .getObjects()
+      .getObjectGroups()
+      .insertNew('Players', 0);
+    group.addObject('Player1');
+    group.addObject('Player2');
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_behavior_property.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Players',
+          behavior_name: 'KeyboardMapper',
+          changed_properties: [
+            // Matched like other property names.
+            { property_name: 'is_synchronized_over_network', new_value: '0' },
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.message).toBe(
+      'Done with warnings.\n' +
+        'Set "isSynchronizedOverNetwork" on behavior "KeyboardMapper" = "false".\n' +
+        'Warnings:\n' +
+        '"Player2" has no "Multiplayer::MultiplayerObjectBehavior" behavior: "isSynchronizedOverNetwork" has no effect until it\'s added.'
+    );
+    expect(
+      player1.getBehavior('KeyboardMapper').isSynchronizedOverNetwork()
+    ).toBe(false);
+    expect(
+      player2.getBehavior('KeyboardMapper').isSynchronizedOverNetwork()
+    ).toBe(false);
+  });
+
+  it('refuses a value that is not a boolean', async () => {
+    const player = addPlayerObject({ name: 'Player', isMultiplayer: true });
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_behavior_property.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          behavior_name: 'KeyboardMapper',
+          changed_properties: [
+            { property_name: 'isSynchronizedOverNetwork', new_value: 'no' },
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(false);
+    expect(result.message).toBe(
+      'Nothing changed. Issues:\n' +
+        'Could not set "isSynchronizedOverNetwork" on behavior "KeyboardMapper": use "true" or "false".'
+    );
+    expect(
+      player.getBehavior('KeyboardMapper').isSynchronizedOverNetwork()
+    ).toBe(true);
+  });
+});

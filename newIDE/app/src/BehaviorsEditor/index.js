@@ -26,7 +26,9 @@ import { IconContainer } from '../UI/IconContainer';
 import { getBehaviorTutorialIds } from '../Utils/GDevelopServices/Tutorial';
 import {
   addBehaviorToObject,
+  isObjectSynchronizedOverNetwork,
   listObjectsBehaviorsTypes,
+  multiplayerObjectBehaviorType,
 } from '../Utils/Behavior';
 import { sendBehaviorAdded } from '../Utils/Analytics/EventSender';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
@@ -42,6 +44,8 @@ import {
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import PasteIcon from '../UI/CustomSvgIcons/Clipboard';
 import CopyIcon from '../UI/CustomSvgIcons/Copy';
+import NetworkSynchronized from '../UI/CustomSvgIcons/NetworkSynchronized';
+import NetworkNotSynchronized from '../UI/CustomSvgIcons/NetworkNotSynchronized';
 import ResponsiveFlatButton from '../UI/ResponsiveFlatButton';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import Text from '../UI/Text';
@@ -84,6 +88,7 @@ type BehaviorConfigurationEditorProps = {|
   pasteBehaviors: () => Promise<void>,
   openExtension: (behaviorType: string) => void,
   isListLocked: boolean,
+  areObjectsSynchronizedOverNetwork: boolean,
   layersContainer: gdLayersContainer,
 |};
 
@@ -107,6 +112,7 @@ const BehaviorConfigurationEditor = React.forwardRef<
       pasteBehaviors,
       openExtension,
       isListLocked,
+      areObjectsSynchronizedOverNetwork,
       layersContainer,
     },
     ref
@@ -178,6 +184,7 @@ const BehaviorConfigurationEditor = React.forwardRef<
       tutorialId => !values.hiddenTutorialHints[tutorialId]
     );
     const iconUrl = behaviorMetadata.getIconFilename();
+    const isSynchronizedOverNetwork = behaviors[0].isSynchronizedOverNetwork();
 
     return (
       <Accordion
@@ -191,6 +198,37 @@ const BehaviorConfigurationEditor = React.forwardRef<
       >
         <AccordionHeader
           actions={[
+            ...(areObjectsSynchronizedOverNetwork &&
+            behaviorTypeName !== multiplayerObjectBehaviorType
+              ? [
+                  <IconButton
+                    key="network-synchronization"
+                    size="small"
+                    id={`behavior-${behaviorName}-network-synchronization-button`}
+                    tooltip={
+                      isSynchronizedOverNetwork
+                        ? t`Synchronized with other players`
+                        : t`Not synchronized: when this behavior is enabled, disabled or changed, other players are not affected. Useful for behaviors handling the player inputs.`
+                    }
+                    onClick={ev => {
+                      ev.stopPropagation();
+                      behaviors.forEach(behavior =>
+                        behavior.setSynchronizedOverNetwork(
+                          !isSynchronizedOverNetwork
+                        )
+                      );
+                      forceUpdate();
+                      onBehaviorsUpdated();
+                    }}
+                  >
+                    {isSynchronizedOverNetwork ? (
+                      <NetworkSynchronized />
+                    ) : (
+                      <NetworkNotSynchronized />
+                    )}
+                  </IconButton>,
+                ]
+              : []),
             <HelpIcon
               key="help"
               size="small"
@@ -743,6 +781,8 @@ const BehaviorsEditor = (props: Props): React.Node => {
   const forceUpdate = useForceUpdate();
 
   const allVisibleBehaviorNames = getAllVisibleBehaviorNames(objects);
+  const areObjectsSynchronizedOverNetwork =
+    objects.length > 0 && objects.every(isObjectSynchronizedOverNetwork);
   const {
     changeBehaviorName,
     removeBehavior,
@@ -880,6 +920,9 @@ const BehaviorsEditor = (props: Props): React.Node => {
                     props.projectScopedContainersAccessor
                   }
                   isListLocked={isListLocked}
+                  areObjectsSynchronizedOverNetwork={
+                    areObjectsSynchronizedOverNetwork
+                  }
                 />
               );
             })}

@@ -43,5 +43,10 @@ describe('PublicApi', () => {
   it('has the gameplay test harness guide', () => {
     expect(publicApi.gameplayHarnessGuide).toContain('interface Harness');
     expect(publicApi.gameplayHarnessGuide).toContain('stepFrames(');
+    expect(publicApi.gameplayHarnessGuide).toContain('setRenderingMode(');
+    expect(publicApi.gameplayHarnessGuide).toContain('harness.multiplayer');
+    expect(publicApi.gameplayHarnessGuide).not.toContain(
+      'GAMEPLAY_HARNESS_EXTENSIONS_DEFINITION'
+    );
   });
 });

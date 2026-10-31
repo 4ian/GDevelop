@@ -969,19 +969,57 @@ namespace gdjs {
 
       // If we are connected to players, then the game can start.
       logger.info('Lobby game has started.');
-      // In case we're joining an existing lobby, read the saved messages to catch-up with the game state.
-      gdjs.multiplayerMessageManager.handleSavedUpdateMessages(runtimeScene);
       if (_isQuickJoiningOrStartingAGame)
         onLobbyQuickJoinFinished(runtimeScene);
-      _isReadyToSendOrReceiveGameUpdateMessages = true;
-      _hasLobbyGameJustStarted = true;
-      _isLobbyGameRunning = true;
+      markLobbyGameAsStarted(runtimeScene);
       removeLobbiesContainer(runtimeScene);
       // Close the websocket, as we don't need it anymore.
       if (_websocket) {
         _websocket.close();
       }
       focusOnGame(runtimeScene);
+    };
+
+    const markLobbyGameAsStarted = (runtimeScene: gdjs.RuntimeScene) => {
+      // In case we're joining an existing lobby, read the saved messages to catch-up with the game state.
+      gdjs.multiplayerMessageManager.handleSavedUpdateMessages(runtimeScene);
+      _isReadyToSendOrReceiveGameUpdateMessages = true;
+      _hasLobbyGameJustStarted = true;
+      _isLobbyGameRunning = true;
+    };
+
+    /**
+     * Start the lobby game as the given player, as when the lobby starts it
+     * once every player is connected, but without lobbies window, backend
+     * nor broker server. Used by gameplay tests, which simulate the
+     * connection to the other players (see `multiplayer-gameplay-tests.ts`).
+     */
+    export const startLobbyGameWithoutLobby = ({
+      runtimeScene,
+      currentPlayerNumber,
+      currentHostPeerId,
+    }: {
+      runtimeScene: gdjs.RuntimeScene;
+      currentPlayerNumber: number;
+      currentHostPeerId: string;
+    }) => {
+      playerNumber = currentPlayerNumber;
+      hostPeerId = currentHostPeerId;
+      markLobbyGameAsStarted(runtimeScene);
+    };
+
+    /**
+     * End a lobby game started with `startLobbyGameWithoutLobby`, leaving the
+     * game as if no lobby game was ever started (not even "just ended").
+     */
+    export const endLobbyGameWithoutLobby = () => {
+      _isReadyToSendOrReceiveGameUpdateMessages = false;
+      _hasLobbyGameJustStarted = false;
+      _isLobbyGameRunning = false;
+      _hasLobbyGameJustEnded = false;
+      _lobbyId = null;
+      playerNumber = null;
+      hostPeerId = null;
     };
 
     /**

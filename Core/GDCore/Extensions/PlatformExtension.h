@@ -238,6 +238,26 @@ class GD_CORE_API PlatformExtension {
   gd::SourceFileMetadata& AddSourceFile();
 
   /**
+   * \brief Add a file to include only in the games running gameplay tests
+   * (previews), after the other files of the extension. It can add helpers
+   * to the gameplay test harness (see
+   * `gdjs.gameplayTests.registerHarnessExtension`). Exported games never
+   * include it.
+   */
+  PlatformExtension& AddGameplayTestIncludeFile(const gd::String& includeFile) {
+    gameplayTestIncludeFiles.push_back(includeFile);
+    return *this;
+  }
+
+  /**
+   * \brief The files to include only in the games running gameplay tests.
+   * \see AddGameplayTestIncludeFile
+   */
+  const std::vector<gd::String>& GetGameplayTestIncludeFiles() const {
+    return gameplayTestIncludeFiles;
+  }
+
+  /**
    * \brief Declare a new object as being part of the extension.
    * \tparam T the declared class inherited from *gd::Object*
    * \param name The name of the object.
@@ -767,6 +787,7 @@ static gd::String GetVariantFullType(const gd::String& extensionName,
   std::map<gd::String, gd::ExpressionMetadata> strExpressionsInfos;
   std::vector<gd::DependencyMetadata> extensionDependenciesMetadata;
   std::vector<gd::SourceFileMetadata> extensionSourceFilesMetadata;
+  std::vector<gd::String> gameplayTestIncludeFiles;
   std::map<gd::String, gd::EventMetadata> eventsInfos;
   std::map<gd::String, gd::PropertyDescriptor> extensionPropertiesMetadata;
   std::map<gd::String, InstructionOrExpressionGroupMetadata>

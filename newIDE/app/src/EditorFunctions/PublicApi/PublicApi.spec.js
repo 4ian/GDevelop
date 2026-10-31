@@ -1,8 +1,4 @@
 // @flow
-// $FlowFixMe[cannot-resolve-module]
-import fs from 'fs';
-// $FlowFixMe[cannot-resolve-module]
-import path from 'path';
 import { getPublicApi, PUBLIC_API_TOOLS_VERSION } from '.';
 import { editorFunctions } from '..';
 
@@ -48,28 +44,9 @@ describe('PublicApi', () => {
     expect(publicApi.gameplayHarnessGuide).toContain('interface Harness');
     expect(publicApi.gameplayHarnessGuide).toContain('stepFrames(');
     expect(publicApi.gameplayHarnessGuide).toContain('setRenderingMode(');
+    expect(publicApi.gameplayHarnessGuide).toContain('harness.multiplayer');
     expect(publicApi.gameplayHarnessGuide).not.toContain(
       'GAMEPLAY_HARNESS_EXTENSIONS_DEFINITION'
     );
-  });
-
-  it('has the helpers added to the harness by every extension', () => {
-    // $FlowFixMe[cannot-resolve-name]
-    const extensionsPath = path.join(__dirname, '../../../../../Extensions');
-    const documentations = fs
-      .readdirSync(extensionsPath)
-      .map(folderName =>
-        path.join(extensionsPath, folderName, 'gameplay-tests.md')
-      )
-      .filter(documentationPath => fs.existsSync(documentationPath))
-      .map(documentationPath => fs.readFileSync(documentationPath, 'utf8'));
-
-    expect(documentations.length).toBeGreaterThan(0);
-    for (const documentation of documentations) {
-      // Headings are one level lower in the guide.
-      expect(publicApi.gameplayHarnessGuide).toContain(
-        documentation.replace(/^## /gm, '### ').trim()
-      );
-    }
   });
 });

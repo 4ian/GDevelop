@@ -3,6 +3,11 @@ import functionsV22 from './v22/functions.json';
 import scriptApiDefinitionV22 from './v22/script-api.d.ts';
 import eventScriptGuide from './event-script-guide.md';
 import gameplayHarnessGuide from './gameplay-harness-guide.md';
+import multiplayerGameplayTests from '../../../../../Extensions/Multiplayer/gameplay-tests.md';
+
+// The documentation of the helpers that extensions add to the gameplay test
+// harness, next to their code.
+const extensionsGameplayTests = [multiplayerGameplayTests];
 
 /**
  * The public API of the editor functions, as given to the external agents
@@ -42,5 +47,12 @@ export const getPublicApi = (): PublicApi => ({
   functions: functionsV22.functions,
   scriptApiDefinition: scriptApiDefinitionV22,
   eventScriptGuide,
-  gameplayHarnessGuide,
+  gameplayHarnessGuide: [
+    gameplayHarnessGuide.trim(),
+    '## Helpers added by extensions',
+    'Only in the projects using these extensions:',
+    ...extensionsGameplayTests.map(extensionGameplayTests =>
+      extensionGameplayTests.replace(/^## /gm, '### ').trim()
+    ),
+  ].join('\n\n'),
 });

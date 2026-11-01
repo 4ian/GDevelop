@@ -1124,6 +1124,78 @@ describe('gdjs.gameplayTests', () => {
     ).to.be(true);
   });
 
+  it('reads and sets the children of variables with paths', async () => {
+    const sceneData = createSceneData('Scene 1');
+    sceneData.variables = [
+      {
+        name: 'Hit',
+        type: 'structure',
+        children: [{ name: 'Distance', type: 'number', value: 0 }],
+      },
+      {
+        name: 'Items',
+        type: 'array',
+        children: [
+          {
+            type: 'structure',
+            children: [{ name: 'Name', type: 'string', value: 'Sword' }],
+          },
+        ],
+      },
+      { name: 'Score', type: 'number', value: 3 },
+    ];
+    const runtimeGame = gdjs.getPixiRuntimeGame({ layouts: [sceneData] });
+    const result = await runTestScript(
+      runtimeGame,
+      `
+      await harness.goToScene('Scene 1');
+      harness.setSceneVariable('Hit.Distance', 12);
+      harness.setSceneVariable('Hit.Side', 'left');
+      harness.setSceneVariable('Items[0].Name', 'Shield');
+
+      harness.assert(
+        harness.getSceneVariable('Hit.Distance').value === 12,
+        'A declared child is set'
+      );
+      harness.assert(
+        harness.getSceneVariable('Hit.Side').value === 'left',
+        'A missing child of a structure is created'
+      );
+      harness.assert(
+        harness.getSceneVariable('Items[0].Name').value === 'Shield',
+        'A child of an item of an array is set'
+      );
+      harness.assert(
+        harness.getSceneVariable('Hit.Missing') === undefined,
+        'A missing child is undefined'
+      );
+
+      const errors = [];
+      for (const variablePath of [
+        'Missing.Child',
+        'Score.Child',
+        'Items[1]',
+        'Hit[0]',
+        'Hit..Distance',
+      ]) {
+        try {
+          harness.setSceneVariable(variablePath, 1);
+          errors.push(variablePath + ' was set');
+        } catch (error) {}
+      }
+      harness.assert(errors.length === 0, errors.join(', '));
+      `
+    );
+
+    expect(result.status).to.be('passed');
+    const currentScene = runtimeGame.getSceneStack().getCurrentScene();
+    if (!currentScene) throw new Error('No scene is running.');
+    const sceneVariables = currentScene.getVariables();
+    expect(sceneVariables.has('Hit.Distance')).to.be(false);
+    expect(sceneVariables.has('Missing')).to.be(false);
+    expect(sceneVariables.get('Score').getAsNumber()).to.be(3);
+  });
+
   it('records a sceneReset event when the same scene is restarted', async () => {
     const runtimeGame = makeRuntimeGame();
     const result = await runTestScript(

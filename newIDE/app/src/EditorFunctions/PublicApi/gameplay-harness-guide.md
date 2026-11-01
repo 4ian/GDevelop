@@ -115,10 +115,11 @@ interface Harness {
   getPlayedSounds(): Array<{ sound: string, frame: number }>;
   /** Returns the raw variable entry ({ name, value, type, children... }) or
    * undefined. Booleans are real booleans: check `v?.value === true`,
-   * NEVER `v.value === "True"`. */
-  getSceneVariable(variableName: string): VariableData | undefined;
-  getGlobalVariable(variableName: string): VariableData | undefined;
-  getObjectVariable(objectIdOrName: number | string, variableName: string): VariableData | undefined;
+   * NEVER `v.value === "True"`. A path reads a child: `"Hit.Distance"` (in
+   * a structure), `"Items[0]"` (in an array), `"Items[0].Name"`. */
+  getSceneVariable(variablePath: string): VariableData | undefined;
+  getGlobalVariable(variablePath: string): VariableData | undefined;
+  getObjectVariable(objectIdOrName: number | string, variablePath: string): VariableData | undefined;
   /** Include full snapshots of this object in the final result. */
   watch(objectName: string): void;
   /** The raw gdjs.RuntimeObject of an instance (an id from `getObjects`,
@@ -187,9 +188,12 @@ interface Harness {
    * logic keeps acting each stepped frame (forces, AI...): to hold an
    * object somewhere, re-apply the position every frame via onFrame. */
   setObjectPosition(id: number, x: number, y: number, z?: number): void;
-  setSceneVariable(variableName: string, value: string|number|boolean): void;
-  setObjectVariable(objectIdOrName: number | string, variableName: string, value: string|number|boolean): void;
-  setGlobalVariable(variableName: string, value: string|number|boolean): void;
+  /** A path sets a child, like the getters: a missing child of a structure
+   * is created, but a path through a missing variable, or one that is not a
+   * structure or an array, or past the end of an array, throws. */
+  setSceneVariable(variablePath: string, value: string|number|boolean): void;
+  setObjectVariable(objectIdOrName: number | string, variablePath: string, value: string|number|boolean): void;
+  setGlobalVariable(variablePath: string, value: string|number|boolean): void;
   /** Create the instances of an external layout in the current scene. */
   loadExternalLayout(externalLayoutName: string, x?: number, y?: number, z?: number): void;
 

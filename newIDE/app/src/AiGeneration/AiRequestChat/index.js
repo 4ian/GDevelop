@@ -71,6 +71,7 @@ import { AiAttachmentDrafts } from '../AiAttachments/AiAttachmentDrafts';
 import { AttachFilesButton } from '../AiAttachments/AttachFilesButton';
 import { useFileDropZone } from '../AiAttachments/UseFileDropZone';
 import attachmentsClasses from '../AiAttachments/AiAttachments.module.css';
+import { LiveMcpServerContext } from '../../LiveMcpServer/LiveMcpServerContext';
 
 const TOO_MANY_USER_MESSAGES_WARNING_COUNT = 15;
 const TOO_MANY_USER_MESSAGES_ERROR_COUNT = 20;
@@ -307,6 +308,7 @@ export const AiRequestChat: React.ComponentType<{
       ]
     );
     const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
+    const liveMcpServer = React.useContext(LiveMcpServerContext);
     const { openCreditsPackageDialog } = React.useContext(
       CreditsPackageStoreContext
     );
@@ -1037,6 +1039,26 @@ export const AiRequestChat: React.ComponentType<{
                   </Link>
                 </Trans>
               </Text>
+              {liveMcpServer.isSupported && (
+                <Text
+                  size="body-small"
+                  color="secondary"
+                  align="center"
+                  noMargin
+                >
+                  <Trans>
+                    You can also{' '}
+                    <Link
+                      href="#"
+                      color="secondary"
+                      onClick={liveMcpServer.openSetupDialog}
+                    >
+                      connect your own AI agent (Claude Code, Codex, Cursor...)
+                    </Link>{' '}
+                    to the editor with MCP (experimental).
+                  </Trans>
+                </Text>
+              )}
               <Text size="body-small" color="secondary" align="center" noMargin>
                 <Trans>
                   Changes and answers may have mistakes: experiment and use it

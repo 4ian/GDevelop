@@ -3616,5 +3616,103 @@
         ]
       }
     }
+  ],
+  "lookupFunctions": [
+    {
+      "name": "read_full_docs",
+      "description": "Reads and returns the full reference documentation for one or more GDevelop extensions.\nUse this to get the exact list of actions, conditions, expressions, objects, behaviors and effects with their parameters. Effect entries also say whether the effect only works on layers (not objects) and/or only in 2D or 3D.\nThis must be used every time you're mentioning or using extension features, as you can't rely on your own knowledge.\nThe returned documentation will be added to the conversation for subsequent steps, so you don't need to read the documentation again if you've done it in this conversation.\nIf you make a mistake and need to generate a new answer, ensure you use this tool to read the documentation before generating a new answer.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "extension_names": {
+            "type": "string",
+            "description": "Comma-separated list of extension names to read (e.g.: `Sprite, Physics3D`...). All extension names are case-sensitive."
+          }
+        },
+        "required": [
+          "extension_names"
+        ]
+      }
+    },
+    {
+      "name": "read_javascript_reference",
+      "description": "Reads pages of the reference of the GDevelop JavaScript game engine (GDJS): the classes, methods and functions the code of a `js` event can call. Only for writing JavaScript: the actions, conditions and expressions of events are documented by `read_full_docs`.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "names": {
+            "type": "string",
+            "description": "Comma-separated, up to 5 names. Either object or behavior types of the project (`Sprite`, `TextObject::Text`, `PlatformBehavior::PlatformerObjectBehavior`): the page of the class of their instances (what `objects[i]` is in a `js(Name)` event, what `object.getBehavior(name)` returns). Or `gdjs` class or namespace names (`gdjs.RuntimeScene`, `gdjs.RuntimeObject`, `gdjs.Variable`, `gdjs.evtTools.sound`): that page. `gdjs` alone lists every class and namespace of the engine. A page has the members declared by that class only: read the parent class it names for the inherited ones. A name that matches nothing gets the closest class, namespace or member names in return (a method name like `simulateJumpKey` finds its class)."
+          }
+        },
+        "required": [
+          "names"
+        ]
+      }
+    },
+    {
+      "name": "search_docs",
+      "description": "Search the GDevelop wiki for guidance on editor workflows, feature/extensions how-to pages... For description, objects, behaviors, effects, actions/conditions/expressions of an extension, use `read_full_docs`. When both apply or unsure, call both at the same time. ",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Natural-language description of the use case or topic. 4-10 words is usually best; longer is fine if it disambiguates (e.g. \"publish to iOS via cloud build, signing requirements\"). Examples: \"save the player progress between sessions\", \"publish to iOS\", \"multiplayer setup lobby\", \"add background music that loops\"..."
+          }
+        },
+        "required": [
+          "query"
+        ]
+      }
+    },
+    {
+      "name": "search_object_asset_store",
+      "description": "Search in the GDevelop Asset Store for objects, or effects for a 3D layer (skyboxes, fog presets), matching the given search terms. Returns up to 5 candidate assets (not reranked). Only searches: it does not create or change anything in the project. Communicate at least the `shortId` and `objectType` when returning answers to the user query.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "search_terms": {
+            "type": "string",
+            "description": "A list of search terms or tags that will be used to find assets in the GDevelop Asset Store. Must be single words separated by a comma, the most generic word must be first. For example: `spaceship, red, insurgent, cannon`."
+          },
+          "allowed_object_types": {
+            "type": "array",
+            "description": "Optional. A list of object types to restrict the search to (e.g. `[\"Sprite\", \"TiledSpriteObject::TiledSprite\"]`). Effects for a 3D layer are found with their effect type: `[\"Scene3D::Skybox\"]` for skyboxes, `[\"Scene3D::ExponentialFog\"]` for fog presets (they are not objects). If not provided, all object types are considered.",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "search_terms"
+        ]
+      }
+    },
+    {
+      "name": "search_resource_store",
+      "description": "Search in the GDevelop Resource Store for free audio files (sounds or musics) or fonts matching the given search terms. Returns up to 10 candidate resources with their name, tags and metadata (for audio: the duration in seconds and whether it is a `sound` or a `music`; for fonts: the supported alphabets). Use it before referencing an audio file (e.g. in a \"Play a sound\" or \"Play a music\" action) or a font (e.g. in the font property of a text object), then use the exact `name` of the chosen resource: it will be automatically installed in the project from the store. Only searches: it does not create or change anything in the project.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "search_terms": {
+            "type": "string",
+            "description": "A list of search terms or tags that will be used to find resources in the GDevelop Resource Store. Must be single words separated by a comma, the most generic word must be first. For example: `explosion, retro`, `music, calm, piano` or `pixel, bold`."
+          },
+          "resource_kind": {
+            "type": "string",
+            "enum": [
+              "audio",
+              "font"
+            ],
+            "description": "The kind of resources to search for: `audio` for sounds and musics, `font` for fonts. Only these two kinds can be searched."
+          }
+        },
+        "required": [
+          "search_terms",
+          "resource_kind"
+        ]
+      }
+    }
   ]
 }

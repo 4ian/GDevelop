@@ -1027,7 +1027,8 @@ export const AiRequestChat: React.ComponentType<{
             <Column justifyContent="center">
               <Text size="body-small" color="secondary" align="center" noMargin>
                 <Trans>
-                  The AI is experimental and still being improved.{' '}
+                  AI can help you create a new game or work on an existing one.
+                  It may make mistakes: experiment and{' '}
                   <Link
                     href={getHelpLink('/interface/ai')}
                     color="secondary"
@@ -1035,35 +1036,23 @@ export const AiRequestChat: React.ComponentType<{
                       Window.openExternalURL(getHelpLink('/interface/ai'))
                     }
                   >
-                    It can inspect your game objects and events.
+                    use it for learning
                   </Link>
-                </Trans>
-              </Text>
-              {liveMcpServer.isSupported && (
-                <Text
-                  size="body-small"
-                  color="secondary"
-                  align="center"
-                  noMargin
-                >
+                  .
+                </Trans>{' '}
+                {liveMcpServer.isSupported && (
                   <Trans>
-                    You can also{' '}
+                    You can also connect a{' '}
                     <Link
                       href="#"
                       color="secondary"
                       onClick={liveMcpServer.openSetupDialog}
                     >
-                      connect your own AI agent (Claude Code, Codex, Cursor...)
-                    </Link>{' '}
-                    to the editor with MCP (experimental).
+                      local AI agent
+                    </Link>
+                    .
                   </Trans>
-                </Text>
-              )}
-              <Text size="body-small" color="secondary" align="center" noMargin>
-                <Trans>
-                  Changes and answers may have mistakes: experiment and use it
-                  for learning.
-                </Trans>
+                )}
               </Text>
             </Column>
           )}

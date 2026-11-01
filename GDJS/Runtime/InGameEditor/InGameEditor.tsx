@@ -7802,7 +7802,12 @@ namespace gdjs {
     }
 
     shouldDragSelectedObject(): boolean {
-      return false;
+      const inputManager = this.editor.getRuntimeGame().getInputManager();
+      return (
+        !this.editor.isLeftMouseButtonCaptured() &&
+        isControlOrCmdPressed(inputManager) &&
+        (!this.isShown() || this.selectionHandle.state === 'idle')
+      );
     }
 
     update(): void {
@@ -7927,8 +7932,6 @@ namespace gdjs {
   class SelectionHandle2D extends THREE.Object3D {
     buttons: Array<ThreeSquare> = [];
     rotationButton: ThreeCircle;
-    // TODO Put one box for each instace
-    area: ThreeSquare;
 
     state: 'idle' | 'resizing' | 'panning' | 'rotating' = 'idle';
     draggedButtonLocation: ButtonLocation | null = null;
@@ -7941,8 +7944,6 @@ namespace gdjs {
     constructor(objectMover: ObjectMover2D) {
       super();
       this._objectMover = objectMover;
-      this.area = new ThreeSquare(0x6868e8, 0.3, 0x6868e8, 0.8);
-      this.add(this.area);
 
       for (const buttonLocation of buttonLocations) {
         const button = new ThreeSquare(0xffffff, 1, 0x6868e8, 1);
@@ -7951,14 +7952,6 @@ namespace gdjs {
       }
       this.rotationButton = new ThreeCircle(0xffffff, 1, 0x6868e8, 1);
       this.add(this.rotationButton);
-    }
-
-    getCenterX() {
-      return this.area.position.x;
-    }
-
-    getCenterY() {
-      return this.area.position.y;
     }
 
     private update(
@@ -7994,20 +7987,11 @@ namespace gdjs {
       this.rotationButton.position.x = centerX;
       this.rotationButton.position.y = minY;
 
-      this.area.position.x = centerX;
-      this.area.position.y = centerY;
-      this.area.scale.x = maxX - minX;
-      this.area.scale.y = maxY - minY;
-
-      let cameraFactor;
-      let cameraForward;
-      let cameraToObject;
+      let cameraFactor: float;
+      const cameraForward = new THREE.Vector3(0, 0, -1);
+      const cameraToObject = new THREE.Vector3();
       if (threeCamera instanceof THREE.PerspectiveCamera) {
-        cameraForward = new THREE.Vector3(0, 0, -1);
         cameraForward.applyQuaternion(threeCamera.quaternion);
-
-        cameraToObject = new THREE.Vector3();
-
         cameraFactor =
           (196 * Math.tan((threeCamera.fov * Math.PI) / 360)) /
           (threeCamera.zoom * canvasHeight);
@@ -8109,56 +8093,53 @@ namespace gdjs {
         editor.getRuntimeGame().getGameResolutionHeight()
       );
 
-      editor.setCursorIcon('');
-      const intersects = editor._recastFromCursor(this.children);
-      if (intersects.length === 0) {
-        return;
-      }
       let hoverredButtonLocation: ButtonLocation | null = null;
       let isRotationButtonHovered = false;
       let isAreaHovered = false;
-      for (const intersect of intersects) {
-        for (
-          let index = 0;
-          index < this.buttons.length && this.state === 'idle';
-          index++
-        ) {
-          const button = this.buttons[index];
+      if (this.state === 'idle') {
+        editor.setCursorIcon('');
+        const intersects = editor._recastFromCursor(this.children);
+        for (const intersect of intersects) {
+          for (let index = 0; index < this.buttons.length; index++) {
+            const button = this.buttons[index];
 
-          if (intersect.object.parent === button) {
-            hoverredButtonLocation = index;
+            if (intersect.object.parent === button) {
+              hoverredButtonLocation = index;
 
-            const isVertical =
-              (index & (ButtonLocation.Left | ButtonLocation.Right)) === 0;
-            const isHorizontal =
-              (index & (ButtonLocation.Top | ButtonLocation.Bottom)) === 0;
+              const isVertical =
+                (index & (ButtonLocation.Left | ButtonLocation.Right)) === 0;
+              const isHorizontal =
+                (index & (ButtonLocation.Top | ButtonLocation.Bottom)) === 0;
 
+              editor.setCursorIcon(
+                isVertical
+                  ? 'ns-resize'
+                  : isHorizontal
+                    ? 'ew-resize'
+                    : (index & ButtonLocation.Top) ===
+                        (index & ButtonLocation.Left)
+                      ? 'nwse-resize'
+                      : 'nesw-resize'
+              );
+              break;
+            }
+          }
+          if (intersect.object.parent === this.rotationButton) {
+            isRotationButtonHovered = true;
             editor.setCursorIcon(
-              isVertical
-                ? 'ns-resize'
-                : isHorizontal
-                  ? 'ew-resize'
-                  : (index & ButtonLocation.Top) ===
-                      (index & ButtonLocation.Left)
-                    ? 'nwse-resize'
-                    : 'nesw-resize'
+              `url("${getSvgIconUrl(editor.getRuntimeGame(), 'InGameEditor-rotate24_black')}"),auto`
             );
             break;
           }
         }
-        if (intersect.object.parent === this.rotationButton) {
-          isRotationButtonHovered = true;
-          editor.setCursorIcon(
-            `url("${getSvgIconUrl(editor.getRuntimeGame(), 'InGameEditor-rotate24_black')}"),auto`
-          );
-          break;
-        }
-      }
-      if (!hoverredButtonLocation && !isRotationButtonHovered) {
-        for (const intersect of intersects) {
-          if (intersect.object.parent === this.area) {
+        if (!hoverredButtonLocation && !isRotationButtonHovered) {
+          // TODO Check the selected objects instead.
+          const objectUnderCursor = editor.getObjectUnderCursor();
+          if (
+            objectUnderCursor &&
+            editor.getSelectedObjects().includes(objectUnderCursor)
+          ) {
             isAreaHovered = true;
-            break;
           }
         }
       }
@@ -8182,10 +8163,6 @@ namespace gdjs {
       }
 
       if (editor.isMouseLeftButtonJustPressed()) {
-        const intersects = editor._recastFromCursor(this.children);
-        if (intersects.length === 0) {
-          return;
-        }
         this.state = 'idle';
         this.draggedButtonLocation = null;
         this._hasActuallyMoved = false;
@@ -8274,6 +8251,7 @@ namespace gdjs {
           translationY
         );
       } else if (this.state === 'resizing') {
+        console.log('Resizing', this.draggedButtonLocation);
         if (!this.draggedButtonLocation) {
           return;
         }

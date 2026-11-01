@@ -212,6 +212,8 @@ module.exports = function (config) {
       `${gdjsRuntimePath}/Extensions/Multiplayer/multiplayertools.js`,
       `${gdjsRuntimePath}/Extensions/Multiplayer/multiplayercomponents.js`,
       `${gdjsRuntimePath}/Extensions/Multiplayer/multiplayerobjectruntimebehavior.js`,
+      `${gdjsRuntimePath}/Extensions/Multiplayer/peerJsHelper.js`,
+      `${gdjsRuntimePath}/Extensions/Multiplayer/multiplayer-gameplay-tests.js`,
       `${gdjsRuntimePath}/Extensions/Lighting/lightruntimeobject.js`,
       `${gdjsRuntimePath}/Extensions/Lighting/lightruntimeobject-pixi-renderer.js`,
       `${gdjsRuntimePath}/Extensions/Lighting/lightobstacleruntimebehavior.js`,

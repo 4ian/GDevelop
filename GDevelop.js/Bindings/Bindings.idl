@@ -2562,6 +2562,8 @@ interface PlatformExtension {
                                            [Const] DOMString smallicon);
 
     [Const, Ref] DependencyMetadata AddDependency();
+    [Ref] PlatformExtension AddGameplayTestIncludeFile([Const] DOMString includeFile);
+    [Const, Ref] VectorString GetGameplayTestIncludeFiles();
 
     [Ref] BehaviorMetadata WRAPPED_AddBehavior([Const] DOMString name,
         [Const] DOMString fullname,

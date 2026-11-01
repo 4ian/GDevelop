@@ -2014,6 +2014,8 @@ export class PlatformExtension extends EmscriptenObject {
   addExpression(name: string, fullname: string, description: string, group: string, smallicon: string): ExpressionMetadata;
   addStrExpression(name: string, fullname: string, description: string, group: string, smallicon: string): ExpressionMetadata;
   addDependency(): DependencyMetadata;
+  addGameplayTestIncludeFile(includeFile: string): PlatformExtension;
+  getGameplayTestIncludeFiles(): VectorString;
   addBehavior(name: string, fullname: string, defaultName: string, description: string, group: string, icon24x24: string, className: string, instance: Behavior, sharedDatasInstance: BehaviorsSharedData): BehaviorMetadata;
   addObject(name: string, fullname: string, description: string, icon24x24: string, instance: ObjectConfiguration): ObjectMetadata;
   addEffect(name: string): EffectMetadata;

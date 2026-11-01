@@ -109,7 +109,15 @@ namespace gdjs {
       }
     }
 
-    step(elapsedTime: float): boolean {
+    /**
+     * Step and render the current scene, and apply the scene changes it
+     * requested.
+     * @param renderOptions See `gdjs.RuntimeScene.render`.
+     */
+    step(
+      elapsedTime: float,
+      renderOptions?: gdjs.RuntimeSceneRenderOptions
+    ): boolean {
       this._throwIfDisposed();
       if (this._isNextLayoutLoading || this._stack.length === 0) {
         return false;
@@ -133,7 +141,7 @@ namespace gdjs {
       // (a scene change/restart action).
       return this.runWithSceneChangeCause('game', () => {
         const currentScene = this._stack[this._stack.length - 1];
-        if (currentScene.renderAndStep(elapsedTime)) {
+        if (currentScene.renderAndStep(elapsedTime, renderOptions)) {
           const request = currentScene.getRequestedChange();
 
           // A scene change was requested by the current scene.

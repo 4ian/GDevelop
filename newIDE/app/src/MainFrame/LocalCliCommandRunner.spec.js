@@ -1,6 +1,9 @@
 // @flow
 import Window from '../Utils/Window';
-import { shouldBlockOnDiagnosticErrorsForCli } from './LocalCliCommandRunner';
+import {
+  shouldBlockOnDiagnosticErrorsForCli,
+  isGameplayTestSelected,
+} from './LocalCliCommandRunner';
 
 // Transitively imported, but shipped as untransformed ESM that Jest cannot
 // load.
@@ -71,6 +74,30 @@ describe('shouldBlockOnDiagnosticErrorsForCli', () => {
     });
 
     expect(shouldBlockOnDiagnosticErrorsForCli(preferencesWith(true))).toBe(
+      false
+    );
+  });
+});
+
+describe('isGameplayTestSelected', () => {
+  test('selects every test when no name nor filter is given', () => {
+    expect(isGameplayTestSelected('Player jumps', [])).toBe(true);
+  });
+
+  test('selects the tests by their exact name', () => {
+    expect(isGameplayTestSelected('Player jumps', ['Player jumps'])).toBe(true);
+    expect(isGameplayTestSelected('Player jumps high', ['Player jumps'])).toBe(
+      false
+    );
+  });
+
+  test('selects the tests matching a filter with wildcards', () => {
+    expect(isGameplayTestSelected('Player jumps', ['Player*'])).toBe(true);
+    expect(isGameplayTestSelected('The player jumps', ['*jumps'])).toBe(true);
+    expect(isGameplayTestSelected('Enemy (boss) attacks', ['*(boss)*'])).toBe(
+      true
+    );
+    expect(isGameplayTestSelected('Enemy attacks', ['Player*', '*jumps'])).toBe(
       false
     );
   });

@@ -6,6 +6,7 @@ import { GameplayTestProperties } from '../../../GameplayTests/GameplayTestPrope
 import {
   type GameplayTestResult,
   type GameplayTestScope,
+  type GameplayTestScreenshot,
 } from '../../../GameplayTests/GameplayTestRunner';
 import Background from '../../../UI/Background';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
@@ -90,7 +91,9 @@ const makeResult = (
 });
 
 /** Draw fake game screenshots, to show the screenshots section. */
-const useFakeScreenshots = (labels: Array<string>) =>
+const useFakeScreenshots = (
+  labels: Array<string>
+): Array<GameplayTestScreenshot> =>
   React.useMemo(
     () =>
       labels.map((label, index) => {
@@ -110,6 +113,8 @@ const useFakeScreenshots = (labels: Array<string>) =>
         return {
           label,
           frame: 120 * (index + 1),
+          width: 320,
+          height: 180,
           jpegBase64: canvas.toDataURL('image/jpeg', 0.7).split(',')[1],
         };
       }),

@@ -36,6 +36,12 @@ module.exports = {
       .addInstructionOrExpressionGroupMetadata(_('Multiplayer'))
       .setIcon('JsPlatform/Extensions/multiplayer.svg');
 
+    // Helpers to test multiplayer games (`harness.multiplayer`), only in
+    // the games running gameplay tests.
+    extension.addGameplayTestIncludeFile(
+      'Extensions/Multiplayer/multiplayer-gameplay-tests.js'
+    );
+
     extension
       .addDependency()
       .setName('Safari View Controller Cordova plugin')

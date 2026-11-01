@@ -144,6 +144,34 @@ export const shouldBlockOnDiagnosticErrorsForCli = (preferences: {
   return preferences.getBlockPreviewAndExportOnDiagnosticErrors();
 };
 
+/**
+ * Whether a test is selected by the names passed via `--cmd-args`: a test
+ * name, or a filter where `*` matches anything (`"Enemy*"`, `"*jump*"`).
+ */
+export const isGameplayTestSelected = (
+  testName: string,
+  testNamesOrFilters: Array<string>
+): boolean =>
+  testNamesOrFilters.length === 0 ||
+  testNamesOrFilters.some(testNameOrFilter =>
+    testNameOrFilter.includes('*')
+      ? new RegExp(
+          '^' +
+            testNameOrFilter
+              .split('*')
+              .map(part => part.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+              .join('.*') +
+            '$'
+        ).test(testName)
+      : testNameOrFilter === testName
+  );
+
+/** A number of milliseconds passed as a CLI argument, like `--timeout-ms`. */
+const getMillisecondsArgument = (argumentName: string): ?number => {
+  const value = Number(Window.getArguments()[argumentName]);
+  return value > 0 ? value : null;
+};
+
 const sanitizeForFileName = (name: string): string =>
   name.replace(/[^a-zA-Z0-9-_]+/g, '_').substring(0, 60) || 'unnamed';
 
@@ -179,18 +207,27 @@ const writeCliGameplayTestResults = (
     return {
       ...output,
       screenshots: result.screenshots.map((screenshot, index) => {
+        const { pngBase64 } = screenshot;
         const screenshotPath = path.join(
           screenshotsDirectoryPath,
           `${sanitizeForFileName(result.testName)}-frame-${
             screenshot.frame
-          }-${sanitizeForFileName(screenshot.label || `${index}`)}.jpg`
+          }-${sanitizeForFileName(screenshot.label || `${index}`)}.${
+            pngBase64 ? 'png' : 'jpg'
+          }`
         );
         try {
           fs.mkdirSync(screenshotsDirectoryPath, { recursive: true });
-          fs.writeFileSync(screenshotPath, screenshot.jpegBase64, 'base64');
+          fs.writeFileSync(
+            screenshotPath,
+            pngBase64 || screenshot.jpegBase64,
+            'base64'
+          );
           return {
             label: screenshot.label,
             frame: screenshot.frame,
+            width: screenshot.width,
+            height: screenshot.height,
             file: screenshotPath,
           };
         } catch (error) {
@@ -364,7 +401,10 @@ const runners: { [commandName: string]: CliCommandRunner } = {
   },
   RUN_ALL_TESTS: async (project, i18n, { commandArgs }) => {
     // Run the gameplay tests of the project and of every extension,
-    // optionally filtered by names passed via --cmd-args.
+    // optionally filtered by names or filters passed via --cmd-args (see
+    // `isGameplayTestSelected`). The time budget of each test and the
+    // longest the game can stay silent while loading can be changed with
+    // --timeout-ms and --loading-timeout-ms.
     const tests: Array<GameplayTestToRun> = [];
     const projectTests = project.getTests();
     for (let i = 0; i < projectTests.getTestsCount(); i++) {
@@ -387,9 +427,9 @@ const runners: { [commandName: string]: CliCommandRunner } = {
         });
       }
     }
-    const filteredTests = commandArgs.length
-      ? tests.filter(test => commandArgs.includes(test.testName))
-      : tests;
+    const filteredTests = tests.filter(test =>
+      isGameplayTestSelected(test.testName, commandArgs)
+    );
     if (filteredTests.length === 0) {
       console.info('[CLI] No gameplay tests to run.');
       return;
@@ -398,7 +438,12 @@ const runners: { [commandName: string]: CliCommandRunner } = {
     const results = await runProjectGameplayTests({
       project,
       tests: filteredTests,
-      options: { screenshots: 'on' },
+      options: {
+        screenshots: 'on',
+        timeoutMs: getMillisecondsArgument('timeout-ms') || undefined,
+        loadingTimeoutMs:
+          getMillisecondsArgument('loading-timeout-ms') || undefined,
+      },
     });
     let failedCount = 0;
     for (const result of results) {

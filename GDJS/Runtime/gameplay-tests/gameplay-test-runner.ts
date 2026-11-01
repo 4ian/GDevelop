@@ -50,6 +50,17 @@ namespace gdjs {
       [conditionOrExpressionName: string]: boolean | number | string;
     };
 
+    /**
+     * When the game is drawn while a test steps it:
+     * - `onScreenshot`: never, except to take a screenshot. Frames run the
+     *   game logic and everything it can read from the rendering (objects
+     *   and layers updated for rendering, world matrices of 3D objects), but
+     *   skip the draw calls, the post-processing passes and the shadow maps.
+     *   Much faster, notably with a software renderer.
+     * - `everyFrame`: every stepped frame is drawn, like in the game.
+     */
+    export type GameplayTestRenderingMode = 'onScreenshot' | 'everyFrame';
+
     export type GameplayTestRunPayload = {
       testName: string;
       /** The body of `async (harness) => { ... }`. */
@@ -71,6 +82,10 @@ namespace gdjs {
        * as possible.
        */
       speedFactor?: number;
+      /** When the game is drawn (see `GameplayTestRenderingMode`). Default:
+       * `everyFrame` when the run is paced (`speedFactor`: a human watches
+       * it), `onScreenshot` otherwise. */
+      renderingMode?: GameplayTestRenderingMode;
       /** Maximum number of screenshots kept: the first one and the last
        * ones. When the script takes none, one is taken when it ends.
        * 0 disables screenshots. Default: 4. */
@@ -81,6 +96,20 @@ namespace gdjs {
        * (the editor gameplay test frame), so the last frame stays visible.
        */
       freezeWhenFinished?: boolean;
+    };
+
+    /**
+     * Sent to the editor while a test runs (at least every second), so it
+     * can tell a slow run from a dead one.
+     */
+    export type GameplayTestProgress = {
+      frame: integer;
+      /** True while the game boots, loads scene assets, creates a scene and
+       * steps its first frame, or draws for a screenshot (the first draws
+       * compile the shaders): the game can then stay busy for a long time
+       * without being able to report anything, so the editor waits up to
+       * `loadingTimeoutMs` before giving up instead of `timeoutMs`. */
+      isLoading: boolean;
     };
 
     export type GameplayTestAssertion = {
@@ -136,7 +165,70 @@ namespace gdjs {
     export type GameplayTestScreenshot = {
       label: string;
       frame: integer;
+      width: integer;
+      height: integer;
+      /** The image, as a JPEG. For a PNG screenshot, the same image flattened
+       * on a gray background. */
       jpegBase64: string;
+      /** Only for a PNG screenshot: the image, with its transparency. */
+      pngBase64?: string;
+    };
+
+    /** Options of `takeScreenshot`. */
+    export type GameplayTestScreenshotOptions = {
+      /** The width of the image, in pixels. The game is drawn at this size:
+       * every layer is placed as at the game resolution, only with more (or
+       * fewer) pixels. The height follows the aspect ratio of the game
+       * resolution. */
+      width?: integer;
+      /** The height of the image, in pixels (see `width`). */
+      height?: integer;
+      /** Keep the image at the size of the game resolution, instead of
+       * downscaling it to 768 pixels at most. */
+      fullResolution?: boolean;
+      /** The layers not drawn in the screenshot. */
+      hideLayers?: Array<string>;
+      /** Draw only these instances (ids) and the instances of these objects
+       * (names). The lights and effects of the layers are kept. */
+      onlyObjects?: Array<integer | string>;
+      /** Make the background transparent (the background color of the scene
+       * and a skybox are not drawn). Implies the PNG format. */
+      transparentBackground?: boolean;
+      /** Default: `png` with a transparent background, `jpeg` otherwise. */
+      format?: 'jpeg' | 'png';
+    };
+
+    /** A camera to set on a layer (see `setCamera`). Values left undefined
+     * are unchanged. */
+    export type GameplayTestCameraOptions = {
+      /** The layer of the camera (default: the base layer, ''). */
+      layer?: string;
+      x?: float;
+      y?: float;
+      /** The elevation of a 3D camera. */
+      z?: float;
+      /** The rotation around Z (the yaw, like an object angle), in degrees. */
+      angle?: float;
+      /** In degrees: 0 looks straight down (the 2D default), 90 looks at the
+       * horizon. */
+      rotationX?: float;
+      rotationY?: float;
+      zoom?: float;
+      /** Keep the camera after the next screenshot instead of restoring it
+       * (the game logic can move it again, like any camera). */
+      keepAfterScreenshot?: boolean;
+    };
+
+    /** The state of the camera of a layer, to restore it after a screenshot. */
+    type LayerCameraState = {
+      x: float;
+      y: float;
+      z: float;
+      isZDerivedFromZoom: boolean;
+      zoom: float;
+      angle: float;
+      rotationX: float;
+      rotationY: float;
     };
 
     /**
@@ -426,9 +518,11 @@ namespace gdjs {
       status: 'passed' | 'failed' | 'error' | 'stopped' | 'timeout';
       framesExecuted: integer;
       durationMs: number;
-      /** Time spent waiting for the game to boot and for scene assets to
-       * load, excluded from the `timeoutMs` budget. `durationMs` includes
-       * it: `durationMs - loadingMs` is what counted against the budget. */
+      /** Time spent waiting for the game to boot, for scene assets to load,
+       * for scenes to be created with their first frame, and drawing the
+       * game for screenshots (the first draws compile the shaders),
+       * excluded from the `timeoutMs` budget. `durationMs` includes it:
+       * `durationMs - loadingMs` is what counted against the budget. */
       loadingMs: number;
       /** The wall-clock budget the run had, loading excluded
        * (`durationMs - loadingMs` close to it means the test is at risk of
@@ -463,6 +557,8 @@ namespace gdjs {
       screenshots: Array<GameplayTestScreenshot>;
       /** Screenshots taken, including the ones not kept in `screenshots`. */
       screenshotsTakenCount: integer;
+      /** The screenshots taken but not kept (see `setMaxScreenshots`). */
+      droppedScreenshots: Array<{ label: string; frame: integer }>;
       /** The `stopProfiling()` summaries captured during the run. */
       profiles: Array<GameplayTestProfilingResult>;
       /** The `benchmark()` measures captured during the run. */
@@ -481,6 +577,8 @@ namespace gdjs {
      * still bounded, so a dead network cannot hang a run forever. */
     const DEFAULT_LOADING_TIMEOUT_MS = 300000;
     const DEFAULT_MAX_FRAMES = 20000;
+    /** The longest `delayBeforeFirstFrameMs` of `goToScene`. */
+    const MAX_DELAY_BEFORE_FIRST_FRAME_MS = 60000;
     /** How long frames are stepped before yielding once to the browser:
      * the game visibly plays (a rendered frame per refresh), stop/progress
      * messages flow, while keeping near-full stepping throughput. */
@@ -495,6 +593,12 @@ namespace gdjs {
     const FAST_RUN_RENDER_DUTY_MULTIPLIER = 4;
     const MAX_PLAYED_SOUNDS = 500;
     const DEFAULT_MAX_SCREENSHOTS = 4;
+    /** The most screenshots a test can keep (see `setMaxScreenshots`). */
+    const MAX_SCREENSHOTS_LIMIT = 20;
+    /** The largest side of a screenshot drawn at a given size. */
+    const MAX_SCREENSHOT_SIDE = 4096;
+    /** The color a PNG screenshot is flattened on, for its JPEG version. */
+    const SCREENSHOT_FLATTENING_GRAY = 128;
     const DEFAULT_PROBE_FRAMES = 30;
     const MAX_PROFILING_SECTIONS = 50;
     const MAX_PROFILING_TIMELINE_ENTRIES = 120;
@@ -757,6 +861,81 @@ namespace gdjs {
       return angle;
     };
 
+    /** The field of view to give to `setCameraZ` for the camera of a layer. */
+    const getCameraFieldOfView = (layer: gdjs.RuntimeLayer): float | null => {
+      const threeCamera = layer.getRenderer().getThreeCamera();
+      return threeCamera && !(threeCamera instanceof THREE.OrthographicCamera)
+        ? threeCamera.fov
+        : null;
+    };
+
+    const getLayerCameraState = (
+      layer: gdjs.RuntimeLayer
+    ): LayerCameraState => ({
+      x: layer.getCameraX(),
+      y: layer.getCameraY(),
+      z: layer.getCameraZ(null),
+      // A camera Z never set is computed from the zoom (see `getCameraZ`).
+      isZDerivedFromZoom: !!(layer as any)._isCameraZDirty,
+      zoom: layer.getCameraZoom(),
+      angle: layer.getCameraRotation(),
+      rotationX: layer.getCameraRotationX(),
+      rotationY: layer.getCameraRotationY(),
+    });
+
+    const setLayerCameraState = (
+      layer: gdjs.RuntimeLayer,
+      cameraState: LayerCameraState
+    ): void => {
+      layer.setCameraX(cameraState.x);
+      layer.setCameraY(cameraState.y);
+      // Setting the zoom makes the camera Z derived from it again.
+      if (cameraState.isZDerivedFromZoom) {
+        layer.setCameraZ(cameraState.z, null);
+        layer.setCameraZoom(cameraState.zoom);
+      } else {
+        layer.setCameraZoom(cameraState.zoom);
+        layer.setCameraZ(cameraState.z, null);
+      }
+      layer.setCameraRotation(cameraState.angle);
+      layer.setCameraRotationX(cameraState.rotationX);
+      layer.setCameraRotationY(cameraState.rotationY);
+    };
+
+    /**
+     * The image of something drawn on a black and on a white background,
+     * with the transparency it has on both: a pixel that is the same on both
+     * is opaque, a pixel that is the background on both is transparent.
+     */
+    const computeImageOnTransparentBackground = (
+      imageOnBlack: ImageData | null,
+      imageOnWhite: ImageData | null
+    ): ImageData | null => {
+      if (!imageOnBlack || !imageOnWhite) return null;
+      const image = new ImageData(imageOnBlack.width, imageOnBlack.height);
+      const onBlack = imageOnBlack.data;
+      const onWhite = imageOnWhite.data;
+      for (let i = 0; i < onBlack.length; i += 4) {
+        // On white, a pixel is lighter than on black by (1 - alpha) * 255.
+        const backgroundShare =
+          (onWhite[i] -
+            onBlack[i] +
+            onWhite[i + 1] -
+            onBlack[i + 1] +
+            onWhite[i + 2] -
+            onBlack[i + 2]) /
+          (3 * 255);
+        const alpha = Math.max(0, Math.min(1, 1 - backgroundShare));
+        // On black, a pixel is its color multiplied by its alpha.
+        for (let channel = 0; channel < 3; channel++) {
+          image.data[i + channel] =
+            alpha > 0 ? Math.min(255, onBlack[i + channel] / alpha) : 0;
+        }
+        image.data[i + 3] = Math.round(alpha * 255);
+      }
+      return image;
+    };
+
     /**
      * The object passed as `harness` to a gameplay test script.
      */
@@ -825,8 +1004,15 @@ namespace gdjs {
       _paceSpeedFactor: float | null = null;
       _paceReferenceWallTimeMs: number = 0;
       _paceReferenceGameTimeMs: number = 0;
+      _renderingMode: GameplayTestRenderingMode;
       _maxScreenshots: integer;
       _screenshotsTakenCount: integer = 0;
+      /** The screenshots taken but not kept (see `setMaxScreenshots`). */
+      _droppedScreenshots: Array<{ label: string; frame: integer }> = [];
+      /** The cameras to restore after the next screenshot (see `setCamera`),
+       * by layer name. */
+      _camerasToRestoreAfterScreenshot: Map<string, LayerCameraState> =
+        new Map();
       _totalStepTimeMs: number = 0;
       _worstStepTimeMs: number = 0;
       _lastTrackedSceneName: string | null = null;
@@ -839,7 +1025,7 @@ namespace gdjs {
       /** Whether the one-time "mouse deltas without pointer lock" hint was
        * already recorded (see `setMouseDelta`). */
       _hasWarnedMouseDelta: boolean = false;
-      _onProgress: ((frame: integer) => void) | null = null;
+      _onProgress: ((progress: GameplayTestProgress) => void) | null = null;
       _lastProgressTimeMs: number = 0;
       /** Rejects the promise raced against the test script, so a stop
        * interrupts the script even when it awaits something else than the
@@ -865,6 +1051,9 @@ namespace gdjs {
           : null;
         this._paceReferenceWallTimeMs = Date.now();
         this._paceReferenceGameTimeMs = 0;
+        this._renderingMode =
+          payload.renderingMode ||
+          (this._paceSpeedFactor !== null ? 'everyFrame' : 'onScreenshot');
         this._maxScreenshots =
           payload.maxScreenshots === undefined
             ? DEFAULT_MAX_SCREENSHOTS
@@ -1023,9 +1212,10 @@ namespace gdjs {
         loadingPromise: Promise<unknown>,
         description: string
       ): Promise<void> {
-        const heartbeatIntervalId = setInterval(() => {
-          if (this._onProgress) this._onProgress(this._framesExecuted);
-        }, 1000);
+        const heartbeatIntervalId = setInterval(
+          () => this._reportProgress(),
+          1000
+        );
         let loadingTimeoutId: any = null;
         try {
           await this._countAsLoading(() =>
@@ -1060,11 +1250,26 @@ namespace gdjs {
         if (this._loadingSinceMs !== null) return load();
         const loadingStartTimeMs = Date.now();
         this._loadingSinceMs = loadingStartTimeMs;
+        // Before anything that could keep the game busy: the editor must
+        // know it is loading to wait long enough for it.
+        this._reportProgress();
         try {
           return await load();
         } finally {
           this._loadingTimeMs += Date.now() - loadingStartTimeMs;
           this._loadingSinceMs = null;
+          this._reportProgress();
+        }
+      }
+
+      /** Tell the editor the run is alive (see `GameplayTestProgress`). */
+      _reportProgress(): void {
+        this._lastProgressTimeMs = Date.now();
+        if (this._onProgress) {
+          this._onProgress({
+            frame: this._framesExecuted,
+            isLoading: this._loadingSinceMs !== null,
+          });
         }
       }
 
@@ -1349,13 +1554,16 @@ namespace gdjs {
       }
 
       /**
-       * Step a single game frame (game logic + rendering) with a fixed
-       * time delta, and return the time it took.
+       * Step a single game frame with a fixed time delta, and return the
+       * time it took. The frame is drawn according to the rendering mode
+       * (see `setRenderingMode`), unless `shouldDraw` forces it.
        */
-      _stepSingleFrame(dtMs: float): float {
+      _stepSingleFrame(dtMs: float, shouldDraw?: boolean): float {
         this._checkGuards();
         const stepStartTimeMs = performance.now();
-        this._runtimeGame.getSceneStack().step(dtMs);
+        this._runtimeGame.getSceneStack().step(dtMs, {
+          skipDrawing: !(shouldDraw || this._renderingMode === 'everyFrame'),
+        });
         const stepTimeMs = performance.now() - stepStartTimeMs;
         this._callOnFrameEnded();
         this._framesExecuted++;
@@ -1367,9 +1575,8 @@ namespace gdjs {
         }
         this._trackChangesAfterStep();
         this._drainPlayedSounds();
-        if (this._onProgress && Date.now() - this._lastProgressTimeMs > 500) {
-          this._lastProgressTimeMs = Date.now();
-          this._onProgress(this._framesExecuted);
+        if (Date.now() - this._lastProgressTimeMs > 500) {
+          this._reportProgress();
         }
         return stepTimeMs;
       }
@@ -1431,6 +1638,13 @@ namespace gdjs {
           this._paceReferenceGameTimeMs = this._gameTimeMs;
         }
         if (Date.now() - this._lastYieldTimeMs < YIELD_BUDGET_MS) return;
+        if (this._renderingMode === 'onScreenshot') {
+          // Nothing is drawn until a screenshot: never wait for an animation
+          // frame, only let pending events (like a stop request) be processed.
+          await new Promise<void>((resolve) => setTimeout(resolve, 0));
+          this._lastYieldTimeMs = Date.now();
+          return;
+        }
         // Fast (unpaced) run: don't wait for an animation frame at every
         // yield - with a slow renderer (software WebGL...), rendering would
         // dominate the wall-clock time of the run. Yield through a timer
@@ -1453,11 +1667,29 @@ namespace gdjs {
 
       /**
        * Load and start the given scene, replacing any running scene.
+       *
+       * `delayBeforeFirstFrameMs` lets this wall-clock time pass between the
+       * creation of the scene and its first frame, as when a big scene is
+       * long to load on the device of a player: the wall-clock timers of the
+       * game and of its extensions fire meanwhile.
        */
       async goToScene(
         sceneName: string,
-        options?: { skipCreatingInstances?: boolean }
+        options?: {
+          skipCreatingInstances?: boolean;
+          delayBeforeFirstFrameMs?: float;
+        }
       ): Promise<void> {
+        const delayBeforeFirstFrameMs =
+          (options && options.delayBeforeFirstFrameMs) || 0;
+        if (
+          !(delayBeforeFirstFrameMs >= 0) ||
+          delayBeforeFirstFrameMs > MAX_DELAY_BEFORE_FIRST_FRAME_MS
+        ) {
+          throw new Error(
+            `delayBeforeFirstFrameMs expects a number of milliseconds between 0 and ${MAX_DELAY_BEFORE_FIRST_FRAME_MS}.`
+          );
+        }
         if (!this._runtimeGame.hasScene(sceneName)) {
           throw new Error(
             `The scene "${sceneName}" does not exist in the game.`
@@ -1488,10 +1720,45 @@ namespace gdjs {
                   : undefined,
               })
             );
+          if (delayBeforeFirstFrameMs > 0) {
+            await new Promise((resolve) =>
+              setTimeout(resolve, delayBeforeFirstFrameMs)
+            );
+          }
           // Step one frame so the scene is fully initialized ("beginning of
           // scene" events have run) before the test continues.
           await this.stepFrames(1);
         });
+      }
+
+      /**
+       * Choose when the game is drawn while the test steps it:
+       * `'onScreenshot'` (the default, unless the run is paced for a human
+       * watching it) only draws the game to take a screenshot, which makes
+       * frames much faster; `'everyFrame'` draws every stepped frame, like
+       * the game does. The game logic is the same in both modes: what it can
+       * read from the rendering (objects and layers updated for rendering,
+       * world matrices of 3D objects used by 3D raycasts) is still updated
+       * at every frame. Use `'everyFrame'` only to measure the rendering or
+       * to test something reading what is drawn.
+       */
+      setRenderingMode(renderingMode: GameplayTestRenderingMode): void {
+        if (
+          renderingMode !== 'onScreenshot' &&
+          renderingMode !== 'everyFrame'
+        ) {
+          throw new Error(
+            `Unknown rendering mode ${JSON.stringify(
+              renderingMode
+            )}. Use 'onScreenshot' or 'everyFrame'.`
+          );
+        }
+        this._renderingMode = renderingMode;
+      }
+
+      /** The rendering mode (see `setRenderingMode`). */
+      getRenderingMode(): GameplayTestRenderingMode {
+        return this._renderingMode;
       }
 
       /**
@@ -3520,61 +3787,489 @@ namespace gdjs {
       }
 
       /**
-       * Take a screenshot of the game canvas (downscaled, unless
-       * `fullResolution` is set: the size of the game, which can be set with
-       * `setGameResolutionSize`). The first one and the last ones are
-       * returned in the test result.
+       * Take a screenshot of the game. The game is drawn right before (see
+       * `setRenderingMode`), from the cameras set with `setCamera` and
+       * `lookAt`, which are then restored. The image is downscaled to 768
+       * pixels at most, unless `fullResolution` (the size of the game
+       * resolution) or a `width`/`height` (the game drawn at this size) is
+       * given.
+       *
+       * `hideLayers`, `onlyObjects` and `transparentBackground` compose an
+       * image (store art, a thumbnail, a cut-out of a character): what they
+       * hide is shown again right after the screenshot.
+       *
+       * The first screenshot and the last ones are kept in the result (4 by
+       * default, see `setMaxScreenshots`).
        */
       async takeScreenshot(
         label: string = '',
-        options?: { fullResolution?: boolean }
+        options?: GameplayTestScreenshotOptions
       ): Promise<void> {
-        if (this._maxScreenshots <= 0) return;
-        // Render the current state of the game now: fast runs skip renders,
-        // and a slow renderer delays animation frames, so the canvas could
-        // show an old frame, or be black after a resize.
+        try {
+          if (this._maxScreenshots <= 0) return;
+          const screenshotOptions = options || {};
+          const transparentBackground =
+            !!screenshotOptions.transparentBackground;
+          const format =
+            screenshotOptions.format ||
+            (transparentBackground ? 'png' : 'jpeg');
+          if (format !== 'png' && format !== 'jpeg') {
+            throw new Error(
+              `Unknown screenshot format ${JSON.stringify(
+                format
+              )}. Use 'png' or 'jpeg'.`
+            );
+          }
+          if (transparentBackground && format !== 'png') {
+            throw new Error(
+              'A JPEG screenshot has no transparency: use the PNG format (the default with `transparentBackground`).'
+            );
+          }
+          const canvas = this._runtimeGame.getRenderer().getCanvas();
+          if (!canvas) {
+            logger.warn('No canvas found: unable to take a screenshot.');
+            return;
+          }
+          const currentScene = this._runtimeGame
+            .getSceneStack()
+            .getCurrentScene();
+
+          let imageData: ImageData | null = null;
+          const showHiddenThings = currentScene
+            ? this._hideForScreenshot(currentScene, screenshotOptions)
+            : () => {};
+          try {
+            // Counted as loading: the first draws compile the shaders, which
+            // can keep the game busy for long in a big 3D scene.
+            await this._countAsLoading(async () =>
+              this._drawAtScreenshotSize(screenshotOptions, () => {
+                const readDrawnImage = (backgroundColor?: integer) => {
+                  // Draw the current state of the game now: frames are not
+                  // drawn by default, and a slow renderer delays animation
+                  // frames, so the canvas could show an old frame.
+                  if (currentScene) currentScene.render({ backgroundColor });
+                  return this._readCanvasImage(canvas, screenshotOptions);
+                };
+                imageData = transparentBackground
+                  ? computeImageOnTransparentBackground(
+                      readDrawnImage(0x000000),
+                      readDrawnImage(0xffffff)
+                    )
+                  : readDrawnImage();
+              })
+            );
+          } finally {
+            showHiddenThings();
+          }
+          if (!imageData) return;
+          this._keepScreenshot(label, imageData, format);
+        } finally {
+          this._restoreCamerasAfterScreenshot();
+        }
+      }
+
+      /**
+       * Hide the layers and objects a screenshot must not show, and return
+       * how to show them again.
+       */
+      private _hideForScreenshot(
+        currentScene: gdjs.RuntimeScene,
+        options: GameplayTestScreenshotOptions
+      ): () => void {
+        const restorers: Array<() => void> = [];
+        const layerNames: Array<string> = [];
+        currentScene.getAllLayerNames(layerNames);
+        for (const layerName of options.hideLayers || []) {
+          if (!currentScene.hasLayer(layerName)) {
+            throw new Error(
+              `Can't hide the layer "${layerName}": it does not exist. Layers: ${layerNames
+                .map((name) => JSON.stringify(name))
+                .join(', ')}.`
+            );
+          }
+          const layer = currentScene.getLayer(layerName);
+          const wasVisible = layer.isVisible();
+          layer.show(false);
+          restorers.push(() => layer.show(wasVisible));
+        }
+        if (options.onlyObjects) {
+          const keptObjects = new Set<gdjs.RuntimeObject>();
+          for (const idOrName of options.onlyObjects) {
+            const objects =
+              typeof idOrName === 'number'
+                ? currentScene
+                    .getAdhocListOfAllInstances()
+                    .filter((object) => object.id === idOrName)
+                : this._getInstances(idOrName);
+            if (objects.length === 0) {
+              throw new Error(
+                `No instance found for ${JSON.stringify(
+                  idOrName
+                )} in \`onlyObjects\`: pass instance ids (from \`getObjects\`) or object names.`
+              );
+            }
+            objects.forEach((object) => keptObjects.add(object));
+          }
+          for (const object of currentScene.getAdhocListOfAllInstances()) {
+            if (keptObjects.has(object) || object.isHidden()) continue;
+            object.hide(true);
+            restorers.push(() => object.hide(false));
+          }
+        }
+        return () => restorers.forEach((restore) => restore());
+      }
+
+      /**
+       * Run `draw` with the game drawn at the size asked for a screenshot
+       * (`width`/`height`): the renderers draw more (or fewer) pixels for the
+       * same game resolution, so every layer stays where it is at the game
+       * resolution.
+       */
+      private _drawAtScreenshotSize(
+        options: GameplayTestScreenshotOptions,
+        draw: () => void
+      ): void {
+        if (options.width === undefined && options.height === undefined) {
+          draw();
+          return;
+        }
+        const gameWidth = this._runtimeGame.getGameResolutionWidth();
+        const gameHeight = this._runtimeGame.getGameResolutionHeight();
+        const pixelRatio =
+          options.width !== undefined
+            ? options.width / gameWidth
+            : (options.height || 0) / gameHeight;
+        const width = Math.round(gameWidth * pixelRatio);
+        const height = Math.round(gameHeight * pixelRatio);
+        if (
+          !(pixelRatio > 0) ||
+          width > MAX_SCREENSHOT_SIDE ||
+          height > MAX_SCREENSHOT_SIDE
+        ) {
+          throw new Error(
+            `Invalid screenshot size: give a width and/or a height between 1 and ${MAX_SCREENSHOT_SIDE} pixels.`
+          );
+        }
+        if (
+          options.width !== undefined &&
+          options.height !== undefined &&
+          Math.abs(options.height - height) > 1
+        ) {
+          throw new Error(
+            `A screenshot of ${options.width}x${options.height} does not have the aspect ratio of the game resolution (${gameWidth}x${gameHeight}): give only a width (${options.width}x${height}) or only a height, or change the game resolution first with \`setGameResolutionSize\` (layers are then placed for this resolution, like in a game window of this size).`
+          );
+        }
+
+        const gameRenderer = this._runtimeGame.getRenderer();
+        const pixiRenderer = gameRenderer.getPIXIRenderer();
+        const threeRenderer = gameRenderer.getThreeRenderer();
         const currentScene = this._runtimeGame
           .getSceneStack()
           .getCurrentScene();
-        if (currentScene) currentScene.render();
-        const canvas = this._runtimeGame.getRenderer().getCanvas();
-        if (!canvas) {
-          logger.warn('No canvas found: unable to take a screenshot.');
-          return;
-        }
+        const layerNames: Array<string> = [];
+        if (currentScene) currentScene.getAllLayerNames(layerNames);
+        const effectComposers = layerNames.map((layerName) =>
+          currentScene
+            ? currentScene
+                .getLayer(layerName)
+                .getRenderer()
+                .getThreeEffectComposer()
+            : null
+        );
+        const setPixelRatio = (pixiResolution: float, threeRatio: float) => {
+          if (pixiRenderer) {
+            pixiRenderer.resolution = pixiResolution;
+            pixiRenderer.resize(gameWidth, gameHeight);
+          }
+          if (threeRenderer) threeRenderer.setPixelRatio(threeRatio);
+          for (const effectComposer of effectComposers) {
+            if (effectComposer) effectComposer.setPixelRatio(threeRatio);
+          }
+        };
+        const previousPixiResolution = pixiRenderer
+          ? pixiRenderer.resolution
+          : 1;
+        const previousThreePixelRatio = threeRenderer
+          ? threeRenderer.getPixelRatio()
+          : 1;
+        // A tiny bit more, so that a rounding error never gives a pixel less.
+        const drawingPixelRatio = width / gameWidth + 1e-9;
+        setPixelRatio(drawingPixelRatio, drawingPixelRatio);
         try {
-          const fullResolution = !!(options && options.fullResolution);
-          const scale = fullResolution
+          draw();
+        } finally {
+          setPixelRatio(previousPixiResolution, previousThreePixelRatio);
+        }
+      }
+
+      /** The image of the canvas, at the size of the screenshot. */
+      private _readCanvasImage(
+        canvas: HTMLCanvasElement,
+        options: GameplayTestScreenshotOptions
+      ): ImageData | null {
+        const isDrawnAtSize =
+          options.width !== undefined || options.height !== undefined;
+        const scale =
+          options.fullResolution || isDrawnAtSize
             ? 1
             : Math.min(
                 1,
                 SCREENSHOT_MAX_SIZE / Math.max(canvas.width, canvas.height, 1)
               );
-          const targetWidth = Math.max(1, Math.round(canvas.width * scale));
-          const targetHeight = Math.max(1, Math.round(canvas.height * scale));
-          const downscaledCanvas = document.createElement('canvas');
-          downscaledCanvas.width = targetWidth;
-          downscaledCanvas.height = targetHeight;
-          const context = downscaledCanvas.getContext('2d');
-          if (!context) return;
-          context.drawImage(canvas, 0, 0, targetWidth, targetHeight);
-          const dataUrl = downscaledCanvas.toDataURL(
-            'image/jpeg',
-            fullResolution ? 0.92 : 0.7
-          );
-          this._screenshotsTakenCount++;
-          if (this._screenshots.length >= this._maxScreenshots) {
-            // Keep the first one and the most recent ones.
-            this._screenshots.splice(this._maxScreenshots > 1 ? 1 : 0, 1);
-          }
-          this._screenshots.push({
-            label,
-            frame: this._framesExecuted,
-            jpegBase64: dataUrl.replace(/^data:image\/jpeg;base64,/, ''),
-          });
-        } catch (error) {
-          logger.warn('Error while taking a screenshot: ' + error);
+        const width = Math.max(1, Math.round(canvas.width * scale));
+        const height = Math.max(1, Math.round(canvas.height * scale));
+        const imageCanvas = document.createElement('canvas');
+        imageCanvas.width = width;
+        imageCanvas.height = height;
+        const context = imageCanvas.getContext('2d');
+        if (!context) return null;
+        context.drawImage(canvas, 0, 0, width, height);
+        return context.getImageData(0, 0, width, height);
+      }
+
+      /** Encode a screenshot and keep it in the result if there is room. */
+      private _keepScreenshot(
+        label: string,
+        imageData: ImageData,
+        format: 'jpeg' | 'png'
+      ): void {
+        const imageCanvas = document.createElement('canvas');
+        imageCanvas.width = imageData.width;
+        imageCanvas.height = imageData.height;
+        const context = imageCanvas.getContext('2d');
+        if (!context) return;
+        context.putImageData(imageData, 0, 0);
+        const pngBase64 =
+          format === 'png'
+            ? imageCanvas
+                .toDataURL('image/png')
+                .replace(/^data:image\/png;base64,/, '')
+            : undefined;
+        if (format === 'png') {
+          // The JPEG version, read by the AI, is flattened on gray.
+          context.globalCompositeOperation = 'destination-over';
+          context.fillStyle = `rgb(${SCREENSHOT_FLATTENING_GRAY}, ${SCREENSHOT_FLATTENING_GRAY}, ${SCREENSHOT_FLATTENING_GRAY})`;
+          context.fillRect(0, 0, imageCanvas.width, imageCanvas.height);
         }
+        const isSmallImage =
+          Math.max(imageData.width, imageData.height) <= SCREENSHOT_MAX_SIZE;
+        const jpegBase64 = imageCanvas
+          .toDataURL('image/jpeg', isSmallImage ? 0.7 : 0.92)
+          .replace(/^data:image\/jpeg;base64,/, '');
+
+        this._screenshotsTakenCount++;
+        if (this._screenshots.length >= this._maxScreenshots) {
+          // Keep the first one and the most recent ones.
+          const [droppedScreenshot] = this._screenshots.splice(
+            this._maxScreenshots > 1 ? 1 : 0,
+            1
+          );
+          this._droppedScreenshots.push({
+            label: droppedScreenshot.label,
+            frame: droppedScreenshot.frame,
+          });
+        }
+        this._screenshots.push({
+          label,
+          frame: this._framesExecuted,
+          width: imageData.width,
+          height: imageData.height,
+          jpegBase64,
+          ...(pngBase64 ? { pngBase64 } : {}),
+        });
+      }
+
+      /**
+       * Change how many screenshots are kept in the result: the first one and
+       * the last ones (4 by default, 20 at most). The ones dropped are listed
+       * in the result (`droppedScreenshots`). Has no effect when the run was
+       * asked to take no screenshot.
+       */
+      setMaxScreenshots(maxScreenshots: integer): void {
+        if (
+          !Number.isInteger(maxScreenshots) ||
+          maxScreenshots < 1 ||
+          maxScreenshots > MAX_SCREENSHOTS_LIMIT
+        ) {
+          throw new Error(
+            `setMaxScreenshots expects an integer between 1 and ${MAX_SCREENSHOTS_LIMIT}.`
+          );
+        }
+        if (this._maxScreenshots <= 0) return;
+        this._maxScreenshots = maxScreenshots;
+      }
+
+      /**
+       * Place the camera of a layer, with the engine camera functions.
+       * Values left undefined are unchanged. The camera is restored after
+       * the next screenshot, unless `keepAfterScreenshot` is set. Meanwhile,
+       * the game logic can move it again (a camera following the player):
+       * set it right before taking the screenshot.
+       */
+      setCamera(options: GameplayTestCameraOptions): void {
+        if (!options || typeof options !== 'object') {
+          throw new Error(
+            'setCamera expects an object like { x: 100, y: 200, z: 300, rotationX: 60, angle: 90, layer: "" }.'
+          );
+        }
+        const layerName = options.layer || '';
+        const layer = this._getLayerForCamera(layerName);
+        if (options.keepAfterScreenshot) {
+          this._camerasToRestoreAfterScreenshot.delete(layerName);
+        } else if (!this._camerasToRestoreAfterScreenshot.has(layerName)) {
+          this._camerasToRestoreAfterScreenshot.set(
+            layerName,
+            getLayerCameraState(layer)
+          );
+        }
+        if (options.x !== undefined) layer.setCameraX(options.x);
+        if (options.y !== undefined) layer.setCameraY(options.y);
+        if (options.zoom !== undefined) layer.setCameraZoom(options.zoom);
+        if (options.z !== undefined) {
+          layer.setCameraZ(options.z, getCameraFieldOfView(layer));
+        }
+        if (options.angle !== undefined) layer.setCameraRotation(options.angle);
+        if (options.rotationX !== undefined) {
+          layer.setCameraRotationX(options.rotationX);
+        }
+        if (options.rotationY !== undefined) {
+          layer.setCameraRotationY(options.rotationY);
+        }
+      }
+
+      /**
+       * Place the 3D camera of a layer at `from`, looking at `to` (a point in
+       * scene coordinates, or the center of an instance given by its id). Like
+       * `setCamera`, the camera is restored after the next screenshot unless
+       * `keepAfterScreenshot` is set.
+       */
+      lookAt(options: {
+        from: GameplayTestPoint3D;
+        to: GameplayTestPoint3D | integer;
+        layer?: string;
+        keepAfterScreenshot?: boolean;
+      }): void {
+        if (!options || typeof options !== 'object' || !options.from) {
+          throw new Error(
+            'lookAt expects an object like { from: { x: 0, y: 500, z: 300 }, to: playerId, layer: "" }.'
+          );
+        }
+        const layerName = options.layer || '';
+        const layer = this._getLayerForCamera(layerName);
+        const threeCamera = layer.getRenderer().getThreeCamera();
+        if (!threeCamera) {
+          throw new Error(
+            `The layer "${layerName}" has no 3D camera: use \`setCamera\` to place a 2D camera.`
+          );
+        }
+        const target = this._getLookAtTarget(options.to);
+        const inverseWorldScale =
+          this._getCurrentScene().getRenderer3DInverseWorldScale();
+        // The same rotation as `threeCamera.lookAt`, read back in the order
+        // the layer renderer composes the camera rotations (Z, then Y, then
+        // X), with Z up as in 3D scenes.
+        const camera = new THREE.PerspectiveCamera();
+        camera.up.set(0, 0, 1);
+        camera.position.set(
+          options.from.x * inverseWorldScale,
+          -options.from.y * inverseWorldScale,
+          options.from.z * inverseWorldScale
+        );
+        camera.lookAt(
+          target.x * inverseWorldScale,
+          -target.y * inverseWorldScale,
+          target.z * inverseWorldScale
+        );
+        const rotation = new THREE.Euler().setFromQuaternion(
+          camera.quaternion,
+          'ZYX'
+        );
+        this.setCamera({
+          layer: layerName,
+          x: options.from.x,
+          y: options.from.y,
+          z: options.from.z,
+          angle: -gdjs.toDegrees(rotation.z),
+          rotationX: gdjs.toDegrees(rotation.x),
+          rotationY: gdjs.toDegrees(rotation.y),
+          keepAfterScreenshot: options.keepAfterScreenshot,
+        });
+      }
+
+      private _getLookAtTarget(
+        to: GameplayTestPoint3D | integer
+      ): GameplayTestPoint3D {
+        if (typeof to !== 'number') {
+          if (!to || typeof to.x !== 'number' || typeof to.y !== 'number') {
+            throw new Error(
+              'lookAt expects `to` to be a point like { x: 0, y: 0, z: 0 } or an instance id (from `getObjects`).'
+            );
+          }
+          return { x: to.x, y: to.y, z: to.z || 0 };
+        }
+        const object = this.getRuntimeObject(to);
+        if (!object) {
+          throw new Error(`No instance with the id ${to} to look at.`);
+        }
+        const snapshot = this._makeObjectSnapshot(object, 0);
+        return {
+          x: snapshot.centerX,
+          y: snapshot.centerY,
+          z: snapshot.centerZ || 0,
+        };
+      }
+
+      private _getLayerForCamera(layerName: string): gdjs.RuntimeLayer {
+        const currentScene = this._getCurrentScene();
+        if (!currentScene.hasLayer(layerName)) {
+          throw new Error(`The layer "${layerName}" does not exist.`);
+        }
+        return currentScene.getLayer(layerName);
+      }
+
+      /** Put back the cameras changed for a screenshot (see `setCamera`). */
+      _restoreCamerasAfterScreenshot(): void {
+        const currentScene = this._runtimeGame
+          .getSceneStack()
+          .getCurrentScene();
+        for (const [layerName, cameraState] of this
+          ._camerasToRestoreAfterScreenshot) {
+          if (currentScene && currentScene.hasLayer(layerName)) {
+            setLayerCameraState(currentScene.getLayer(layerName), cameraState);
+          }
+        }
+        this._camerasToRestoreAfterScreenshot.clear();
+      }
+
+      /**
+       * The box of what is drawn for a 3D instance (the Three.js object of
+       * its renderer, its 3D model included), in scene coordinates - or null
+       * for an instance not drawn in 3D. Unlike the position and size of the
+       * instance, it does not depend on where the origin of a 3D model is:
+       * use it to check that something stands on the ground or does not
+       * float.
+       */
+      getRenderedBounds(id: integer): GameplayTestWorldBounds | null {
+        const object = this.getRuntimeObject(id);
+        if (!object) {
+          throw new Error(`No instance with the id ${id}.`);
+        }
+        const threeObject = object.get3DRendererObject();
+        if (!threeObject) return null;
+        threeObject.updateWorldMatrix(true, true);
+        const box = new THREE.Box3().setFromObject(threeObject, true);
+        if (box.isEmpty()) return null;
+        // The Three.js world is mirrored on Y and scaled by the inverse of
+        // the world scale (see `getRenderer3DInverseWorldScale`).
+        const worldScale = this._getCurrentScene().getRenderer3DWorldScale();
+        return {
+          minX: box.min.x * worldScale,
+          minY: -box.max.y * worldScale,
+          minZ: box.min.z * worldScale,
+          maxX: box.max.x * worldScale,
+          maxY: -box.min.y * worldScale,
+          maxZ: box.max.z * worldScale,
+        };
       }
 
       /**
@@ -3719,11 +4414,15 @@ namespace gdjs {
       /**
        * Replace `Math.random` by a generator seeded with the given number
        * until the end of the test, so that the game makes the same random
-       * choices at every run.
+       * choices at every run. Drawing the game does not use it (Three.js
+       * draws random identifiers for what it creates the first time it draws
+       * something): the game logic gets the same random numbers whether
+       * frames are drawn or not (see `setRenderingMode`).
        */
       setRandomSeed(seed: integer): void {
         if (!this._originalMathRandom) {
           this._originalMathRandom = Math.random;
+          this._installUnseededRandomWhileDrawing();
         }
         // Mulberry32, a small and fast pseudo-random generator.
         let state = seed >>> 0;
@@ -3740,7 +4439,40 @@ namespace gdjs {
         if (this._originalMathRandom) {
           Math.random = this._originalMathRandom;
           this._originalMathRandom = null;
+          this._uninstallUnseededRandomWhileDrawing();
         }
+      }
+
+      /** Undo `_installUnseededRandomWhileDrawing`. */
+      _uninstallUnseededRandomWhileDrawing: () => void = () => {};
+
+      /**
+       * Make the scenes draw with the original `Math.random`, so that what
+       * the drawing consumes does not shift the seeded sequence used by the
+       * game logic (see `setRandomSeed`).
+       */
+      private _installUnseededRandomWhileDrawing(): void {
+        const harness = this;
+        const rendererPrototype = gdjs.RuntimeScenePixiRenderer.prototype;
+        const originalRender = rendererPrototype.render;
+        rendererPrototype.render = function (
+          this: gdjs.RuntimeScenePixiRenderer,
+          options?: gdjs.RuntimeSceneRenderOptions
+        ) {
+          const seededRandom = Math.random;
+          if (harness._originalMathRandom) {
+            Math.random = harness._originalMathRandom;
+          }
+          try {
+            originalRender.call(this, options);
+          } finally {
+            Math.random = seededRandom;
+          }
+        };
+        this._uninstallUnseededRandomWhileDrawing = () => {
+          rendererPrototype.render = originalRender;
+          this._uninstallUnseededRandomWhileDrawing = () => {};
+        };
       }
 
       /**
@@ -3748,9 +4480,10 @@ namespace gdjs {
        * optimizes the code meanwhile), then measure each of the next
        * `frames` frames, the profiled sections, the draw calls and a
        * checksum of the final state.
-       * Frames never wait for an animation frame (which renders the game
-       * once more, and can be delayed by the browser), so that two runs of
-       * the same scenario do the same work.
+       * Frames are always drawn, whatever the rendering mode, and never
+       * wait for an animation frame (which renders the game once more, and
+       * can be delayed by the browser), so that two runs of the same
+       * scenario do the same work.
        */
       async benchmark(
         name: string,
@@ -3768,7 +4501,7 @@ namespace gdjs {
           isMeasured: boolean
         ) => {
           for (let i = 0; i < frameCount; i++) {
-            const stepTimeMs = this._stepSingleFrame(dtMs);
+            const stepTimeMs = this._stepSingleFrame(dtMs, true);
             if (isMeasured) {
               frameTimesMs.push(Math.round(stepTimeMs * 1000) / 1000);
             }
@@ -3894,6 +4627,40 @@ namespace gdjs {
       /** Undo the pointer lock shim (see `_installPointerLockShim`). */
       _uninstallPointerLockShim: () => void = () => {};
 
+      /** Called at the end of the test (see `onTestEnded`). */
+      _testEndedCallbacks: Array<() => void> = [];
+
+      /**
+       * Call `callback` at the end of the test, whatever its outcome, before
+       * the game is given back to the editor. For harness extensions (see
+       * `gdjs.gameplayTests.registerHarnessExtension`), to undo what their
+       * helpers changed in the game.
+       */
+      onTestEnded(callback: () => void): void {
+        this._testEndedCallbacks.push(callback);
+      }
+
+      /** Add the helpers of the registered harness extensions. */
+      _installHarnessExtensions(): void {
+        for (const [name, factory] of harnessExtensionFactories) {
+          this[name] = factory(this);
+        }
+      }
+
+      /** Call the `onTestEnded` callbacks, the last registered first. */
+      _callTestEndedCallbacks(): void {
+        for (const callback of this._testEndedCallbacks.reverse()) {
+          try {
+            callback();
+          } catch (error) {
+            logger.error(
+              'Error while cleaning up after a gameplay test: ' + error
+            );
+          }
+        }
+        this._testEndedCallbacks = [];
+      }
+
       /**
        * Patch pointer lock during the test: `requestPointerLock` never
        * really locks the OS mouse, but as soon as the game requests it, a
@@ -4006,7 +4773,19 @@ namespace gdjs {
           gameTimeMs: Math.round(this._gameTimeMs),
           assertions: this._assertions,
           errors: errors.slice(0, MAX_ERRORS),
-          warnings: [...this._runWarnings, ...this._getWarnings()],
+          warnings: [
+            ...this._runWarnings,
+            ...(this._droppedScreenshots.length > 0
+              ? [
+                  `${this._droppedScreenshots.length} screenshot(s) were taken but not kept, as only ${this._maxScreenshots} are kept (the first one and the last ones): ${this._droppedScreenshots
+                    .map(({ label, frame }) => `"${label}" (frame ${frame})`)
+                    .join(
+                      ', '
+                    )}. Keep more with \`harness.setMaxScreenshots(count)\`.`,
+                ]
+              : []),
+            ...this._getWarnings(),
+          ],
           consoleLogs: this._consoleLogs,
           eventLog: this._eventLog,
           finalState: {
@@ -4021,6 +4800,7 @@ namespace gdjs {
           },
           screenshots: this._screenshots,
           screenshotsTakenCount: this._screenshotsTakenCount,
+          droppedScreenshots: this._droppedScreenshots,
           profiles: this._profiles,
           benchmarks: this._benchmarks,
           performance:
@@ -4147,6 +4927,48 @@ namespace gdjs {
     };
 
     /**
+     * Creates the helpers an extension adds to the harness of a test (see
+     * `registerHarnessExtension`).
+     */
+    export type GameplayTestHarnessExtensionFactory = (
+      harness: GameplayTestHarness
+    ) => object;
+
+    const harnessExtensionFactories = new Map<
+      string,
+      GameplayTestHarnessExtensionFactory
+    >();
+
+    /**
+     * Add helpers to the harness of every gameplay test: `factory` is called
+     * at the beginning of each test, and what it returns becomes
+     * `harness.<name>` (like `harness.multiplayer`).
+     *
+     * Made to be called by a file of an extension included only in gameplay
+     * test previews (`extension.addGameplayTestIncludeFile` in its
+     * `JsExtension.js`). The helpers throw an `Error` with a message saying
+     * what to do, like the harness does, and can undo what they changed at
+     * the end of the test with `harness.onTestEnded`. Their types are
+     * declared by extending the `GameplayTestHarness` interface.
+     */
+    export const registerHarnessExtension = (
+      name: string,
+      factory: GameplayTestHarnessExtensionFactory
+    ): void => {
+      if (!/^[a-z][a-zA-Z0-9]*$/.test(name)) {
+        throw new Error(
+          `Invalid harness extension name "${name}": use a camelCase name, like "multiplayer".`
+        );
+      }
+      if (name in GameplayTestHarness.prototype) {
+        throw new Error(
+          `"${name}" is already a member of the harness: give another name to the harness extension.`
+        );
+      }
+      harnessExtensionFactories.set(name, factory);
+    };
+
+    /**
      * The gameplay test being currently run, if any.
      */
     let currentlyRunningHarness: GameplayTestHarness | null = null;
@@ -4171,16 +4993,28 @@ namespace gdjs {
     /**
      * Run a gameplay test script against the game and return its result.
      *
-     * The game main loop keeps rendering (paused) while the test steps the
-     * game logic deterministically at full speed, yielding to the browser
-     * regularly so the run stays visible and interruptible (see
-     * `_maybeYield`).
+     * The game main loop is paused while the test steps the game logic
+     * deterministically at full speed, yielding to the browser regularly so
+     * the run stays interruptible (see `_maybeYield`). The game is drawn
+     * according to the rendering mode (see `setRenderingMode`).
      */
     export const runGameplayTest = async (
       runtimeGame: gdjs.RuntimeGame,
       payload: GameplayTestRunPayload,
-      onProgress?: (frame: integer) => void
+      onProgress?: (progress: GameplayTestProgress) => void
     ): Promise<GameplayTestResult> => {
+      if (currentlyRunningHarness && currentlyRunningHarness._stopped) {
+        // The editor stops a test it gave up on (it stayed silent for too
+        // long) before running the next one, but the stopped test only ends
+        // after the step it is busy with: wait for it.
+        const stoppedHarness = currentlyRunningHarness;
+        const deadlineMs = Date.now() + stoppedHarness._loadingTimeoutMs;
+        while (currentlyRunningHarness === stoppedHarness) {
+          if (Date.now() > deadlineMs) break;
+          if (onProgress) onProgress({ frame: 0, isLoading: true });
+          await new Promise((resolve) => setTimeout(resolve, 250));
+        }
+      }
       if (currentlyRunningHarness) {
         const failedResult = new GameplayTestHarness(
           runtimeGame,
@@ -4254,7 +5088,7 @@ namespace gdjs {
           Date.now() - lastBootHeartbeatTimeMs > 1000
         ) {
           lastBootHeartbeatTimeMs = Date.now();
-          harness._onProgress(0);
+          harness._onProgress({ frame: 0, isLoading: true });
         }
         await new Promise((resolve) => setTimeout(resolve, 20));
       }
@@ -4274,6 +5108,15 @@ namespace gdjs {
       const originalOnFrameEnded = inputManager.onFrameEnded.bind(inputManager);
       inputManager.onFrameEnded = () => {};
       harness._callOnFrameEnded = originalOnFrameEnded;
+
+      // The paused main loop draws the game at every animation frame: when
+      // the game is only drawn for screenshots, skip these draws too.
+      const sceneStack = runtimeGame.getSceneStack();
+      const originalRenderWithoutStep = sceneStack.renderWithoutStep;
+      sceneStack.renderWithoutStep = () =>
+        harness._renderingMode === 'onScreenshot'
+          ? !!sceneStack.getCurrentScene()
+          : originalRenderWithoutStep.call(sceneStack);
 
       harness._installPointerLockShim();
       harness._installSoundLog();
@@ -4328,6 +5171,7 @@ namespace gdjs {
 
       let result: GameplayTestResult;
       try {
+        harness._installHarnessExtensions();
         // A wall-clock watchdog, in case the script awaits something that
         // never resolves. Checked periodically (not a one-shot timer) so
         // the time spent loading - which grows `_loadingTimeMs` - and the
@@ -4361,7 +5205,7 @@ namespace gdjs {
         });
         // Report the test as started (frame 0): a test can legitimately
         // spend time without stepping any frame.
-        if (harness._onProgress) harness._onProgress(0);
+        harness._reportProgress();
         try {
           await Promise.race([
             scriptFunction(harness, scriptConsole),
@@ -4429,7 +5273,9 @@ namespace gdjs {
         } catch (error) {
           // Ignore errors during cleanup.
         }
+        harness._callTestEndedCallbacks();
         inputManager.onFrameEnded = originalOnFrameEnded;
+        sceneStack.renderWithoutStep = originalRenderWithoutStep;
         harness._restoreMathRandom();
         harness._uninstallPageVisibilityTracking();
         harness._uninstallPointerLockShim();

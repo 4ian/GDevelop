@@ -62,7 +62,11 @@ namespace gdjs {
       // TODO (3D): call the method with the same name on RuntimeLayers so they can dispose?
     }
 
-    render() {
+    /**
+     * Draw the scene.
+     * @param options See `gdjs.RuntimeScene.render`.
+     */
+    render(options?: gdjs.RuntimeSceneRenderOptions) {
       const runtimeGameRenderer = this._runtimeGameRenderer;
       if (!runtimeGameRenderer) return;
 
@@ -70,6 +74,14 @@ namespace gdjs {
       if (!pixiRenderer) return;
 
       const threeRenderer = this._threeRenderer;
+      const isBackgroundColorForced =
+        !!options && options.backgroundColor !== undefined;
+      const backgroundColor =
+        options && options.backgroundColor !== undefined
+          ? options.backgroundColor
+          : this._runtimeScene.getBackgroundColor();
+      const shouldClearCanvas =
+        isBackgroundColorForced || this._runtimeScene.getClearCanvas();
 
       // If we are in VR, we cannot render like this: we must use the special VR
       // rendering method to not display a black screen.
@@ -115,15 +127,7 @@ namespace gdjs {
           const runtimeLayerRenderer = runtimeLayer.getRenderer();
           const runtimeLayerRenderingType = runtimeLayer.getRenderingType();
 
-          // Determine if this layer will actually render in 3D mode.
-          // Keep in sync with: `shouldRenderLayerIn3D` in `layer-pixi-renderer.ts`.
-          const shouldRenderLayerIn3D =
-            this._runtimeScene.getGame().isInGameEdition() ||
-            (runtimeLayerRenderingType !==
-              gdjs.RuntimeLayerRenderingType.TWO_D &&
-              runtimeLayerRenderer.has3DObjects());
-
-          if (!shouldRenderLayerIn3D) {
+          if (!this._shouldRenderLayerIn3D(runtimeLayer)) {
             // Render a layer with 2D rendering (PixiJS).
 
             if (lastRenderWas3D) {
@@ -134,10 +138,9 @@ namespace gdjs {
 
             if (isFirstRender) {
               // Render the background color.
-              pixiRenderer.background.color =
-                this._runtimeScene.getBackgroundColor();
+              pixiRenderer.background.color = backgroundColor;
               pixiRenderer.background.alpha = 1;
-              if (this._runtimeScene.getClearCanvas()) pixiRenderer.clear();
+              if (shouldClearCanvas) pixiRenderer.clear();
 
               isFirstRender = false;
             }
@@ -207,19 +210,29 @@ namespace gdjs {
                 threeRenderer.resetState();
               }
 
+              // The background shown by an effect (a skybox), replaced by
+              // the forced background color while this layer is drawn.
+              let replacedThreeSceneBackground:
+                | THREE.Color
+                | THREE.Texture
+                | null = null;
               if (isFirstRender) {
                 // Render the background color.
-                threeRenderer.setClearColor(
-                  this._runtimeScene.getBackgroundColor()
-                );
+                threeRenderer.setClearColor(backgroundColor);
                 threeRenderer.resetState();
-                if (this._runtimeScene.getClearCanvas()) threeRenderer.clear();
+                if (shouldClearCanvas) threeRenderer.clear();
                 if (!this._backgroundColor) {
                   this._backgroundColor = new THREE.Color();
                 }
-                this._backgroundColor.set(
-                  this._runtimeScene.getBackgroundColor()
-                );
+                this._backgroundColor.set(backgroundColor);
+                if (
+                  isBackgroundColorForced &&
+                  threeScene.background &&
+                  threeScene.background !== this._backgroundColor
+                ) {
+                  replacedThreeSceneBackground = threeScene.background;
+                  threeScene.background = this._backgroundColor;
+                }
                 if (!threeScene.background) {
                   threeScene.background = this._backgroundColor;
                 }
@@ -247,6 +260,9 @@ namespace gdjs {
                 threeRenderer.setClearAlpha(clearAlpha);
               } else {
                 threeRenderer.render(threeScene, threeCamera);
+              }
+              if (replacedThreeSceneBackground) {
+                threeScene.background = replacedThreeSceneBackground;
               }
 
               this._layerRenderingMetrics.rendered3DLayersCount++;
@@ -291,9 +307,9 @@ namespace gdjs {
 
         // Render all the layers then.
         // TODO: replace by a loop like in 3D?
-        pixiRenderer.background.color = this._runtimeScene.getBackgroundColor();
+        pixiRenderer.background.color = backgroundColor;
         pixiRenderer.render(this._pixiContainer, {
-          clear: this._runtimeScene.getClearCanvas(),
+          clear: shouldClearCanvas,
         });
         this._layerRenderingMetrics.rendered2DLayersCount++;
       }
@@ -308,6 +324,53 @@ namespace gdjs {
 
       // Uncomment to check the number of 2D&3D rendering done
       // console.log(this._layerRenderingMetrics);
+    }
+
+    /**
+     * Determine if a layer will actually render in 3D mode.
+     * Keep in sync with: `shouldRenderLayerIn3D` in `layer-pixi-renderer.ts`.
+     */
+    private _shouldRenderLayerIn3D(runtimeLayer: gdjs.RuntimeLayer): boolean {
+      return (
+        this._runtimeScene.getGame().isInGameEdition() ||
+        (runtimeLayer.getRenderingType() !==
+          gdjs.RuntimeLayerRenderingType.TWO_D &&
+          runtimeLayer.getRenderer().has3DObjects())
+      );
+    }
+
+    /**
+     * Do what `render` does that the game logic can depend on, without
+     * drawing anything: update the world matrices of the 3D scenes and of
+     * their cameras, as Three.js does at the beginning of a render. Raycasts
+     * against 3D objects and their bounding boxes read them.
+     *
+     * Only the layers that `render` would draw in 3D are updated, so that
+     * the game logic reads the same matrices whether frames are drawn or not.
+     */
+    updateWithoutDrawing() {
+      const threeRenderer = this._threeRenderer;
+      if (!threeRenderer || threeRenderer.xr.isPresenting) return;
+
+      for (const runtimeLayer of this._runtimeScene._orderedLayers) {
+        if (!runtimeLayer.isVisible()) continue;
+        if (!this._shouldRenderLayerIn3D(runtimeLayer)) continue;
+
+        const runtimeLayerRenderer = runtimeLayer.getRenderer();
+        const threeScene = runtimeLayerRenderer.getThreeScene();
+        const threeCamera = runtimeLayerRenderer.getThreeCamera();
+        if (
+          !threeScene ||
+          !threeCamera ||
+          !runtimeLayerRenderer.getThreeEffectComposer()
+        ) {
+          continue;
+        }
+        if (threeScene.matrixWorldAutoUpdate) threeScene.updateMatrixWorld();
+        if (!threeCamera.parent && threeCamera.matrixWorldAutoUpdate) {
+          threeCamera.updateMatrixWorld();
+        }
+      }
     }
 
     /**

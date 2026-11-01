@@ -7806,7 +7806,7 @@ namespace gdjs {
       return (
         !this.editor.isLeftMouseButtonCaptured() &&
         isControlOrCmdPressed(inputManager) &&
-        (!this.isShown() || this.selectionHandle.state === 'idle')
+        this.selectionHandle.state === 'idle'
       );
     }
 
@@ -8065,10 +8065,6 @@ namespace gdjs {
     }
 
     step(editor: InGameEditor) {
-      const selectedObjects = editor.getSelectedObjects();
-      if (selectedObjects.length === 0) {
-        return;
-      }
       const currentScene = editor.getCurrentScene();
       if (!currentScene) {
         return;
@@ -8083,15 +8079,19 @@ namespace gdjs {
       if (!threeCamera || !threeScene) {
         return;
       }
-      const selectionAABB = editor.getSelectionAABB();
-      if (!selectionAABB) {
-        return;
+      {
+        const selectionAABB = editor.getSelectionAABB();
+        if (selectionAABB) {
+          this.update(
+            selectionAABB,
+            threeCamera,
+            editor.getRuntimeGame().getGameResolutionHeight()
+          );
+        }
       }
-      this.update(
-        selectionAABB,
-        threeCamera,
-        editor.getRuntimeGame().getGameResolutionHeight()
-      );
+
+      const inputManager = editor.getRuntimeGame().getInputManager();
+      const isLeftButtonPressed = inputManager.isMouseButtonPressed(0);
 
       let hoverredButtonLocation: ButtonLocation | null = null;
       let isRotationButtonHovered = false;
@@ -8133,20 +8133,32 @@ namespace gdjs {
           }
         }
         if (!hoverredButtonLocation && !isRotationButtonHovered) {
-          // TODO Check the selected objects instead.
           const objectUnderCursor = editor.getObjectUnderCursor();
-          if (
-            objectUnderCursor &&
-            editor.getSelectedObjects().includes(objectUnderCursor)
-          ) {
+          if (objectUnderCursor) {
+            // Allow to grab objects that are not selected.
+            if (
+              editor.isMouseLeftButtonJustPressed() &&
+              !isShiftPressed(inputManager) &&
+              !editor.getSelectedObjects().includes(objectUnderCursor)
+            ) {
+              editor._selection.clear();
+              editor._selection.add(objectUnderCursor);
+            }
             isAreaHovered = true;
           }
         }
       }
+      const selectedObjects = editor.getSelectedObjects();
+      if (selectedObjects.length === 0) {
+        console.log('Selection is empty');
+        return;
+      }
 
-      const inputManager = editor.getRuntimeGame().getInputManager();
-      const isLeftButtonPressed = inputManager.isMouseButtonPressed(0);
       if (!isLeftButtonPressed || editor.isLeftMouseButtonCaptured()) {
+        if (editor.isLeftMouseButtonCaptured()) {
+          console.log('Left mouse button captured');
+        }
+
         if (this.state === 'idle') {
           return;
         }
@@ -8163,6 +8175,8 @@ namespace gdjs {
       }
 
       if (editor.isMouseLeftButtonJustPressed()) {
+        console.log('Mouse left button just pressed');
+
         this.state = 'idle';
         this.draggedButtonLocation = null;
         this._hasActuallyMoved = false;
@@ -8177,7 +8191,9 @@ namespace gdjs {
         } else if (isRotationButtonHovered) {
           this.state = 'rotating';
         } else if (isAreaHovered) {
-          this.state = 'panning';
+          if (!isControlOrCmdPressed(inputManager)) {
+            this.state = 'panning';
+          }
           console.log('Start dragging');
         }
         if (this.state !== 'idle') {

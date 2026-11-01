@@ -65,8 +65,9 @@ export const useMcpServers = ({
   // Called by the `--mcp` command once the project is loaded.
   onMcpProjectReady: () => void,
 |} => {
-  const { resourceStoreTools, projectCreationTools } = useMcpServerTools({
+  const { lookupTools, projectCreationTools } = useMcpServerTools({
     i18n,
+    project,
     projectCreationCallbacks,
   });
   const makeHandlers = React.useCallback(
@@ -98,7 +99,7 @@ export const useMcpServers = ({
         handlers: {
           ...handlers,
           isReadOnly: !!appArguments['read-only'],
-          serverTools: resourceStoreTools,
+          serverTools: lookupTools,
           runEditorFunctionCalls: async (functionCalls, options) => {
             await projectReady.promise;
             return handlers.runEditorFunctionCalls(functionCalls, options);
@@ -118,7 +119,7 @@ export const useMcpServers = ({
       ipcRenderer.send('mcp-ready');
       return () => ipcRenderer.removeListener('mcp-message', onMcpMessageEvent);
     },
-    [makeHandlers, resourceStoreTools]
+    [makeHandlers, lookupTools]
   );
   const onMcpProjectReady = React.useCallback(
     () => projectReadyRef.current.resolve(),
@@ -149,7 +150,7 @@ export const useMcpServers = ({
             handlers: {
               ...makeHandlers('http'),
               getOpenedProject: () => openedProjectRef.current,
-              serverTools: [...resourceStoreTools, ...projectCreationTools],
+              serverTools: [...lookupTools, ...projectCreationTools],
             },
             send: text => {
               if (ipcRenderer)
@@ -177,7 +178,7 @@ export const useMcpServers = ({
         );
       };
     },
-    [makeHandlers, resourceStoreTools, projectCreationTools]
+    [makeHandlers, lookupTools, projectCreationTools]
   );
 
   return { onMcpProjectReady };

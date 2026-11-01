@@ -68,6 +68,10 @@ type InstanceSurfaces = {
   surfaceBeneath?: SurfaceBeneath | null;
   /** Only with `surface_beneath.grid`: the heights of the surfaces in the box of the instance, the instance included. */
   surfaceGrid?: {
+    /** The highest point found: x, y and, with up "z", z. */
+    highest: { x: number; y: number; z?: number } | null;
+    /** The lowest point found. */
+    lowest: { x: number; y: number; z?: number } | null;
     /** The X of each column. */
     xs: Array<number>;
     /** With up "z": the Y of each row. */
@@ -76,10 +80,6 @@ type InstanceSurfaces = {
     z?: Array<Array<number | null>>;
     /** With up "-y": the Y of the surface for each column, null where there is none. */
     y?: Array<number | null>;
-    /** The highest point found: x, y and, with up "z", z. */
-    highest: { x: number; y: number; z?: number } | null;
-    /** The lowest point found. */
-    lowest: { x: number; y: number; z?: number } | null;
   };
 };
 
@@ -341,6 +341,7 @@ declare function add_behavior(args: {
 
 type InspectBehaviorPropertiesResult = FunctionResult & {
   properties: Array<NamedProperty>;
+  isSynchronizedOverNetwork?: boolean;
   [key: string]: any;
 };
 /**

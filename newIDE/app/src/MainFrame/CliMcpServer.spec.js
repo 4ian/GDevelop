@@ -13,10 +13,9 @@ import {
   type McpCreateProject,
 } from './McpServerTools/ProjectCreationTools';
 import {
-  makeResourceStoreTools,
-  type McpSearchResources,
-  type McpFoundResource,
-} from './McpServerTools/ResourceStoreTools';
+  makeLookupTools,
+  type McpCallLookupTool,
+} from './McpServerTools/LookupTools';
 
 // The real PixiResourcesLoader transitively imports ESM-only packages that
 // Jest cannot parse: replace it with the test mock.
@@ -125,7 +124,7 @@ describe('CliMcpServer', () => {
     // Handled by the GDevelop AI backend, not by the editor.
     expect(toolNames).not.toContain('search_docs');
     expect(toolNames).not.toContain('run_edit_agent');
-    // Only when the editor can search the resources.
+    // Only when the editor can call the GDevelop AI backend.
     expect(toolNames).not.toContain('search_resource_store');
 
     const createSceneTool = tools.find(tool => tool.name === 'create_scene');
@@ -148,7 +147,7 @@ describe('CliMcpServer', () => {
   it('tells in `run_script` the tools a script cannot call', () => {
     const tools = getMcpTools({
       isReadOnly: false,
-      serverTools: makeResourceStoreTools(async () => []),
+      serverTools: makeLookupTools(async () => ({ success: true })),
     });
     const runScriptTool = tools.find(tool => tool.name === 'run_script');
     if (!runScriptTool) throw new Error('No run_script tool.');
@@ -354,29 +353,27 @@ describe('CliMcpServer', () => {
     expect(getResult(response).content[0].text).toContain('interface Harness');
   });
 
-  it('searches the resources installed by name, when the editor can', async () => {
-    const searchResources = jest.fn(
-      async (options: Object): Promise<Array<McpFoundResource>> => [
-        {
-          name: 'Monster growl.wav',
-          tags: ['monster', 'growl'],
-          metadata: { duration: 1.2, kind: 'sound' },
-        },
-      ]
+  it('reads the docs and searches the stores on the GDevelop AI backend', async () => {
+    const callLookupTool = jest.fn(
+      async (options: Object): Promise<Object> => ({
+        success: true,
+        extensionDocumentations: { Physics3D: '# Extension "3D physics"' },
+      })
     );
     const handlers: CliMcpServerHandlers = {
       ...makeFakeCliMcpServerHandlers(),
-      serverTools: makeResourceStoreTools(
-        (searchResources: McpSearchResources)
-      ),
+      serverTools: makeLookupTools((callLookupTool: McpCallLookupTool)),
     };
     const listResponse = await handleMcpMessage(
       { jsonrpc: '2.0', id: 10, method: 'tools/list' },
       handlers
     );
-    expect(getResult(listResponse).tools.map(tool => tool.name)).toContain(
-      'search_resource_store'
-    );
+    const toolNames = getResult(listResponse).tools.map(tool => tool.name);
+    expect(toolNames).toContain('read_full_docs');
+    expect(toolNames).toContain('search_docs');
+    expect(toolNames).toContain('read_javascript_reference');
+    expect(toolNames).toContain('search_object_asset_store');
+    expect(toolNames).toContain('search_resource_store');
 
     const response = await handleMcpMessage(
       {
@@ -384,36 +381,61 @@ describe('CliMcpServer', () => {
         id: 11,
         method: 'tools/call',
         params: {
-          name: 'search_resource_store',
-          arguments: { search_terms: 'monster, growl', resource_kind: 'audio' },
+          name: 'read_full_docs',
+          arguments: { extension_names: 'Physics3D' },
         },
       },
       handlers
     );
-    expect(searchResources).toHaveBeenCalledWith({
-      searchTerms: 'monster, growl',
-      resourceKind: 'audio',
+    expect(callLookupTool).toHaveBeenCalledWith({
+      name: 'read_full_docs',
+      args: { extension_names: 'Physics3D' },
+      withProjectExtensions: true,
     });
     const result = getResult(response);
     expect(result.isError).toBe(false);
-    expect(JSON.parse(result.content[0].text).resources[0].name).toBe(
-      'Monster growl.wav'
-    );
+    expect(
+      JSON.parse(result.content[0].text).extensionDocumentations.Physics3D
+    ).toBe('# Extension "3D physics"');
 
-    const invalidResponse = await handleMcpMessage(
+    callLookupTool.mockImplementationOnce(async () => ({
+      success: false,
+      message: 'No search terms were provided.',
+    }));
+    const failedResponse = await handleMcpMessage(
       {
         jsonrpc: '2.0',
         id: 12,
         method: 'tools/call',
         params: {
-          name: 'search_resource_store',
-          arguments: { search_terms: 'growl', resource_kind: 'image' },
+          name: 'search_object_asset_store',
+          arguments: { search_terms: ' ' },
         },
       },
       handlers
     );
-    expect(getResult(invalidResponse).isError).toBe(true);
+    expect(callLookupTool).toHaveBeenLastCalledWith({
+      name: 'search_object_asset_store',
+      args: { search_terms: ' ' },
+      withProjectExtensions: false,
+    });
+    expect(getResult(failedResponse).isError).toBe(true);
     expect(handlers.runEditorFunctionCalls).not.toHaveBeenCalled();
+  });
+
+  it('only reads the docs when read-only', async () => {
+    const response = await handleMcpMessage(
+      { jsonrpc: '2.0', id: 13, method: 'tools/list' },
+      {
+        ...makeFakeCliMcpServerHandlers({ isReadOnly: true }),
+        serverTools: makeLookupTools(async () => ({ success: true })),
+      }
+    );
+    const toolNames = getResult(response).tools.map(tool => tool.name);
+    expect(toolNames).toContain('read_full_docs');
+    expect(toolNames).toContain('search_docs');
+    expect(toolNames).not.toContain('search_object_asset_store');
+    expect(toolNames).not.toContain('search_resource_store');
   });
 
   it('gives the screenshots of a gameplay test as images', async () => {

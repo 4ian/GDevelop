@@ -3,15 +3,20 @@ import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import { type CliProjectCreationCallbacks } from '../CliEditorFunctions';
-import { createResourceSearch } from '../../Utils/GDevelopServices/Generation';
+import { createLookupToolCall } from '../../Utils/GDevelopServices/Generation';
+import { prepareAiUserContent } from '../../AiGeneration/PrepareAiUserContent';
+import { makeSimplifiedProjectBuilder } from '../../EditorFunctions/SimplifiedProject/SimplifiedProject';
+import { getPublicApi } from '../../EditorFunctions/PublicApi';
 import { notLoggedInErrorMessage } from '../../AiGeneration/UseGenerateEvents';
 import { listAllExamples } from '../../Utils/GDevelopServices/Example';
 import UrlStorageProvider from '../../ProjectsStorage/UrlStorageProvider';
 import CloudStorageProvider from '../../ProjectsStorage/CloudStorageProvider';
 import { type NewProjectSetup } from '../../ProjectCreation/NewProjectSetupDialog';
 import { type McpServerTool } from './McpServerTool';
-import { makeResourceStoreTools } from './ResourceStoreTools';
+import { makeLookupTools } from './LookupTools';
 import { makeProjectCreationTools } from './ProjectCreationTools';
+
+const gd: libGDevelop = global.gd;
 
 /**
  * The tools of the MCP server needing the editor (the user, the project
@@ -19,12 +24,14 @@ import { makeProjectCreationTools } from './ProjectCreationTools';
  */
 export const useMcpServerTools = ({
   i18n,
+  project,
   projectCreationCallbacks,
 }: {|
   i18n: I18nType,
+  project: ?gdProject,
   projectCreationCallbacks: CliProjectCreationCallbacks,
 |}): {|
-  resourceStoreTools: Array<McpServerTool>,
+  lookupTools: Array<McpServerTool>,
   projectCreationTools: Array<McpServerTool>,
 |} => {
   const { profile, getAuthorizationHeader } = React.useContext(
@@ -38,23 +45,45 @@ export const useMcpServerTools = ({
   projectCreationCallbacksRef.current = projectCreationCallbacks;
   const i18nRef = React.useRef(i18n);
   i18nRef.current = i18n;
+  const projectRef = React.useRef(project);
+  projectRef.current = project;
 
-  // The search the editor does to install a resource by name (see
-  // `useSearchAndInstallResource`), done for the agent to choose the name.
-  const resourceStoreTools = React.useMemo(
+  // Like for the GDevelop AI, the extensions of the project are given so that
+  // they are documented too.
+  const lookupTools = React.useMemo(
     () =>
-      makeResourceStoreTools(async ({ searchTerms, resourceKind }) => {
+      makeLookupTools(async ({ name, args, withProjectExtensions }) => {
         const currentProfile = profileRef.current;
         if (!currentProfile) throw new Error(notLoggedInErrorMessage);
-        const resourceSearch = await createResourceSearch(
+        const currentProject = projectRef.current;
+        const projectSpecificExtensionsSummaryJson =
+          withProjectExtensions && currentProject
+            ? JSON.stringify(
+                makeSimplifiedProjectBuilder(
+                  gd
+                ).getProjectSpecificExtensionsSummary(currentProject)
+              )
+            : null;
+        const preparedAiUserContent = await prepareAiUserContent({
+          getAuthorizationHeader: () => getAuthorizationHeaderRef.current(),
+          userId: currentProfile.id,
+          simplifiedProjectJson: null,
+          projectSpecificExtensionsSummaryJson,
+        });
+        const lookupToolCall = await createLookupToolCall(
           () => getAuthorizationHeaderRef.current(),
-          { userId: currentProfile.id, searchTerms, resourceKind }
+          {
+            userId: currentProfile.id,
+            name,
+            args,
+            toolsVersion: getPublicApi().toolsVersion,
+            projectSpecificExtensionsSummaryJson:
+              preparedAiUserContent.projectSpecificExtensionsSummaryJson,
+            projectSpecificExtensionsSummaryJsonUserRelativeKey:
+              preparedAiUserContent.projectSpecificExtensionsSummaryJsonUserRelativeKey,
+          }
         );
-        return (resourceSearch.results || []).map(({ resource }) => ({
-          name: resource.name,
-          tags: resource.tags || [],
-          metadata: resource.metadata || null,
-        }));
+        return lookupToolCall.output;
       }),
     []
   );
@@ -132,5 +161,5 @@ export const useMcpServerTools = ({
     []
   );
 
-  return { resourceStoreTools, projectCreationTools };
+  return { lookupTools, projectCreationTools };
 };

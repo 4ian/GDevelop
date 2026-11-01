@@ -16,6 +16,114 @@ namespace gdjs {
    */
   export namespace gameplayTests {
     /**
+     * A path to a variable, like `Player.Inventory[2].Name`: the variable
+     * name, then child names (in structures) and indexes (in arrays).
+     */
+    type VariablePath = {
+      variableName: string;
+      childSteps: Array<string | integer>;
+    };
+
+    const parseVariablePath = (variablePath: string): VariablePath => {
+      const match = /^([^.[\]]+)((?:\.[^.[\]]+|\[\d+\])*)$/.exec(variablePath);
+      if (!match) {
+        throw new Error(
+          `Invalid variable path "${variablePath}": use a name, then ".Child" for a child of a structure and "[0]" for an item of an array (like "Player.Inventory[0].Name").`
+        );
+      }
+      const childSteps: Array<string | integer> = [];
+      const stepRegex = /\.([^.[\]]+)|\[(\d+)\]/g;
+      let stepMatch: RegExpExecArray | null;
+      while ((stepMatch = stepRegex.exec(match[2]))) {
+        childSteps.push(
+          stepMatch[1] !== undefined ? stepMatch[1] : parseInt(stepMatch[2], 10)
+        );
+      }
+      return { variableName: match[1], childSteps };
+    };
+
+    /**
+     * The data of a variable of a container (a variable path can go into its
+     * children), or undefined if it does not exist.
+     */
+    const getVariableDataAtPath = (
+      variablesContainer: gdjs.VariablesContainer,
+      variablePath: string
+    ): VariableNetworkSyncData | undefined => {
+      const variablesData = variablesContainer.getNetworkSyncData({});
+      // A name with a dot of an old project.
+      const variableDataWithExactName = variablesData.find(
+        (variableData) => variableData.name === variablePath
+      );
+      if (variableDataWithExactName) return variableDataWithExactName;
+
+      const { variableName, childSteps } = parseVariablePath(variablePath);
+      let variableData = variablesData.find(
+        (variableData) => variableData.name === variableName
+      );
+      for (const childStep of childSteps) {
+        if (!variableData) return undefined;
+        const children = variableData.children || [];
+        variableData =
+          typeof childStep === 'number'
+            ? variableData.type === 'array'
+              ? children[childStep]
+              : undefined
+            : variableData.type === 'structure'
+              ? children.find((child) => !!child && child.name === childStep)
+              : undefined;
+      }
+      return variableData;
+    };
+
+    /**
+     * The variable of a container to set, at a variable path. Like events, a
+     * missing variable or a missing child of a structure is created, but an
+     * existing value is never converted to a structure or an array: a path
+     * going through a variable that is not one throws.
+     */
+    const getVariableToSetAtPath = (
+      variablesContainer: gdjs.VariablesContainer,
+      variablePath: string
+    ): gdjs.Variable => {
+      if (variablesContainer.has(variablePath)) {
+        return variablesContainer.get(variablePath);
+      }
+      const { variableName, childSteps } = parseVariablePath(variablePath);
+      if (childSteps.length && !variablesContainer.has(variableName)) {
+        throw new Error(
+          `There is no variable "${variableName}" to set "${variablePath}": declare it (as a structure or an array) in the game.`
+        );
+      }
+      let variable = variablesContainer.get(variableName);
+      let pathToVariable = variableName;
+      for (const childStep of childSteps) {
+        if (typeof childStep === 'number') {
+          if (
+            variable.getType() !== 'array' ||
+            childStep >= variable.getChildrenCount()
+          ) {
+            throw new Error(
+              variable.getType() === 'array'
+                ? `The array "${pathToVariable}" has no item ${childStep} (it has ${variable.getChildrenCount()}), so "${variablePath}" can't be set.`
+                : `"${pathToVariable}" is a ${variable.getType()}, not an array, so "${variablePath}" can't be set.`
+            );
+          }
+          variable = variable.getChildAt(childStep);
+          pathToVariable += `[${childStep}]`;
+        } else {
+          if (variable.getType() !== 'structure') {
+            throw new Error(
+              `"${pathToVariable}" is a ${variable.getType()}, not a structure, so "${variablePath}" can't be set.`
+            );
+          }
+          variable = variable.getChild(childStep);
+          pathToVariable += `.${childStep}`;
+        }
+      }
+      return variable;
+    };
+    /**
      * One readable state entry, derived by the editor from an extension's own
      * declarations: `name` is the event-sheet name of a condition or
      * expression ('IsOnFloor', 'CurrentSpeed', 'PropertyHealth'...) and
@@ -2945,26 +3053,30 @@ namespace gdjs {
 
       /**
        * Get a scene variable, or undefined if it does not exist.
+       * @param variablePath A variable name, or a path to a child, like
+       * `Player.Inventory[0].Name`.
        */
       getSceneVariable(
-        variableName: string
+        variablePath: string
       ): VariableNetworkSyncData | undefined {
-        return this._getCurrentScene()
-          .getVariables()
-          .getNetworkSyncData({})
-          .find((variable) => variable.name === variableName);
+        return getVariableDataAtPath(
+          this._getCurrentScene().getVariables(),
+          variablePath
+        );
       }
 
       /**
        * Get a global variable, or undefined if it does not exist.
+       * @param variablePath A variable name, or a path to a child, like
+       * `Player.Inventory[0].Name`.
        */
       getGlobalVariable(
-        variableName: string
+        variablePath: string
       ): VariableNetworkSyncData | undefined {
-        return this._runtimeGame
-          .getVariables()
-          .getNetworkSyncData({})
-          .find((variable) => variable.name === variableName);
+        return getVariableDataAtPath(
+          this._runtimeGame.getVariables(),
+          variablePath
+        );
       }
 
       /**
@@ -3667,13 +3779,19 @@ namespace gdjs {
       /**
        * Set a scene variable (number, string or boolean).
        * Use for test setup only.
+       * @param variablePath A variable name, or a path to a child, like
+       * `Player.Inventory[0].Name`. Throws if it goes through a variable that
+       * is not a structure or an array.
        */
       setSceneVariable(
-        variableName: string,
+        variablePath: string,
         value: string | number | boolean
       ): void {
         this._setVariableFromValue(
-          this._getCurrentScene().getVariables().get(variableName),
+          getVariableToSetAtPath(
+            this._getCurrentScene().getVariables(),
+            variablePath
+          ),
           value
         );
       }
@@ -3683,17 +3801,15 @@ namespace gdjs {
        * or undefined if the object or the variable does not exist.
        * @param objectIdOrName An instance id (from `getObjects`) or an object
        * name (first instance).
+       * @param variablePath A variable name, or a path to a child.
        */
       getObjectVariable(
         objectIdOrName: integer | string,
-        variableName: string
+        variablePath: string
       ): VariableNetworkSyncData | undefined {
         const object = this.getRuntimeObject(objectIdOrName);
         if (!object) return undefined;
-        return object
-          .getVariables()
-          .getNetworkSyncData({})
-          .find((variable) => variable.name === variableName);
+        return getVariableDataAtPath(object.getVariables(), variablePath);
       }
 
       /**
@@ -3701,20 +3817,22 @@ namespace gdjs {
        * Use for test setup only. Throws if the object does not exist.
        * @param objectIdOrName An instance id (from `getObjects`) or an object
        * name (first instance).
+       * @param variablePath A variable name, or a path to a child (see
+       * `setSceneVariable`).
        */
       setObjectVariable(
         objectIdOrName: integer | string,
-        variableName: string,
+        variablePath: string,
         value: string | number | boolean
       ): void {
         const object = this.getRuntimeObject(objectIdOrName);
         if (!object) {
           throw new Error(
-            `No instance "${objectIdOrName}" found to set the variable "${variableName}".`
+            `No instance "${objectIdOrName}" found to set the variable "${variablePath}".`
           );
         }
         this._setVariableFromValue(
-          object.getVariables().get(variableName),
+          getVariableToSetAtPath(object.getVariables(), variablePath),
           value
         );
       }
@@ -3722,13 +3840,19 @@ namespace gdjs {
       /**
        * Set a global variable (number, string or boolean).
        * Use for test setup only.
+       * @param variablePath A variable name, or a path to a child, like
+       * `Player.Inventory[0].Name`. Throws if it goes through a variable that
+       * is not a structure or an array.
        */
       setGlobalVariable(
-        variableName: string,
+        variablePath: string,
         value: string | number | boolean
       ): void {
         this._setVariableFromValue(
-          this._runtimeGame.getVariables().get(variableName),
+          getVariableToSetAtPath(
+            this._runtimeGame.getVariables(),
+            variablePath
+          ),
           value
         );
       }

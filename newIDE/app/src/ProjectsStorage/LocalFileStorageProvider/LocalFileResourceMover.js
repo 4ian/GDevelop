@@ -19,7 +19,7 @@ import {
   isURL,
   parseLocalFilePathOrExtensionFromMetadata,
 } from '../../ResourcesList/ResourceUtils';
-import { sanitizeFilePath } from '../../Utils/Filename';
+import { sanitizeFilename, sanitizeFilePath } from '../../Utils/Filename';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { extractDecodedFilenameFromProjectResourceUrl } from '../../Utils/GDevelopServices/Project';
 import axios from 'axios';
@@ -35,11 +35,26 @@ type Options = {|
   authenticatedUser: AuthenticatedUser,
 |};
 
+const isPathInFolder = (folderPath: string, filePath: string): boolean => {
+  const relativePath = path.relative(folderPath, filePath);
+  return (
+    !!relativePath &&
+    relativePath !== '..' &&
+    !relativePath.startsWith('..' + path.sep) &&
+    !path.isAbsolute(relativePath)
+  );
+};
+
 const generateUnusedFilepath = (
   basePath: string,
   alreadyUsedFilePaths: Set<string>,
-  filename: string
+  unsafeFilename: string
 ) => {
+  // The filename comes from the project (a resource URL or name), so it must
+  // not be able to point outside of the base folder.
+  const filename = isPathInFolder(basePath, path.join(basePath, unsafeFilename))
+    ? unsafeFilename
+    : sanitizeFilename(unsafeFilename);
   const directory = path.dirname(filename);
   const extension = path.extname(filename);
   const filenameWithoutExtension = path.basename(filename, extension);
@@ -136,14 +151,21 @@ export const moveUrlResourcesToLocalFiles = async ({
               localFilePath,
               extension,
             } = parseLocalFilePathOrExtensionFromMetadata(resource);
-            const downloadedFilePath = localFilePath
+            const resolvedLocalFilePath = localFilePath
               ? path.resolve(projectPath, localFilePath)
-              : generateUnusedFilepathFromResourceName(
-                  baseAssetsPath,
-                  downloadedFilePaths,
-                  resource.getName(),
-                  extension || ''
-                );
+              : null;
+            // The local file path comes from the project, so it's only used
+            // if it stays inside the project folder.
+            const downloadedFilePath =
+              resolvedLocalFilePath &&
+              isPathInFolder(projectPath, resolvedLocalFilePath)
+                ? resolvedLocalFilePath
+                : generateUnusedFilepathFromResourceName(
+                    baseAssetsPath,
+                    downloadedFilePaths,
+                    resource.getName(),
+                    extension || ''
+                  );
 
             await fs.ensureDir(baseAssetsPath);
             await fs.ensureDir(path.dirname(downloadedFilePath));

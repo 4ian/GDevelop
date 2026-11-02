@@ -2,7 +2,11 @@
 import slugs from 'slugs';
 import axios from 'axios';
 import * as PIXI from 'pixi.js-legacy';
-import { Spine, TextureAtlas } from '@esotericsoftware/spine-pixi-v7';
+import {
+  Spine,
+  TextureAtlas,
+  SpineTexture,
+} from '@esotericsoftware/spine-pixi-v7';
 import * as THREE from 'three';
 import { GLTFLoader, GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
@@ -12,6 +16,19 @@ import { checkIfCredentialsRequired } from '../Utils/CrossOrigin';
 import { dracoDecoderPath } from '../Utils/DracoDecoder';
 import { type ResourceKind } from '../ResourcesList/ResourceSource';
 const gd: libGDevelop = global.gd;
+
+// Prevent `SpineTexture.dispose` (called by `TextureAtlas.dispose` during
+// `PIXI.Assets.unload`) from destroying the `PIXI.Texture` owned by
+// `PixiResourcesLoader`.
+if (SpineTexture && SpineTexture.prototype) {
+  // $FlowFixMe[cannot-write]
+  // $FlowFixMe[missing-this-annot]
+  SpineTexture.prototype.dispose = function() {
+    if (this.texture && this.texture.baseTexture && SpineTexture.textureMap) {
+      SpineTexture.textureMap.delete(this.texture.baseTexture);
+    }
+  };
+}
 
 type SpineTextureAtlasOrLoadingError = {|
   // $FlowFixMe[value-as-type]
@@ -623,6 +640,7 @@ export default class PixiResourcesLoader {
       // TODO: only unload if no other resources pointing to the same Spine Atlas?
       await PIXI.Assets.unload(resourceName).catch(() => {});
       delete spineAtlasPromises[resourceName];
+      PIXI.Assets.resolver.prefer();
 
       // Also reload any resource embedding this resource:
       await this._reloadEmbedderResources(project, resourceName, 'spine');
@@ -1149,6 +1167,7 @@ export default class PixiResourcesLoader {
         src: atlasUrl,
         data: { images },
       });
+      PIXI.Assets.resolver.prefer();
       PIXI.Assets.load(spineTextureAtlasName).then(
         textureAtlas => {
           resolve({
@@ -1248,6 +1267,7 @@ export default class PixiResourcesLoader {
             alias: spineName,
             src: spineUrl,
           });
+          PIXI.Assets.resolver.prefer();
           PIXI.Assets.load(spineName).then(
             () => {
               resolve({

@@ -761,7 +761,6 @@ export const EmbeddedGameFrame = ({
     [previewDebuggerServer]
   );
 
-  const [isDraggedItem3D, setDraggedItem3D] = React.useState(false);
   const dropTargetRef = React.useRef<HTMLDivElement | null>(null);
 
   const dragNewInstance = React.useCallback(
@@ -779,8 +778,6 @@ export const EmbeddedGameFrame = ({
 
       const name = monitor.getItem().name;
       if (!name) return;
-
-      setDraggedItem3D(!!monitor.getItem().is3D);
 
       const clientOffset = monitor.getClientOffset();
       const dropTargetRect = dropTarget.getBoundingClientRect();
@@ -918,17 +915,9 @@ export const EmbeddedGameFrame = ({
               >
                 {canDrop && (
                   <div className={classes.hintText}>
-                    {isDraggedItem3D ? (
-                      <Text color="inherit">
-                        <Trans>Drag here to add to the scene</Trans>
-                      </Text>
-                    ) : (
-                      <Text color="inherit">
-                        <Trans>
-                          2D objects can't be edited when in 3D mode
-                        </Trans>
-                      </Text>
-                    )}
+                    <Text color="inherit">
+                      <Trans>Drag here to add to the scene</Trans>
+                    </Text>
                   </div>
                 )}
               </div>

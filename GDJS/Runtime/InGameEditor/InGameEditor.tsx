@@ -8243,42 +8243,45 @@ namespace gdjs {
         let translationX = cursorX - initialCursorX;
         let translationY = cursorY - initialCursorY;
 
-        if (editorGrid.isSnappingEnabled(inputManager)) {
-          const initialSelectionLeft = this.initialSelectionAABB.min[0];
-          const initialSelectionRight = this.initialSelectionAABB.max[0];
-          const initialSelectionTop = this.initialSelectionAABB.min[1];
-          const initialSelectionBottom = this.initialSelectionAABB.max[1];
-          const initialSelectionCenterX =
-            (initialSelectionLeft + initialSelectionRight) / 2;
-          const initialSelectionCenterY =
-            (initialSelectionTop + initialSelectionBottom) / 2;
-          const magnetLeft = initialCursorX < initialSelectionCenterX;
-          const magnetTop = initialCursorY < initialSelectionCenterY;
-
-          const initialMagnetX = magnetLeft
-            ? initialSelectionLeft
-            : initialSelectionRight;
-          const initialMagnetY = magnetTop
-            ? initialSelectionTop
-            : initialSelectionBottom;
-          const magnetPosition: FloatPoint = [0, 0];
-          magnetPosition[0] = initialMagnetX + translationX;
-          magnetPosition[1] = initialMagnetY + translationY;
-          editorGrid.roundPositionToGrid(
-            magnetPosition,
-            !editorGrid.isSnappingEnabled(inputManager)
-          );
-          translationX = magnetPosition[0] - initialMagnetX;
-          translationY = magnetPosition[1] - initialMagnetY;
-        }
-
         this._hasActuallyMoved =
           this._hasActuallyMoved || translationX !== 0 || translationY !== 0;
-        this._objectMover.translate(
-          editor.getSelectedObjects() as Array<gdjs.RuntimeObject>,
-          translationX,
-          translationY
-        );
+
+        if (this._hasActuallyMoved) {
+          if (editorGrid.isSnappingEnabled(inputManager)) {
+            const initialSelectionLeft = this.initialSelectionAABB.min[0];
+            const initialSelectionRight = this.initialSelectionAABB.max[0];
+            const initialSelectionTop = this.initialSelectionAABB.min[1];
+            const initialSelectionBottom = this.initialSelectionAABB.max[1];
+            const initialSelectionCenterX =
+              (initialSelectionLeft + initialSelectionRight) / 2;
+            const initialSelectionCenterY =
+              (initialSelectionTop + initialSelectionBottom) / 2;
+            const magnetLeft = initialCursorX < initialSelectionCenterX;
+            const magnetTop = initialCursorY < initialSelectionCenterY;
+
+            const initialMagnetX = magnetLeft
+              ? initialSelectionLeft
+              : initialSelectionRight;
+            const initialMagnetY = magnetTop
+              ? initialSelectionTop
+              : initialSelectionBottom;
+            const magnetPosition: FloatPoint = [0, 0];
+            magnetPosition[0] = initialMagnetX + translationX;
+            magnetPosition[1] = initialMagnetY + translationY;
+            editorGrid.roundPositionToGrid(
+              magnetPosition,
+              !editorGrid.isSnappingEnabled(inputManager)
+            );
+            translationX = magnetPosition[0] - initialMagnetX;
+            translationY = magnetPosition[1] - initialMagnetY;
+          }
+
+          this._objectMover.translate(
+            editor.getSelectedObjects() as Array<gdjs.RuntimeObject>,
+            translationX,
+            translationY
+          );
+        }
       } else if (this.state === 'resizing') {
         console.log('Resizing', this.draggedButtonLocation);
         if (!this.draggedButtonLocation) {

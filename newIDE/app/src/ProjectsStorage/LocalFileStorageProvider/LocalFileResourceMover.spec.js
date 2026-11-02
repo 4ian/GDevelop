@@ -274,6 +274,62 @@ describe('LocalResourceMover', () => {
     expect(fetchedResources.erroredResources).toEqual([]);
   });
 
+  it('keeps downloaded resources inside the project folder', async () => {
+    const { project: testProject } = makeTestProject(gd);
+    project = testProject;
+    const addResource = (name: string, file: string, metadata: string) => {
+      const newResource = new gd.ImageResource();
+      newResource.setName(name);
+      newResource.setFile(file);
+      newResource.setMetadata(metadata);
+      testProject.getResourcesManager().addResource(newResource);
+      newResource.delete();
+    };
+    const urlWithPathInFilename =
+      'https://www.example.com/..%2F..%2Fdownloaded.sh';
+    addResource('MyResourceWithPathInUrl', urlWithPathInFilename, '');
+    addResource(
+      'MyBlobResourceWithPathInMetadata',
+      blobUrl,
+      '{"localFilePath": "../outside.png","extension":".png"}'
+    );
+    addResource('../../MyBlobResourceWithPathInName', blobUrl, '');
+
+    mockFn(optionalRequire.mockFsExtra.ensureDir).mockResolvedValue({});
+    mockFn(optionalRequire.mockFsExtra.existsSync).mockReturnValue(false);
+    mockFn(optionalRequire.mockElectron.ipcRenderer.invoke).mockResolvedValue();
+    // $FlowFixMe[method-unbinding]
+    mockFn(axios.get).mockResolvedValue({ data: 'fake-array-buffer-content' });
+
+    // $FlowFixMe[incompatible-type]
+    const options = makeMoveAllProjectResourcesOptions(project);
+    // $FlowFixMe[incompatible-type]
+    const fetchedResources = await moveUrlResourcesToLocalFiles(options);
+
+    expect(
+      optionalRequire.mockElectron.ipcRenderer.invoke
+    ).toHaveBeenCalledWith(
+      'local-file-download',
+      urlWithPathInFilename,
+      path.join('assets', '.._.._downloaded.sh')
+    );
+    expect(
+      optionalRequire.mockElectron.ipcRenderer.invoke
+    ).toHaveBeenCalledWith(
+      'local-file-save-from-arraybuffer',
+      'fake-array-buffer-content',
+      path.join('assets', 'MyBlobResourceWithPathInMetadata.png')
+    );
+    expect(
+      optionalRequire.mockElectron.ipcRenderer.invoke
+    ).toHaveBeenCalledWith(
+      'local-file-save-from-arraybuffer',
+      'fake-array-buffer-content',
+      path.join('assets', '.._.._MyBlobResourceWithPathInName')
+    );
+    expect(fetchedResources.erroredResources).toEqual([]);
+  });
+
   describe('Support for blobs', () => {
     it('fetches resources with blobs and can download them', async () => {
       project = makeTestProjectWithBlobResourcesToDownload();

@@ -1722,22 +1722,8 @@ namespace gdjs {
       time: 0,
     };
 
-    // Dragged new object:
     _draggedNewObject: gdjs.RuntimeObject | null = null;
-    _draggedSelectedObject: gdjs.RuntimeObject | null = null;
-    private _objectToDuplicateOnDrag: gdjs.RuntimeObject | null = null;
-    private _draggedSelectedObjectInitialX: float = 0;
-    private _draggedSelectedObjectInitialY: float = 0;
-    private _draggedSelectedObjectInitialZ: float = 0;
-    private _draggedSelectedObjectTotalDelta: SelectionMovement3D = {
-      translationX: 0,
-      translationY: 0,
-      translationZ: 0,
-      rotation: null,
-      scaleX: 1,
-      scaleY: 1,
-      scaleZ: 1,
-    };
+
     private _instancesEditorSettings: InstancesEditorSettings | null = null;
     private _toolbar: Toolbar;
     private _inGameEditorSettings: InGameEditorSettings;
@@ -2024,8 +2010,6 @@ namespace gdjs {
       this._hiddenInstanceMarkers.clear();
       this._selectionControls.remove();
       this._draggedNewObject = null;
-      this._draggedSelectedObject = null;
-      this._objectToDuplicateOnDrag = null;
       const selectedObjectIds = this._selection
         .getSelectedObjects()
         .map((object) => object.persistentUuid)
@@ -2802,139 +2786,8 @@ namespace gdjs {
       this._sendSelectionUpdate({ hasSelectedObjectBeenModified: true });
     }
 
-    private _handleSelectedObjectDragging(): void {
-      const inputManager = this._runtimeGame.getInputManager();
-
-      // Always check first if we should end an existing drag.
-      if (
-        this._draggedSelectedObject &&
-        (inputManager.isMouseButtonReleased(0) ||
-          !this._selectionControls.shouldDragSelectedObject())
-      ) {
-        this._draggedSelectedObject = null;
-        const changeHappened = this._objectMover3D.endMove();
-        this._sendSelectionUpdate({
-          hasSelectedObjectBeenModified: changeHappened,
-        });
-      }
-
-      if (
-        !inputManager.isMouseButtonPressed(0) ||
-        !this._selectionControls.shouldDragSelectedObject()
-      ) {
-        this._objectToDuplicateOnDrag = null;
-      }
-
-      // Inspect then if a drag should be started or continued.
-      if (!this._selectionControls.shouldDragSelectedObject()) {
-        // We can early return as the rest is not applicable (we've already checked
-        // if a drag should be ended).
-        return;
-      }
-      if (!this._currentScene) return;
-      const editedInstanceContainer = this.getEditedInstanceContainer();
-      if (!editedInstanceContainer) return;
-
-      if (
-        inputManager.isMouseButtonPressed(0) &&
-        !this._draggedSelectedObject
-      ) {
-        if (!this._objectToDuplicateOnDrag) {
-          const objectUnderCursor = this.getObjectUnderCursor();
-          if (
-            objectUnderCursor &&
-            this._selection.getSelectedObjects().includes(objectUnderCursor)
-          ) {
-            this._objectToDuplicateOnDrag = objectUnderCursor;
-          }
-        }
-        // Only duplicate once the cursor has moved, to avoid silently
-        // stacking a copy on the original with a Ctrl+click.
-        if (
-          this._objectToDuplicateOnDrag &&
-          !this._hasCursorStayedStillWhilePressed({ toleranceRadius: 3 })
-        ) {
-          const object = this._duplicateSelectedObjects(
-            this._objectToDuplicateOnDrag
-          );
-          this._objectToDuplicateOnDrag = null;
-          if (!object) {
-            return;
-          }
-          this._draggedSelectedObject = object;
-          this._draggedSelectedObjectInitialX = object.getX();
-          this._draggedSelectedObjectInitialY = object.getY();
-          this._draggedSelectedObjectInitialZ = is3D(object)
-            ? object.getZ()
-            : 0;
-          this._objectMover3D.startMove();
-        }
-      }
-
-      // Continue an existing drag.
-      if (!this._draggedSelectedObject) {
-        return;
-      }
-
-      let isIntersectionFound = false;
-      let intersectionX: float = 0;
-      let intersectionY: float = 0;
-      let intersectionZ: float = 0;
-      if (is3D(this._draggedSelectedObject)) {
-        const cursor = this._getCursorIn3D(
-          this._selection.getSelectedObjects()
-        );
-        if (cursor) {
-          isIntersectionFound = true;
-          [intersectionX, intersectionY, intersectionZ] = cursor;
-        }
-      } else {
-        const projectedCursor = this._getProjectedCursor();
-        if (projectedCursor) {
-          isIntersectionFound = true;
-          [intersectionX, intersectionY] = projectedCursor;
-        }
-      }
-      if (isIntersectionFound) {
-        this._editorGrid.setNormal('Z');
-        this._editorGrid.setPosition(
-          intersectionX,
-          intersectionY,
-          intersectionZ
-        );
-        const cameraLayer = this._getCameraLayer(
-          this._draggedSelectedObject.getLayer()
-        );
-        const threeScene = cameraLayer
-          ? cameraLayer.getRenderer().getThreeScene()
-          : null;
-        if (threeScene) {
-          this._editorGrid.setTreeScene(threeScene);
-        }
-        this._editorGrid.setVisible(true);
-        if (this._editorGrid.isSnappingEnabled(inputManager)) {
-          intersectionX = this._editorGrid.getSnappedX(intersectionX);
-          intersectionY = this._editorGrid.getSnappedY(intersectionY);
-        }
-        this._draggedSelectedObjectTotalDelta.translationX =
-          intersectionX - this._draggedSelectedObjectInitialX;
-        this._draggedSelectedObjectTotalDelta.translationY =
-          intersectionY - this._draggedSelectedObjectInitialY;
-        this._draggedSelectedObjectTotalDelta.translationZ =
-          intersectionZ - this._draggedSelectedObjectInitialZ;
-      } else {
-        this._draggedSelectedObjectTotalDelta.translationX = 0;
-        this._draggedSelectedObjectTotalDelta.translationY = 0;
-        this._draggedSelectedObjectTotalDelta.translationZ = 0;
-      }
-      this._objectMover3D.move(
-        this._selection.getSelectedObjects(),
-        this._draggedSelectedObjectTotalDelta
-      );
-    }
-
-    private _duplicateSelectedObjects(
-      objectUnderCursor: gdjs.RuntimeObject
+    _duplicateSelectedObjects(
+      objectUnderCursor: gdjs.RuntimeObject | null = null
     ): gdjs.RuntimeObject | null {
       const editedInstanceContainer = this.getEditedInstanceContainer();
       if (!editedInstanceContainer) return null;
@@ -3657,7 +3510,7 @@ namespace gdjs {
       }
     }
 
-    private _hasCursorStayedStillWhilePressed({
+    _hasCursorStayedStillWhilePressed({
       toleranceRadius,
     }: {
       toleranceRadius: float;
@@ -4779,7 +4632,6 @@ namespace gdjs {
       this._handlePointerLock();
       this._handleTransformControlsMode();
       this._handleCameraMovement();
-      this._handleSelectedObjectDragging();
       this._selectionControls.step();
       this._updateSelectionBox();
       this._handleSelection({ objectUnderCursor });
@@ -7099,12 +6951,29 @@ namespace gdjs {
     private _wasMovingLastFrame = false;
     private _objectMover: ObjectMover3D;
 
+    _draggedSelectedObject: gdjs.RuntimeObject | null = null;
+    private _objectToDuplicateOnDrag: gdjs.RuntimeObject | null = null;
+    private _draggedSelectedObjectInitialX: float = 0;
+    private _draggedSelectedObjectInitialY: float = 0;
+    private _draggedSelectedObjectInitialZ: float = 0;
+    private _draggedSelectedObjectTotalDelta: SelectionMovement3D = {
+      translationX: 0,
+      translationY: 0,
+      translationZ: 0,
+      rotation: null,
+      scaleX: 1,
+      scaleY: 1,
+      scaleZ: 1,
+    };
+
     constructor(editor: InGameEditor, objectMover: ObjectMover3D) {
       this.editor = editor;
       this._objectMover = objectMover;
     }
 
     step(): void {
+      this._handleSelectedObjectDragging();
+
       if (
         this._wasMovingLastFrame &&
         !this._selectionControlsMovementTotalDelta
@@ -7597,7 +7466,7 @@ namespace gdjs {
         this._isShown &&
         this.threeTransformControls &&
         !this.editor._draggedNewObject &&
-        !this.editor._draggedSelectedObject
+        !this._draggedSelectedObject
       ) {
         if (
           this._transformControlsMode === 'rotate' &&
@@ -7686,6 +7555,8 @@ namespace gdjs {
       this.dummyThreeObject.removeFromParent();
       this.editor.getEditorGrid().setVisible(false);
       this._isShown = false;
+      // this._draggedSelectedObject = null;
+      // this._objectToDuplicateOnDrag = null;
     }
 
     isShown(): boolean {
@@ -7767,6 +7638,135 @@ namespace gdjs {
 
     hasActuallyMoved(): boolean {
       return this._hasActuallyMoved;
+    }
+
+    private _handleSelectedObjectDragging(): void {
+      const inputManager = this.editor.getRuntimeGame().getInputManager();
+
+      // Always check first if we should end an existing drag.
+      if (
+        this._draggedSelectedObject &&
+        (inputManager.isMouseButtonReleased(0) ||
+          !this.shouldDragSelectedObject())
+      ) {
+        this._draggedSelectedObject = null;
+        const changeHappened = this._objectMover.endMove();
+        this.editor._sendSelectionUpdate({
+          hasSelectedObjectBeenModified: changeHappened,
+        });
+      }
+
+      if (
+        !inputManager.isMouseButtonPressed(0) ||
+        !this.shouldDragSelectedObject()
+      ) {
+        this._objectToDuplicateOnDrag = null;
+      }
+
+      // Inspect then if a drag should be started or continued.
+      if (!this.shouldDragSelectedObject()) {
+        // We can early return as the rest is not applicable (we've already checked
+        // if a drag should be ended).
+        return;
+      }
+      if (!this.editor.getCurrentScene()) return;
+      const editedInstanceContainer = this.editor.getEditedInstanceContainer();
+      if (!editedInstanceContainer) return;
+
+      if (
+        inputManager.isMouseButtonPressed(0) &&
+        !this._draggedSelectedObject
+      ) {
+        if (!this._objectToDuplicateOnDrag) {
+          const objectUnderCursor = this.editor.getObjectUnderCursor();
+          if (
+            objectUnderCursor &&
+            this.editor.getSelectedObjects().includes(objectUnderCursor)
+          ) {
+            this._objectToDuplicateOnDrag = objectUnderCursor;
+          }
+        }
+        // Only duplicate once the cursor has moved, to avoid silently
+        // stacking a copy on the original with a Ctrl+click.
+        if (
+          this._objectToDuplicateOnDrag &&
+          !this.editor._hasCursorStayedStillWhilePressed({ toleranceRadius: 3 })
+        ) {
+          const object = this.editor._duplicateSelectedObjects(
+            this._objectToDuplicateOnDrag
+          );
+          this._objectToDuplicateOnDrag = null;
+          if (!object) {
+            return;
+          }
+          this._draggedSelectedObject = object;
+          this._draggedSelectedObjectInitialX = object.getX();
+          this._draggedSelectedObjectInitialY = object.getY();
+          this._draggedSelectedObjectInitialZ = is3D(object)
+            ? object.getZ()
+            : 0;
+          this._objectMover.startMove();
+        }
+      }
+
+      // Continue an existing drag.
+      if (!this._draggedSelectedObject) {
+        return;
+      }
+
+      let isIntersectionFound = false;
+      let intersectionX: float = 0;
+      let intersectionY: float = 0;
+      let intersectionZ: float = 0;
+      if (is3D(this._draggedSelectedObject)) {
+        const cursor = this.editor._getCursorIn3D(
+          this.editor.getSelectedObjects() as Array<gdjs.RuntimeObject>
+        );
+        if (cursor) {
+          isIntersectionFound = true;
+          [intersectionX, intersectionY, intersectionZ] = cursor;
+        }
+      } else {
+        const projectedCursor = this.editor._getProjectedCursor();
+        if (projectedCursor) {
+          isIntersectionFound = true;
+          [intersectionX, intersectionY] = projectedCursor;
+        }
+      }
+      const editorGrid = this.editor.getEditorGrid();
+      if (isIntersectionFound) {
+        editorGrid.setNormal('Z');
+        editorGrid.setPosition(intersectionX, intersectionY, intersectionZ);
+        const cameraLayer = this.editor._getCameraLayer(
+          this._draggedSelectedObject.getLayer()
+        );
+        const threeScene = cameraLayer
+          ? cameraLayer.getRenderer().getThreeScene()
+          : null;
+        if (threeScene) {
+          editorGrid.setTreeScene(threeScene);
+        }
+        editorGrid.setVisible(true);
+        if (editorGrid.isSnappingEnabled(inputManager)) {
+          intersectionX = editorGrid.getSnappedX(intersectionX);
+          intersectionY = editorGrid.getSnappedY(intersectionY);
+        }
+        this._draggedSelectedObjectTotalDelta.translationX =
+          intersectionX - this._draggedSelectedObjectInitialX;
+        this._draggedSelectedObjectTotalDelta.translationY =
+          intersectionY - this._draggedSelectedObjectInitialY;
+        this._draggedSelectedObjectTotalDelta.translationZ =
+          intersectionZ - this._draggedSelectedObjectInitialZ;
+      } else {
+        this._draggedSelectedObjectTotalDelta.translationX = 0;
+        this._draggedSelectedObjectTotalDelta.translationY = 0;
+        this._draggedSelectedObjectTotalDelta.translationZ = 0;
+      }
+      console.log('move duplicated selection');
+      this._objectMover.move(
+        this.editor.getSelectedObjects() as Array<gdjs.RuntimeObject>,
+        this._draggedSelectedObjectTotalDelta
+      );
     }
   }
 
@@ -7880,6 +7880,7 @@ namespace gdjs {
     }
   }
 
+  // TODO Handle mobile syle.
   const selectionStyle = {
     bigButtonSize: 10,
     smallButtonSize: 8,
@@ -7940,6 +7941,7 @@ namespace gdjs {
 
     private _hasActuallyMoved = false;
     private _objectMover: ObjectMover2D;
+    hasDuplicatedSelection = false;
 
     constructor(objectMover: ObjectMover2D) {
       super();
@@ -8191,9 +8193,8 @@ namespace gdjs {
         } else if (isRotationButtonHovered) {
           this.state = 'rotating';
         } else if (isAreaHovered) {
-          if (!isControlOrCmdPressed(inputManager)) {
-            this.state = 'panning';
-          }
+          this.state = 'panning';
+          this.hasDuplicatedSelection = false;
           console.log('Start dragging');
         }
         if (this.state !== 'idle') {
@@ -8222,6 +8223,18 @@ namespace gdjs {
       editor.captureLeftMouseButton();
       const editorGrid = editor.getEditorGrid();
       if (this.state === 'panning') {
+        // Only duplicate once the cursor has moved, to avoid silently
+        // stacking a copy on the original with a Ctrl+click.
+        if (
+          isControlOrCmdPressed(inputManager) &&
+          !this.hasDuplicatedSelection &&
+          !editor._hasCursorStayedStillWhilePressed({ toleranceRadius: 3 })
+        ) {
+          editor._duplicateSelectedObjects();
+          this.hasDuplicatedSelection = true;
+          console.log('Duplicate selection');
+        }
+
         const cursorX = gdjs.evtTools.input.getCursorX(currentScene, '', 0);
         const cursorY = gdjs.evtTools.input.getCursorY(currentScene, '', 0);
         const initialCursorX = this.initialCursorPosition[0];

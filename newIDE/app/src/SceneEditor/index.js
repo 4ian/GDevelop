@@ -198,6 +198,7 @@ type Props = {|
   editorId: string,
   gameEditorMode: 'embedded-game' | 'instances-editor',
   setGameEditorMode: ('embedded-game' | 'instances-editor') => void,
+  setEditorMode: ('2d-editor' | '3d-editor') => void,
   onRestartInGameEditor: (reason: string) => void,
   showRestartInGameEditorAfterErrorButton: boolean,
   project: gdProject,
@@ -405,6 +406,9 @@ export default class SceneEditor extends React.Component<Props, State> {
       this.props.setGameEditorMode(
         this.state.instancesEditorSettings.gameEditorMode
       );
+    }
+    if (this.props.isActive && this.state.instancesEditorSettings.editorMode) {
+      this.props.setEditorMode(this.state.instancesEditorSettings.editorMode);
     }
 
     this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
@@ -914,6 +918,9 @@ export default class SceneEditor extends React.Component<Props, State> {
           this.state.instancesEditorSettings.gameEditorMode
         );
       }
+      if (this.state.instancesEditorSettings.editorMode) {
+        this.props.setEditorMode(this.state.instancesEditorSettings.editorMode);
+      }
 
       // When the scene is refocused, the selections are cleaned
       // to avoid cases where we hold references to instances or objects
@@ -978,6 +985,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         ...this.state.instancesEditorSettings,
         editorMode: newMode,
       });
+      this.props.setEditorMode(newMode);
     } else {
       const gameEditorMode =
         newMode === '3d-editor' ? 'embedded-game' : 'instances-editor';

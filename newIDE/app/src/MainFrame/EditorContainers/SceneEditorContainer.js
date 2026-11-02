@@ -316,6 +316,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
             editorId={this.props.editorId}
             gameEditorMode={this.props.gameEditorMode}
             setGameEditorMode={this.props.setGameEditorMode}
+            setEditorMode={this.props.setEditorMode}
             onRestartInGameEditor={this.props.onRestartInGameEditor}
             showRestartInGameEditorAfterErrorButton={
               this.props.showRestartInGameEditorAfterErrorButton

@@ -743,6 +743,9 @@ const MainFrame = (props: Props): React.MixedElement => {
     () => setGameEditorMode('embedded-game'),
     []
   );
+  const [editorMode, setEditorMode] = React.useState<'2d-editor' | '3d-editor'>(
+    '2d-editor'
+  );
 
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.
@@ -6281,6 +6284,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       ? 'embedded-game'
       : gameEditorMode,
     setGameEditorMode,
+    setEditorMode,
     editorTabs: state.editorTabs,
     currentProject: currentProject,
     currentFileMetadata: currentFileMetadata,
@@ -6437,6 +6441,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         onEnable={onEnableInGameEditor}
         previewDebuggerServer={previewDebuggerServer || null}
         onLaunchPreviewForInGameEdition={onLaunchPreviewForInGameEdition}
+        editorMode={editorMode}
       >
         <LineStackLayout noMargin>
           <SlowGraphicsRenderingIndicator />

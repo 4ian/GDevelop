@@ -213,6 +213,7 @@ type Props = {|
   |}) => Promise<void>,
   // Shown at the bottom of the game, above it (like indicators).
   children?: React.Node,
+  editorMode: '3d-editor' | '2d-editor',
 |};
 
 const DropTarget = makeDropTarget<{||}>(objectWithContextReactDndType);
@@ -238,6 +239,7 @@ export const EmbeddedGameFrame = ({
   enabled,
   onEnable,
   children,
+  editorMode,
 }: Props): React.MixedElement => {
   const [
     previewIndexHtmlLocation,
@@ -761,6 +763,7 @@ export const EmbeddedGameFrame = ({
     [previewDebuggerServer]
   );
 
+  const [isDraggedItem3D, setDraggedItem3D] = React.useState(false);
   const dropTargetRef = React.useRef<HTMLDivElement | null>(null);
 
   const dragNewInstance = React.useCallback(
@@ -778,6 +781,8 @@ export const EmbeddedGameFrame = ({
 
       const name = monitor.getItem().name;
       if (!name) return;
+
+      setDraggedItem3D(!!monitor.getItem().is3D);
 
       const clientOffset = monitor.getClientOffset();
       const dropTargetRect = dropTarget.getBoundingClientRect();
@@ -915,9 +920,17 @@ export const EmbeddedGameFrame = ({
               >
                 {canDrop && (
                   <div className={classes.hintText}>
-                    <Text color="inherit">
-                      <Trans>Drag here to add to the scene</Trans>
-                    </Text>
+                    {isDraggedItem3D || editorMode === '2d-editor' ? (
+                      <Text color="inherit">
+                        <Trans>Drag here to add to the scene</Trans>
+                      </Text>
+                    ) : (
+                      <Text color="inherit">
+                        <Trans>
+                          2D objects can't be edited when in 3D mode
+                        </Trans>
+                      </Text>
+                    )}
                   </div>
                 )}
               </div>

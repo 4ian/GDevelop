@@ -58,6 +58,7 @@ export type RenderEditorContainerProps = {|
   paneIdentifier: string,
   gameEditorMode: 'embedded-game' | 'instances-editor',
   setGameEditorMode: ('embedded-game' | 'instances-editor') => void,
+  setEditorMode: ('2d-editor' | '3d-editor') => void,
   projectItemName: ?string,
   editorId: string,
   project: ?gdProject,

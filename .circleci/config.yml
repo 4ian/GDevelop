@@ -60,9 +60,17 @@ commands:
             - << parameters.cache-key >>
       - run:
           name: Install Emscripten (for GDevelop.js)
+          # The downloads of the SDK sometimes fail: retry them.
           command: |
             if [ ! -d emsdk ]; then git clone https://github.com/juj/emsdk.git; fi
-            cd emsdk && ./emsdk install 3.1.21 && ./emsdk activate 3.1.21
+            cd emsdk
+            for i in 1 2 3; do
+              ./emsdk install 3.1.21 && break
+              if [ $i -eq 3 ]; then exit 1; fi
+              echo "Installing the Emscripten SDK failed, retrying in 10 seconds..."
+              sleep 10
+            done
+            ./emsdk activate 3.1.21
   save-emscripten-sdk:
     parameters:
       cache-key:

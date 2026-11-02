@@ -2009,12 +2009,24 @@ namespace gdjs {
             return;
           }
           const playerNumber = parseInt(matches[1], 10);
+          const isCurrentPlayerHost = gdjs.multiplayer.isCurrentPlayerHost();
+          // Heartbeat requests and answers share this prefix. Ignore a late answer
+          // if a lobby transition makes us interpret it as the host's player list.
+          if (
+            !isCurrentPlayerHost &&
+            (!messageData ||
+              typeof messageData.playersInfo !== 'object' ||
+              !messageData.playersInfo)
+          ) {
+            return;
+          }
+
           // Ensure we know who is who.
           _peerIdToPlayerNumber[messageSender] = playerNumber;
 
           // If we are not the host, save what the host told us about the other players info
           // and respond with a heartbeat immediately, informing the host of our playerId and username.
-          if (!gdjs.multiplayer.isCurrentPlayerHost()) {
+          if (!isCurrentPlayerHost) {
             const currentPlayerNumber =
               gdjs.multiplayer.getCurrentPlayerNumber();
             const currentlyKnownPlayerNumbers = Object.keys(_playersInfo).map(

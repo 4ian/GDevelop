@@ -313,6 +313,11 @@ const ResourcePropertiesEditor: React.ComponentType<{
               .getValue(),
           onUpdateProperty: (resource, name, value) => {
             resource.updateProperty(name, value);
+            // Properties (like smoothing) change how the resource is displayed:
+            // let the editors (scene editors, in-game editor...) reload it.
+            triggerOnResourceExternallyChanged({
+              identifier: resource.getFile(),
+            });
             forceUpdate();
           },
           layersContainer: null,

@@ -263,9 +263,9 @@ const applyPixiTextureSettings = (resource: gdResource, texture: any) => {
   if (resource.getKind() !== 'image') return;
 
   const imageResource = gd.asImageResource(resource);
-  if (!imageResource.isSmooth()) {
-    texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
-  }
+  texture.baseTexture.scaleMode = imageResource.isSmooth()
+    ? PIXI.SCALE_MODES.LINEAR
+    : PIXI.SCALE_MODES.NEAREST;
 };
 
 const applyThreeTextureSettings = (
@@ -276,10 +276,11 @@ const applyThreeTextureSettings = (
   if (resource.getKind() !== 'image') return;
 
   const imageResource = gd.asImageResource(resource);
-  if (!imageResource.isSmooth()) {
-    threeTexture.magFilter = THREE.NearestFilter;
-    threeTexture.minFilter = THREE.NearestFilter;
-  }
+  const filter = imageResource.isSmooth()
+    ? THREE.LinearFilter
+    : THREE.NearestFilter;
+  threeTexture.magFilter = filter;
+  threeTexture.minFilter = filter;
 };
 
 // If modifying this function, make sure to update Resource3DPreview.worker.js copy.
@@ -545,8 +546,16 @@ export default class PixiResourcesLoader {
       );
       if (currentUrl === loadedEntry.loadedFromUrl) {
         console.info(
-          `Resource "${resourceName}" file/URL is unchanged: keeping the already loaded texture (no reload needed).`
+          `Resource "${resourceName}" file/URL is unchanged: keeping the already loaded texture and only applying its settings.`
         );
+        // The settings (like smoothing) may have changed without the file changing.
+        const resource = resourcesManager.getResource(resourceName);
+        applyPixiTextureSettings(resource, loadedEntry.pixiTexture);
+        if (loadedOrLoadingThreeTextures[resourceName]) {
+          const threeTexture = await loadedOrLoadingThreeTextures[resourceName];
+          applyThreeTextureSettings(resource, threeTexture);
+          threeTexture.needsUpdate = true;
+        }
         return;
       }
     }
@@ -969,8 +978,6 @@ export default class PixiResourcesLoader {
     }
 
     const threeTexture = new THREE.Texture(image);
-    threeTexture.magFilter = THREE.LinearFilter;
-    threeTexture.minFilter = THREE.LinearFilter;
     threeTexture.wrapS = THREE.RepeatWrapping;
     threeTexture.wrapT = THREE.RepeatWrapping;
     threeTexture.colorSpace = THREE.SRGBColorSpace;

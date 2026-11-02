@@ -27,3 +27,26 @@
     };
   }
 })();
+
+// Prevent `SpineTexture.dispose` (called by `TextureAtlas.dispose` during
+// `PIXI.Assets.unload`) from destroying the `PIXI.Texture` returned by
+// `PIXI.Texture.from(baseTexture)`: that texture is owned by GDevelop's
+// `PixiImageManager` and may still be shared with other scenes or objects.
+// Its lifecycle is managed by `PixiImageManager.unloadResource`.
+(function () {
+  if (
+    typeof spine !== "undefined" &&
+    spine.SpineTexture &&
+    spine.SpineTexture.prototype
+  ) {
+    spine.SpineTexture.prototype.dispose = function () {
+      if (
+        this.texture &&
+        this.texture.baseTexture &&
+        spine.SpineTexture.textureMap
+      ) {
+        spine.SpineTexture.textureMap.delete(this.texture.baseTexture);
+      }
+    };
+  }
+})();

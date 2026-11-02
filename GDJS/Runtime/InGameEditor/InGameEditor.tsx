@@ -7844,11 +7844,26 @@ namespace gdjs {
       }
       editorGrid.setTreeScene(threeScene);
       editorGrid.setVisible(true);
+      // Allow a stable grid divisions count when orbitting the camera in 3D.
+      const cameraDistance = cameraCenter
+        ? Math.hypot(
+            topLayer.getCameraX() - cameraCenter[0],
+            topLayer.getCameraY() - cameraCenter[1],
+            topLayer.getCameraZ(null)
+          )
+        : Math.abs(topLayer.getCameraZ(null));
+      const zoomFactor = Math.min(
+        Number.MAX_SAFE_INTEGER,
+        (0.5 * topLayer.getHeight()) /
+          (cameraDistance *
+            Math.tan(0.5 * gdjs.toRad(topLayer.getCamera3DFieldOfView())))
+      );
       editorGrid.setDivisionsCount(
         Math.floor(
           Math.max(
-            game.getGameResolutionWidth() / editorGrid.gridHeight,
-            game.getGameResolutionHeight() / editorGrid.gridWidth
+            game.getGameResolutionWidth() /
+              (editorGrid.gridHeight * zoomFactor),
+            game.getGameResolutionHeight() / (editorGrid.gridWidth * zoomFactor)
           )
         ) + 1
       );

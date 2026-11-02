@@ -1775,6 +1775,7 @@ namespace gdjs {
         isFreeCamera: () => this._getEditorCamera().isFreeCamera(),
         getSvgIconUrl: (iconName: string) => getSvgIconUrl(game, iconName),
         hasSelectionControlsShown: () => !!this._selectionControls.isShown(),
+        getEditorMode: () => this.getEditorMode(),
       });
 
       this._applyInGameEditorSettings();
@@ -3686,11 +3687,10 @@ namespace gdjs {
         editedInstanceContainer._setLayerDefaultZOrders();
         const newObject = editedInstanceContainer.createObject(name);
         if (!newObject) return;
-        // TODO
-        // if (!is3D(newObject)) {
-        //   editedInstanceContainer.markObjectForDeletion(newObject);
-        //   return;
-        // }
+        if (!is3D(newObject) && this.getEditorMode() !== '2d-editor') {
+          editedInstanceContainer.markObjectForDeletion(newObject);
+          return;
+        }
         newObject.persistentUuid = gdjs.makeUuid();
         newObject.setLayer(selectedLayer.getName());
         newObject.setZOrder(selectedLayer.getDefaultZOrder());
@@ -4709,6 +4709,7 @@ namespace gdjs {
     private _isFreeCamera: () => boolean;
     private _getSvgIconUrl: (iconName: string) => string;
     private _hasSelectionControlsShown: () => boolean;
+    private _getEditorMode: () => '3d-editor' | '2d-editor';
 
     private addOrUpdateToolbarStyle() {
       const id = 'InGameEditor-Toolbar-Style';
@@ -4859,6 +4860,7 @@ namespace gdjs {
       isFreeCamera,
       getSvgIconUrl,
       hasSelectionControlsShown,
+      getEditorMode,
     }: {
       getTransformControlsMode: () => 'translate' | 'rotate' | 'scale';
       setTransformControlsMode: (
@@ -4870,6 +4872,7 @@ namespace gdjs {
       isFreeCamera: () => boolean;
       getSvgIconUrl: (iconName: string) => string;
       hasSelectionControlsShown: () => boolean;
+      getEditorMode: () => '3d-editor' | '2d-editor';
     }) {
       this._getTransformControlsMode = getTransformControlsMode;
       this._setTransformControlsMode = setTransformControlsMode;
@@ -4879,6 +4882,7 @@ namespace gdjs {
       this._isFreeCamera = isFreeCamera;
       this._getSvgIconUrl = getSvgIconUrl;
       this._hasSelectionControlsShown = hasSelectionControlsShown;
+      this._getEditorMode = getEditorMode;
 
       this.addOrUpdateToolbarStyle();
     }
@@ -4986,8 +4990,9 @@ namespace gdjs {
         };
       }
 
-      // TODO Hide the main toolbar in 2D mode?
-      const displayed = this._hasSelectionControlsShown();
+      const displayed =
+        this._hasSelectionControlsShown() &&
+        this._getEditorMode() !== '2d-editor';
 
       this._renderedElements.container.tabIndex = displayed ? 0 : -1;
       this._renderedElements.container.style.transform = displayed

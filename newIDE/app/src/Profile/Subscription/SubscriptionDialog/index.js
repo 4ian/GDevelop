@@ -113,6 +113,7 @@ export default function SubscriptionDialog({
     buyUpdateOrCancelPlan,
     cancelReasonDialogOpen,
     setCancelReasonDialogOpen,
+    passwordPromptDialog,
   } = useBuyUpdateOrCancelPlan({
     onOpenPendingDialog,
     couponCode,
@@ -493,6 +494,7 @@ export default function SubscriptionDialog({
               </Text>
             </Dialog>
           )}
+          {passwordPromptDialog}
           {cancelReasonDialogOpen && (
             <CancelReasonDialog
               onClose={() => {

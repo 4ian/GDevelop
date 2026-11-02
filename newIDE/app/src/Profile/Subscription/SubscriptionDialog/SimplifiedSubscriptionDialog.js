@@ -347,7 +347,10 @@ export default function SimplifiedSubscriptionDialog({
     ? 'rgba(0, 0, 0, 0.08)'
     : 'rgba(255, 255, 255, 0.08)';
 
-  const { buyUpdateOrCancelPlan } = useBuyUpdateOrCancelPlan({
+  const {
+    buyUpdateOrCancelPlan,
+    passwordPromptDialog,
+  } = useBuyUpdateOrCancelPlan({
     onOpenPendingDialog,
     couponCode,
     dialogVariant: 'simplified',
@@ -640,6 +643,7 @@ export default function SimplifiedSubscriptionDialog({
       {({ i18n }) => (
         <Dialog title={null} open maxWidth="md" flexColumnBody noPadding>
           {renderContent(i18n)}
+          {passwordPromptDialog}
         </Dialog>
       )}
     </I18n>

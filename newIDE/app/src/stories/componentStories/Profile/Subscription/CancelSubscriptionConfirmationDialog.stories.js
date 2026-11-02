@@ -76,6 +76,16 @@ const mockShopApi = ({ delayResponse }: {| delayResponse?: number |}) => {
         productType: 'GAME_TEMPLATE',
         productId: nextMonthGameTemplateListingData.id,
       },
+      {
+        month: getMonth(2),
+        productType: 'ASSET_PACK',
+        productId: claimableAssetPackListingData.id,
+      },
+      {
+        month: getMonth(2),
+        productType: 'GAME_TEMPLATE',
+        productId: claimableGameTemplateListingData.id,
+      },
     ])
     .onAny()
     .reply(config => {
@@ -184,6 +194,26 @@ const DialogWithUser = ({
 export const MonthlyWithUnclaimedProducts = (): React.Node => {
   mockShopApi({});
   return <DialogWithUser authenticatedUser={monthlyGoldAuthenticatedUser} />;
+};
+
+export const MonthlyRenewingNextMonth = (): React.Node => {
+  mockShopApi({});
+  return (
+    <DialogWithUser
+      authenticatedUser={{
+        ...monthlyGoldAuthenticatedUser,
+        subscription: {
+          ...subscriptionForGoldUser,
+          pricingSystemId: fakeGoldMonthlyPricingSystem.id,
+          endOfPeriodAt: new Date(
+            new Date().getFullYear(),
+            new Date().getMonth() + 1,
+            2
+          ).getTime(),
+        },
+      }}
+    />
+  );
 };
 
 export const MonthlyWithEverythingClaimed = (): React.Node => {

@@ -142,6 +142,12 @@ const getNotificationPrimaryTextByType = (
   return null;
 };
 
+// Notifications of types unknown to this version are not displayed,
+// so they must not be counted as unseen either.
+export const isNotificationDisplayable = (
+  notification: Notification
+): boolean => !!getNotificationPrimaryTextByType(notification);
+
 const getNotificationClickCallback = ({
   notification,
   addRouteArguments,

@@ -6,7 +6,11 @@ import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
 import RaisedButton from '../../UI/RaisedButton';
 import Text from '../../UI/Text';
-import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
+import {
+  ColumnStackLayout,
+  LineStackLayout,
+  ResponsiveLineStackLayout,
+} from '../../UI/Layout';
 import { ImageWithFallback } from '../../UI/ImageWithFallback';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import {
@@ -34,12 +38,14 @@ const styles = {
     borderRadius: 4,
     flexShrink: 0,
   },
-  upcomingProduct: { opacity: 0.5 },
+  product: { flex: 1, minWidth: 0 },
+  upcomingProduct: { flex: 1, minWidth: 0, opacity: 0.5 },
 };
 
-const getNextMonthStartDate = (): Date => {
-  const now = new Date();
-  return new Date(now.getFullYear(), now.getMonth() + 1, 1);
+// Drops happen at the start of each month: the first one missed is the one after the end of the period.
+const getFirstMissedDropDate = (endOfPeriodAt: ?number): Date => {
+  const date = endOfPeriodAt ? new Date(endOfPeriodAt) : new Date();
+  return new Date(date.getFullYear(), date.getMonth() + 1, 1);
 };
 
 const getMonth = (date: Date): string =>
@@ -56,7 +62,7 @@ type Props = {|
 /**
  * Asks to confirm the cancellation, showing the benefits that will be lost,
  * the free products the user has not claimed yet and, for monthly subscriptions,
- * the ones of next month.
+ * the first ones they will miss.
  */
 const CancelSubscriptionConfirmationDialog = ({
   userSubscriptionPlanEvenIfLegacy,
@@ -76,8 +82,8 @@ const CancelSubscriptionConfirmationDialog = ({
     setUnclaimedProductListingDatas,
   ] = React.useState<?Array<ProductListingData>>(null);
   const [
-    nextMonthProductListingDatas,
-    setNextMonthProductListingDatas,
+    missedProductListingDatas,
+    setMissedProductListingDatas,
   ] = React.useState<?Array<ProductListingData>>(null);
 
   const pricingSystem =
@@ -86,15 +92,12 @@ const CancelSubscriptionConfirmationDialog = ({
           pricingSystem => pricingSystem.id === subscription.pricingSystemId
         )
       : null;
-  const nextMonthStartDate = getNextMonthStartDate();
-  // Yearly subscribers keep their subscription for months after cancelling,
-  // and monthly ones whose period ends after next drop will still get it.
-  const willMissNextMonthProducts =
-    !!pricingSystem &&
-    pricingSystem.period === 'month' &&
-    !!subscription &&
-    (!subscription.endOfPeriodAt ||
-      subscription.endOfPeriodAt < nextMonthStartDate.getTime());
+  const firstMissedDropDate = getFirstMissedDropDate(
+    subscription ? subscription.endOfPeriodAt : null
+  );
+  // Yearly subscribers keep their subscription for months after cancelling.
+  const shouldShowMissedProducts =
+    !!pricingSystem && pricingSystem.period === 'month';
 
   React.useEffect(
     () => {
@@ -107,7 +110,7 @@ const CancelSubscriptionConfirmationDialog = ({
           ] = await Promise.all([
             listListedPrivateAssetPacks(),
             listListedPrivateGameTemplates(),
-            willMissNextMonthProducts ? listGivenAwayProducts() : [],
+            shouldShowMissedProducts ? listGivenAwayProducts() : [],
           ]);
           setUnclaimedProductListingDatas(
             getClaimableProductListingDatas({
@@ -118,7 +121,7 @@ const CancelSubscriptionConfirmationDialog = ({
               receivedGameTemplates,
             })
           );
-          const nextMonth = getMonth(nextMonthStartDate);
+          const firstMissedDropMonth = getMonth(firstMissedDropDate);
           const productListingDatas: Array<ProductListingData> = [
             ...privateAssetPackListingDatas,
             ...privateGameTemplateListingDatas,
@@ -129,11 +132,11 @@ const CancelSubscriptionConfirmationDialog = ({
               ...(receivedGameTemplates || []),
             ].map(receivedProduct => receivedProduct.id)
           );
-          setNextMonthProductListingDatas(
+          setMissedProductListingDatas(
             givenAwayProducts
               .filter(
                 givenAwayProduct =>
-                  givenAwayProduct.month === nextMonth &&
+                  givenAwayProduct.month === firstMissedDropMonth &&
                   !receivedProductIds.has(givenAwayProduct.productId)
               )
               .map(givenAwayProduct =>
@@ -150,7 +153,7 @@ const CancelSubscriptionConfirmationDialog = ({
             error
           );
           setUnclaimedProductListingDatas([]);
-          setNextMonthProductListingDatas([]);
+          setMissedProductListingDatas([]);
         }
       })();
     },
@@ -180,7 +183,7 @@ const CancelSubscriptionConfirmationDialog = ({
   ) => (
     <div
       key={productListingData.id}
-      style={canClaim ? undefined : styles.upcomingProduct}
+      style={canClaim ? styles.product : styles.upcomingProduct}
     >
       <LineStackLayout noMargin alignItems="center">
         <ImageWithFallback
@@ -197,26 +200,28 @@ const CancelSubscriptionConfirmationDialog = ({
               <Trans>Asset pack</Trans>
             )}
           </Text>
+          {canClaim && (
+            <LineStackLayout noMargin>
+              <RaisedButton
+                primary
+                label={<Trans>Claim it in the store</Trans>}
+                onClick={() => openInStore(productListingData)}
+              />
+            </LineStackLayout>
+          )}
         </ColumnStackLayout>
-        {canClaim && (
-          <RaisedButton
-            primary
-            label={<Trans>Claim it in the store</Trans>}
-            onClick={() => openInStore(productListingData)}
-          />
-        )}
       </LineStackLayout>
     </div>
   );
 
-  const isLoading =
-    !unclaimedProductListingDatas || !nextMonthProductListingDatas;
+  const isLoading = !unclaimedProductListingDatas || !missedProductListingDatas;
 
   return (
     <Dialog
       title={<Trans>Cancel your subscription?</Trans>}
       open
-      maxWidth="sm"
+      maxWidth="md"
+      fullHeight
       onRequestClose={onClose}
       onApply={onConfirm}
       actions={[
@@ -238,6 +243,19 @@ const CancelSubscriptionConfirmationDialog = ({
         <PlaceholderLoader />
       ) : (
         <ColumnStackLayout noMargin>
+          {unclaimedProductListingDatas &&
+            unclaimedProductListingDatas.length > 0 && (
+              <ColumnStackLayout noMargin>
+                <Text size="sub-title" noMargin>
+                  <Trans>You have not claimed this month's free products</Trans>
+                </Text>
+                <ResponsiveLineStackLayout noMargin>
+                  {unclaimedProductListingDatas.map(productListingData =>
+                    renderProduct(productListingData, true)
+                  )}
+                </ResponsiveLineStackLayout>
+              </ColumnStackLayout>
+            )}
           <I18n>
             {({ i18n }) => (
               <Text>
@@ -261,36 +279,29 @@ const CancelSubscriptionConfirmationDialog = ({
               subscriptionPlanWithPricingSystems={
                 userSubscriptionPlanEvenIfLegacy
               }
-              comparedSubscriptionPlanWithPricingSystems={freeSubscriptionPlan}
+              nextSubscriptionPlanWithPricingSystems={freeSubscriptionPlan}
               hideFullTableLink
             />
           )}
-          <ColumnStackLayout noMargin>
-            {unclaimedProductListingDatas &&
-              unclaimedProductListingDatas.length > 0 && (
-                <ColumnStackLayout noMargin>
+          {missedProductListingDatas && missedProductListingDatas.length > 0 && (
+            <ColumnStackLayout noMargin>
+              <I18n>
+                {({ i18n }) => (
                   <Text size="sub-title" noMargin>
                     <Trans>
-                      You have not claimed this month's free products
+                      Coming on {i18n.date(firstMissedDropDate)}, free for
+                      subscribers
                     </Trans>
                   </Text>
-                  {unclaimedProductListingDatas.map(productListingData =>
-                    renderProduct(productListingData, true)
-                  )}
-                </ColumnStackLayout>
-              )}
-            {nextMonthProductListingDatas &&
-              nextMonthProductListingDatas.length > 0 && (
-                <ColumnStackLayout noMargin>
-                  <Text size="sub-title" noMargin>
-                    <Trans>Coming next month, free for subscribers</Trans>
-                  </Text>
-                  {nextMonthProductListingDatas.map(productListingData =>
-                    renderProduct(productListingData, false)
-                  )}
-                </ColumnStackLayout>
-              )}
-          </ColumnStackLayout>
+                )}
+              </I18n>
+              <ResponsiveLineStackLayout noMargin>
+                {missedProductListingDatas.map(productListingData =>
+                  renderProduct(productListingData, false)
+                )}
+              </ResponsiveLineStackLayout>
+            </ColumnStackLayout>
+          )}
         </ColumnStackLayout>
       )}
     </Dialog>

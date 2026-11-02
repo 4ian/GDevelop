@@ -68,6 +68,7 @@ type Props = {|
   recommendedPlanId: ?string,
   onOpenPendingDialog: (open: boolean) => void,
   couponCode?: ?string,
+  onOpenStore?: ?() => void,
 |};
 
 export default function SubscriptionDialog({
@@ -77,6 +78,7 @@ export default function SubscriptionDialog({
   recommendedPlanId,
   onOpenPendingDialog,
   couponCode,
+  onOpenStore,
 }: Props): React.Node {
   const [
     educationPlanSeatsCount,
@@ -519,6 +521,7 @@ export default function SubscriptionDialog({
               onOpenStore={() => {
                 setCancelConfirmationDialogOpen(false);
                 onClose();
+                if (onOpenStore) onOpenStore();
               }}
             />
           )}

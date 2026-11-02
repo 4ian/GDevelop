@@ -841,7 +841,7 @@ export const getCalloutToGetSubscriptionOrClaimProduct = ({
 };
 
 /**
- * The products given away to subscribers this month and the next one.
+ * The products given away to subscribers this month and the next two.
  */
 export type GivenAwayProduct = {|
   /** Formatted as YYYY-MM. */

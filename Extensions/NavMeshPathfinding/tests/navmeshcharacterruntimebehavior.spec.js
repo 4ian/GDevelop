@@ -315,6 +315,29 @@ describe('gdjs.NavMeshCharacterRuntimeBehavior', function () {
     expect(getPathLength(character)).to.be.within(180, 220);
   });
 
+  it('can find a shorter path when an obstacle moves away', function () {
+    const blockingObstacle = addObstacle(runtimeScene, 50, 300);
+    blockingObstacle.setPosition(475, 150);
+    character.setPosition(400, 300);
+    runtimeScene.renderAndStep(1000 / 60);
+    runtimeScene.renderAndStep(1000 / 60);
+
+    getCharacterBehavior(character).moveTo(600, 300, 0);
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(getPathLength(character)).to.be.above(240);
+
+    blockingObstacle.setPosition(475, 500);
+    // Only the tiles around the obstacle are built again, without waiting
+    // for a whole second.
+    for (let stepIndex = 0; stepIndex < 10; stepIndex++) {
+      runtimeScene.renderAndStep(1000 / 60);
+    }
+    character.setPosition(400, 300);
+    getCharacterBehavior(character).moveTo(600, 300, 0);
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(getPathLength(character)).to.be.within(180, 220);
+  });
+
   it('frees the navigation mesh and the crowd when the scene is unloaded', function () {
     character.setPosition(400, 300);
     runtimeScene.renderAndStep(1000 / 60);

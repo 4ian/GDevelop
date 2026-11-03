@@ -65,6 +65,7 @@ import {
   CrowdAgentParams,
   CrowdParams,
   NavMeshQueryParams,
+  RawModule,
 } from 'recast-navigation';
 
 import {
@@ -154,6 +155,7 @@ declare global {
       CrowdAgentParams,
       CrowdParams,
       NavMeshQueryParams,
+      RawModule,
       buildTiledNavMeshRcConfig,
       createDefaultTileCacheMeshProcess,
       dtIlog2,

@@ -20,11 +20,40 @@ namespace gdjs {
   };
 
   /**
+   * Building a tile of 32x32 cells takes 1 to 3 milliseconds: at most this
+   * many cells of tiles are built per frame, after obstacles changed or when
+   * the navigation mesh is first built (a whole level).
+   */
+  const cellsBuiltPerFrameMax = 4 * 32 * 32;
+  /**
+   * Obstacles moving continuously (pushed, falling...) would rebuild their
+   * tiles at every frame: tiles are rebuilt at most 10 times per second,
+   * so the navigation mesh follows obstacles with a delay of a tenth of a
+   * second at most.
+   */
+  const tilesUpdateInterval = 0.1;
+  /**
+   * Paths are searched again at most once per second after the navigation
+   * mesh changed, like when the whole navigation mesh was rebuilt.
+   */
+  const pathsRefreshInterval = 1;
+  /**
+   * How far from a position the navigation mesh is searched for characters
+   * and destinations.
+   */
+  const searchHalfExtent = 100;
+
+  type NavMeshTileCoordinates = { x: integer; y: integer };
+
+  /**
    * NavMeshObstaclesManager manages the common objects shared by objects
    * having a pathfinding behavior: In particular, the obstacles behaviors are
    * required to declare themselves (see
    * `NavMeshObstaclesManager.addObstacle`) to the manager of their
    * associated container (see `NavMeshObstaclesManager.getManager`).
+   *
+   * The navigation mesh is made of tiles: when an obstacle changes, only the
+   * tiles around it are built again.
    * @category Behaviors > NavMesh pathfinding
    */
   export class NavMeshObstaclesManager {
@@ -33,19 +62,25 @@ namespace gdjs {
     characters = new Set<NavMeshCharacterRuntimeBehavior>();
     is3D = false;
     navMesh: RecastNav.NavMesh | null = null;
-    private navMeshConfig: Partial<RecastNav.SoloNavMeshGeneratorConfig> = {
-      cs: 10,
-      ch: 10,
-      walkableSlopeAngle: 50,
-      walkableHeight: 15,
-      // In cell depths: the navmesh height is at most 1 cell away from the
-      // floors (for characters on hills).
-      detailSampleMaxError: 1,
-      walkableClimb: 2,
-      walkableRadius: 1,
-    };
+    private tileBuilder: gdjs.NavMeshTileBuilder | null = null;
+    private obstacleGeometries = new Map<
+      NavMeshObstacleRuntimeBehavior,
+      gdjs.NavMeshObstacleGeometry
+    >();
+    /** The tiles to build, in the order they are built. */
+    private tilesToBuild = new Map<integer, NavMeshTileCoordinates>();
+    private tileVertices: Array<float> = [];
+    /** In 2D, the ground goes around the obstacles. */
+    private groundArea: gdjs.NavMeshArea | null = null;
+    private obstaclesAreaAroundGround: gdjs.NavMeshArea | null = null;
+    private isFirstBuildInProgress = false;
+    private haveTilesChangedSincePathsRefresh = false;
+    private timeSincePathsRefresh: float = 0;
+    private timeSinceTilesUpdate: float = 0;
+    private crowdCapacity: integer = 0;
     cellSize: float = 10;
     cellDepth: float = 10;
+    slopeMaxAngle: float = 50;
     walkableRadius: float = -1;
     walkableDepth: float = 150;
     stairHeightMax: float = 20;
@@ -66,7 +101,7 @@ namespace gdjs {
       }
       this.cellSize = Math.max(0, sharedData.cellSize) || 10;
       this.cellDepth = sharedData.cellDepth;
-      this.navMeshConfig.walkableSlopeAngle = sharedData.slopeMaxAngle;
+      this.slopeMaxAngle = sharedData.slopeMaxAngle;
       this.stairHeightMax = sharedData.stairHeightMax;
       this.walkableDepth = sharedData.walkableDepth;
       this.walkableRadius = sharedData.walkableRadius;
@@ -97,22 +132,32 @@ namespace gdjs {
       }
       this.hasStepped = true;
       this.timeSinceLastNavMeshLastRebuild += timeDelta;
+      this.timeSincePathsRefresh += timeDelta;
+      this.timeSinceTilesUpdate += timeDelta;
       // Don't try to build the nav mesh before the events get a chance
       // to build the level.
       if (!this.isFirstFrame) {
         this.rebuildNavMeshIfNeeded();
+        this.buildTilesOfFrame();
       }
       this.isFirstFrame = false;
 
       if (!this.crowd) {
         return;
       }
+      this.refreshPathsIfNeeded();
       for (const character of this.characters) {
+        this.placeLostAgentBackOnNavMesh(character);
         character.teleportAgentToObjectIfNeeded();
       }
       this.crowd.update(timeDelta); //1 / 60, timeDelta, 8);
     }
 
+    /**
+     * Build the whole navigation mesh again (for instance, when the radius
+     * of characters changed). Obstacles only rebuild the tiles around them
+     * (see `updateObstacle`).
+     */
     invalidateNavMesh(): void {
       this.isNavMeshDirty = true;
     }
@@ -123,48 +168,123 @@ namespace gdjs {
       }
       this.timeSinceLastNavMeshLastRebuild = 0;
       this.isNavMeshDirty = false;
-      const positions: Array<float> = [];
-      const indices: Array<integer> = [];
-      for (const obstacle of this.obstacles) {
-        const object = obstacle.owner;
-        const firstObstacleIndex = indices.length;
-        // Surfaces are in 3D: they are ignored by 2D navigation meshes.
-        const surface = this.is3D ? object.getSurface() : null;
-        if (surface && gdjs.Base3DHandler.is3D(object)) {
-          this.addSurfaceFor(object, surface, positions, indices);
-        } else if (gdjs.Base3DHandler.is3D(object)) {
-          if (isModel3D(object) && obstacle._shape === 'Mesh') {
-            this.addMeshFor(object, obstacle, positions, indices);
-          } else {
-            this.addBoxFor(object, positions, indices);
-          }
-        } else if (!this.is3D) {
-          this.addPolygonsFor(object, positions, indices);
-        }
-        if (obstacle._isObstacleOnly) {
-          this.makeTrianglesNotWalkable(positions, indices, firstObstacleIndex);
+      this.buildNavMesh();
+    }
+
+    private buildNavMesh(): void {
+      const recastModule = gdjs.NavMeshTileBuilder.recastModule;
+      if (!recastModule) {
+        return;
+      }
+      const obstaclesArea = this.getObstaclesArea();
+      const groundArea = this.is3D ? null : this.getGroundArea(obstaclesArea);
+      const area = groundArea || obstaclesArea;
+      if (!area) {
+        return;
+      }
+      const tileBuilder = new gdjs.NavMeshTileBuilder(
+        recastModule,
+        this.getTileConfiguration(),
+        area
+      );
+      const navMesh = tileBuilder.createNavMesh();
+      if (!navMesh) {
+        tileBuilder.dispose();
+        return;
+      }
+      const isFirstBuild = !this.navMesh;
+      const oldNavMesh = this.navMesh;
+      const oldTileBuilder = this.tileBuilder;
+      const oldCrowd = this.crowd;
+      this.navMesh = navMesh;
+      this.tileBuilder = tileBuilder;
+      this.groundArea = groundArea;
+      this.obstaclesAreaAroundGround = groundArea ? obstaclesArea : null;
+
+      this.tilesToBuild.clear();
+      if (groundArea) {
+        this.addTilesToBuildIn(groundArea);
+      } else {
+        for (const obstacle of this.obstacles) {
+          this.addTilesToBuildIn(this.getObstacleGeometry(obstacle).area);
         }
       }
-      if (!this.is3D) {
-        this.addGroundFor2D(positions, indices);
-        this.navMeshConfig.walkableClimb = 0.1;
-        this.navMeshConfig.walkableHeight = 2;
-        this.navMeshConfig.ch = this.cellSize;
+      if (isFirstBuild) {
+        // The tiles are built over several frames, the ones around
+        // characters first. Others are built when needed by a query (see
+        // `buildTilesAround`).
+        this.isFirstBuildInProgress = true;
+        this.sortTilesToBuildByDistanceToCharacters();
       } else {
-        const walkableClimbMin =
-          this.navMeshConfig.walkableSlopeAngle &&
-          this.navMeshConfig.walkableSlopeAngle > 40
-            ? 2
-            : 1;
-        this.navMeshConfig.walkableClimb = Math.max(
+        this.isFirstBuildInProgress = false;
+        this.buildAllTiles();
+      }
+
+      this.createCrowd();
+      if (oldCrowd) {
+        oldCrowd.destroy();
+      }
+      if (oldNavMesh) {
+        oldNavMesh.destroy();
+      }
+      if (oldTileBuilder) {
+        oldTileBuilder.dispose();
+      }
+      if (this.debuggerRenderer) {
+        this.debuggerRenderer.renderFor3D();
+      }
+    }
+
+    private createCrowd(): void {
+      if (!this.navMesh) {
+        return;
+      }
+      this.crowdCapacity = this.characters.size + 100;
+      this.crowd = new RecastNav.Crowd(this.navMesh, {
+        maxAgents: this.crowdCapacity,
+        maxAgentRadius: this.getCharacterRadiusMax(),
+      });
+      for (const character of this.characters) {
+        this.buildCharacterAgent(character);
+      }
+    }
+
+    /** The height of the cells of the navigation mesh, along the Z axis. */
+    getCellHeight(): float {
+      return this.is3D ? this.cellDepth : this.cellSize;
+    }
+
+    private getTileConfiguration(): gdjs.NavMeshTileConfiguration {
+      let walkableClimb = 0.1;
+      let walkableHeight = 2;
+      if (this.is3D) {
+        const walkableClimbMin = this.slopeMaxAngle > 40 ? 2 : 1;
+        walkableClimb = Math.max(
           walkableClimbMin,
           this.stairHeightMax / this.cellDepth
         );
-        this.navMeshConfig.walkableHeight = this.walkableDepth / this.cellDepth;
-        this.navMeshConfig.ch = this.cellDepth;
+        walkableHeight = this.walkableDepth / this.cellDepth;
       }
-      this.navMeshConfig.cs = this.cellSize;
+      // Recast takes distances in whole cells.
+      return {
+        cellSize: this.cellSize,
+        cellHeight: this.getCellHeight(),
+        walkableSlopeAngle: this.slopeMaxAngle,
+        walkableHeight: Math.floor(walkableHeight),
+        walkableClimb: Math.floor(walkableClimb),
+        walkableRadius: this.getWalkableRadiusInCells(),
+      };
+    }
 
+    private getWalkableRadiusInCells(): integer {
+      return Math.floor(
+        (this.walkableRadius < 0
+          ? this.getCharacterRadiusMax()
+          : this.walkableRadius) / this.cellSize
+      );
+    }
+
+    private getCharacterRadiusMax(): float {
       let characterRadiusMax = 0;
       for (const character of this.characters) {
         characterRadiusMax = Math.max(
@@ -172,37 +292,287 @@ namespace gdjs {
           character.getRadius()
         );
       }
-      this.navMeshConfig.walkableRadius =
-        (this.walkableRadius < 0 ? characterRadiusMax : this.walkableRadius) /
-        this.cellSize;
+      return characterRadiusMax;
+    }
 
-      const result = RecastNav.generateSoloNavMesh(
-        positions,
-        indices,
-        this.navMeshConfig
+    private getObstaclesArea(): gdjs.NavMeshArea | null {
+      let area: gdjs.NavMeshArea | null = null;
+      for (const obstacle of this.obstacles) {
+        const geometry = this.getObstacleGeometry(obstacle);
+        if (geometry.isEmpty()) {
+          continue;
+        }
+        area = area ? getAreasUnion(area, geometry.area) : { ...geometry.area };
+      }
+      return area;
+    }
+
+    /**
+     * The ground of 2D navigation meshes covers the obstacles, and extends
+     * around them in case the area is not closed by obstacles and
+     * characters are expected to go around them.
+     */
+    private getGroundArea(
+      obstaclesArea: gdjs.NavMeshArea | null
+    ): gdjs.NavMeshArea {
+      const game = this.instanceContainer.getGame();
+      if (!obstaclesArea) {
+        return {
+          minX: 0,
+          minZ: 0,
+          maxX: game.getGameResolutionWidth(),
+          maxZ: game.getGameResolutionHeight() * this.inverseSpeedScaleY,
+        };
+      }
+      const gameSize = Math.max(
+        game.getGameResolutionWidth(),
+        game.getGameResolutionHeight()
       );
-      if (result.success) {
-        const oldNavMesh = this.navMesh;
-        const oldCrowd = this.crowd;
-        this.navMesh = result.navMesh;
-        this.crowd = new RecastNav.Crowd(this.navMesh, {
-          maxAgents: this.characters.size + 100,
-          maxAgentRadius: characterRadiusMax,
-        });
-        for (const character of this.characters) {
-          this.buildCharacterAgent(character);
-        }
-        if (this.debuggerRenderer) {
-          this.debuggerRenderer.renderFor3D();
-        }
+      return {
+        minX: obstaclesArea.minX - gameSize,
+        maxX: obstaclesArea.maxX + gameSize,
+        minZ: (obstaclesArea.minZ - gameSize) * this.inverseSpeedScaleY,
+        maxZ: (obstaclesArea.maxZ + gameSize) * this.inverseSpeedScaleY,
+      };
+    }
 
-        if (oldNavMesh) {
-          oldNavMesh.destroy();
+    private addTilesToBuildIn(area: gdjs.NavMeshArea): void {
+      const { tileBuilder } = this;
+      if (!tileBuilder || !Number.isFinite(area.minX)) {
+        return;
+      }
+      tileBuilder.forEachTileAffectedBy(area, (tileX, tileY) => {
+        const tileKey = tileBuilder.getTileKey(tileX, tileY);
+        if (!this.tilesToBuild.has(tileKey)) {
+          this.tilesToBuild.set(tileKey, { x: tileX, y: tileY });
         }
-        if (oldCrowd) {
-          oldCrowd.destroy();
+      });
+    }
+
+    private sortTilesToBuildByDistanceToCharacters(): void {
+      const { tileBuilder } = this;
+      if (!tileBuilder || this.characters.size === 0) {
+        return;
+      }
+      const getDistanceToCharacters = (tile: NavMeshTileCoordinates) => {
+        const area = tileBuilder.getTileGeometryArea(tile.x, tile.y);
+        const tileCenterX = (area.minX + area.maxX) / 2;
+        const tileCenterZ = (area.minZ + area.maxZ) / 2;
+        let distanceMin = Number.POSITIVE_INFINITY;
+        for (const character of this.characters) {
+          distanceMin = Math.min(
+            distanceMin,
+            Math.hypot(
+              character.owner.getX() - tileCenterX,
+              this.toNavMeshZ(character.owner.getY()) - tileCenterZ
+            )
+          );
+        }
+        return distanceMin;
+      };
+      const tilesWithDistance = Array.from(this.tilesToBuild.entries()).map(
+        ([tileKey, tile]) => ({
+          tileKey,
+          tile,
+          distance: getDistanceToCharacters(tile),
+        })
+      );
+      tilesWithDistance.sort(
+        (a, b) => a.distance - b.distance || a.tileKey - b.tileKey
+      );
+      this.tilesToBuild.clear();
+      for (const { tileKey, tile } of tilesWithDistance) {
+        this.tilesToBuild.set(tileKey, tile);
+      }
+    }
+
+    private toNavMeshZ(sceneY: float): float {
+      return this.is3D ? sceneY : sceneY * this.inverseSpeedScaleY;
+    }
+
+    private buildAllTiles(): void {
+      for (const tile of this.tilesToBuild.values()) {
+        this.buildTile(tile);
+      }
+      this.tilesToBuild.clear();
+      this.onTilesBuilt();
+    }
+
+    private buildTilesOfFrame(): void {
+      const { tileBuilder } = this;
+      if (
+        !tileBuilder ||
+        this.tilesToBuild.size === 0 ||
+        (!this.isFirstBuildInProgress &&
+          this.timeSinceTilesUpdate < tilesUpdateInterval)
+      ) {
+        return;
+      }
+      this.timeSinceTilesUpdate = 0;
+      if (
+        !this.isFirstBuildInProgress &&
+        this.getWalkableRadiusInCells() !==
+          tileBuilder.configuration.walkableRadius
+      ) {
+        // The characters changed since the navigation mesh was built: all
+        // the tiles must be eroded by their new radius.
+        this.invalidateNavMesh();
+      }
+      const tileCellsCount =
+        tileBuilder.tileSizeInCells * tileBuilder.tileSizeInCells;
+      let builtCellsCount = 0;
+      for (const [tileKey, tile] of this.tilesToBuild) {
+        if (builtCellsCount >= cellsBuiltPerFrameMax) {
+          break;
+        }
+        this.tilesToBuild.delete(tileKey);
+        this.buildTile(tile);
+        builtCellsCount += tileCellsCount;
+      }
+      this.onTilesBuilt();
+    }
+
+    /**
+     * Build the tiles waiting to be built around a position of the scene,
+     * for queries that can't wait for them.
+     */
+    buildTilesAround(sceneX: float, sceneY: float): void {
+      const { tileBuilder } = this;
+      if (!tileBuilder || this.tilesToBuild.size === 0) {
+        return;
+      }
+      const z = this.toNavMeshZ(sceneY);
+      let hasBuiltTiles = false;
+      tileBuilder.forEachTileIn(
+        {
+          minX: sceneX - searchHalfExtent,
+          minZ: z - searchHalfExtent,
+          maxX: sceneX + searchHalfExtent,
+          maxZ: z + searchHalfExtent,
+        },
+        (tileX, tileY) => {
+          const tileKey = tileBuilder.getTileKey(tileX, tileY);
+          const tile = this.tilesToBuild.get(tileKey);
+          if (!tile) {
+            return;
+          }
+          this.tilesToBuild.delete(tileKey);
+          this.buildTile(tile);
+          hasBuiltTiles = true;
+        }
+      );
+      if (hasBuiltTiles) {
+        this.onTilesBuilt();
+      }
+    }
+
+    private buildTile(tile: NavMeshTileCoordinates): void {
+      const { navMesh, tileBuilder } = this;
+      if (!navMesh || !tileBuilder) {
+        return;
+      }
+      const geometryArea = tileBuilder.getTileGeometryArea(tile.x, tile.y);
+      const vertices = this.tileVertices;
+      vertices.length = 0;
+      for (const obstacle of this.obstacles) {
+        const geometry = this.getObstacleGeometry(obstacle);
+        if (geometry.overlaps(geometryArea)) {
+          geometry.appendTileTriangles(tileBuilder, tile.x, tile.y, vertices);
         }
       }
+      if (this.groundArea) {
+        this.addGroundFor2D(this.groundArea, geometryArea, vertices);
+      }
+      const isBuilt = tileBuilder.buildTile(navMesh, tile.x, tile.y, vertices);
+      if (!isBuilt) {
+        // Obstacles moved too far from where they were: the navigation mesh
+        // is built again for their new area.
+        this.invalidateNavMesh();
+      }
+      this.haveTilesChangedSincePathsRefresh = true;
+    }
+
+    private onTilesBuilt(): void {
+      if (this.isFirstBuildInProgress && this.tilesToBuild.size === 0) {
+        this.isFirstBuildInProgress = false;
+        // Paths found while tiles were missing can now be improved.
+        this.timeSincePathsRefresh = pathsRefreshInterval;
+      }
+      if (this.debuggerRenderer) {
+        this.debuggerRenderer.renderFor3D();
+      }
+    }
+
+    private refreshPathsIfNeeded(): void {
+      if (
+        !this.haveTilesChangedSincePathsRefresh ||
+        this.timeSincePathsRefresh < pathsRefreshInterval
+      ) {
+        return;
+      }
+      this.haveTilesChangedSincePathsRefresh = false;
+      this.timeSincePathsRefresh = 0;
+      for (const character of this.characters) {
+        character.refreshPath();
+      }
+    }
+
+    /**
+     * Agents are lost by the crowd when the tile under them is built again
+     * without any floor near them (an obstacle came on them).
+     */
+    private placeLostAgentBackOnNavMesh(
+      character: NavMeshCharacterRuntimeBehavior
+    ): void {
+      const agent = character._agent;
+      const recastModule = gdjs.NavMeshTileBuilder.recastModule;
+      if (
+        !agent ||
+        !this.crowd ||
+        !recastModule ||
+        agent.state() !== recastModule.DT_CROWDAGENT_STATE_INVALID
+      ) {
+        return;
+      }
+      this.crowd.removeAgent(agent);
+      character._agent = null;
+      this.buildCharacterAgent(character);
+    }
+
+    private getObstacleGeometry(
+      obstacle: NavMeshObstacleRuntimeBehavior
+    ): gdjs.NavMeshObstacleGeometry {
+      let geometry = this.obstacleGeometries.get(obstacle);
+      if (!geometry) {
+        geometry = this.createObstacleGeometry(obstacle);
+        this.obstacleGeometries.set(obstacle, geometry);
+      }
+      return geometry;
+    }
+
+    private createObstacleGeometry(
+      obstacle: NavMeshObstacleRuntimeBehavior
+    ): gdjs.NavMeshObstacleGeometry {
+      const positions: Array<float> = [];
+      const indices: Array<integer> = [];
+      const object = obstacle.owner;
+      // Surfaces are in 3D: they are ignored by 2D navigation meshes.
+      const surface = this.is3D ? object.getSurface() : null;
+      if (surface && gdjs.Base3DHandler.is3D(object)) {
+        this.addSurfaceFor(object, surface, positions, indices);
+      } else if (gdjs.Base3DHandler.is3D(object)) {
+        if (isModel3D(object) && obstacle._shape === 'Mesh') {
+          this.addMeshFor(object, obstacle, positions, indices);
+        } else {
+          this.addBoxFor(object, positions, indices);
+        }
+      } else if (!this.is3D) {
+        this.addPolygonsFor(object, positions, indices);
+      }
+      if (obstacle._isObstacleOnly) {
+        this.makeTrianglesNotWalkable(positions, indices, 0);
+      }
+      return new gdjs.NavMeshObstacleGeometry(positions, indices);
     }
 
     setDebugDrawEnabled(
@@ -215,67 +585,31 @@ namespace gdjs {
       this.debuggerRenderer.setEnabled(instanceContainer, enableDebugDraw);
     }
 
+    /**
+     * Add the part of the ground in the area of a tile.
+     */
     private addGroundFor2D(
-      positions: Array<float>,
-      indices: Array<integer>
+      groundArea: gdjs.NavMeshArea,
+      tileGeometryArea: gdjs.NavMeshArea,
+      vertices: Array<float>
     ): void {
-      const game = this.instanceContainer.getGame();
-      let minX = 0;
-      let minY = 0;
-      let maxX = game.getGameResolutionWidth();
-      let maxY = game.getGameResolutionHeight();
-      if (positions.length > 0) {
-        minX = Number.POSITIVE_INFINITY;
-        minY = Number.POSITIVE_INFINITY;
-        maxX = Number.NEGATIVE_INFINITY;
-        maxY = Number.NEGATIVE_INFINITY;
-        for (let index = 0; index + 2 < positions.length; index += 3) {
-          const x = positions[index];
-          const y = positions[index + 2];
-          minX = Math.min(minX, x);
-          minY = Math.min(minY, y);
-          maxX = Math.max(maxX, x);
-          maxY = Math.max(maxY, y);
-        }
-        const gameSize = Math.max(
-          game.getGameResolutionWidth(),
-          game.getGameResolutionHeight()
-        );
-        // Extends the area in case it's not closed by obstacles
-        // and characters may be expected to go around them.
-        minX -= gameSize;
-        minY -= gameSize;
-        maxX += gameSize;
-        maxY += gameSize;
+      const minX = Math.max(groundArea.minX, tileGeometryArea.minX);
+      const minZ = Math.max(groundArea.minZ, tileGeometryArea.minZ);
+      const maxX = Math.min(groundArea.maxX, tileGeometryArea.maxX);
+      const maxZ = Math.min(groundArea.maxZ, tileGeometryArea.maxZ);
+      if (minX >= maxX || minZ >= maxZ) {
+        return;
       }
-      const width = maxX - minX;
-      const height = (maxY - minY) * this.inverseSpeedScaleY;
-      const centerX = (maxX + minX) / 2;
-      const centerY = ((maxY + minY) / 2) * this.inverseSpeedScaleY;
-
-      const zMax = -1;
-      const zMin = -this.cellSize;
-      const depth = zMax - zMin;
-      const centerZ = (zMax + zMin) / 2;
-      const indicesOffset = Math.round(positions.length / 3);
-      for (let index = 0; index + 2 < cubePositions.length; index = index + 3) {
-        let x = cubePositions[index];
-        let y = cubePositions[index + 2];
-        let z = cubePositions[index + 1];
-
-        x *= width;
-        y *= height;
-        z *= depth;
-
-        x += centerX;
-        y += centerY;
-        z += centerZ;
-
-        // Y is the top for Recast
-        positions.push(x, z, y);
-      }
+      // Y is the top for Recast
+      const minY = -this.cellSize;
+      const maxY = -1;
       for (const vertexIndex of cubeIndices) {
-        indices.push(vertexIndex + indicesOffset);
+        const index = vertexIndex * 3;
+        vertices.push(
+          minX + (cubePositions[index] + 0.5) * (maxX - minX),
+          minY + (cubePositions[index + 1] + 0.5) * (maxY - minY),
+          minZ + (cubePositions[index + 2] + 0.5) * (maxZ - minZ)
+        );
       }
     }
 
@@ -429,28 +763,33 @@ namespace gdjs {
         return;
       }
       const point = new THREE.Vector3();
-      const euler = new THREE.Euler(
-        gdjs.toRad(object.getRotationX()),
-        gdjs.toRad(object.getRotationY()),
-        gdjs.toRad(object.getAngle()),
-        'ZYX'
+      // A matrix avoids computing the rotation again for each vertex.
+      const rotation = new THREE.Matrix4().makeRotationFromEuler(
+        new THREE.Euler(
+          gdjs.toRad(object.getRotationX()),
+          gdjs.toRad(object.getRotationY()),
+          gdjs.toRad(object.getAngle()),
+          'ZYX'
+        )
       );
+      const width = object.getWidth();
+      const height = object.getHeight();
+      const depth = object.getDepth();
+      const centerX = object.getCenterXInScene();
+      const centerY = object.getCenterYInScene();
+      const centerZ = object.getCenterZInScene();
       const indicesOffset = Math.round(positions.length / 3);
       const surfacePositions = triangles.positions;
       for (let index = 0; index + 2 < surfacePositions.length; index += 3) {
         // Positions are from 0 to 1 in the object box, rotated around its center.
         point.set(
-          (surfacePositions[index] - 0.5) * object.getWidth(),
-          (surfacePositions[index + 1] - 0.5) * object.getHeight(),
-          (surfacePositions[index + 2] - 0.5) * object.getDepth()
+          (surfacePositions[index] - 0.5) * width,
+          (surfacePositions[index + 1] - 0.5) * height,
+          (surfacePositions[index + 2] - 0.5) * depth
         );
-        point.applyEuler(euler);
+        point.applyMatrix4(rotation);
         // Y is the top for Recast
-        positions.push(
-          object.getCenterXInScene() + point.x,
-          object.getCenterZInScene() + point.z,
-          object.getCenterYInScene() + point.y
-        );
+        positions.push(centerX + point.x, centerZ + point.z, centerY + point.y);
       }
       const surfaceIndices = triangles.indices;
       for (let index = 0; index + 2 < surfaceIndices.length; index += 3) {
@@ -639,21 +978,20 @@ namespace gdjs {
         return;
       }
       const owner = character.owner;
+      this.buildTilesAround(owner.getX(), owner.getY());
       const navMeshQuery = new RecastNav.NavMeshQuery(this.navMesh);
       const { success: hasFoundOrigin, point: origin } =
         navMeshQuery.findClosestPoint(
           {
             x: owner.getX(),
             y: gdjs.Base3DHandler.is3D(owner) ? owner.getZ() : 0,
-            z: this.is3D
-              ? owner.getY()
-              : owner.getY() * this.inverseSpeedScaleY,
+            z: this.toNavMeshZ(owner.getY()),
           },
           {
             halfExtents: {
-              x: 100,
-              y: this.is3D ? 100 : this.cellSize / 2 - 0.5,
-              z: 100,
+              x: searchHalfExtent,
+              y: this.is3D ? searchHalfExtent : this.cellSize / 2 - 0.5,
+              z: searchHalfExtent,
             },
           }
         );
@@ -695,9 +1033,9 @@ namespace gdjs {
     addObstacle(obstacle: NavMeshObstacleRuntimeBehavior): void {
       this.obstacles.add(obstacle);
       if (gdjs.Base3DHandler.is3D(obstacle.owner)) {
-        this.is3D = true;
+        this.use3D();
       }
-      this.invalidateNavMesh();
+      this.updateObstacle(obstacle);
     }
 
     /**
@@ -706,6 +1044,115 @@ namespace gdjs {
      */
     removeObstacle(obstacle: NavMeshObstacleRuntimeBehavior): void {
       this.obstacles.delete(obstacle);
+      const geometry = this.obstacleGeometries.get(obstacle);
+      this.obstacleGeometries.delete(obstacle);
+      if (geometry) {
+        this.addTilesToBuildIn(geometry.area);
+      }
+    }
+
+    /**
+     * Take into account a change of an obstacle (position, size, shape...):
+     * the tiles where it was and where it is now are built again.
+     */
+    updateObstacle(obstacle: NavMeshObstacleRuntimeBehavior): void {
+      const oldGeometry = this.obstacleGeometries.get(obstacle);
+      if (!this.tileBuilder) {
+        // It will be computed when the navigation mesh is built.
+        this.obstacleGeometries.delete(obstacle);
+        return;
+      }
+      const geometry = this.createObstacleGeometry(obstacle);
+      this.obstacleGeometries.set(obstacle, geometry);
+      if (oldGeometry) {
+        this.addTilesToBuildIn(oldGeometry.area);
+      }
+      this.addTilesToBuildIn(geometry.area);
+      this.extendGroundIfNeeded(geometry);
+    }
+
+    /**
+     * Take into account a change of the surface of an obstacle: only the
+     * tiles of the part of the surface that changed are built again.
+     * @param changedArea The part of the surface that changed, from 0 to 1
+     * in the object box (see `gdjs.Surface.getChangedArea`).
+     */
+    updateObstacleSurface(
+      obstacle: NavMeshObstacleRuntimeBehavior,
+      changedArea: gdjs.SurfaceArea
+    ): void {
+      if (!this.tileBuilder || !this.obstacleGeometries.has(obstacle)) {
+        this.updateObstacle(obstacle);
+        return;
+      }
+      this.obstacleGeometries.set(
+        obstacle,
+        this.createObstacleGeometry(obstacle)
+      );
+      this.addTilesToBuildIn(this.getObjectArea(obstacle.owner, changedArea));
+    }
+
+    /**
+     * The area of the navigation mesh covered by a part of an object box.
+     * @param boxArea The part of the box, from 0 to 1.
+     */
+    private getObjectArea(
+      object: gdjs.RuntimeObject,
+      boxArea: gdjs.SurfaceArea
+    ): gdjs.NavMeshArea {
+      const point = new THREE.Vector3();
+      const euler = new THREE.Euler(0, 0, gdjs.toRad(object.getAngle()), 'ZYX');
+      let depth = 0;
+      if (gdjs.Base3DHandler.is3D(object)) {
+        euler.x = gdjs.toRad(object.getRotationX());
+        euler.y = gdjs.toRad(object.getRotationY());
+        depth = object.getDepth();
+      }
+      let area: gdjs.NavMeshArea | null = null;
+      for (const boxX of [boxArea.minX, boxArea.maxX]) {
+        for (const boxY of [boxArea.minY, boxArea.maxY]) {
+          for (const boxZ of [0, 1]) {
+            point.set(
+              (boxX - 0.5) * object.getWidth(),
+              (boxY - 0.5) * object.getHeight(),
+              (boxZ - 0.5) * depth
+            );
+            point.applyEuler(euler);
+            const x = object.getCenterXInScene() + point.x;
+            const z = this.toNavMeshZ(object.getCenterYInScene() + point.y);
+            const cornerArea = { minX: x, minZ: z, maxX: x, maxZ: z };
+            area = area ? getAreasUnion(area, cornerArea) : cornerArea;
+          }
+        }
+      }
+      return area || { minX: 0, minZ: 0, maxX: 0, maxZ: 0 };
+    }
+
+    /**
+     * The 2D ground is built around the obstacles: it must be built again
+     * when they go out of it.
+     */
+    private extendGroundIfNeeded(geometry: gdjs.NavMeshObstacleGeometry) {
+      const { obstaclesAreaAroundGround } = this;
+      if (
+        obstaclesAreaAroundGround &&
+        !geometry.isEmpty() &&
+        !isAreaInside(geometry.area, obstaclesAreaAroundGround)
+      ) {
+        this.invalidateNavMesh();
+      }
+    }
+
+    /**
+     * Obstacles and characters in 3D make the navigation mesh in 3D: the
+     * geometry of obstacles changes.
+     */
+    private use3D(): void {
+      if (this.is3D) {
+        return;
+      }
+      this.is3D = true;
+      this.obstacleGeometries.clear();
       this.invalidateNavMesh();
     }
 
@@ -718,7 +1165,13 @@ namespace gdjs {
       }
       this.characters.add(character);
       if (gdjs.Base3DHandler.is3D(character.owner)) {
-        this.is3D = true;
+        this.use3D();
+      }
+      if (this.crowd && this.characters.size > this.crowdCapacity) {
+        const oldCrowd = this.crowd;
+        this.createCrowd();
+        oldCrowd.destroy();
+        return;
       }
       this.buildCharacterAgent(character);
     }
@@ -744,6 +1197,8 @@ namespace gdjs {
       }
       this.characters.clear();
       this.obstacles.clear();
+      this.obstacleGeometries.clear();
+      this.tilesToBuild.clear();
       if (this.crowd) {
         this.crowd.destroy();
         this.crowd = null;
@@ -752,12 +1207,35 @@ namespace gdjs {
         this.navMesh.destroy();
         this.navMesh = null;
       }
+      if (this.tileBuilder) {
+        this.tileBuilder.dispose();
+        this.tileBuilder = null;
+      }
       if (this.debuggerRenderer) {
         this.debuggerRenderer.dispose();
         this.debuggerRenderer = null;
       }
     }
   }
+
+  const getAreasUnion = (
+    a: gdjs.NavMeshArea,
+    b: gdjs.NavMeshArea
+  ): gdjs.NavMeshArea => ({
+    minX: Math.min(a.minX, b.minX),
+    minZ: Math.min(a.minZ, b.minZ),
+    maxX: Math.max(a.maxX, b.maxX),
+    maxZ: Math.max(a.maxZ, b.maxZ),
+  });
+
+  const isAreaInside = (
+    area: gdjs.NavMeshArea,
+    container: gdjs.NavMeshArea
+  ): boolean =>
+    area.minX >= container.minX &&
+    area.minZ >= container.minZ &&
+    area.maxX <= container.maxX &&
+    area.maxZ <= container.maxZ;
 
   gdjs.registerRuntimeSceneUnloadedCallback(function (runtimeScene) {
     // Without this, the navigation mesh and the crowd of each unloaded scene
@@ -805,9 +1283,11 @@ namespace gdjs {
     _oldSurface: gdjs.Surface | null = null;
     _oldSurfaceVersion: integer = 0;
 
-    _oldX: float = 0;
-    _oldY: float = 0;
-    _oldZ: float = 0;
+    // The transformation of the object when its geometry was given to the
+    // navigation mesh.
+    _oldCenterX: float = 0;
+    _oldCenterY: float = 0;
+    _oldCenterZ: float = 0;
     _oldWidth: float = 0;
     _oldHeight: float = 0;
     _oldDepth: float = 0;
@@ -835,15 +1315,15 @@ namespace gdjs {
     override applyBehaviorOverriding(behaviorData): boolean {
       if (behaviorData.shape !== undefined) {
         this._shape = behaviorData.shape;
-        this._manager.invalidateNavMesh();
       }
       if (behaviorData.meshShapeResourceName !== undefined) {
         this._meshShapeResourceName = behaviorData.meshShapeResourceName;
-        this._manager.invalidateNavMesh();
       }
       if (behaviorData.obstacleOnly !== undefined) {
         this._isObstacleOnly = !!behaviorData.obstacleOnly;
-        this._manager.invalidateNavMesh();
+      }
+      if (this._registeredInManager) {
+        this._manager.updateObstacle(this);
       }
       return true;
     }
@@ -858,64 +1338,113 @@ namespace gdjs {
       if (!this.activated() && this._registeredInManager) {
         this._manager.removeObstacle(this);
         this._registeredInManager = false;
-      } else {
-        if (this.activated() && !this._registeredInManager) {
-          this._manager.addObstacle(this);
-          this._registeredInManager = true;
-        }
+      } else if (this.activated() && !this._registeredInManager) {
+        this.addToManager();
+      }
+      if (!this._registeredInManager) {
+        return;
       }
 
-      const newX = this.owner.getX();
-      const newY = this.owner.getY();
-      const newWidth = this.owner.getWidth();
-      const newHeight = this.owner.getHeight();
-      const newRotationZ = this.owner.getAngle();
-      let newZ = 0;
-      let newDepth = 0;
-      let newRotationX = 0;
-      let newRotationY = 0;
-      if (gdjs.Base3DHandler.is3D(this.owner)) {
-        newZ = this.owner.getZ();
-        newDepth = this.owner.getDepth();
-        newRotationX = this.owner.getRotationX();
-        newRotationY = this.owner.getRotationY();
-      }
       const surface = this.owner.getSurface();
       const surfaceVersion = surface ? surface.getVersion() : 0;
-      if (
+      const hasSurfaceChanged =
         surface !== this._oldSurface ||
-        surfaceVersion !== this._oldSurfaceVersion
-      ) {
-        this._oldSurface = surface;
-        this._oldSurfaceVersion = surfaceVersion;
-        if (this._registeredInManager) {
-          this._manager.invalidateNavMesh();
+        surfaceVersion !== this._oldSurfaceVersion;
+      const changedSurfaceArea =
+        hasSurfaceChanged && surface && surface === this._oldSurface
+          ? surface.getChangedArea(this._oldSurfaceVersion)
+          : null;
+      this._oldSurface = surface;
+      this._oldSurfaceVersion = surfaceVersion;
+
+      if (this.hasMovedNoticeably()) {
+        this.rememberTransformation();
+        this._manager.updateObstacle(this);
+      } else if (hasSurfaceChanged) {
+        if (changedSurfaceArea) {
+          this._manager.updateObstacleSurface(this, changedSurfaceArea);
+        } else {
+          this._manager.updateObstacle(this);
         }
       }
-      if (
-        this._oldX !== newX ||
-        this._oldY !== newY ||
-        this._oldZ !== newZ ||
-        this._oldWidth !== newWidth ||
-        this._oldHeight !== newHeight ||
-        this._oldDepth !== newDepth ||
-        this._oldRotationX !== newRotationX ||
-        this._oldRotationY !== newRotationY ||
-        this._oldRotationZ !== newRotationZ
-      ) {
-        if (this._registeredInManager) {
-          this._manager.invalidateNavMesh();
-        }
-        this._oldX = newX;
-        this._oldY = newY;
-        this._oldZ = newZ;
-        this._oldWidth = newWidth;
-        this._oldHeight = newHeight;
-        this._oldDepth = newDepth;
-        this._oldRotationX = newRotationX;
-        this._oldRotationY = newRotationY;
-        this._oldRotationZ = newRotationZ;
+    }
+
+    private addToManager() {
+      this.rememberTransformation();
+      const surface = this.owner.getSurface();
+      this._oldSurface = surface;
+      this._oldSurfaceVersion = surface ? surface.getVersion() : 0;
+      this._manager.addObstacle(this);
+      this._registeredInManager = true;
+    }
+
+    private rememberTransformation() {
+      const owner = this.owner;
+      this._oldCenterX = owner.getCenterXInScene();
+      this._oldCenterY = owner.getCenterYInScene();
+      this._oldWidth = owner.getWidth();
+      this._oldHeight = owner.getHeight();
+      this._oldRotationZ = owner.getAngle();
+      if (gdjs.Base3DHandler.is3D(owner)) {
+        this._oldCenterZ = owner.getCenterZInScene();
+        this._oldDepth = owner.getDepth();
+        this._oldRotationX = owner.getRotationX();
+        this._oldRotationY = owner.getRotationY();
       }
+    }
+
+    /**
+     * Recast voxelizes obstacles in cells, and simplifies the outlines of
+     * the floors by more than a cell: a change moving the object box by
+     * less than half a cell can't make a noticeable difference in the
+     * navigation mesh. Ignoring it avoids building tiles again for physics
+     * bodies jittering or settling slowly. Changes are measured since the
+     * last update, so slow movements still add up.
+     */
+    private hasMovedNoticeably(): boolean {
+      const owner = this.owner;
+      const angleDifference = gdjs.evtTools.common.angleDifference;
+      let centerZ = 0;
+      let depth = 0;
+      let rotationX = 0;
+      let rotationY = 0;
+      if (gdjs.Base3DHandler.is3D(owner)) {
+        centerZ = owner.getCenterZInScene();
+        depth = owner.getDepth();
+        rotationX = owner.getRotationX();
+        rotationY = owner.getRotationY();
+      }
+      const width = owner.getWidth();
+      const height = owner.getHeight();
+      // A rotation moves the corners of the box at most by its angle (in
+      // radians) times half of the box diagonal.
+      const halfDiagonal = Math.hypot(width, height, depth) / 2;
+      const tiltDistance =
+        gdjs.toRad(
+          Math.abs(angleDifference(rotationX, this._oldRotationX)) +
+            Math.abs(angleDifference(rotationY, this._oldRotationY))
+        ) * halfDiagonal;
+      const horizontalDistance =
+        Math.hypot(
+          owner.getCenterXInScene() - this._oldCenterX,
+          owner.getCenterYInScene() - this._oldCenterY
+        ) +
+        (Math.abs(width - this._oldWidth) +
+          Math.abs(height - this._oldHeight)) /
+          2 +
+        gdjs.toRad(
+          Math.abs(angleDifference(owner.getAngle(), this._oldRotationZ))
+        ) *
+          halfDiagonal +
+        tiltDistance;
+      const verticalDistance =
+        Math.abs(centerZ - this._oldCenterZ) +
+        Math.abs(depth - this._oldDepth) / 2 +
+        tiltDistance;
+      return (
+        horizontalDistance > this._manager.cellSize / 2 ||
+        verticalDistance > this._manager.getCellHeight() / 2
+      );
     }
 
     override doStepPostEvents(
@@ -926,8 +1455,7 @@ namespace gdjs {
       if (this._registeredInManager) {
         return;
       }
-      this._manager.addObstacle(this);
-      this._registeredInManager = true;
+      this.addToManager();
     }
 
     override onDeActivate() {

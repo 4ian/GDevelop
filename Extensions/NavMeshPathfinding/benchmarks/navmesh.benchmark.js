@@ -229,11 +229,12 @@ describe('gdjs.NavMeshObstaclesManager Benchmark', function () {
       moveCharacterAcrossLevel(runtimeScene, character, index)
     );
 
-    const samplesMs = [];
-    for (let frame = 0; frame < 600; frame++) {
+    const framesPerSecond = 60;
+    const frameTimesMs = [];
+    for (let frame = 0; frame < 20 * framesPerSecond; frame++) {
       // The boxes move on circles, at 100 pixels per second.
       for (const { box, x, y } of boxes) {
-        const angle = (frame / 60) * (100 / 150);
+        const angle = (frame / framesPerSecond) * (100 / 150);
         box.setPosition(
           x + 150 * Math.cos(angle) - 150,
           y + 150 * Math.sin(angle)
@@ -241,21 +242,43 @@ describe('gdjs.NavMeshObstaclesManager Benchmark', function () {
         box.setAngle(gdjs.toDegrees(angle));
       }
       const start = performance.now();
-      runtimeScene.renderAndStep(1000 / 60);
-      samplesMs.push(performance.now() - start);
+      runtimeScene.renderAndStep(1000 / framesPerSecond);
+      frameTimesMs.push(performance.now() - start);
     }
     runtimeScene.unloadScene();
+    // The navigation mesh used to be rebuilt at most once per second, with
+    // nothing done at the other frames: the median frame would hide it, the
+    // time of each second of frames doesn't.
+    const secondTimesMs = [];
+    for (
+      let second = 0;
+      second * framesPerSecond < frameTimesMs.length;
+      second++
+    ) {
+      secondTimesMs.push(
+        frameTimesMs
+          .slice(second * framesPerSecond, (second + 1) * framesPerSecond)
+          .reduce((sum, frameTimeMs) => sum + frameTimeMs, 0)
+      );
+    }
     reportBenchmarkResult({
-      name: `NavMesh: ${movingBoxesCount} boxes moving on a ${levelSize}x${levelSize} terrain (frame)`,
-      samplesMs,
+      name: `NavMesh: ${movingBoxesCount} boxes moving on a ${levelSize}x${levelSize} terrain (1 second of frames)`,
+      samplesMs: secondTimesMs,
     });
-    const sortedSamplesMs = samplesMs.slice().sort((a, b) => a - b);
+    const sortedFrameTimesMs = frameTimesMs.slice().sort((a, b) => a - b);
+    const getPercentile = (percentile) =>
+      sortedFrameTimesMs[
+        Math.floor((sortedFrameTimesMs.length - 1) * percentile)
+      ].toFixed(2);
     console.log(
       `NavMesh with ${movingBoxesCount} moving boxes, frame time (ms): ` +
-        `median ${sortedSamplesMs[300].toFixed(2)}, ` +
-        `99th percentile ${sortedSamplesMs[594].toFixed(2)}, ` +
-        `max ${sortedSamplesMs[599].toFixed(2)}, ` +
-        `total ${samplesMs.reduce((sum, sample) => sum + sample, 0).toFixed(0)}`
+        `median ${getPercentile(0.5)}, ` +
+        `99th percentile ${getPercentile(0.99)}, ` +
+        `max ${getPercentile(1)}, ` +
+        `per second ${(
+          secondTimesMs.reduce((sum, secondTimeMs) => sum + secondTimeMs, 0) /
+          secondTimesMs.length
+        ).toFixed(1)}`
     );
   });
 });

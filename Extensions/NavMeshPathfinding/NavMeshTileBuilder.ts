@@ -37,6 +37,12 @@ namespace gdjs {
 
   const logger = new gdjs.Logger('NavMesh');
 
+  /**
+   * What happened to a tile given to Detour: its polygons can be too many
+   * to be converted, or to be added to the navigation mesh.
+   */
+  type NavMeshTileAddition = 'added' | 'notConverted' | 'refused';
+
   const maxEdgeLength = 12;
   const maxSimplificationError = 1.3;
   const minRegionArea = 8 * 8;
@@ -232,7 +238,7 @@ namespace gdjs {
         return true;
       }
       const { polyMesh, polyMeshDetail } = polygonMesh;
-      const isAdded = this.addTile(
+      const tileAddition = this.addTile(
         navMesh,
         tileX,
         tileY,
@@ -241,16 +247,16 @@ namespace gdjs {
       );
       this.recast.freePolyMesh(polyMesh);
       this.recast.freePolyMeshDetail(polyMeshDetail);
-      if (isAdded) {
+      if (tileAddition === 'added') {
         this.tilesCount++;
         return true;
       }
-      if (this.tilesCount >= this.maxTilesCount) {
+      if (tileAddition === 'refused' && this.tilesCount >= this.maxTilesCount) {
         return false;
       }
       // Building the navigation mesh again would give the same tile.
       logger.warn(
-        `The tile ${tileX};${tileY} of the navigation mesh has too many polygons: try bigger cells.`
+        `The tile ${tileX};${tileY} of the navigation mesh has too many polygons or vertices: try bigger cells.`
       );
       return true;
     }
@@ -450,7 +456,7 @@ namespace gdjs {
       tileY: integer,
       polyMesh: RecastNav.RawModule.rcPolyMesh,
       polyMeshDetail: RecastNav.RawModule.rcPolyMeshDetail
-    ): boolean {
+    ): NavMeshTileAddition {
       const { recastModule, configuration } = this;
       const walkableAreaId = this.recast.WALKABLE_AREA;
       for (let index = 0; index < polyMesh.get_npolys(); index++) {
@@ -489,9 +495,8 @@ namespace gdjs {
       recastModule.destroy(result);
       if (!isCreated) {
         recastModule.destroy(navMeshData);
-        // The polygons can't be converted for Detour (too many vertices):
-        // the tile is left empty.
-        return true;
+        // The polygons can't be converted for Detour (too many vertices).
+        return 'notConverted';
       }
       const { status } = navMesh.addTile(
         RecastNav.UnsignedCharArray.fromRaw(navMeshData),
@@ -505,7 +510,7 @@ namespace gdjs {
         navMeshData.set_isView(true);
       }
       recastModule.destroy(navMeshData);
-      return isAdded;
+      return isAdded ? 'added' : 'refused';
     }
 
     dispose(): void {

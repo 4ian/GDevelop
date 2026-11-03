@@ -28,12 +28,14 @@ namespace gdjs {
   // also voxelizes a border around it (see `borderSizeInCells`): 32 cells
   // is the usual trade-off of Recast.
   const tileSizeInCellsMin = 32;
-  // Tile and polygon references share 22 bits: with up to 4096 tiles, each
-  // tile can have 1024 polygons. Half of the tiles are kept for obstacles
-  // moving out of the area the navigation mesh was built for.
-  const tilesCountMax = 2048;
-  const tileBitsMax = 12;
+  // Tile and polygon references share 22 bits: the more tiles, the less
+  // polygons per tile. With up to 1024 tiles (and the room kept for more,
+  // see `maxTilesCount`), each tile can have 1024 polygons. Bigger tiles can
+  // have more polygons.
+  const tilesCountMax = 1024;
   const polygonsAndTileBits = 22;
+
+  const logger = new gdjs.Logger('NavMesh');
 
   const maxEdgeLength = 12;
   const maxSimplificationError = 1.3;
@@ -65,6 +67,7 @@ namespace gdjs {
     private readonly originX: float;
     private readonly originZ: float;
     private readonly maxTilesCount: integer;
+    private tilesCount: integer = 0;
     /**
      * Each tile is voxelized with a border, so that the erosion by the
      * character radius and the regions match between neighbor tiles.
@@ -96,16 +99,19 @@ namespace gdjs {
       this.originZ = area.minZ;
       const { cellSize } = configuration;
       let tileSizeInCells = tileSizeInCellsMin;
-      while (
+      const getTilesCount = () =>
         Math.ceil((area.maxX - area.minX) / (tileSizeInCells * cellSize)) *
-          Math.ceil((area.maxZ - area.minZ) / (tileSizeInCells * cellSize)) >
-        tilesCountMax
-      ) {
+        Math.ceil((area.maxZ - area.minZ) / (tileSizeInCells * cellSize));
+      while (getTilesCount() > tilesCountMax) {
         tileSizeInCells *= 2;
       }
       this.tileSizeInCells = tileSizeInCells;
       this.tileWidth = tileSizeInCells * cellSize;
-      this.maxTilesCount = 1 << tileBitsMax;
+      // Twice the tiles are kept for obstacles moving out of the area the
+      // navigation mesh was built for (with the tiles of its border).
+      this.maxTilesCount = RecastNav.dtNextPow2(
+        Math.max(2, (Math.ceil(Math.sqrt(getTilesCount())) + 2) ** 2 * 2)
+      );
       this.borderSizeInCells = configuration.walkableRadius + 3;
       this.borderWidth = this.borderSizeInCells * cellSize;
 
@@ -126,7 +132,8 @@ namespace gdjs {
         tileWidth: this.tileWidth,
         tileHeight: this.tileWidth,
         maxTiles: this.maxTilesCount,
-        maxPolys: 1 << (polygonsAndTileBits - tileBitsMax),
+        maxPolys:
+          1 << (polygonsAndTileBits - RecastNav.dtIlog2(this.maxTilesCount)),
       });
       const isInitialized = navMesh.initTiled(navMeshParams);
       this.recastModule.destroy(navMeshParams.raw);
@@ -208,7 +215,7 @@ namespace gdjs {
      * Build a tile and replace it in the navigation mesh.
      * @param vertices The X, Y and Z of the 3 vertices of each triangle
      * touching the tile geometry area (see `getTileGeometryArea`).
-     * @returns false if the navigation mesh can't contain the tile.
+     * @returns false if the navigation mesh can't contain more tiles.
      */
     buildTile(
       navMesh: RecastNav.NavMesh,
@@ -234,13 +241,25 @@ namespace gdjs {
       );
       this.recast.freePolyMesh(polyMesh);
       this.recast.freePolyMeshDetail(polyMeshDetail);
-      return isAdded;
+      if (isAdded) {
+        this.tilesCount++;
+        return true;
+      }
+      if (this.tilesCount >= this.maxTilesCount) {
+        return false;
+      }
+      // Building the navigation mesh again would give the same tile.
+      logger.warn(
+        `The tile ${tileX};${tileY} of the navigation mesh has too many polygons: try bigger cells.`
+      );
+      return true;
     }
 
     removeTile(navMesh: RecastNav.NavMesh, tileX: integer, tileY: integer) {
       const tileRef = navMesh.getTileRefAt(tileX, tileY, 0);
       if (tileRef) {
         navMesh.removeTile(tileRef);
+        this.tilesCount--;
       }
     }
 
@@ -370,6 +389,10 @@ namespace gdjs {
         minY = Math.min(minY, vertices[index]);
         maxY = Math.max(maxY, vertices[index]);
       }
+      // Cells of all tiles are aligned on the same heights, so that the
+      // edges of neighbor tiles are at the same heights.
+      minY =
+        Math.floor(minY / configuration.cellHeight) * configuration.cellHeight;
       const area = this.getTileGeometryArea(tileX, tileY);
       const sizeInCells = this.tileSizeInCells + this.borderSizeInCells * 2;
       if (

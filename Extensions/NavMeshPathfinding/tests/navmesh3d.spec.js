@@ -494,6 +494,18 @@ describe('gdjs.NavMeshObstacleRuntimeBehavior (3D)', function () {
       expect(playScene()).to.eql(playScene());
     });
 
+    it('builds the navigation mesh when obstacles are created after the first frames', function () {
+      const runtimeScene = createScene();
+      const character = addCharacter(runtimeScene);
+      character.setPosition(100, 300);
+      stepOneSecond(runtimeScene);
+
+      addGround(runtimeScene);
+      addWall(runtimeScene);
+      stepOneSecond(runtimeScene);
+      expect(walkAcross(runtimeScene, character)).to.be.above(700);
+    });
+
     it("doesn't rebuild the navigation mesh for tiny movements", function () {
       const runtimeScene = createScene();
       addGround(runtimeScene);

@@ -78,6 +78,7 @@ namespace gdjs {
     private timeSincePathsRefresh: float = 0;
     private timeSinceTilesUpdate: float = 0;
     private crowdCapacity: integer = 0;
+    private crowdAgentRadiusMax: float = 0;
     cellSize: float = 10;
     cellDepth: float = 10;
     slopeMaxAngle: float = 50;
@@ -240,9 +241,10 @@ namespace gdjs {
         return;
       }
       this.crowdCapacity = this.characters.size + 100;
+      this.crowdAgentRadiusMax = this.getCharacterRadiusMax();
       this.crowd = new RecastNav.Crowd(this.navMesh, {
         maxAgents: this.crowdCapacity,
-        maxAgentRadius: this.getCharacterRadiusMax(),
+        maxAgentRadius: this.crowdAgentRadiusMax,
       });
       for (const character of this.characters) {
         this.buildCharacterAgent(character);
@@ -534,9 +536,17 @@ namespace gdjs {
       ) {
         return;
       }
+      const velocity = agent.velocity();
       this.crowd.removeAgent(agent);
       character._agent = null;
       this.buildCharacterAgent(character);
+      // Set by `buildCharacterAgent`.
+      const newAgent = character._agent as RecastNav.CrowdAgent | null;
+      if (newAgent) {
+        newAgent.raw.set_vel(0, velocity.x);
+        newAgent.raw.set_vel(1, velocity.y);
+        newAgent.raw.set_vel(2, velocity.z);
+      }
     }
 
     private getObstacleGeometry(
@@ -1058,8 +1068,10 @@ namespace gdjs {
     updateObstacle(obstacle: NavMeshObstacleRuntimeBehavior): void {
       const oldGeometry = this.obstacleGeometries.get(obstacle);
       if (!this.tileBuilder) {
-        // It will be computed when the navigation mesh is built.
+        // It will be computed when the navigation mesh is built. It was
+        // not built yet, or there was no obstacle.
         this.obstacleGeometries.delete(obstacle);
+        this.invalidateNavMesh();
         return;
       }
       const geometry = this.createObstacleGeometry(obstacle);
@@ -1085,11 +1097,17 @@ namespace gdjs {
         this.updateObstacle(obstacle);
         return;
       }
-      this.obstacleGeometries.set(
-        obstacle,
-        this.createObstacleGeometry(obstacle)
-      );
-      this.addTilesToBuildIn(this.getObjectArea(obstacle.owner, changedArea));
+      const geometry = this.createObstacleGeometry(obstacle);
+      this.obstacleGeometries.set(obstacle, geometry);
+      // The triangles touching the part that changed go beyond it.
+      const area = this.getObjectArea(obstacle.owner, changedArea);
+      const triangleSizeMax = geometry.getTriangleSizeMax();
+      this.addTilesToBuildIn({
+        minX: area.minX - triangleSizeMax,
+        minZ: area.minZ - triangleSizeMax,
+        maxX: area.maxX + triangleSizeMax,
+        maxZ: area.maxZ + triangleSizeMax,
+      });
     }
 
     /**
@@ -1133,11 +1151,12 @@ namespace gdjs {
      * when they go out of it.
      */
     private extendGroundIfNeeded(geometry: gdjs.NavMeshObstacleGeometry) {
-      const { obstaclesAreaAroundGround } = this;
+      const { groundArea, obstaclesAreaAroundGround } = this;
       if (
-        obstaclesAreaAroundGround &&
+        groundArea &&
         !geometry.isEmpty() &&
-        !isAreaInside(geometry.area, obstaclesAreaAroundGround)
+        (!obstaclesAreaAroundGround ||
+          !isAreaInside(geometry.area, obstaclesAreaAroundGround))
       ) {
         this.invalidateNavMesh();
       }
@@ -1167,7 +1186,13 @@ namespace gdjs {
       if (gdjs.Base3DHandler.is3D(character.owner)) {
         this.use3D();
       }
-      if (this.crowd && this.characters.size > this.crowdCapacity) {
+      if (
+        this.crowd &&
+        (this.characters.size > this.crowdCapacity ||
+          // The crowd looks for agents on the navigation mesh around them,
+          // according to the biggest radius.
+          character.getRadius() > this.crowdAgentRadiusMax)
+      ) {
         const oldCrowd = this.crowd;
         this.createCrowd();
         oldCrowd.destroy();

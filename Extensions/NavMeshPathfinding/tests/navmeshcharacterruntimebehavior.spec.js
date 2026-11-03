@@ -338,6 +338,24 @@ describe('gdjs.NavMeshCharacterRuntimeBehavior', function () {
     expect(getPathLength(character)).to.be.within(180, 220);
   });
 
+  it('extends the walkable area to obstacles created later', function () {
+    const runtimeScene = createScene();
+    const character = addCharacter(runtimeScene);
+    character.setPosition(400, 300);
+    // Without any obstacle, the walkable area is the screen.
+    runtimeScene.renderAndStep(1000 / 60);
+    runtimeScene.renderAndStep(1000 / 60);
+
+    // The walkable area goes around obstacles by the size of the screen.
+    const farObstacle = addObstacle(runtimeScene);
+    farObstacle.setPosition(1100, 300);
+    for (let stepIndex = 0; stepIndex < 62; stepIndex++) {
+      runtimeScene.renderAndStep(1000 / 60);
+    }
+    getCharacterBehavior(character).moveTo(1800, 300, 0);
+    expect(getCharacterBehavior(character).pathFound()).to.be(true);
+  });
+
   it('frees the navigation mesh and the crowd when the scene is unloaded', function () {
     character.setPosition(400, 300);
     runtimeScene.renderAndStep(1000 / 60);

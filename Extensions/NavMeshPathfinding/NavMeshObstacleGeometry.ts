@@ -32,6 +32,27 @@ namespace gdjs {
       this.area = { minX, minZ, maxX, maxZ };
     }
 
+    /**
+     * The biggest width or length of the triangles, along the X and Z axis.
+     */
+    getTriangleSizeMax(): float {
+      const { positions, indices } = this;
+      let triangleSizeMax = 0;
+      for (let index = 0; index + 2 < indices.length; index += 3) {
+        const a = indices[index] * 3;
+        const b = indices[index + 1] * 3;
+        const c = indices[index + 2] * 3;
+        triangleSizeMax = Math.max(
+          triangleSizeMax,
+          Math.max(positions[a], positions[b], positions[c]) -
+            Math.min(positions[a], positions[b], positions[c]),
+          Math.max(positions[a + 2], positions[b + 2], positions[c + 2]) -
+            Math.min(positions[a + 2], positions[b + 2], positions[c + 2])
+        );
+      }
+      return triangleSizeMax;
+    }
+
     isEmpty(): boolean {
       return this.indices.length === 0;
     }

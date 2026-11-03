@@ -568,6 +568,36 @@ describe('gdjs.NavMeshObstacleRuntimeBehavior (3D)', function () {
       expect(buildTileSpy.callCount).to.be.within(1, 4);
     });
 
+    it('converts surfaces edited at every frame at most 10 times per second', function () {
+      const runtimeScene = createScene();
+      const ground = addObstacle(runtimeScene);
+      ground.setDepth(200);
+      const surface = setGroundSurface(ground, getHillZ, 'heightField');
+      const getHeightFieldSpy = sinon.spy(surface, 'getHeightField');
+      const character = addCharacter(runtimeScene);
+      character.setPosition(100, 500);
+      stepOneSecond(runtimeScene);
+      getHeightFieldSpy.resetHistory();
+
+      // Like a terrain dug at every frame.
+      for (let stepIndex = 0; stepIndex < 60; stepIndex++) {
+        surface.getGroundZ = (x, y) => getHillZ(x, y) - stepIndex;
+        surface.version++;
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+      expect(getHeightFieldSpy.callCount).to.be.within(9, 11);
+
+      // The last edit is taken into account.
+      stepOneSecond(runtimeScene);
+      getCharacterBehavior(character).moveTo(900, 500, 0);
+      let maxZ = Number.NEGATIVE_INFINITY;
+      stepUntilDestinationIsReached(runtimeScene, character, () => {
+        maxZ = Math.max(maxZ, character.getZ());
+      });
+      expect(getCharacterBehavior(character).destinationReached()).to.be(true);
+      expect(maxZ).to.be.within(200 - 59 - 35, 200 - 59 + 35);
+    });
+
     it('builds large navigation meshes over several frames, and can be used right away', function () {
       const runtimeScene = createScene();
       const ground = addObstacle(runtimeScene);

@@ -356,6 +356,34 @@ describe('gdjs.NavMeshCharacterRuntimeBehavior', function () {
     expect(getCharacterBehavior(character).pathFound()).to.be(true);
   });
 
+  it('builds the navigation mesh again only once when an obstacle goes out of the ground', function () {
+    const createNavMeshSpy = sinon.spy(
+      gdjs.NavMeshTileBuilder.prototype,
+      'createNavMesh'
+    );
+    try {
+      const obstacle = addObstacle(runtimeScene);
+      obstacle.setPosition(400, 600);
+      character.setPosition(400, 300);
+      runtimeScene.renderAndStep(1000 / 60);
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(createNavMeshSpy.callCount).to.be(1);
+
+      // It goes out, and keeps moving before the navigation mesh is built
+      // again (at most once per second).
+      for (let stepIndex = 0; stepIndex < 30; stepIndex++) {
+        obstacle.setY(2000 + stepIndex * 10);
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+      for (let stepIndex = 0; stepIndex < 180; stepIndex++) {
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+      expect(createNavMeshSpy.callCount).to.be(2);
+    } finally {
+      createNavMeshSpy.restore();
+    }
+  });
+
   it('frees the navigation mesh and the crowd when the scene is unloaded', function () {
     character.setPosition(400, 300);
     runtimeScene.renderAndStep(1000 / 60);

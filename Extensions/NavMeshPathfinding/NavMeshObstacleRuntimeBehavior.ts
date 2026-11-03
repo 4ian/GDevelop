@@ -37,6 +37,12 @@ namespace gdjs {
    */
   const tileRebuildIntervalMin = 0.1;
   /**
+   * The geometry of obstacles that changed (moved, surface edited...) is
+   * computed again at most 10 times per second, as converting a terrain
+   * or a 3D model takes several milliseconds.
+   */
+  const obstaclesUpdateIntervalMin = 0.1;
+  /**
    * Paths are searched again at most once per second after the navigation
    * mesh changed, like when the whole navigation mesh was rebuilt.
    */
@@ -74,10 +80,23 @@ namespace gdjs {
     is3D = false;
     navMesh: RecastNav.NavMesh | null = null;
     private tileBuilder: gdjs.NavMeshTileBuilder | null = null;
+    /**
+     * The geometry of each obstacle, except the ones added since the last
+     * update of changed obstacles (see `updateChangedObstacles`).
+     */
     private obstacleGeometries = new Map<
       NavMeshObstacleRuntimeBehavior,
       gdjs.NavMeshObstacleGeometry
     >();
+    /**
+     * The obstacles whose geometry must be computed again, with the part of
+     * their surface that changed, or null if the whole obstacle changed.
+     */
+    private changedObstacles = new Map<
+      NavMeshObstacleRuntimeBehavior,
+      gdjs.SurfaceArea | null
+    >();
+    private obstaclesUpdateTime: float = Number.NEGATIVE_INFINITY;
     /** The tiles to build, in the order they are built. */
     private tilesToBuild = new Map<integer, NavMeshTileCoordinates>();
     private tileVertices: Array<float> = [];
@@ -161,6 +180,7 @@ namespace gdjs {
       // to build the level.
       if (!this.isFirstFrame) {
         this.rebuildNavMeshIfNeeded();
+        this.updateChangedObstaclesIfNeeded();
         this.buildTilesOfFrame();
       }
       this.isFirstFrame = false;
@@ -191,7 +211,6 @@ namespace gdjs {
         return;
       }
       this.timeSinceLastNavMeshLastRebuild = 0;
-      this.isNavMeshDirty = false;
       this.buildNavMesh();
     }
 
@@ -200,6 +219,12 @@ namespace gdjs {
       if (!recastModule) {
         return;
       }
+      // Even if the navigation mesh can't be built, the current one is kept
+      // up to date with the obstacles.
+      this.updateChangedObstacles();
+      // Changes extending the 2D ground (see `extendGroundIfNeeded`) are
+      // taken into account by this build.
+      this.isNavMeshDirty = false;
       const obstaclesArea = this.getObstaclesArea();
       const groundArea = this.is3D ? null : this.getGroundArea(obstaclesArea);
       const area = groundArea || obstaclesArea;
@@ -439,6 +464,7 @@ namespace gdjs {
         // The characters changed since the navigation mesh was built: all
         // the tiles must be eroded by their new radius.
         this.invalidateNavMesh();
+        return;
       }
       const tileCellsCount =
         tileBuilder.tileSizeInCells * tileBuilder.tileSizeInCells;
@@ -472,6 +498,7 @@ namespace gdjs {
      * for queries that can't wait for them.
      */
     buildTilesAround(sceneX: float, sceneY: float): void {
+      this.updateChangedObstaclesIfNeeded();
       const { tileBuilder } = this;
       if (!tileBuilder || this.tilesToBuild.size === 0) {
         return;
@@ -510,8 +537,10 @@ namespace gdjs {
       const vertices = this.tileVertices;
       vertices.length = 0;
       for (const obstacle of this.obstacles) {
-        const geometry = this.getObstacleGeometry(obstacle);
-        if (geometry.overlaps(geometryArea)) {
+        // Obstacles added since the last update of changed obstacles are
+        // not in the navigation mesh yet: their tiles will be built then.
+        const geometry = this.obstacleGeometries.get(obstacle);
+        if (geometry && geometry.overlaps(geometryArea)) {
           geometry.appendTileTriangles(tileBuilder, tile.x, tile.y, vertices);
         }
       }
@@ -1141,6 +1170,7 @@ namespace gdjs {
      */
     removeObstacle(obstacle: NavMeshObstacleRuntimeBehavior): void {
       this.obstacles.delete(obstacle);
+      this.changedObstacles.delete(obstacle);
       const geometry = this.obstacleGeometries.get(obstacle);
       this.obstacleGeometries.delete(obstacle);
       if (geometry) {
@@ -1153,7 +1183,6 @@ namespace gdjs {
      * the tiles where it was and where it is now are built again.
      */
     updateObstacle(obstacle: NavMeshObstacleRuntimeBehavior): void {
-      const oldGeometry = this.obstacleGeometries.get(obstacle);
       if (!this.tileBuilder) {
         // It will be computed when the navigation mesh is built. It was
         // not built yet, or there was no obstacle.
@@ -1161,13 +1190,7 @@ namespace gdjs {
         this.invalidateNavMesh();
         return;
       }
-      const geometry = this.createObstacleGeometry(obstacle);
-      this.obstacleGeometries.set(obstacle, geometry);
-      if (oldGeometry) {
-        this.addTilesToBuildIn(oldGeometry.area);
-      }
-      this.addTilesToBuildIn(geometry.area);
-      this.extendGroundIfNeeded(geometry);
+      this.changedObstacles.set(obstacle, null);
     }
 
     /**
@@ -1184,17 +1207,77 @@ namespace gdjs {
         this.updateObstacle(obstacle);
         return;
       }
-      const geometry = this.createObstacleGeometry(obstacle);
-      this.obstacleGeometries.set(obstacle, geometry);
-      // The triangles touching the part that changed go beyond it.
-      const area = this.getObjectArea(obstacle.owner, changedArea);
-      const triangleSizeMax = geometry.getTriangleSizeMax();
-      this.addTilesToBuildIn({
-        minX: area.minX - triangleSizeMax,
-        minZ: area.minZ - triangleSizeMax,
-        maxX: area.maxX + triangleSizeMax,
-        maxZ: area.maxZ + triangleSizeMax,
-      });
+      if (!this.changedObstacles.has(obstacle)) {
+        this.changedObstacles.set(obstacle, { ...changedArea });
+        return;
+      }
+      const previousChangedArea = this.changedObstacles.get(obstacle);
+      // The whole obstacle may already have changed.
+      if (previousChangedArea) {
+        previousChangedArea.minX = Math.min(
+          previousChangedArea.minX,
+          changedArea.minX
+        );
+        previousChangedArea.minY = Math.min(
+          previousChangedArea.minY,
+          changedArea.minY
+        );
+        previousChangedArea.maxX = Math.max(
+          previousChangedArea.maxX,
+          changedArea.maxX
+        );
+        previousChangedArea.maxY = Math.max(
+          previousChangedArea.maxY,
+          changedArea.maxY
+        );
+      }
+    }
+
+    private updateChangedObstaclesIfNeeded(): void {
+      if (
+        this.changedObstacles.size === 0 ||
+        // They will be updated when the navigation mesh is built again,
+        // maybe with other settings (in 3D instead of 2D...).
+        this.isNavMeshDirty ||
+        this.time - this.obstaclesUpdateTime < obstaclesUpdateIntervalMin
+      ) {
+        return;
+      }
+      this.updateChangedObstacles();
+    }
+
+    /**
+     * Compute again the geometry of the obstacles that changed, and add the
+     * tiles where they were and where they are now to the tiles to build.
+     */
+    private updateChangedObstacles(): void {
+      this.obstaclesUpdateTime = this.time;
+      for (const [obstacle, changedSurfaceArea] of this.changedObstacles) {
+        const oldGeometry = this.obstacleGeometries.get(obstacle);
+        const geometry = this.createObstacleGeometry(obstacle);
+        this.obstacleGeometries.set(obstacle, geometry);
+        if (oldGeometry && changedSurfaceArea) {
+          // The triangles touching the part that changed go beyond it.
+          const area = this.getObjectArea(obstacle.owner, changedSurfaceArea);
+          const triangleSizeMax = Math.max(
+            oldGeometry.getTriangleSizeMax(),
+            geometry.getTriangleSizeMax()
+          );
+          this.addTilesToBuildIn({
+            minX: area.minX - triangleSizeMax,
+            minZ: area.minZ - triangleSizeMax,
+            maxX: area.maxX + triangleSizeMax,
+            maxZ: area.maxZ + triangleSizeMax,
+          });
+        } else {
+          if (oldGeometry) {
+            this.addTilesToBuildIn(oldGeometry.area);
+          }
+          this.addTilesToBuildIn(geometry.area);
+        }
+        this.extendGroundIfNeeded(geometry);
+      }
+      this.changedObstacles.clear();
     }
 
     /**
@@ -1258,7 +1341,14 @@ namespace gdjs {
         return;
       }
       this.is3D = true;
-      this.obstacleGeometries.clear();
+      // Their geometry is computed again when the navigation mesh is built.
+      if (this.tileBuilder) {
+        for (const obstacle of this.obstacles) {
+          this.changedObstacles.set(obstacle, null);
+        }
+      } else {
+        this.obstacleGeometries.clear();
+      }
       this.invalidateNavMesh();
     }
 
@@ -1310,6 +1400,7 @@ namespace gdjs {
       this.characters.clear();
       this.obstacles.clear();
       this.obstacleGeometries.clear();
+      this.changedObstacles.clear();
       this.tilesToBuild.clear();
       this.tileBuildTimes.clear();
       if (this.crowd) {

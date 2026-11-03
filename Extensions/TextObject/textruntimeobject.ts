@@ -106,6 +106,7 @@ namespace gdjs {
     _wrapping: boolean = false;
     // A wrapping of 1 makes games crash on Firefox
     _wrappingWidth: float = 100;
+    _requestedHeight: float = 100;
 
     _isOutlineEnabled: boolean;
     _outlineThickness: float;
@@ -723,6 +724,14 @@ namespace gdjs {
 
     override setWidth(width: float): void {
       this.setWrappingWidth(width);
+    }
+
+    getRequestedHeight(): float {
+      return this._requestedHeight;
+    }
+
+    override setHeight(height: float): void {
+      this._requestedHeight = height;
     }
 
     override getDrawableY(): float {

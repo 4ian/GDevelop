@@ -46,6 +46,13 @@ namespace gdjs {
    * and destinations.
    */
   const searchHalfExtent = 100;
+  /**
+   * The debug draw shows the tiles rebuilt during the last second, and is
+   * drawn again at most 4 times per second (drawing the whole navigation
+   * mesh is slow).
+   */
+  const debugDrawnRebuiltTileDuration = 1;
+  const debugDrawIntervalMin = 0.25;
 
   type NavMeshTileCoordinates = { x: integer; y: integer };
 
@@ -101,6 +108,9 @@ namespace gdjs {
     crowd: RecastNav.Crowd | null = null;
     hasStepped = false;
     debuggerRenderer: gdjs.NavMeshDebuggerRenderer | null = null;
+    private isDebugDrawOutdated = false;
+    private debugDrawTime: float = Number.NEGATIVE_INFINITY;
+    private firstBuildEndTime: float = Number.POSITIVE_INFINITY;
 
     constructor(instanceContainer: gdjs.RuntimeInstanceContainer, sharedData) {
       this.instanceContainer = instanceContainer;
@@ -154,6 +164,7 @@ namespace gdjs {
         this.buildTilesOfFrame();
       }
       this.isFirstFrame = false;
+      this.updateDebugDraw();
 
       if (!this.crowd) {
         return;
@@ -244,9 +255,7 @@ namespace gdjs {
       if (oldTileBuilder) {
         oldTileBuilder.dispose();
       }
-      if (this.debuggerRenderer) {
-        this.debuggerRenderer.renderFor3D();
-      }
+      this.isDebugDrawOutdated = true;
     }
 
     private createCrowd(): void {
@@ -525,12 +534,62 @@ namespace gdjs {
     private onTilesBuilt(): void {
       if (this.isFirstBuildInProgress && this.tilesToBuild.size === 0) {
         this.isFirstBuildInProgress = false;
+        this.firstBuildEndTime = this.time;
         // Paths found while tiles were missing can now be improved.
         this.timeSincePathsRefresh = pathsRefreshInterval;
       }
-      if (this.debuggerRenderer) {
-        this.debuggerRenderer.renderFor3D();
+      this.isDebugDrawOutdated = true;
+    }
+
+    private updateDebugDraw(): void {
+      if (
+        !this.debuggerRenderer ||
+        !this.isDebugDrawOutdated ||
+        this.time - this.debugDrawTime < debugDrawIntervalMin
+      ) {
+        return;
       }
+      this.debugDrawTime = this.time;
+      this.debuggerRenderer.renderFor3D();
+      // Rebuilt tiles are drawn again when they are no longer recent.
+      this.isDebugDrawOutdated = false;
+      for (const tileBuildTime of this.tileBuildTimes.values()) {
+        if (this.isRecentTileRebuild(tileBuildTime)) {
+          this.isDebugDrawOutdated = true;
+          break;
+        }
+      }
+    }
+
+    private isRecentTileRebuild(tileBuildTime: float): boolean {
+      return (
+        tileBuildTime > this.firstBuildEndTime &&
+        this.time - tileBuildTime < debugDrawnRebuiltTileDuration
+      );
+    }
+
+    /**
+     * How the debug draw shows the tile at a position of the navigation
+     * mesh: tiles are drawn like a checkerboard, and the ones rebuilt during
+     * the last second stand out.
+     */
+    getTileDebugDrawing(x: float, z: float): 'even' | 'odd' | 'rebuilt' {
+      const { tileBuilder } = this;
+      if (!tileBuilder) {
+        return 'even';
+      }
+      const tileX = tileBuilder.getTileX(x);
+      const tileY = tileBuilder.getTileY(z);
+      const tileBuildTime = this.tileBuildTimes.get(
+        tileBuilder.getTileKey(tileX, tileY)
+      );
+      if (
+        tileBuildTime !== undefined &&
+        this.isRecentTileRebuild(tileBuildTime)
+      ) {
+        return 'rebuilt';
+      }
+      return (tileX + tileY) % 2 === 0 ? 'even' : 'odd';
     }
 
     private refreshPathsIfNeeded(): void {

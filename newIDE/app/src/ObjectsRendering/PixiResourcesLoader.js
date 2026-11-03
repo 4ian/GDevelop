@@ -259,13 +259,15 @@ const determineCrossOrigin = (url: string) => {
   return 'anonymous';
 };
 
+const getPixiScaleMode = (imageResource: gdImageResource): number =>
+  imageResource.isSmooth() ? PIXI.SCALE_MODES.LINEAR : PIXI.SCALE_MODES.NEAREST;
+
 const applyPixiTextureSettings = (resource: gdResource, texture: any) => {
   if (resource.getKind() !== 'image') return;
 
-  const imageResource = gd.asImageResource(resource);
-  texture.baseTexture.scaleMode = imageResource.isSmooth()
-    ? PIXI.SCALE_MODES.LINEAR
-    : PIXI.SCALE_MODES.NEAREST;
+  texture.baseTexture.scaleMode = getPixiScaleMode(
+    gd.asImageResource(resource)
+  );
 };
 
 const applyThreeTextureSettings = (
@@ -528,6 +530,11 @@ export default class PixiResourcesLoader {
     //   every "resource content changed" code path does).
     // In any other case (texture not loaded yet, invalid/loading texture, no
     // recorded URL, or a non-image resource), we fall back to a full reload.
+    //
+    // A change of settings (like the smoothing) also does a full reload: the
+    // texture is replaced instead of having its parameters changed, as the
+    // parameters of a texture already on the GPU are not always taken into
+    // account by the scene editor.
     const resourcesManager = project.getResourcesManager();
     if (
       loadedEntry &&
@@ -544,18 +551,17 @@ export default class PixiResourcesLoader {
         resourceName,
         { isResourceForPixi: true }
       );
-      if (currentUrl === loadedEntry.loadedFromUrl) {
+      const imageResource = gd.asImageResource(
+        resourcesManager.getResource(resourceName)
+      );
+      if (
+        currentUrl === loadedEntry.loadedFromUrl &&
+        loadedEntry.pixiTexture.baseTexture.scaleMode ===
+          getPixiScaleMode(imageResource)
+      ) {
         console.info(
-          `Resource "${resourceName}" file/URL is unchanged: keeping the already loaded texture and only applying its settings.`
+          `Resource "${resourceName}" file/URL and settings are unchanged: keeping the already loaded texture (no reload needed).`
         );
-        // The settings (like smoothing) may have changed without the file changing.
-        const resource = resourcesManager.getResource(resourceName);
-        applyPixiTextureSettings(resource, loadedEntry.pixiTexture);
-        if (loadedOrLoadingThreeTextures[resourceName]) {
-          const threeTexture = await loadedOrLoadingThreeTextures[resourceName];
-          applyThreeTextureSettings(resource, threeTexture);
-          threeTexture.needsUpdate = true;
-        }
         return;
       }
     }

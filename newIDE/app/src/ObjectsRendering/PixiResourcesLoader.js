@@ -259,13 +259,15 @@ const determineCrossOrigin = (url: string) => {
   return 'anonymous';
 };
 
+const getPixiScaleMode = (imageResource: gdImageResource): number =>
+  imageResource.isSmooth() ? PIXI.SCALE_MODES.LINEAR : PIXI.SCALE_MODES.NEAREST;
+
 const applyPixiTextureSettings = (resource: gdResource, texture: any) => {
   if (resource.getKind() !== 'image') return;
 
-  const imageResource = gd.asImageResource(resource);
-  if (!imageResource.isSmooth()) {
-    texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
-  }
+  texture.baseTexture.scaleMode = getPixiScaleMode(
+    gd.asImageResource(resource)
+  );
 };
 
 const applyThreeTextureSettings = (
@@ -276,10 +278,11 @@ const applyThreeTextureSettings = (
   if (resource.getKind() !== 'image') return;
 
   const imageResource = gd.asImageResource(resource);
-  if (!imageResource.isSmooth()) {
-    threeTexture.magFilter = THREE.NearestFilter;
-    threeTexture.minFilter = THREE.NearestFilter;
-  }
+  const filter = imageResource.isSmooth()
+    ? THREE.LinearFilter
+    : THREE.NearestFilter;
+  threeTexture.magFilter = filter;
+  threeTexture.minFilter = filter;
 };
 
 // If modifying this function, make sure to update Resource3DPreview.worker.js copy.
@@ -527,6 +530,11 @@ export default class PixiResourcesLoader {
     //   every "resource content changed" code path does).
     // In any other case (texture not loaded yet, invalid/loading texture, no
     // recorded URL, or a non-image resource), we fall back to a full reload.
+    //
+    // A change of settings (like the smoothing) also does a full reload: the
+    // texture is replaced instead of having its parameters changed, as the
+    // parameters of a texture already on the GPU are not always taken into
+    // account by the scene editor.
     const resourcesManager = project.getResourcesManager();
     if (
       loadedEntry &&
@@ -543,9 +551,16 @@ export default class PixiResourcesLoader {
         resourceName,
         { isResourceForPixi: true }
       );
-      if (currentUrl === loadedEntry.loadedFromUrl) {
+      const imageResource = gd.asImageResource(
+        resourcesManager.getResource(resourceName)
+      );
+      if (
+        currentUrl === loadedEntry.loadedFromUrl &&
+        loadedEntry.pixiTexture.baseTexture.scaleMode ===
+          getPixiScaleMode(imageResource)
+      ) {
         console.info(
-          `Resource "${resourceName}" file/URL is unchanged: keeping the already loaded texture (no reload needed).`
+          `Resource "${resourceName}" file/URL and settings are unchanged: keeping the already loaded texture (no reload needed).`
         );
         return;
       }
@@ -969,8 +984,6 @@ export default class PixiResourcesLoader {
     }
 
     const threeTexture = new THREE.Texture(image);
-    threeTexture.magFilter = THREE.LinearFilter;
-    threeTexture.minFilter = THREE.LinearFilter;
     threeTexture.wrapS = THREE.RepeatWrapping;
     threeTexture.wrapT = THREE.RepeatWrapping;
     threeTexture.colorSpace = THREE.SRGBColorSpace;

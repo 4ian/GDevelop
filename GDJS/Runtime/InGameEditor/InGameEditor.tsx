@@ -2810,6 +2810,7 @@ namespace gdjs {
         if (!newObject) return null;
         newObject.persistentUuid = gdjs.makeUuid();
         newObject.setLayer(selectedObject.getLayer());
+        newObject.setZOrder(selectedObject.getZOrder());
         newObject.setX(selectedObject.getX());
         newObject.setY(selectedObject.getY());
         newObject.setAngle(selectedObject.getAngle());

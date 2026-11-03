@@ -583,6 +583,19 @@ namespace gdjs {
     return gdjs.Base3DHandler.is3D(object);
   };
 
+  interface TextSizeInterface {
+    getWrappingWidth(): float;
+    getRequestedHeight(): float;
+    setWrapping(enable: boolean): void;
+  }
+
+  const isTextObject = (
+    object: gdjs.RuntimeObject
+  ): object is gdjs.RuntimeObject & TextSizeInterface => {
+    //@ts-ignore We are checking if the methods are present.
+    return object.getWrappingWidth && object.getRequestedHeight;
+  };
+
   type ScreenArea = {
     minX: float;
     minY: float;
@@ -1028,14 +1041,31 @@ namespace gdjs {
     return false;
   };
 
+  const getObjectWidth = (instance: gdjs.RuntimeObject) =>
+    isTextObject(instance)
+      ? instance.getWrappingWidth() || instance.getWidth()
+      : instance.getWidth();
+
+  const getObjectHeight = (instance: gdjs.RuntimeObject) =>
+    isTextObject(instance)
+      ? instance.getRequestedHeight() || instance.getHeight()
+      : instance.getHeight();
+
+  const getObjectDrawableY = (instance: gdjs.RuntimeObject) =>
+    isTextObject(instance) && instance.getHeight()
+      ? ((instance.getDrawableY() - instance.getY()) / instance.getHeight()) *
+          instance.getRequestedHeight() +
+        instance.getY()
+      : instance.getDrawableY();
+
   const getUnrotatedInstanceAABB = (
     instance: gdjs.RuntimeObject,
     unrotatedAABB: AABB3D
   ): AABB3D => {
     const minX = instance.getDrawableX();
-    const minY = instance.getDrawableY();
-    const maxX = minX + instance.getWidth();
-    const maxY = minY + instance.getHeight();
+    const minY = getObjectDrawableY(instance);
+    const maxX = minX + getObjectWidth(instance);
+    const maxY = minY + getObjectHeight(instance);
     let minZ = 0;
     let maxZ = 0;
     if (is3D(instance)) {
@@ -3336,8 +3366,8 @@ namespace gdjs {
     ): InstanceData | null {
       if (!runtimeObject.persistentUuid) return null;
 
-      const width = runtimeObject.getWidth();
-      const height = runtimeObject.getHeight();
+      const width = getObjectWidth(runtimeObject);
+      const height = getObjectHeight(runtimeObject);
       const depth = !is3D(runtimeObject) ? undefined : runtimeObject.getDepth();
       const defaultWidth = runtimeObject.getOriginalWidth();
       const defaultHeight = runtimeObject.getOriginalHeight();
@@ -3947,6 +3977,9 @@ namespace gdjs {
               runtimeObject.setWidth(instance.width);
               runtimeObject.setHeight(instance.height);
             } else {
+              if (isTextObject(runtimeObject)) {
+                runtimeObject.setWrapping(false);
+              }
               runtimeObject.setWidth(runtimeObject.getOriginalWidth());
               runtimeObject.setHeight(runtimeObject.getOriginalHeight());
             }

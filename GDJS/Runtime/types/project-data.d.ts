@@ -328,7 +328,8 @@ declare interface LayoutData extends InstanceContainerData {
 }
 
 declare interface InstancesEditorSettings {
-  editorMode: '2d-editor' | '3d-editor';
+  editorMode: '2d-editor' | '3d-editor' | undefined;
+  gameEditorMode: 'instances-editor' | 'embedded-game';
   grid: boolean;
   gridType: 'rectangular' | 'isometric';
   gridWidth: float;

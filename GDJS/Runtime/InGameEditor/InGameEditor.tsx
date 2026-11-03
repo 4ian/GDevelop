@@ -1509,6 +1509,8 @@ namespace gdjs {
         selectedInstance.setX(Math.round(newX));
         selectedInstance.setY(Math.round(newY));
 
+        // TODO Fix the resizing of text objects.
+
         // Also round the size.
         selectedInstance.setWidth(Math.round(newWidth));
         selectedInstance.setHeight(Math.round(newHeight));
@@ -2344,14 +2346,13 @@ namespace gdjs {
       instancesEditorSettings: InstancesEditorSettings
     ) {
       this._instancesEditorSettings = instancesEditorSettings;
-      this._editorGrid.setSettings(instancesEditorSettings);
       this.applyInstancesEditorSettings();
     }
 
     getEditorMode(): '2d-editor' | '3d-editor' {
       return this._instancesEditorSettings
         ? this._instancesEditorSettings.editorMode
-        : '3d-editor';
+        : '2d-editor';
     }
 
     updateInstancesEditorSettings(
@@ -2370,12 +2371,20 @@ namespace gdjs {
       if (!this._instancesEditorSettings) {
         return;
       }
-      if (this._instancesEditorSettings.editorMode === '2d-editor') {
-        this._selectionControls3D.remove();
-        this._selectionControls = this._selectionControls2D;
-      } else {
+      // Compatibility with GD <= 5.6.286
+      if (!this._instancesEditorSettings.editorMode) {
+        this._instancesEditorSettings.editorMode =
+          this._instancesEditorSettings.gameEditorMode === 'embedded-game'
+            ? '3d-editor'
+            : '2d-editor';
+      }
+      // end of compatibility code
+      if (this._instancesEditorSettings.editorMode === '3d-editor') {
         this._selectionControls2D.remove();
         this._selectionControls = this._selectionControls3D;
+      } else {
+        this._selectionControls3D.remove();
+        this._selectionControls = this._selectionControls2D;
       }
       this._editorGrid.setVisible(false);
       this._editorGrid.setSettings(this._instancesEditorSettings);
@@ -5235,7 +5244,7 @@ namespace gdjs {
     normal: 'Z' | 'Y' | 'X' = 'Z';
     position = new THREE.Vector3();
     divisionsCount = 10;
-    editorMode: '3d-editor' | '2d-editor' = '3d-editor';
+    editorMode: '3d-editor' | '2d-editor' = '2d-editor';
 
     isForcefullyHidden = true;
     gridWidth: float = 0;
@@ -5271,7 +5280,7 @@ namespace gdjs {
       this.isSnappingEnabledByDefault = instancesEditorSettings.snap;
       this.gridType = instancesEditorSettings.gridType;
       this.divisionsCount = 10;
-      this.editorMode = instancesEditorSettings.editorMode;
+      this.editorMode = instancesEditorSettings.editorMode | '2d-grid';
       this.rebuildGrid();
     }
 
@@ -6055,6 +6064,8 @@ namespace gdjs {
       debuggerClient.sendCameraState(this.getCameraState());
     }
   }
+
+  // TODO Implement a zoom-in/out at cursor for 2D editor.
 
   interface CameraControl {
     step(): void;

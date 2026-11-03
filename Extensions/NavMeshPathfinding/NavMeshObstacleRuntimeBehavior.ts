@@ -20,18 +20,22 @@ namespace gdjs {
   };
 
   /**
-   * Building a tile of 32x32 cells takes 1 to 3 milliseconds: at most this
-   * many cells of tiles are built per frame, after obstacles changed or when
-   * the navigation mesh is first built (a whole level).
+   * Building a tile of 32x32 cells takes 1 to 3 milliseconds. When the
+   * navigation mesh is first built (a whole level), at most this many cells
+   * of tiles are built per frame.
    */
-  const cellsBuiltPerFrameMax = 4 * 32 * 32;
+  const cellsBuiltPerFrameMaxForFirstBuild = 4 * 32 * 32;
+  /**
+   * After obstacles changed, at most one tile is built per frame, so that
+   * frames stay regular, and at most this many per second, whatever the
+   * frame rate.
+   */
+  const tilesRebuiltPerSecondMax = 40;
   /**
    * Obstacles moving continuously (pushed, falling...) would rebuild their
-   * tiles at every frame: tiles are rebuilt at most 10 times per second,
-   * so the navigation mesh follows obstacles with a delay of a tenth of a
-   * second at most.
+   * tiles at every frame: each tile is rebuilt at most 10 times per second.
    */
-  const tilesUpdateInterval = 0.1;
+  const tileRebuildIntervalMin = 0.1;
   /**
    * Paths are searched again at most once per second after the navigation
    * mesh changed, like when the whole navigation mesh was rebuilt.
@@ -76,7 +80,11 @@ namespace gdjs {
     private isFirstBuildInProgress = false;
     private haveTilesChangedSincePathsRefresh = false;
     private timeSincePathsRefresh: float = 0;
-    private timeSinceTilesUpdate: float = 0;
+    /** The time of the manager, to know when tiles were built. */
+    private time: float = 0;
+    private tileBuildTimes = new Map<integer, float>();
+    /** How many tiles can be rebuilt now (see `tilesRebuiltPerSecondMax`). */
+    private tileRebuildsAllowance: float = 1;
     private crowdCapacity: integer = 0;
     private crowdAgentRadiusMax: float = 0;
     cellSize: float = 10;
@@ -134,7 +142,11 @@ namespace gdjs {
       this.hasStepped = true;
       this.timeSinceLastNavMeshLastRebuild += timeDelta;
       this.timeSincePathsRefresh += timeDelta;
-      this.timeSinceTilesUpdate += timeDelta;
+      this.time += timeDelta;
+      this.tileRebuildsAllowance = Math.min(
+        1,
+        this.tileRebuildsAllowance + timeDelta * tilesRebuiltPerSecondMax
+      );
       // Don't try to build the nav mesh before the events get a chance
       // to build the level.
       if (!this.isFirstFrame) {
@@ -203,6 +215,7 @@ namespace gdjs {
       this.obstaclesAreaAroundGround = groundArea ? obstaclesArea : null;
 
       this.tilesToBuild.clear();
+      this.tileBuildTimes.clear();
       if (groundArea) {
         this.addTilesToBuildIn(groundArea);
       } else {
@@ -405,12 +418,10 @@ namespace gdjs {
       if (
         !tileBuilder ||
         this.tilesToBuild.size === 0 ||
-        (!this.isFirstBuildInProgress &&
-          this.timeSinceTilesUpdate < tilesUpdateInterval)
+        (!this.isFirstBuildInProgress && this.tileRebuildsAllowance < 1)
       ) {
         return;
       }
-      this.timeSinceTilesUpdate = 0;
       if (
         !this.isFirstBuildInProgress &&
         this.getWalkableRadiusInCells() !==
@@ -422,16 +433,29 @@ namespace gdjs {
       }
       const tileCellsCount =
         tileBuilder.tileSizeInCells * tileBuilder.tileSizeInCells;
+      const cellsBuiltPerFrameMax = this.isFirstBuildInProgress
+        ? cellsBuiltPerFrameMaxForFirstBuild
+        : tileCellsCount;
       let builtCellsCount = 0;
       for (const [tileKey, tile] of this.tilesToBuild) {
         if (builtCellsCount >= cellsBuiltPerFrameMax) {
           break;
         }
+        const tileBuildTime = this.tileBuildTimes.get(tileKey);
+        if (
+          tileBuildTime !== undefined &&
+          this.time - tileBuildTime < tileRebuildIntervalMin
+        ) {
+          continue;
+        }
         this.tilesToBuild.delete(tileKey);
         this.buildTile(tile);
         builtCellsCount += tileCellsCount;
       }
-      this.onTilesBuilt();
+      if (builtCellsCount > 0) {
+        this.tileRebuildsAllowance = 0;
+        this.onTilesBuilt();
+      }
     }
 
     /**
@@ -485,6 +509,10 @@ namespace gdjs {
       if (this.groundArea) {
         this.addGroundFor2D(this.groundArea, geometryArea, vertices);
       }
+      this.tileBuildTimes.set(
+        tileBuilder.getTileKey(tile.x, tile.y),
+        this.time
+      );
       const isBuilt = tileBuilder.buildTile(navMesh, tile.x, tile.y, vertices);
       if (!isBuilt) {
         // Obstacles moved too far from where they were: the navigation mesh
@@ -1224,6 +1252,7 @@ namespace gdjs {
       this.obstacles.clear();
       this.obstacleGeometries.clear();
       this.tilesToBuild.clear();
+      this.tileBuildTimes.clear();
       if (this.crowd) {
         this.crowd.destroy();
         this.crowd = null;

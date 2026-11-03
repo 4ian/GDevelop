@@ -66,7 +66,13 @@ export const prepareInstancesEditorSettings = (
     windowMask: object.windowMask || false,
     selectedLayer: object.selectedLayer || '',
     gameEditorMode: object.gameEditorMode || 'instances-editor',
-    editorMode: object.editorMode || '2d-editor',
+    editorMode:
+      object.editorMode ||
+      // Compatibility with GD <= 5.6.286
+      object.gameEditorMode === 'embedded-game'
+        ? '3d-editor'
+        : '2d-editor',
+    // end of compatibility code
   };
 };
 

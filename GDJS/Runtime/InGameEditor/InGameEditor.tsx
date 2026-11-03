@@ -3176,7 +3176,8 @@ namespace gdjs {
       if (
         objectUnderCursor &&
         !this._selectionBoxes.has(objectUnderCursor) &&
-        !this.isInstanceSealed(objectUnderCursor)
+        !this.isInstanceSealed(objectUnderCursor) &&
+        !this._selectionControls.isHovered()
       ) {
         this._createBoundingBoxIfNeeded(objectUnderCursor);
       }
@@ -7807,7 +7808,9 @@ namespace gdjs {
     setTransformControlsMode(mode: 'scale' | 'translate' | 'rotate'): void {}
 
     isHovered(): boolean {
-      return false;
+      return (
+        this.selectionHandle.isHovered || this.selectionHandle.state !== 'idle'
+      );
     }
 
     forceUpdate(): void {
@@ -7973,6 +7976,7 @@ namespace gdjs {
     private _hasActuallyMoved = false;
     private _objectMover: ObjectMover2D;
     hasDuplicatedSelection = false;
+    isHovered = false;
 
     constructor(objectMover: ObjectMover2D) {
       super();
@@ -8181,6 +8185,7 @@ namespace gdjs {
           }
         }
       }
+      this.isHovered = hoverredButtonLocation || isRotationButtonHovered;
       const selectedObjects = editor.getSelectedObjects();
       if (selectedObjects.length === 0) {
         console.log('Selection is empty');

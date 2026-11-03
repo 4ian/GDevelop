@@ -1696,7 +1696,7 @@ namespace gdjs {
     private _selectionBoxStartCursorY: float = 0;
 
     // The selected objects.
-    private _selection = new Selection();
+    _selection = new Selection();
     private _selectionBoxes: Map<RuntimeObject, ObjectSelectionBoxHelper> =
       new Map();
     // Markers displayed on instances that are hidden when the scene starts
@@ -2351,7 +2351,7 @@ namespace gdjs {
 
     getEditorMode(): '2d-editor' | '3d-editor' {
       return this._instancesEditorSettings
-        ? this._instancesEditorSettings.editorMode
+        ? this._instancesEditorSettings.editorMode || '2d-editor'
         : '2d-editor';
     }
 
@@ -5282,7 +5282,7 @@ namespace gdjs {
       this.isSnappingEnabledByDefault = instancesEditorSettings.snap;
       this.gridType = instancesEditorSettings.gridType;
       this.divisionsCount = 10;
-      this.editorMode = instancesEditorSettings.editorMode | '2d-grid';
+      this.editorMode = instancesEditorSettings.editorMode || '2d-editor';
       this.rebuildGrid();
     }
 
@@ -8186,7 +8186,7 @@ namespace gdjs {
           }
         }
       }
-      this.isHovered = hoverredButtonLocation || isRotationButtonHovered;
+      this.isHovered = !!hoverredButtonLocation || isRotationButtonHovered;
       const selectedObjects = editor.getSelectedObjects();
       if (selectedObjects.length === 0) {
         console.log('Selection is empty');

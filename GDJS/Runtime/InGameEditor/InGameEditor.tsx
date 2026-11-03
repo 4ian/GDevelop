@@ -926,7 +926,8 @@ namespace gdjs {
         if (options && options.ignoreIf(object)) {
           continue;
         }
-        const aabb2D = object.getAABB();
+        const aabb2D: AABB3D = { min: [0, 0, 0], max: [0, 0, 0] };
+        getInstanceAABB(object, aabb2D);
         const minZ = is3D(object) ? object.getUnrotatedAABBMinZ() : 0;
         const maxZ = is3D(object) ? object.getUnrotatedAABBMaxZ() : 0;
         if (aabb) {

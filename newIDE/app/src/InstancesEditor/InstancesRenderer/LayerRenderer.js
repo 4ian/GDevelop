@@ -16,6 +16,7 @@ import {
   type Polygon,
 } from '../../Utils/PolygonHelper';
 import Rendered3DInstance from '../../ObjectsRendering/Renderers/Rendered3DInstance';
+import LayerEnvironmentMapEffect from './LayerEnvironmentMapEffect';
 import {
   type BasicProfilingCounters,
   increaseInstanceUpdate,
@@ -84,6 +85,12 @@ export default class LayerRenderer {
   _threeScene: THREE.Scene | null = null;
   // $FlowFixMe[value-as-type]
   _threeCamera: THREE.PerspectiveCamera | null = null;
+  // The 3D renderer rendering the scene (only known once rendered).
+  // $FlowFixMe[value-as-type]
+  _threeRenderer: THREE.WebGLRenderer | null = null;
+
+  // Shows the "Environment map" effect of the layer in the 3D scene.
+  _environmentMapEffect: LayerEnvironmentMapEffect = new LayerEnvironmentMapEffect();
 
   // For a 2D+3D layer, the 2D rendering is done on the render texture
   // and then must be displayed on a plane in the 3D world:
@@ -604,6 +611,13 @@ export default class LayerRenderer {
   render() {
     resetBasicProfilingCounters(this._basicProfilingCounters);
 
+    this._environmentMapEffect.update(
+      this.project,
+      this.layer,
+      this._threeScene,
+      this._threeRenderer
+    );
+
     this._computeViewBounds();
     this.instances.iterateOverInstancesWithZOrdering(
       // $FlowFixMe[incompatible-type] - gd.castObject is not supporting typings.
@@ -814,6 +828,7 @@ export default class LayerRenderer {
     // $FlowFixMe[value-as-type]
     pixiRenderer: PIXI.Renderer
   ): void {
+    this._threeRenderer = threeRenderer;
     if (!this._threePlaneTexture || !this._renderTexture) {
       return;
     }
@@ -896,6 +911,8 @@ export default class LayerRenderer {
   }
 
   delete() {
+    this._environmentMapEffect.dispose(this._threeScene);
+
     // Destroy all instances
     for (let s in this.renderedInstances) {
       let i = Number(s);

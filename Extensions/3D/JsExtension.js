@@ -3094,6 +3094,118 @@ module.exports = {
     }
     {
       const effect = extension
+        .addEffect('EnvironmentMap')
+        .setFullName(_('Environment map'))
+        .setDescription(
+          _(
+            'Light the scene with images (image based lighting), for realistic reflections and lighting on 3D boxes and 3D models. The images can also be shown as the background of the layer.'
+          )
+        )
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/EnvironmentMapEffect.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('source')
+        .setValue('cube')
+        .setLabel(_('Source'))
+        .setType('choice')
+        .addChoice('cube', _('Cube map (6 images)'))
+        .addChoice('equirect', _('Equirectangular image (360° panorama)'))
+        .setDescription(
+          _(
+            'A cube map is made of 6 images (like a skybox). An equirectangular image is a single 360° panorama.'
+          )
+        );
+      properties
+        .getOrCreate('rightFaceResourceName')
+        .setType('resource')
+        .addExtraInfo('image')
+        .setLabel(_('Right face (X+)'))
+        .setGroup(_('Images'));
+      properties
+        .getOrCreate('leftFaceResourceName')
+        .setType('resource')
+        .addExtraInfo('image')
+        .setLabel(_('Left face (X-)'))
+        .setGroup(_('Images'));
+      properties
+        .getOrCreate('topFaceResourceName')
+        .setType('resource')
+        .addExtraInfo('image')
+        .setLabel(_('Top face (Y+)'))
+        .setGroup(_('Images'));
+      properties
+        .getOrCreate('bottomFaceResourceName')
+        .setType('resource')
+        .addExtraInfo('image')
+        .setLabel(_('Bottom face (Y-)'))
+        .setGroup(_('Images'));
+      properties
+        .getOrCreate('frontFaceResourceName')
+        .setType('resource')
+        .addExtraInfo('image')
+        .setLabel(_('Front face (Z+)'))
+        .setGroup(_('Images'));
+      properties
+        .getOrCreate('backFaceResourceName')
+        .setType('resource')
+        .addExtraInfo('image')
+        .setLabel(_('Back face (Z-)'))
+        .setGroup(_('Images'));
+      properties
+        .getOrCreate('equirectangularResourceName')
+        .setType('resource')
+        .addExtraInfo('image')
+        .setLabel(_('Equirectangular image (360° panorama)'))
+        .setGroup(_('Images'))
+        .setDescription(
+          _('Used when the source is an equirectangular image.')
+        );
+      properties
+        .getOrCreate('environmentIntensity')
+        .setValue('1')
+        .setLabel(_('Environment light intensity'))
+        .setType('number')
+        .setDescription(
+          _(
+            'Intensity of the light given by the images to 3D boxes and 3D models using a standard material. 0 disables it.'
+          )
+        )
+        .setGroup(_('Lighting'));
+      properties
+        .getOrCreate('rotation')
+        .setValue('0')
+        .setLabel(_('Rotation'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
+        .setDescription(
+          _('Rotation of the images around the vertical axis of the scene.')
+        )
+        .setGroup(_('Orientation'));
+      properties
+        .getOrCreate('showBackground')
+        .setValue('false')
+        .setLabel(_('Show the images as the background'))
+        .setType('boolean')
+        .setDescription(
+          _(
+            'Display the images behind the scene (they are only used to light the scene otherwise).'
+          )
+        )
+        .setGroup(_('Background'));
+      properties
+        .getOrCreate('backgroundIntensity')
+        .setValue('1')
+        .setLabel(_('Background brightness'))
+        .setType('number')
+        .setDescription(
+          _('Brightness of the images shown in the background (1 shows them as they are).')
+        )
+        .setGroup(_('Background'));
+    }
+    {
+      const effect = extension
         .addEffect('HueAndSaturation')
         .setFullName(_('Hue and saturation'))
         .setDescription(

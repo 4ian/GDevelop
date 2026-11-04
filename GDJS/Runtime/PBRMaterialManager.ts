@@ -985,6 +985,43 @@ namespace gdjs {
     }
 
     /**
+     * Prefilter an environment texture (a cube texture or an equirectangular
+     * texture) with PMREM, so that it can be used as the `environment` of a
+     * scene with a smooth roughness on every GPU.
+     *
+     * @returns the prefiltered texture, to dispose with
+     * `disposeEnvironmentTexture` when not used anymore, or null when no 3D
+     * renderer is available.
+     */
+    prefilterEnvironmentTexture(
+      sourceTexture: THREE.Texture
+    ): THREE.Texture | null {
+      const threeRenderer = this._runtimeGame.getRenderer().getThreeRenderer();
+      if (!threeRenderer) {
+        logger.warn(
+          'Cannot prefilter the environment texture: no 3D renderer is available.'
+        );
+        return null;
+      }
+      if (!this._pmremGenerator) {
+        this._pmremGenerator = new THREE.PMREMGenerator(threeRenderer);
+      }
+      // PMREM prefiltering is needed for smooth roughness on every GPU
+      // (see https://threejs.org/docs/#api/en/materials/MeshStandardMaterial).
+      return (sourceTexture as THREE.CubeTexture).isCubeTexture
+        ? this._pmremGenerator.fromCubemap(sourceTexture as THREE.CubeTexture)
+            .texture
+        : this._pmremGenerator.fromEquirectangular(sourceTexture).texture;
+    }
+
+    /**
+     * Dispose a texture returned by `prefilterEnvironmentTexture`.
+     */
+    disposeEnvironmentTexture(texture: THREE.Texture): void {
+      texture.dispose();
+    }
+
+    /**
      * Use the 6 given images as an environment map (image based lighting).
      *
      * @param faceResourceNames the names of 6 image resources, in the order
@@ -1074,24 +1111,14 @@ namespace gdjs {
       runtimeScene: gdjs.RuntimeScene,
       sourceTexture: THREE.Texture
     ): void {
-      const threeRenderer = this._runtimeGame.getRenderer().getThreeRenderer();
-      if (!threeRenderer) {
-        logger.warn(
-          'Cannot setup the environment map: no 3D renderer is available.'
-        );
+      const environmentTexture = this.prefilterEnvironmentTexture(
+        sourceTexture
+      );
+      if (!environmentTexture) {
         return;
       }
-      if (!this._pmremGenerator) {
-        this._pmremGenerator = new THREE.PMREMGenerator(threeRenderer);
-      }
       const previousTexture = this._environmentTexture;
-      // PMREM prefiltering is needed for smooth roughness on every GPU
-      // (see https://threejs.org/docs/#api/en/materials/MeshStandardMaterial).
-      this._environmentTexture = (sourceTexture as THREE.CubeTexture)
-        .isCubeTexture
-        ? this._pmremGenerator.fromCubemap(sourceTexture as THREE.CubeTexture)
-            .texture
-        : this._pmremGenerator.fromEquirectangular(sourceTexture).texture;
+      this._environmentTexture = environmentTexture;
       if (previousTexture) {
         previousTexture.dispose();
       }

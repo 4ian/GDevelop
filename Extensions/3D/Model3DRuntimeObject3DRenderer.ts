@@ -73,6 +73,13 @@ namespace gdjs {
     private _originalModel: THREE_ADDONS.GLTF;
     private _animationMixer: THREE.AnimationMixer;
     private _action: THREE.AnimationAction | null;
+    /**
+     * The materials owned by this object (copies of the materials of the
+     * model, configured with PBR settings). They are disposed when the model
+     * is rebuilt or when the object is destroyed, to avoid leaking GPU
+     * memory.
+     */
+    private _ownedMaterials = new Set<THREE.Material>();
 
     /**
      * The model origin evaluated according to the object configuration.
@@ -111,6 +118,21 @@ namespace gdjs {
 
       this._animationMixer = new THREE.AnimationMixer(model);
       this._action = null;
+      // Dispose the materials owned by this object when it is destroyed.
+      runtimeObject.registerDestroyCallback(() =>
+        this._disposeOwnedMaterials()
+      );
+    }
+
+    private _disposeOwnedMaterials() {
+      const pbrMaterialManager = this._model3DRuntimeObject
+        .getInstanceContainer()
+        .getGame()
+        .getPBRMaterialManager();
+      for (const material of this._ownedMaterials) {
+        pbrMaterialManager.disposeUniqueMaterial(material);
+      }
+      this._ownedMaterials.clear();
     }
 
     updateAnimation(timeDelta: float) {
@@ -343,6 +365,9 @@ namespace gdjs {
       // - _replaceMaterials is destructive
       // - _updateDefaultTransformation may need to work with meshes in local space
 
+      // Dispose the materials owned for the previous model.
+      this._disposeOwnedMaterials();
+
       // This group hold the rotation defined by properties.
       const threeObject = new THREE.Group();
       threeObject.rotation.order = 'ZYX';
@@ -381,9 +406,15 @@ namespace gdjs {
     }
 
     /**
-     * Replace materials to better work with lights (or no light).
+     * Replace materials to better work with lights (or no light), or to
+     * apply the PBR settings configured on the object.
      */
     private _replaceMaterials(threeObject: THREE.Object3D) {
+      const pbrConfig = this._model3DRuntimeObject.getPBRConfig();
+      if (pbrConfig && pbrConfig.enabled !== false) {
+        this._applyPBRMaterials(threeObject, pbrConfig, '');
+        return;
+      }
       if (
         this._model3DRuntimeObject._materialType ===
         gdjs.Model3DRuntimeObject.MaterialType.StandardWithoutMetalness
@@ -395,6 +426,137 @@ namespace gdjs {
       ) {
         traverseToSetBasicMaterialFromMeshes(threeObject);
       }
+    }
+
+    private _getPBRMaterialManager(): gdjs.PBRMaterialManager {
+      return this._model3DRuntimeObject
+        .getInstanceContainer()
+        .getGame()
+        .getPBRMaterialManager();
+    }
+
+    private _getPBRMaterialOptions(material: THREE.Material) {
+      const pbrConfig = this._model3DRuntimeObject.getPBRConfig();
+      return {
+        materialType: (pbrConfig && pbrConfig.material === 'physical'
+          ? 'physical'
+          : 'standard') as gdjs.PBRMaterialType,
+        vertexColors: material.vertexColors,
+      };
+    }
+
+    /**
+     * Give a PBR material to every mesh of the model (copied from the
+     * material of the model and configured with the PBR settings of the
+     * object and of the mesh).
+     *
+     * @param meshName The name of the mesh to configure, or '' for all of
+     * them.
+     */
+    private _applyPBRMaterials(
+      threeObject: THREE.Object3D,
+      pbrConfig: gdjs.PBRConfig,
+      meshName: string
+    ) {
+      const pbrMaterialManager = this._getPBRMaterialManager();
+      threeObject.traverse((node) => {
+        const mesh = node as THREE.Mesh;
+        if (!mesh.material) {
+          return;
+        }
+        if (meshName && mesh.name !== meshName) {
+          return;
+        }
+        const settings = gdjs.pbrconfig.getSettingsForTarget(
+          pbrConfig,
+          mesh.name || ''
+        );
+        const isArray = Array.isArray(mesh.material);
+        const materials: THREE.Material[] = isArray
+          ? (mesh.material as THREE.Material[])
+          : [mesh.material as THREE.Material];
+        const newMaterials = materials.map((material) => {
+          // Always work on a copy: the materials of the model are shared with
+          // the other instances and with the model manager cache.
+          const isOwned = this._ownedMaterials.has(material);
+          const target = isOwned
+            ? material
+            : pbrMaterialManager.makeUniqueMaterialCopy(material);
+          const newMaterial = pbrMaterialManager.configureMaterial(
+            target,
+            settings,
+            this._getPBRMaterialOptions(material)
+          );
+          if (newMaterial !== target) {
+            // The material type had to change (e.g. for the glass preset).
+            this._ownedMaterials.delete(target);
+            pbrMaterialManager.disposeUniqueMaterial(target);
+          }
+          this._ownedMaterials.add(newMaterial);
+          return newMaterial;
+        });
+        mesh.material = isArray
+          ? (newMaterials as THREE.Material[])
+          : newMaterials[0];
+      });
+    }
+
+    /**
+     * To be called when the PBR configuration of the object changed (after
+     * being changed by events).
+     *
+     * @param meshName The name of the mesh to update, or '' for all of them.
+     */
+    onPBRConfigChanged(meshName: string) {
+      const pbrConfig = this._model3DRuntimeObject.getPBRConfig();
+      if (!pbrConfig || pbrConfig.enabled === false) {
+        return;
+      }
+      this._applyPBRMaterials(this._threeObject, pbrConfig, meshName);
+    }
+
+    private _getTargetMaterial(targetName: string): THREE.Material | null {
+      let foundMaterial: THREE.Material | null = null;
+      this._threeObject.traverse((node) => {
+        if (foundMaterial) return;
+        const mesh = node as THREE.Mesh;
+        if (!mesh.material) return;
+        if (targetName && mesh.name !== targetName) return;
+        foundMaterial = Array.isArray(mesh.material)
+          ? mesh.material[0]
+          : mesh.material;
+      });
+      return foundMaterial;
+    }
+
+    getPBRFloatValue(
+      targetName: string,
+      property: gdjs.PBRFloatPropertyName
+    ): float {
+      const material = this._getTargetMaterial(targetName);
+      return material
+        ? this._getPBRMaterialManager().getFloatProperty(material, property)
+        : 0;
+    }
+
+    getPBRColorValue(
+      targetName: string,
+      property: gdjs.PBRColorPropertyName
+    ): string {
+      const material = this._getTargetMaterial(targetName);
+      return material
+        ? this._getPBRMaterialManager().getColorProperty(material, property)
+        : '255;255;255';
+    }
+
+    getPBRTextureSlotName(
+      targetName: string,
+      slot: gdjs.PBRTextureSlotName
+    ): string {
+      const material = this._getTargetMaterial(targetName);
+      return material
+        ? this._getPBRMaterialManager().getTextureSlotName(material, slot)
+        : '';
     }
 
     getAnimationCount() {

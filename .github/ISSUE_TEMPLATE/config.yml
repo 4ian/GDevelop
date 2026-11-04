@@ -12,6 +12,9 @@ contact_links:
   - name: Submit a new game example that you created
     url: https://github.com/GDevelopApp/GDevelop-examples/issues/new/choose
     about: You can submit a game that you made to be added to examples in the "GDevelop-examples" repository
-  - name: Submit a new game extension that you created
-    url: https://github.com/4ian/GDevelop-extensions/issues/new/choose
-    about: You can submit an extension that you made in the "GDevelop-extensions" repository
+  - name: Share an extension that you created
+    url: https://github.com/GDevelopApp/GDevelop-community-list/issues/new?template=new-extension.yml
+    about: You can add an extension that you made to the "GDevelop-community-list" repository
+  - name: Submit an official or experimental extension
+    url: https://github.com/GDevelopApp/GDevelop-extensions#submit-an-extension
+    about: Open a pull request on the "GDevelop-extensions" repository to submit or update an extension reviewed by the extensions team

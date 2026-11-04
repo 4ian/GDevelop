@@ -32,6 +32,8 @@ namespace gdjs {
       isCastingShadow: boolean;
       isReceivingShadow: boolean;
       materialType: 'Basic' | 'StandardWithoutMetalness';
+      /** The JSON of the PBR material configuration (empty when disabled). */
+      pbrConfig?: string;
     };
   }
   type FaceName = 'front' | 'back' | 'left' | 'right' | 'top' | 'bottom';
@@ -84,6 +86,7 @@ namespace gdjs {
     _tint: string;
     _isCastingShadow: boolean = true;
     _isReceivingShadow: boolean = true;
+    _pbrConfig: gdjs.PBRConfig | null = null;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -136,6 +139,7 @@ namespace gdjs {
       this._tint = objectData.content.tint || '255;255;255';
       this._isCastingShadow = objectData.content.isCastingShadow || false;
       this._isReceivingShadow = objectData.content.isReceivingShadow || false;
+      this._pbrConfig = gdjs.parsePBRConfig(objectData.content.pbrConfig);
 
       this._materialType = this._convertMaterialType(
         objectData.content.materialType
@@ -246,6 +250,179 @@ namespace gdjs {
 
     getRenderer(): gdjs.RuntimeObject3DRenderer {
       return this._renderer;
+    }
+
+    /**
+     * The PBR material configuration of the object (or null when PBR is not
+     * used).
+     * @internal
+     */
+    getPBRConfig(): gdjs.PBRConfig | null {
+      return this._pbrConfig;
+    }
+
+    /**
+     * Return true when PBR materials are used (the configuration exists and
+     * is enabled).
+     */
+    isPBREnabled(): boolean {
+      return !!(this._pbrConfig && this._pbrConfig.enabled !== false);
+    }
+
+    /**
+     * The name of the PBR target of a face (for the events).
+     */
+    private _getPBRTargetName(faceTarget: string): string {
+      if (!faceTarget || faceTarget === 'all') return '';
+      return faceNameToBitmaskIndex[faceTarget] !== undefined ? faceTarget : '';
+    }
+
+    /**
+     * Change a numeric PBR property (for the events). `faceTarget` is the
+     * name of a face or 'all' for every face.
+     */
+    setPBRValue(faceTarget: string, property: string, value: float): void {
+      const config = this._pbrConfig;
+      if (
+        !config ||
+        config.enabled === false ||
+        !gdjs.isPBRFloatProperty(property)
+      )
+        return;
+      const targetName = this._getPBRTargetName(faceTarget);
+      if (!targetName) this._clearPBRFloatOverrides(property);
+      gdjs.pbrconfig.setFloatValue(config, targetName, property, value);
+      this._renderer.onPBRConfigChanged(
+        targetName ? faceNameToBitmaskIndex[targetName] : undefined
+      );
+    }
+
+    /**
+     * Get a numeric PBR property (for the events).
+     */
+    getPBRValue(faceTarget: string, property: string): float {
+      if (!gdjs.isPBRFloatProperty(property)) return 0;
+      return this._renderer.getPBRFloatValue(
+        this._getPBRTargetName(faceTarget),
+        property
+      );
+    }
+
+    /**
+     * Change a color PBR property (for the events). `faceTarget` is the name
+     * of a face or 'all' for every face.
+     */
+    setPBRColor(faceTarget: string, property: string, color: string): void {
+      const config = this._pbrConfig;
+      if (
+        !config ||
+        config.enabled === false ||
+        !gdjs.isPBRColorProperty(property)
+      )
+        return;
+      const targetName = this._getPBRTargetName(faceTarget);
+      if (!targetName) this._clearPBRColorOverrides(property);
+      gdjs.pbrconfig.setColorValue(config, targetName, property, color);
+      this._renderer.onPBRConfigChanged(
+        targetName ? faceNameToBitmaskIndex[targetName] : undefined
+      );
+    }
+
+    /**
+     * Get a color PBR property (for the events).
+     */
+    getPBRColor(faceTarget: string, property: string): string {
+      if (!gdjs.isPBRColorProperty(property)) return '255;255;255';
+      return this._renderer.getPBRColorValue(
+        this._getPBRTargetName(faceTarget),
+        property
+      );
+    }
+
+    /**
+     * Change a PBR texture slot (for the events). An empty resource name
+     * removes the texture of the slot.
+     */
+    setPBRTexture(
+      faceTarget: string,
+      slot: string,
+      resourceName: string
+    ): void {
+      const config = this._pbrConfig;
+      if (!config || config.enabled === false || !gdjs.isPBRTextureSlot(slot))
+        return;
+      const targetName = this._getPBRTargetName(faceTarget);
+      if (!targetName) this._clearPBRTextureOverrides(slot);
+      gdjs.pbrconfig.setTextureSlot(config, targetName, slot, resourceName);
+      this._renderer.onPBRConfigChanged(
+        targetName ? faceNameToBitmaskIndex[targetName] : undefined
+      );
+    }
+
+    /**
+     * Get the resource name of a PBR texture slot (for the events).
+     */
+    getPBRTexture(faceTarget: string, slot: string): string {
+      if (!gdjs.isPBRTextureSlot(slot)) return '';
+      return this._renderer.getPBRTextureSlotName(
+        this._getPBRTargetName(faceTarget),
+        slot
+      );
+    }
+
+    /**
+     * Return true when a texture is set on a PBR texture slot (for the
+     * events).
+     */
+    isPBRTextureSet(faceTarget: string, slot: string): boolean {
+      return this.getPBRTexture(faceTarget, slot) !== '';
+    }
+
+    /**
+     * Apply a PBR material preset (for the events).
+     */
+    applyPBRPreset(faceTarget: string, presetName: string): void {
+      const config = this._pbrConfig;
+      if (!config || config.enabled === false) return;
+      const targetName = this._getPBRTargetName(faceTarget);
+      gdjs.pbrconfig.applyPreset(
+        config,
+        targetName,
+        presetName as gdjs.PBRPresetName
+      );
+      this._renderer.onPBRConfigChanged(
+        targetName ? faceNameToBitmaskIndex[targetName] : undefined
+      );
+    }
+
+    /**
+     * When a property is changed for all the faces, the face overrides of
+     * this property are removed so that the new value is really used
+     * everywhere.
+     */
+    private _clearPBRFloatOverrides(property: gdjs.PBRFloatPropertyName) {
+      const targets = this._pbrConfig && this._pbrConfig.targets;
+      if (!targets) return;
+      for (const targetName of Object.keys(targets)) {
+        delete targets[targetName][property];
+      }
+    }
+
+    private _clearPBRColorOverrides(property: gdjs.PBRColorPropertyName) {
+      const targets = this._pbrConfig && this._pbrConfig.targets;
+      if (!targets) return;
+      for (const targetName of Object.keys(targets)) {
+        delete targets[targetName][property];
+      }
+    }
+
+    private _clearPBRTextureOverrides(slot: gdjs.PBRTextureSlotName) {
+      const targets = this._pbrConfig && this._pbrConfig.targets;
+      if (!targets) return;
+      for (const targetName of Object.keys(targets)) {
+        const textures = targets[targetName].textures;
+        if (textures) delete textures[slot];
+      }
     }
 
     getBackFaceUpThroughWhichAxisRotation(): 'X' | 'Y' {
@@ -476,6 +653,10 @@ namespace gdjs {
         newObjectData.content.isReceivingShadow
       ) {
         this.updateShadowReceiving(newObjectData.content.isReceivingShadow);
+      }
+      if (oldObjectData.content.pbrConfig !== newObjectData.content.pbrConfig) {
+        this._pbrConfig = gdjs.parsePBRConfig(newObjectData.content.pbrConfig);
+        this._renderer._updateMaterials();
       }
 
       return true;

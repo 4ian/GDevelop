@@ -56,6 +56,14 @@ namespace gdjs {
      * Map associating a resource name to the loaded Three.js texture.
      */
     private _loadedThreeTextures: Hashtable<THREE.Texture<HTMLImageElement>>;
+    /**
+     * Map associating a resource name to the loaded Three.js texture for
+     * non-color data (normal maps, roughness...), that must be kept in the
+     * linear color space.
+     */
+    private _loadedThreeLinearTextures: Hashtable<
+      THREE.Texture<HTMLImageElement>
+    >;
     private _loadedThreeMaterials = new ThreeMaterialCache();
     private _loadedThreeCubeTextures = new Map<string, THREE.CubeTexture>();
     private _loadedThreeCubeTextureKeysByResourceName = new ArrayMap<
@@ -79,6 +87,7 @@ namespace gdjs {
         { width: 192, height: 192 }
       );
       this._loadedThreeTextures = new Hashtable();
+      this._loadedThreeLinearTextures = new Hashtable();
     }
 
     getResourceKinds(): ResourceKind[] {
@@ -201,10 +210,20 @@ namespace gdjs {
      * Return the three.js texture associated to the specified resource name.
      * Returns a placeholder texture if not found.
      * @param resourceName The name of the resource
+     * @param options Set `isColorData` to false for textures holding non-color
+     * data (normal maps, roughness...), that must be kept in the linear color
+     * space. It defaults to true.
      * @returns The requested texture, or a placeholder if not found.
      */
-    getThreeTexture(resourceName: string): THREE.Texture<HTMLImageElement> {
-      const loadedThreeTexture = this._loadedThreeTextures.get(resourceName);
+    getThreeTexture(
+      resourceName: string,
+      options?: { isColorData?: boolean }
+    ): THREE.Texture<HTMLImageElement> {
+      const isColorData = !options || options.isColorData !== false;
+      const loadedTextures = isColorData
+        ? this._loadedThreeTextures
+        : this._loadedThreeLinearTextures;
+      const loadedThreeTexture = loadedTextures.get(resourceName);
       if (loadedThreeTexture) {
         return loadedThreeTexture;
       }
@@ -215,13 +234,15 @@ namespace gdjs {
       threeTexture.minFilter = THREE.LinearFilter;
       threeTexture.wrapS = THREE.RepeatWrapping;
       threeTexture.wrapT = THREE.RepeatWrapping;
-      threeTexture.colorSpace = THREE.SRGBColorSpace;
+      threeTexture.colorSpace = isColorData
+        ? THREE.SRGBColorSpace
+        : THREE.NoColorSpace;
       threeTexture.needsUpdate = true;
 
       const resource = this._getImageResource(resourceName);
 
       applyThreeTextureSettings(threeTexture, resource);
-      this._loadedThreeTextures.put(resourceName, threeTexture);
+      loadedTextures.put(resourceName, threeTexture);
 
       return threeTexture;
     }
@@ -587,7 +608,10 @@ namespace gdjs {
       const threeTextures: Array<THREE.Texture<HTMLImageElement>> = [];
       this._loadedThreeTextures.values(threeTextures);
       this._loadedThreeTextures.clear();
-      for (const threeTexture of threeTextures) {
+      const threeLinearTextures: Array<THREE.Texture<HTMLImageElement>> = [];
+      this._loadedThreeLinearTextures.values(threeLinearTextures);
+      this._loadedThreeLinearTextures.clear();
+      for (const threeTexture of [...threeTextures, ...threeLinearTextures]) {
         threeTexture.dispose();
       }
       for (const cubeTexture of this._loadedThreeCubeTextures.values()) {
@@ -639,8 +663,22 @@ namespace gdjs {
         threeTexture.dispose();
         this._loadedThreeTextures.remove(resourceName);
       }
+      const threeLinearTexture =
+        this._loadedThreeLinearTextures.get(resourceName);
+      if (threeLinearTexture) {
+        threeLinearTexture.dispose();
+        this._loadedThreeLinearTextures.remove(resourceName);
+      }
 
       this._loadedThreeMaterials.dispose(resourceName);
+
+      // Let the PBR material manager remove the textures of this resource
+      // from the materials using it (to avoid keeping disposed textures).
+      const pbrMaterialManager =
+        this._resourceLoader._runtimeGame.getPBRMaterialManager();
+      if (pbrMaterialManager) {
+        pbrMaterialManager.onImageResourceUnloaded(resourceName);
+      }
 
       const cubeTextureKeys =
         this._loadedThreeCubeTextureKeysByResourceName.getValuesFor(

@@ -567,6 +567,10 @@ namespace gdjs {
     }
 
     private _setRenderTargetSamples(renderTarget: THREE.WebGLRenderTarget) {
+      // The stencil is only used while rendering the scene: never copy it from
+      // the samples. On Windows (Direct3D), WebGL copies it on the CPU, which
+      // stalls the GPU every frame (ambient occlusion, depth of field...).
+      renderTarget.resolveStencilBuffer = false;
       if (renderTarget.samples === this._renderTargetSamples) {
         return;
       }

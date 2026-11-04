@@ -1,0 +1,18 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+	<circle cx="12" cy="12" r="12" fill="#98DE24" />
+	<mask id="mask0_802_3806" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24">
+		<circle cx="12" cy="12" r="12" fill="#D9D9D9" />
+	</mask>
+	<g mask="url(#mask0_802_3806)">
+		<path d="M11.2419 5.72486C17.5737 5.64156 18.696 13.7122 18.3934 15.1801C22.8125 16.2933 21.4953 20.141 20.2299 21.2151L20.2118 21.2304C19.3473 21.9643 17.3107 23.6933 13.5 24C9.66253 24.3089 5.76283 23.21 4.72142 22.8134C3.68001 22.4168 2.25934 22.1932 1.8536 19.5397C1.52901 17.417 3.31222 16.2371 4.11815 15.8806C4.25119 12.1545 4.91003 5.80817 11.2419 5.72486Z" fill="url(#paint0_linear_802_3806)" />
+		<ellipse cx="0.846336" cy="0.911439" rx="0.846336" ry="0.911439" transform="matrix(-0.914359 0.404904 0.404904 0.914359 16.0637 13.1708)" fill="#3B314F" />
+		<ellipse cx="0.846336" cy="0.911439" rx="0.846336" ry="0.911439" transform="matrix(-0.914359 0.404904 0.404904 0.914359 8.98706 13.1708)" fill="#3B314F" />
+		<path d="M20.0001 5.00003C20.3655 6.93178 20.8772 12.2833 20.0001 18.2351" stroke="#CF0A80" stroke-width="0.918557" stroke-linecap="round" />
+	</g>
+	<defs>
+		<linearGradient id="paint0_linear_802_3806" x1="14.7489" y1="6.37278" x2="10.2511" y2="24.2265" gradientUnits="userSpaceOnUse">
+			<stop stop-color="#F783F2" />
+			<stop offset="1" stop-color="#E040DA" />
+		</linearGradient>
+	</defs>
+</svg>

@@ -324,10 +324,22 @@ namespace gdjs {
       this._downloadedArrayBuffers.delete(resource);
       try {
         const gltf: THREE_ADDONS.GLTF = await loader.parseAsync(data, '');
+        const textureQuality3DManager = this._resourceLoader
+          .getRuntimeGame()
+          .getTextureQuality3DManager();
         forEachMaterial(gltf.scene, (material) =>
-          forEachTexture(material, (texture) =>
-            this._sharedTextures.retain(texture, resource.name)
-          )
+          forEachTexture(material, (texture) => {
+            this._sharedTextures.retain(texture, resource.name);
+            // Apply the texture quality settings (resampling of oversized
+            // textures and anisotropic filtering) while keeping the filtering
+            // settings of the glTF samplers, unless the developer chose to
+            // override them.
+            textureQuality3DManager.applyToTexture(texture, {
+              label: resource.name,
+              kind: 'model',
+              respectSamplerSettings: true,
+            });
+          })
         );
         this._loadedThreeModels.set(resource, gltf);
       } catch (error) {

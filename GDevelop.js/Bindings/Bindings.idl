@@ -4275,6 +4275,7 @@ interface Model3DObjectConfiguration {
 
     [Const, Ref] DOMString GetModelResourceName();
     [Const, Ref] DOMString GetMaterialType();
+    [Const, Ref] DOMString GetPBRConfig();
     [Const, Ref] DOMString GetOriginLocation();
     [Const, Ref] DOMString GetCenterLocation();
 

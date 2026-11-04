@@ -22,6 +22,7 @@ import { getMeasurementUnitShortLabel } from '../../PropertiesEditor/PropertiesM
 import AlertMessage from '../../UI/AlertMessage';
 import { hasLight } from './Model3DEditor';
 import { PropertyCheckbox } from './PropertyFields';
+import PBRMaterialEditor from './PBRMaterialEditor';
 import { mapVector } from '../../Utils/MapFor';
 import ColorField from '../../UI/ColorField';
 import {
@@ -91,6 +92,7 @@ const Cube3DEditor = ({
 }: EditorProps): React.Node => {
   const forceUpdate = useForceUpdate();
   const properties = objectConfiguration.getProperties();
+  const [pbrTargetName, setPbrTargetName] = React.useState<string>('all');
 
   const onChangeProperty = React.useCallback(
     (property: string, value: string) => {
@@ -256,6 +258,35 @@ const Cube3DEditor = ({
               </Trans>
             </AlertMessage>
           )}
+      </ColumnStackLayout>
+      <Text size="block-title" noMargin>
+        <Trans>PBR materials</Trans>
+      </Text>
+      <ColumnStackLayout noMargin>
+        <SelectField
+          value={pbrTargetName}
+          floatingLabelText={<Trans>Face to edit</Trans>}
+          helperMarkdownText={
+            'PBR settings can be set for the whole object and overridden for a single face.'
+          }
+          onChange={(event, index, newValue) => setPbrTargetName(newValue)}
+          fullWidth
+        >
+          <SelectOption value="all" label={t`All faces`} />
+          <SelectOption value="front" label={t`Front face`} />
+          <SelectOption value="back" label={t`Back face`} />
+          <SelectOption value="left" label={t`Left face`} />
+          <SelectOption value="right" label={t`Right face`} />
+          <SelectOption value="top" label={t`Top face`} />
+          <SelectOption value="bottom" label={t`Bottom face`} />
+        </SelectField>
+        <PBRMaterialEditor
+          objectConfiguration={objectConfiguration}
+          project={project}
+          resourceManagementProps={resourceManagementProps}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
+          targetName={pbrTargetName === 'all' ? '' : pbrTargetName}
+        />
       </ColumnStackLayout>
       <Text size="block-title" noMargin>
         <Trans>Textures</Trans>

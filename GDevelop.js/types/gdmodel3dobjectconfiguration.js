@@ -18,6 +18,7 @@ declare class gdModel3DObjectConfiguration extends gdObjectConfiguration {
   getRotationZ(): number;
   getModelResourceName(): string;
   getMaterialType(): string;
+  getPBRConfig(): string;
   getOriginLocation(): string;
   getCenterLocation(): string;
   shouldKeepAspectRatio(): boolean;

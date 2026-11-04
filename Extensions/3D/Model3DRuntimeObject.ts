@@ -45,6 +45,8 @@ namespace gdjs {
       crossfadeDuration: float;
       isCastingShadow: boolean;
       isReceivingShadow: boolean;
+      /** The JSON of the PBR material configuration (empty when disabled). */
+      pbrConfig?: string;
     };
   }
 
@@ -113,6 +115,7 @@ namespace gdjs {
     _crossfadeDuration: float = 0;
     _isCastingShadow: boolean = true;
     _isReceivingShadow: boolean = true;
+    _pbrConfig: gdjs.PBRConfig | null = null;
     _data: Model3DObjectData;
 
     constructor(
@@ -138,6 +141,7 @@ namespace gdjs {
         objectData.content.materialType
       );
       this._crossfadeDuration = objectData.content.crossfadeDuration || 0;
+      this._pbrConfig = gdjs.parsePBRConfig(objectData.content.pbrConfig);
 
       this.setIsCastingShadow(objectData.content.isCastingShadow);
       this.setIsReceivingShadow(objectData.content.isReceivingShadow);
@@ -231,6 +235,11 @@ namespace gdjs {
       ) {
         this.setIsReceivingShadow(newObjectData.content.isReceivingShadow);
       }
+      if (oldObjectData.content.pbrConfig !== newObjectData.content.pbrConfig) {
+        this._pbrConfig = gdjs.parsePBRConfig(newObjectData.content.pbrConfig);
+        // Rebuild the model to apply the new materials.
+        this.onModelChanged(newObjectData);
+      }
       if (this.getInstanceContainer().getGame().isInGameEdition()) {
         const oldDefaultAnimationSource =
           this._animations.length > 0 ? this._animations[0].source : null;
@@ -309,6 +318,171 @@ namespace gdjs {
       this._modelResourceName = objectData.content.modelResourceName;
       this._renderer._reloadModel(this, this._runtimeScene);
       this.onModelChanged(objectData);
+    }
+
+    /**
+     * The PBR material configuration of the object (or null when PBR is not
+     * used).
+     * @internal
+     */
+    getPBRConfig(): gdjs.PBRConfig | null {
+      return this._pbrConfig;
+    }
+
+    /**
+     * Return true when PBR materials are used (the configuration exists and
+     * is enabled).
+     */
+    isPBREnabled(): boolean {
+      return !!(this._pbrConfig && this._pbrConfig.enabled !== false);
+    }
+
+    /**
+     * The name of the PBR target of a mesh (for the events).
+     */
+    private _getPBRTargetName(meshTarget: string): string {
+      if (!meshTarget || meshTarget === 'all') return '';
+      return meshTarget;
+    }
+
+    /**
+     * Change a numeric PBR property (for the events). `meshTarget` is the
+     * name of a mesh or 'all' for every mesh.
+     */
+    setPBRValue(meshTarget: string, property: string, value: float): void {
+      const config = this._pbrConfig;
+      if (
+        !config ||
+        config.enabled === false ||
+        !gdjs.isPBRFloatProperty(property)
+      )
+        return;
+      const targetName = this._getPBRTargetName(meshTarget);
+      if (!targetName) this._clearPBRFloatOverrides(property);
+      gdjs.pbrconfig.setFloatValue(config, targetName, property, value);
+      this._renderer.onPBRConfigChanged(targetName);
+    }
+
+    /**
+     * Get a numeric PBR property (for the events).
+     */
+    getPBRValue(meshTarget: string, property: string): float {
+      if (!gdjs.isPBRFloatProperty(property)) return 0;
+      return this._renderer.getPBRFloatValue(
+        this._getPBRTargetName(meshTarget),
+        property
+      );
+    }
+
+    /**
+     * Change a color PBR property (for the events). `meshTarget` is the name
+     * of a mesh or 'all' for every mesh.
+     */
+    setPBRColor(meshTarget: string, property: string, color: string): void {
+      const config = this._pbrConfig;
+      if (
+        !config ||
+        config.enabled === false ||
+        !gdjs.isPBRColorProperty(property)
+      )
+        return;
+      const targetName = this._getPBRTargetName(meshTarget);
+      if (!targetName) this._clearPBRColorOverrides(property);
+      gdjs.pbrconfig.setColorValue(config, targetName, property, color);
+      this._renderer.onPBRConfigChanged(targetName);
+    }
+
+    /**
+     * Get a color PBR property (for the events).
+     */
+    getPBRColor(meshTarget: string, property: string): string {
+      if (!gdjs.isPBRColorProperty(property)) return '255;255;255';
+      return this._renderer.getPBRColorValue(
+        this._getPBRTargetName(meshTarget),
+        property
+      );
+    }
+
+    /**
+     * Change a PBR texture slot (for the events). An empty resource name
+     * removes the texture of the slot.
+     */
+    setPBRTexture(
+      meshTarget: string,
+      slot: string,
+      resourceName: string
+    ): void {
+      const config = this._pbrConfig;
+      if (!config || config.enabled === false || !gdjs.isPBRTextureSlot(slot))
+        return;
+      const targetName = this._getPBRTargetName(meshTarget);
+      if (!targetName) this._clearPBRTextureOverrides(slot);
+      gdjs.pbrconfig.setTextureSlot(config, targetName, slot, resourceName);
+      this._renderer.onPBRConfigChanged(targetName);
+    }
+
+    /**
+     * Get the resource name of a PBR texture slot (for the events).
+     */
+    getPBRTexture(meshTarget: string, slot: string): string {
+      if (!gdjs.isPBRTextureSlot(slot)) return '';
+      return this._renderer.getPBRTextureSlotName(
+        this._getPBRTargetName(meshTarget),
+        slot
+      );
+    }
+
+    /**
+     * Return true when a texture is set on a PBR texture slot (for the
+     * events).
+     */
+    isPBRTextureSet(meshTarget: string, slot: string): boolean {
+      return this.getPBRTexture(meshTarget, slot) !== '';
+    }
+
+    /**
+     * Apply a PBR material preset (for the events).
+     */
+    applyPBRPreset(meshTarget: string, presetName: string): void {
+      const config = this._pbrConfig;
+      if (!config || config.enabled === false) return;
+      const targetName = this._getPBRTargetName(meshTarget);
+      gdjs.pbrconfig.applyPreset(
+        config,
+        targetName,
+        presetName as gdjs.PBRPresetName
+      );
+      this._renderer.onPBRConfigChanged(targetName);
+    }
+
+    /**
+     * When a property is changed for all the meshes, the mesh overrides of
+     * this property are removed so that the new value is really used
+     * everywhere.
+     */
+    private _clearPBRFloatOverrides(property: gdjs.PBRFloatPropertyName) {
+      const targets = this._pbrConfig && this._pbrConfig.targets;
+      if (!targets) return;
+      for (const targetName of Object.keys(targets)) {
+        delete targets[targetName][property];
+      }
+    }
+
+    private _clearPBRColorOverrides(property: gdjs.PBRColorPropertyName) {
+      const targets = this._pbrConfig && this._pbrConfig.targets;
+      if (!targets) return;
+      for (const targetName of Object.keys(targets)) {
+        delete targets[targetName][property];
+      }
+    }
+
+    private _clearPBRTextureOverrides(slot: gdjs.PBRTextureSlotName) {
+      const targets = this._pbrConfig && this._pbrConfig.targets;
+      if (!targets) return;
+      for (const targetName of Object.keys(targets)) {
+        const textures = targets[targetName].textures;
+        if (textures) delete textures[slot];
+      }
     }
 
     _updateModel(objectData: Model3DObjectData) {

@@ -276,6 +276,9 @@ export default class InstancesEditor extends Component<Props, State> {
           canvas: threeCanvas,
           // Ask for the discrete graphics card, if any.
           powerPreference: 'high-performance',
+          // Enable multisample anti-aliasing so that 3D models (and any 3D
+          // geometry) have smooth edges, like in other engines (Godot, Unity...).
+          antialias: true,
         });
       } catch (error) {
         console.error(
@@ -290,6 +293,13 @@ export default class InstancesEditor extends Component<Props, State> {
     if (threeCanvas && threeRenderer) {
       gameCanvas = threeCanvas;
       threeRenderer.autoClear = false;
+      // Render at the native resolution of the display (device pixel ratio),
+      // like Godot does, so that the editor is crisp on high-DPI screens
+      // (Windows laptops with 125%/150% scaling, macOS Retina...).
+      // Without this, the canvas is rendered at 1x then stretched by the
+      // browser, which looks blurry/pixelated (especially for 3D models).
+      const pixelRatio = window.devicePixelRatio || 1;
+      threeRenderer.setPixelRatio(pixelRatio);
       threeRenderer.setSize(initialWidth, initialHeight);
 
       // Create a PixiJS renderer that use the same GL context as Three.js
@@ -302,12 +312,19 @@ export default class InstancesEditor extends Component<Props, State> {
         context: threeRenderer.getContext(),
         clearBeforeRender: false,
         preserveDrawingBuffer: true,
+        // The MSAA of the canvas is set by the Three.js renderer above
+        // (both renderers share the same WebGL context), so this option
+        // has no effect here - keep it explicit for clarity.
         antialias: false,
         backgroundAlpha: 0,
         // It's the default value, but it's better to make it explicit.
         // It allows instances composed of several pixi objects to detect hovering.
         eventMode: 'auto',
-        // TODO (3D): add a setting for pixel ratio (`resolution: window.devicePixelRatio`)
+        // Use the same pixel ratio as the Three.js renderer so that the
+        // shared canvas drawing buffer stays consistent, and the 2D objects
+        // (rendered by PixiJS on a RenderTexture, itself displayed in the 3D
+        // world) are rendered at the native display resolution.
+        resolution: pixelRatio,
       });
 
       this.threeRenderer = threeRenderer;

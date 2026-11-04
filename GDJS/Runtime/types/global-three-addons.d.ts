@@ -6,6 +6,7 @@ import {
 } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils';
+import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils';
 
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 import { SelectionBox } from 'three/examples/jsm/interactive/SelectionBox';
@@ -36,6 +37,7 @@ declare global {
       GLTFLoaderPlugin,
       DRACOLoader,
       SkeletonUtils,
+      mergeVertices,
       TransformControls,
       SelectionBox,
       EffectComposer,

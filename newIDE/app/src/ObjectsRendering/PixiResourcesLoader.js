@@ -6,6 +6,7 @@ import { Spine, TextureAtlas } from '@esotericsoftware/spine-pixi-v7';
 import * as THREE from 'three';
 import { GLTFLoader, GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
+import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils';
 import ResourcesLoader from '../ResourcesLoader';
 import { loadFontFace } from '../Utils/FontFaceLoader';
 import { checkIfCredentialsRequired } from '../Utils/CrossOrigin';
@@ -238,6 +239,8 @@ const load3DModel = (
       url,
       gltf => {
         traverseToRemoveMetalnessFromMeshes(gltf.scene);
+        ensureSmoothNormals(gltf.scene);
+        applyModelTextureQuality(gltf.scene);
         resolve(gltf);
       },
       undefined,
@@ -279,7 +282,83 @@ const applyThreeTextureSettings = (
   if (!imageResource.isSmooth()) {
     threeTexture.magFilter = THREE.NearestFilter;
     threeTexture.minFilter = THREE.NearestFilter;
+    threeTexture.generateMipmaps = false;
+    threeTexture.anisotropy = 1;
   }
+};
+
+// The maximum anisotropic filtering level asked for smoothed textures.
+// It is automatically clamped to what the GPU supports when the texture is
+// uploaded by Three.js (`capabilities.getMaxAnisotropy()`).
+const maxTextureAnisotropy = 16;
+
+// If modifying this function, make sure to update Resource3DPreview.worker.js copy.
+const applyModelTextureQuality = (node: THREE.Object3D) => {
+  node.traverse(child => {
+    // $FlowFixMe[value-as-type]
+    const mesh = (child: THREE.Mesh);
+    if (!mesh.material) {
+      return;
+    }
+    const materials = Array.isArray(mesh.material)
+      ? mesh.material
+      : [mesh.material];
+    materials.forEach(material => {
+      for (const key in material) {
+        const value = material[key];
+        if (!value || !value.isTexture) continue;
+        // $FlowFixMe[value-as-type]
+        const texture = (value: THREE.Texture);
+        // Keep pixel-art (nearest) textures untouched: they must stay sharp
+        // without smoothing. Everything else gets the best quality:
+        // mipmaps (to avoid aliasing/"noise" in small details) and
+        // anisotropic filtering (to keep textures sharp at grazing angles).
+        if (
+          texture.magFilter === THREE.NearestFilter &&
+          texture.minFilter === THREE.NearestFilter
+        ) {
+          texture.generateMipmaps = false;
+          texture.anisotropy = 1;
+          continue;
+        }
+        texture.generateMipmaps = true;
+        if (texture.minFilter === THREE.LinearFilter) {
+          texture.minFilter = THREE.LinearMipmapLinearFilter;
+        }
+        texture.anisotropy = maxTextureAnisotropy;
+        texture.needsUpdate = true;
+      }
+    });
+  });
+};
+
+// If modifying this function, make sure to update Resource3DPreview.worker.js copy.
+const ensureSmoothNormals = (node: THREE.Object3D) => {
+  node.traverse(child => {
+    // $FlowFixMe[value-as-type]
+    const mesh = (child: THREE.Mesh);
+    const geometry = mesh.geometry;
+    if (!geometry || !geometry.isBufferGeometry) return;
+    if (geometry.getAttribute('normal')) return;
+    try {
+      if (!geometry.index) {
+        // On a non-indexed geometry, `computeVertexNormals` would generate
+        // flat (per-face) normals, because every triangle has its own
+        // vertices. Merge duplicated vertices first, so that the normals
+        // computed at shared corners are averaged (= smooth shading).
+        const mergedGeometry = mergeVertices(geometry, 1e-4);
+        if (mergedGeometry.getAttribute('position')) {
+          mesh.geometry = mergedGeometry;
+        }
+      }
+      mesh.geometry.computeVertexNormals();
+    } catch (error) {
+      console.warn(
+        'Unable to compute smooth normals for a mesh of a 3D model:',
+        error
+      );
+    }
+  });
 };
 
 // If modifying this function, make sure to update Resource3DPreview.worker.js copy.
@@ -970,7 +1049,11 @@ export default class PixiResourcesLoader {
 
     const threeTexture = new THREE.Texture(image);
     threeTexture.magFilter = THREE.LinearFilter;
-    threeTexture.minFilter = THREE.LinearFilter;
+    // Use mipmaps and anisotropic filtering so that smoothed textures stay
+    // sharp and free of aliasing when seen small, far or at grazing angles.
+    threeTexture.minFilter = THREE.LinearMipmapLinearFilter;
+    threeTexture.generateMipmaps = true;
+    threeTexture.anisotropy = maxTextureAnisotropy;
     threeTexture.wrapS = THREE.RepeatWrapping;
     threeTexture.wrapT = THREE.RepeatWrapping;
     threeTexture.colorSpace = THREE.SRGBColorSpace;

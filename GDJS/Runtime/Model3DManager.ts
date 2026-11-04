@@ -52,6 +52,40 @@ namespace gdjs {
     }
   };
 
+  /**
+   * Compute smooth (averaged) vertex normals for the meshes of a model that
+   * don't have any normal attribute. Without this, such meshes would be
+   * rendered with flat shading (or wrongly) by Three.js, as a fallback
+   * default - which looks broken/low quality.
+   */
+  const ensureSmoothNormals = (scene: THREE.Object3D): void => {
+    scene.traverse((object) => {
+      const mesh = object as THREE.Mesh;
+      const geometry = mesh.geometry;
+      if (!geometry || !(geometry as any).isBufferGeometry) return;
+      if (geometry.getAttribute('normal')) return;
+
+      try {
+        if (!geometry.index) {
+          // On a non-indexed geometry, `computeVertexNormals` would generate
+          // flat (per-face) normals, because every triangle has its own
+          // vertices. Merge duplicated vertices first, so that the normals
+          // computed at shared corners are averaged (= smooth shading).
+          const mergedGeometry = THREE_ADDONS.mergeVertices(geometry, 1e-4);
+          if (mergedGeometry.getAttribute('position')) {
+            mesh.geometry = mergedGeometry;
+          }
+        }
+        mesh.geometry.computeVertexNormals();
+      } catch (error) {
+        logger.warn(
+          'Unable to compute smooth normals for a mesh of a 3D model:',
+          error
+        );
+      }
+    });
+  };
+
   type SharedTextureEntry = {
     key: string;
     texture: Promise<THREE.Texture>;
@@ -324,6 +358,7 @@ namespace gdjs {
       this._downloadedArrayBuffers.delete(resource);
       try {
         const gltf: THREE_ADDONS.GLTF = await loader.parseAsync(data, '');
+        ensureSmoothNormals(gltf.scene);
         const textureQuality3DManager = this._resourceLoader
           .getRuntimeGame()
           .getTextureQuality3DManager();

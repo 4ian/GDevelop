@@ -8,6 +8,80 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
+import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils';
+
+// The maximum anisotropic filtering level asked for smoothed textures.
+// It is automatically clamped to what the GPU supports when the texture is
+// uploaded by Three.js (`capabilities.getMaxAnisotropy()`).
+const maxTextureAnisotropy = 16;
+
+// Copied from PixiResourcesLoader.js
+// $FlowFixMe[missing-local-annot]
+const applyModelTextureQuality = node => {
+  node.traverse(child => {
+    const mesh = child;
+    if (!mesh.material) {
+      return;
+    }
+    const materials = Array.isArray(mesh.material)
+      ? mesh.material
+      : [mesh.material];
+    materials.forEach(material => {
+      for (const key in material) {
+        const value = material[key];
+        if (!value || !value.isTexture) continue;
+        const texture = value;
+        // Keep pixel-art (nearest) textures untouched: they must stay sharp
+        // without smoothing. Everything else gets the best quality:
+        // mipmaps (to avoid aliasing/"noise" in small details) and
+        // anisotropic filtering (to keep textures sharp at grazing angles).
+        if (
+          texture.magFilter === THREE.NearestFilter &&
+          texture.minFilter === THREE.NearestFilter
+        ) {
+          texture.generateMipmaps = false;
+          texture.anisotropy = 1;
+          continue;
+        }
+        texture.generateMipmaps = true;
+        if (texture.minFilter === THREE.LinearFilter) {
+          texture.minFilter = THREE.LinearMipmapLinearFilter;
+        }
+        texture.anisotropy = maxTextureAnisotropy;
+        texture.needsUpdate = true;
+      }
+    });
+  });
+};
+
+// Copied from PixiResourcesLoader.js
+// $FlowFixMe[missing-local-annot]
+const ensureSmoothNormals = node => {
+  node.traverse(child => {
+    const mesh = child;
+    const geometry = mesh.geometry;
+    if (!geometry || !geometry.isBufferGeometry) return;
+    if (geometry.getAttribute('normal')) return;
+    try {
+      if (!geometry.index) {
+        // On a non-indexed geometry, `computeVertexNormals` would generate
+        // flat (per-face) normals, because every triangle has its own
+        // vertices. Merge duplicated vertices first, so that the normals
+        // computed at shared corners are averaged (= smooth shading).
+        const mergedGeometry = mergeVertices(geometry, 1e-4);
+        if (mergedGeometry.getAttribute('position')) {
+          mesh.geometry = mergedGeometry;
+        }
+      }
+      mesh.geometry.computeVertexNormals();
+    } catch (error) {
+      console.warn(
+        'Unable to compute smooth normals for a mesh of a 3D model:',
+        error
+      );
+    }
+  });
+};
 
 // Copied from PixiResourcesLoader.js
 // $FlowFixMe[missing-local-annot]
@@ -67,9 +141,13 @@ const MESSAGE_TYPES = {
 };
 
 let renderer = null;
-let width = 128;
-let height = 128;
-const previewTextureSize = 128;
+// Render the previews at a high resolution so that they stay crisp when
+// displayed at a large size (full width cards in the resources pickers...),
+// including on high-DPI screens. Browsers smoothly downscale them when
+// shown as small thumbnails.
+let width = 512;
+let height = 512;
+const previewTextureSize = 512;
 let offscreenCanvas = null;
 let dracoLoader = null;
 // The scene, its light and the camera are reused for every model: only the
@@ -180,7 +258,7 @@ const renderModel = async (resourceUrl, resourceData, basePath) => {
           ...parser.textureLoader.options,
           resizeWidth: previewTextureSize,
           resizeHeight: previewTextureSize,
-          resizeQuality: 'low',
+          resizeQuality: 'high',
         });
       }
       return { name: 'GDEVELOP_preview_texture_size' };
@@ -200,6 +278,8 @@ const renderModel = async (resourceUrl, resourceData, basePath) => {
 
         const model = gltf.scene;
         model.traverse(removeMetalnessFromMesh);
+        ensureSmoothNormals(model);
+        applyModelTextureQuality(model);
 
         // We can't just rely on model.boundingBox because it doesn't take into account
         // the model's scale and position.

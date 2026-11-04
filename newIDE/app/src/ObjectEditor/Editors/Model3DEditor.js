@@ -32,6 +32,7 @@ import { type GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
 import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils';
 import * as THREE from 'three';
 import { PropertyCheckbox, PropertyField } from './PropertyFields';
+import PBRMaterialEditor from './PBRMaterialEditor';
 import ResourceSelectorWithThumbnail from '../../ResourcesList/ResourceSelectorWithThumbnail';
 import { ChoiceProperty } from '../../BehaviorsEditor/Editors/Physics2Editor';
 import { renameObjectAnimationReferences } from '../../Utils/ObjectAnimationsRefactoring';
@@ -469,6 +470,22 @@ const Model3DEditor = ({
       })
     : [];
 
+  const [pbrTargetName, setPbrTargetName] = React.useState<string>('all');
+  const meshNames = React.useMemo<Array<string>>(
+    () => {
+      const names = [];
+      if (gltf) {
+        gltf.scene.traverse(node => {
+          if (node.isMesh && node.name && !names.includes(node.name)) {
+            names.push(node.name);
+          }
+        });
+      }
+      return names;
+    },
+    [gltf]
+  );
+
   return (
     <>
       <ScrollView ref={scrollView}>
@@ -597,6 +614,36 @@ const Model3DEditor = ({
           <PropertyCheckbox
             objectConfiguration={objectConfiguration}
             propertyName="isReceivingShadow"
+          />
+          <Text size="block-title" noMargin>
+            <Trans>PBR materials</Trans>
+          </Text>
+          <SelectField
+            value={pbrTargetName}
+            floatingLabelText={<Trans>Mesh to edit</Trans>}
+            helperMarkdownText={
+              'PBR settings can be set for the whole model and overridden for a single mesh.'
+            }
+            onChange={(event, index, newValue) => setPbrTargetName(newValue)}
+            fullWidth
+          >
+            <SelectOption value="all" label={t`All meshes`} />
+            {meshNames.map(meshName => (
+              <SelectOption
+                key={meshName}
+                value={meshName}
+                label={meshName}
+                shouldNotTranslate
+              />
+            ))}
+          </SelectField>
+          <PBRMaterialEditor
+            objectConfiguration={objectConfiguration}
+            project={project}
+            resourceManagementProps={resourceManagementProps}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
+            targetName={pbrTargetName === 'all' ? '' : pbrTargetName}
+            onObjectUpdated={onObjectUpdated}
           />
           <Text size="block-title">Animations</Text>
           <Column noMargin expand>

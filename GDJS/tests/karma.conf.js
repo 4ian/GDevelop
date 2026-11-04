@@ -141,6 +141,7 @@ module.exports = function (config) {
       `${gdjsRuntimePath}/fontfaceobserver-font-manager/fontfaceobserver.js`,
       `${gdjsRuntimePath}/fontfaceobserver-font-manager/fontfaceobserver-font-manager.js`,
       `${gdjsRuntimePath}/Model3DManager.js`,
+      `${gdjsRuntimePath}/TextureQuality3DManager.js`,
       `${gdjsRuntimePath}/jsonmanager.js`,
       `${gdjsRuntimePath}/ResourceLoader.js`,
       `${gdjsRuntimePath}/ResourceCache.js`,

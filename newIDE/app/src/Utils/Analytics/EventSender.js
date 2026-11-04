@@ -1007,7 +1007,22 @@ export const sendMcpToolCalled = (metadata: {|
   // `http`: an agent connected to the opened editor; `stdio`: `--mcp`.
   transport: 'http' | 'stdio',
 |}) => {
-  recordEvent('mcp-tool-called', metadata);
+  // Failures are sent each time to be investigated. Successes are sent once a day
+  // per tool and client (with the duration of the sent call only), as an agent
+  // can call tools hundreds of times a day.
+  if (!metadata.success) {
+    recordEvent('mcp-tool-called', metadata);
+    return;
+  }
+  recordDailyAggregatedEvent(
+    'mcp-tool-called',
+    metadata,
+    `mcp-tool-called-${JSON.stringify({
+      toolName: metadata.toolName,
+      clientName: metadata.clientName,
+      transport: metadata.transport,
+    })}`
+  );
 };
 
 export const sendMcpAgentConnected = (metadata: {|
@@ -1018,5 +1033,13 @@ export const sendMcpAgentConnected = (metadata: {|
   // Null for `--mcp`, where the project is the one given in the arguments.
   hasOpenedProject: boolean | null,
 |}) => {
-  recordEvent('mcp-agent-connected', metadata);
+  // Sent once a day per client, as some agents reconnect for every tool call.
+  recordDailyAggregatedEvent(
+    'mcp-agent-connected',
+    metadata,
+    `mcp-agent-connected-${JSON.stringify({
+      clientName: metadata.clientName,
+      transport: metadata.transport,
+    })}`
+  );
 };

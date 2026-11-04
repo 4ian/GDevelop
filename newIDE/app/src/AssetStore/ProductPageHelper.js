@@ -35,6 +35,11 @@ import FlatButton from '../UI/FlatButton';
 import { Column } from '../UI/Grid';
 import { type MediaItem } from '../UI/ResponsiveMediaGallery';
 
+const styles = {
+  // Wrap the buttons on narrow screens, keeping them aligned to the left.
+  purchaseButtons: { display: 'flex', flexWrap: 'wrap', gap: 8 },
+};
+
 export const getOtherProductsFromSameAuthorTiles = <
   T:
     | PrivateAssetPackListingData
@@ -590,6 +595,7 @@ export const PurchaseProductButtons = <
   onClickBuyWithCredits,
   customLabel,
   fullWidth,
+  additionalButton,
 }: {|
   productListingData: T,
   selectedUsageType: string,
@@ -601,6 +607,7 @@ export const PurchaseProductButtons = <
   onClickBuyWithCredits?: () => void | Promise<void>,
   customLabel?: React.Node,
   fullWidth?: boolean,
+  additionalButton?: React.Node,
 |}): any => {
   const { authenticated } = React.useContext(AuthenticatedUserContext);
   const shouldUseOrSimulateAppStoreProduct =
@@ -667,7 +674,7 @@ export const PurchaseProductButtons = <
       fullWidth={fullWidth}
     />
   ) : (
-    <LineStackLayout noMargin>
+    <div style={styles.purchaseButtons}>
       {creditPrice && (
         <FlatButton
           primary
@@ -689,7 +696,8 @@ export const PurchaseProductButtons = <
         id={`buy-${productType}`}
         size="medium"
       />
-    </LineStackLayout>
+      {additionalButton}
+    </div>
   );
 };
 

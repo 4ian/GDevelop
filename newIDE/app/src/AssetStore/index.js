@@ -1018,7 +1018,6 @@ export const AssetStore: React.ComponentType<{
                 <BundleInformationPage
                   bundleListingData={openedBundleListingData}
                   noPadding
-                  onBack={onBack}
                   onBundleOpen={selectBundle}
                   onGameTemplateOpen={selectPrivateGameTemplate}
                   onAssetPackOpen={selectPrivateAssetPack}

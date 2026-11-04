@@ -62,6 +62,8 @@ import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import RaisedButton from '../../UI/RaisedButton';
 import Play from '../../UI/CustomSvgIcons/Play';
 import PrivateGameTemplatePurchaseDialog from './PrivateGameTemplatePurchaseDialog';
+import GiftPurchaseDialog from '../Gift/GiftPurchaseDialog';
+import BuyAsGiftButton from '../Gift/BuyAsGiftButton';
 import PasswordPromptDialog from '../PasswordPromptDialog';
 import PublicProfileContext from '../../Profile/PublicProfileContext';
 import { LARGE_WIDGET_SIZE } from '../../MainFrame/EditorContainers/HomePage/CardWidget';
@@ -182,6 +184,10 @@ const PrivateGameTemplateInformationPage = ({
     purchasingPrivateGameTemplateListingData,
     setPurchasingPrivateGameTemplateListingData,
   ] = React.useState<?PrivateGameTemplateListingData>(null);
+  const [
+    isGiftPurchaseDialogOpen,
+    setIsGiftPurchaseDialogOpen,
+  ] = React.useState<boolean>(false);
   const [isFetching, setIsFetching] = React.useState<boolean>(false);
   const { openUserPublicProfile } = React.useContext(PublicProfileContext);
   const [
@@ -239,6 +245,12 @@ const PrivateGameTemplateInformationPage = ({
     ]
   );
   const isAlreadyReceived = !!userGameTemplatePurchaseUsageType;
+  // Products no longer sold (archived, or replaced by another offer) can't be offered.
+  const isListedInStore =
+    !!privateGameTemplateListingDatas &&
+    privateGameTemplateListingDatas.some(
+      ({ id }) => id === privateGameTemplateListingData.id
+    );
 
   const templatesIncludedInBundleTiles = React.useMemo(
     () =>
@@ -664,6 +676,18 @@ const PrivateGameTemplateInformationPage = ({
                               isAlreadyReceived={isAlreadyReceived}
                               onClickBuy={onClickBuy}
                               onClickBuyWithCredits={onWillBuyWithCredits}
+                              additionalButton={
+                                isListedInStore ? (
+                                  <BuyAsGiftButton
+                                    onClick={() =>
+                                      setIsGiftPurchaseDialogOpen(true)
+                                    }
+                                    simulateAppStoreProduct={
+                                      simulateAppStoreProduct
+                                    }
+                                  />
+                                ) : null
+                              }
                             />
                           )}
                           {!shouldUseOrSimulateAppStoreProduct && (
@@ -681,6 +705,17 @@ const PrivateGameTemplateInformationPage = ({
                           label={<Trans>Open template</Trans>}
                         />
                       ) : null}
+                      {!errorText &&
+                        isAlreadyReceived &&
+                        isListedInStore &&
+                        !shouldUseOrSimulateAppStoreProduct && (
+                          <Line noMargin justifyContent="center">
+                            <BuyAsGiftButton
+                              onClick={() => setIsGiftPurchaseDialogOpen(true)}
+                              simulateAppStoreProduct={simulateAppStoreProduct}
+                            />
+                          </Line>
+                        )}
                     </ColumnStackLayout>
                   </div>
                 </ResponsiveLineStackLayout>
@@ -759,6 +794,13 @@ const PrivateGameTemplateInformationPage = ({
               }
               usageType={selectedUsageType}
               onClose={() => setPurchasingPrivateGameTemplateListingData(null)}
+            />
+          )}
+          {isGiftPurchaseDialogOpen && (
+            <GiftPurchaseDialog
+              productListingData={privateGameTemplateListingData}
+              usageType={selectedUsageType}
+              onClose={() => setIsGiftPurchaseDialogOpen(false)}
             />
           )}
         </>

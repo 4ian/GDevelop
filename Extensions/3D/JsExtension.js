@@ -36,6 +36,241 @@ module.exports = {
       .addInstructionOrExpressionGroupMetadata(_('3D'))
       .setIcon('res/conditions/3d_box.svg');
 
+    const pbrFloatProperties = JSON.stringify([
+      'metallic',
+      'roughness',
+      'opacity',
+      'emissiveIntensity',
+      'normalScale',
+      'aoIntensity',
+      'displacementScale',
+      'displacementBias',
+      'envMapIntensity',
+      'ior',
+      'transmission',
+      'clearcoat',
+      'alphaCutoff',
+    ]);
+    const pbrColorProperties = JSON.stringify(['baseColor', 'emissiveColor']);
+    const pbrTextureSlots = JSON.stringify([
+      'baseColor',
+      'metallicRoughness',
+      'metallic',
+      'roughness',
+      'normal',
+      'ao',
+      'emissive',
+      'height',
+      'opacity',
+    ]);
+    const pbrPresets = JSON.stringify([
+      'metal',
+      'gold',
+      'glass',
+      'wood',
+      'plastic',
+      'stone',
+      'fabric',
+      'rubber',
+      'custom',
+    ]);
+    const pbrIcon = 'res/conditions/3d_box.svg';
+
+    /**
+     * Add the actions, conditions and expressions used to read and change
+     * the PBR materials of a 3D object while the game is running.
+     *
+     * @param object the object metadata.
+     * @param objectType the type of the object.
+     * @param objectTypeName the name shown for the object.
+     * @param targetChoices the names of the targets of the object (faces of a
+     * 3D box), or null when the target is a free name (mesh of a 3D model).
+     */
+    const addPBRMaterialInstructions = ({
+      object,
+      objectType,
+      objectTypeName,
+      targetChoices,
+    }) => {
+      const addTargetParameter = (instructionBuilder) => {
+        const builderWithObject = instructionBuilder.addParameter(
+          'object',
+          _(objectTypeName),
+          objectType,
+          false
+        );
+        return targetChoices
+          ? builderWithObject
+              .addParameter(
+                'stringWithSelector',
+                _('Face (or "all")'),
+                JSON.stringify(targetChoices),
+                false
+              )
+              .setDefaultValue('"all"')
+          : builderWithObject
+              .addParameter(
+                'string',
+                _('Mesh name (empty for all the meshes)'),
+                '',
+                false
+              )
+              .setDefaultValue('""');
+      };
+
+      // Numeric properties (metallic, roughness, opacity...).
+      addTargetParameter(
+        object.addExpressionAndConditionAndAction(
+          'number',
+          'PBRValue',
+          _('PBR material property'),
+          _('the value of a PBR material property'),
+          _('the _PARAM2_ PBR property of _PARAM0_ (_PARAM1_)'),
+          _('PBR materials'),
+          pbrIcon
+        )
+      )
+        .addParameter(
+          'stringWithSelector',
+          _('Property'),
+          pbrFloatProperties,
+          false
+        )
+        .setDefaultValue('"metallic"')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setPBRValue')
+        .setGetter('getPBRValue');
+
+      // Color properties (base color and emissive color).
+      addTargetParameter(
+        object.addExpressionAndConditionAndAction(
+          'string',
+          'PBRColor',
+          _('PBR material color'),
+          _('the value of a PBR material color'),
+          _('the _PARAM2_ PBR color of _PARAM0_ (_PARAM1_)'),
+          _('PBR materials'),
+          pbrIcon
+        )
+      )
+        .addParameter(
+          'stringWithSelector',
+          _('Property'),
+          pbrColorProperties,
+          false
+        )
+        .setDefaultValue('"baseColor"')
+        .useStandardParameters('string', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setPBRColor')
+        .setGetter('getPBRColor');
+
+      // Color change with a color picker.
+      addTargetParameter(
+        object.addScopedAction(
+          'SetPBRColor',
+          _('PBR material color'),
+          _('Change the color of the PBR material.'),
+          _('Set the _PARAM2_ PBR color of _PARAM0_ (_PARAM1_) to _PARAM3_'),
+          _('PBR materials'),
+          'res/actions/color24.png',
+          'res/actions/color.png'
+        )
+      )
+        .addParameter(
+          'stringWithSelector',
+          _('Property'),
+          pbrColorProperties,
+          false
+        )
+        .setDefaultValue('"baseColor"')
+        .addParameter('color', _('Color'), '', false)
+        .setFunctionName('setPBRColor');
+
+      // Texture slots.
+      addTargetParameter(
+        object.addExpressionAndConditionAndAction(
+          'string',
+          'PBRTexture',
+          _('PBR material texture'),
+          _('the image used by a PBR material texture slot'),
+          _('the _PARAM2_ PBR texture of _PARAM0_ (_PARAM1_)'),
+          _('PBR materials'),
+          pbrIcon
+        )
+      )
+        .addParameter(
+          'stringWithSelector',
+          _('Texture slot'),
+          pbrTextureSlots,
+          false
+        )
+        .setDefaultValue('"baseColor"')
+        .useStandardParameters('string', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setPBRTexture')
+        .setGetter('getPBRTexture');
+
+      addTargetParameter(
+        object.addScopedAction(
+          'SetPBRTexture',
+          _('PBR material texture'),
+          _(
+            'Change the image used by a PBR material texture slot (an empty image removes the texture).'
+          ),
+          _('Set the _PARAM2_ PBR texture of _PARAM0_ (_PARAM1_) to _PARAM3_'),
+          _('PBR materials'),
+          pbrIcon,
+          pbrIcon
+        )
+      )
+        .addParameter(
+          'stringWithSelector',
+          _('Texture slot'),
+          pbrTextureSlots,
+          false
+        )
+        .setDefaultValue('"baseColor"')
+        .addParameter('imageResource', _('Image (empty to remove)'), '', false)
+        .setFunctionName('setPBRTexture');
+
+      addTargetParameter(
+        object.addScopedCondition(
+          'IsPBRTextureSet',
+          _('PBR material texture set'),
+          _('Check if an image is used by a PBR material texture slot.'),
+          _('The _PARAM2_ PBR texture of _PARAM0_ (_PARAM1_) is set'),
+          _('PBR materials'),
+          pbrIcon,
+          pbrIcon
+        )
+      )
+        .addParameter(
+          'stringWithSelector',
+          _('Texture slot'),
+          pbrTextureSlots,
+          false
+        )
+        .setDefaultValue('"baseColor"')
+        .setFunctionName('isPBRTextureSet');
+
+      // Material presets (metal, glass, wood, plastic...).
+      addTargetParameter(
+        object.addScopedAction(
+          'ApplyPBRPreset',
+          _('Apply a PBR material preset'),
+          _(
+            'Apply a PBR material preset (metal, gold, glass, wood, plastic, stone, fabric or rubber).'
+          ),
+          _('Apply the _PARAM2_ PBR preset to _PARAM0_ (_PARAM1_)'),
+          _('PBR materials'),
+          pbrIcon,
+          pbrIcon
+        )
+      )
+        .addParameter('stringWithSelector', _('Preset'), pbrPresets, false)
+        .setDefaultValue('"metal"')
+        .setFunctionName('applyPBRPreset');
+    };
+
     {
       const base3D = extension
         .addBehavior(
@@ -983,6 +1218,13 @@ module.exports = {
         .addParameter('object', _('3D model'), 'Model3DObject', false)
         .addParameter('number', _('Crossfade duration (in seconds)'), '', false)
         .setFunctionName('setCrossfadeDuration');
+
+      addPBRMaterialInstructions({
+        object,
+        objectType: 'Model3DObject',
+        objectTypeName: '3D model',
+        targetChoices: null,
+      });
     }
 
     const Cube3DObject = new gd.ObjectJsImplementation();
@@ -1060,6 +1302,10 @@ module.exports = {
         propertyName === 'isReceivingShadow'
       ) {
         objectContent[propertyName] = newValue === '1';
+        return true;
+      }
+      if (propertyName === 'pbrConfig') {
+        objectContent.pbrConfig = newValue;
         return true;
       }
 
@@ -1319,6 +1565,15 @@ module.exports = {
         .setLabel(_('Shadow receiving'))
         .setGroup(_('Lighting'));
 
+      // The PBR configuration is edited with the PBR Material Editor (the
+      // property itself is hidden and only stores its JSON).
+      objectProperties
+        .getOrCreate('pbrConfig')
+        .setValue(objectContent.pbrConfig || '')
+        .setType('pbrConfig')
+        .setLabel(_('PBR material'))
+        .setHidden(true);
+
       return objectProperties;
     };
     Cube3DObject.content = {
@@ -1351,6 +1606,7 @@ module.exports = {
       tint: '255;255;255',
       isCastingShadow: true,
       isReceivingShadow: true,
+      pbrConfig: '',
     };
 
     Cube3DObject.updateInitialInstanceProperty = function (
@@ -1859,6 +2115,13 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('setColor');
 
+    addPBRMaterialInstructions({
+      object,
+      objectType: 'Cube3DObject',
+      objectTypeName: '3D box',
+      targetChoices: ['all', 'front', 'back', 'left', 'right', 'top', 'bottom'],
+    });
+
     extension
       .addExpressionAndConditionAndAction(
         'number',
@@ -2200,6 +2463,104 @@ module.exports = {
       .setGetter('gdjs.scene3d.camera.getFov')
       .setIncludeFile('Extensions/3D/Scene3DTools.js');
 
+    {
+      // Environment maps and image based lighting (IBL) for PBR materials.
+      const pbrIncludeFile = 'PBRMaterialManager.js';
+
+      extension
+        .addAction(
+          'SetEnvironmentMapFromCubeImages',
+          _('Use 6 images as the environment map'),
+          _(
+            'Use 6 images as the environment map (image based lighting) of the scene. PBR materials use it to reflect the environment and to be lit by it.'
+          ),
+          _(
+            'Use 6 images as the environment map (image based lighting) of the scene'
+          ),
+          _('PBR materials'),
+          'res/actions/antialiasing24.png',
+          'res/actions/antialiasing.png'
+        )
+        .addParameter('imageResource', _('Image for the X+ face'), '', false)
+        .addParameter('imageResource', _('Image for the X- face'), '', false)
+        .addParameter('imageResource', _('Image for the Y+ face'), '', false)
+        .addParameter('imageResource', _('Image for the Y- face'), '', false)
+        .addParameter('imageResource', _('Image for the Z+ face'), '', false)
+        .addParameter('imageResource', _('Image for the Z- face'), '', false)
+        .getCodeExtraInformation()
+        .setIncludeFile(pbrIncludeFile)
+        .setFunctionName('gdjs.pbr.setEnvironmentMapFromCubeImages');
+
+      extension
+        .addAction(
+          'SetEnvironmentMapFromEquirectangularImage',
+          _('Use an equirectangular image as the environment map'),
+          _(
+            'Use an equirectangular image as the environment map (image based lighting) of the scene.'
+          ),
+          _(
+            'Use the equirectangular image _PARAM0_ as the environment map (image based lighting) of the scene'
+          ),
+          _('PBR materials'),
+          'res/actions/antialiasing24.png',
+          'res/actions/antialiasing.png'
+        )
+        .addParameter(
+          'imageResource',
+          _('Equirectangular image (360° panorama)'),
+          '',
+          false
+        )
+        .getCodeExtraInformation()
+        .setIncludeFile(pbrIncludeFile)
+        .setFunctionName('gdjs.pbr.setEnvironmentMapFromEquirectangularImage');
+
+      extension
+        .addAction(
+          'RemoveEnvironmentMap',
+          _('Remove the environment map'),
+          _('Remove the environment map (image based lighting) of the scene.'),
+          _('Remove the environment map (image based lighting) of the scene'),
+          _('PBR materials'),
+          'res/actions/antialiasing24.png',
+          'res/actions/antialiasing.png'
+        )
+        .getCodeExtraInformation()
+        .setIncludeFile(pbrIncludeFile)
+        .setFunctionName('gdjs.pbr.removeEnvironmentMap');
+
+      extension
+        .addCondition(
+          'HasEnvironmentMap',
+          _('Environment map set'),
+          _(
+            'Check if an environment map (image based lighting) is set on the scene.'
+          ),
+          _('An environment map (image based lighting) is set on the scene'),
+          _('PBR materials'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .getCodeExtraInformation()
+        .setIncludeFile(pbrIncludeFile)
+        .setFunctionName('gdjs.pbr.hasEnvironmentMap');
+
+      extension
+        .addExpressionAndConditionAndAction(
+          'number',
+          'EnvironmentIntensity',
+          _('Environment map intensity'),
+          _('the intensity of the environment map (image based lighting)'),
+          _('the intensity of the environment map (image based lighting)'),
+          _('PBR materials'),
+          'res/conditions/3d_box.svg'
+        )
+        .addCodeOnlyParameter('currentScene', '')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('gdjs.pbr.setEnvironmentIntensity')
+        .setGetter('gdjs.pbr.getEnvironmentIntensity')
+        .setIncludeFile(pbrIncludeFile);
+    }
     {
       const effect = extension
         .addEffect('LinearFog')
@@ -2865,6 +3226,14 @@ module.exports = {
       4: 0,
       5: 1,
     };
+    const faceIndexToFaceName = {
+      0: 'front',
+      1: 'back',
+      2: 'left',
+      3: 'right',
+      4: 'top',
+      5: 'bottom',
+    };
 
     const noRepeatTextureVertexIndexToUvMapping = {
       0: [0, 0],
@@ -2930,6 +3299,293 @@ module.exports = {
       });
       transparentMaterial = newTransparentMaterial;
       return newTransparentMaterial;
+    };
+
+    // -------------------------------------------------------------------------
+    // PBR materials (used to preview the PBR settings of the objects).
+    // -------------------------------------------------------------------------
+
+    /**
+     * Parse the JSON of a PBR material configuration.
+     * @returns {Object | null}
+     */
+    const parsePBRConfig = (json) => {
+      if (!json) return null;
+      try {
+        const parsed = JSON.parse(json);
+        return parsed && typeof parsed === 'object' ? parsed : null;
+      } catch (error) {
+        console.warn('Invalid PBR material configuration:', json);
+        return null;
+      }
+    };
+
+    /**
+     * Merge PBR settings: `settings` overrides `base`.
+     */
+    const mergePBRSettings = (base, settings) => {
+      const merged = { ...base, ...settings };
+      if (base && base.textures && settings && settings.textures) {
+        merged.textures = { ...base.textures, ...settings.textures };
+      }
+      return merged;
+    };
+
+    /**
+     * The settings applied to a target (a face of a 3D box or a mesh of a 3D
+     * model): the settings of the object merged with the settings of the
+     * target.
+     */
+    const getPBRSettingsForTarget = (config, targetName) => {
+      if (!config) return {};
+      return mergePBRSettings(
+        config.settings,
+        targetName && config.targets ? config.targets[targetName] : undefined
+      );
+    };
+
+    /** @type {{ [cacheKey: string]: Promise<THREE.Material> }} */
+    const pbrMaterialPromises = {};
+
+    const isColorTextureSlot = (slotName) =>
+      slotName === 'baseColor' || slotName === 'emissive';
+
+    const getPBRThreeTexture = async (
+      project,
+      pixiResourcesLoader,
+      resourceName,
+      isColorData
+    ) => {
+      if (!resourceName) return null;
+      const texture = await pixiResourcesLoader.getThreeTexture(
+        project,
+        resourceName
+      );
+      if (isColorData) return texture;
+      // Textures holding data (normal, roughness...) must be kept in the
+      // linear color space: use a copy to not impact the color textures.
+      const linearTexture = texture.clone();
+      linearTexture.colorSpace = THREE.NoColorSpace;
+      linearTexture.needsUpdate = true;
+      return linearTexture;
+    };
+
+    /**
+     * Build a PBR material for the scene editor preview.
+     * @returns {Promise<THREE.Material>}
+     */
+    const createPBRMaterial = async (
+      project,
+      pixiResourcesLoader,
+      settings,
+      options
+    ) => {
+      const needsPhysical =
+        settings.transmission !== undefined ||
+        settings.ior !== undefined ||
+        settings.clearcoat !== undefined;
+      const materialType =
+        options.materialType === 'physical' ||
+        (options.materialType !== 'basic' && needsPhysical)
+          ? 'physical'
+          : options.materialType === 'basic'
+            ? 'basic'
+            : 'standard';
+      const baseMaterial = options.baseMaterial || null;
+      const baseMaterialType =
+        baseMaterial && baseMaterial.isMeshPhysicalMaterial
+          ? 'physical'
+          : baseMaterial && baseMaterial.isMeshBasicMaterial
+            ? 'basic'
+            : baseMaterial
+              ? 'standard'
+              : null;
+      let material;
+      if (baseMaterial && baseMaterialType === materialType) {
+        // Keep the original material (and so its textures) and only apply the
+        // settings on top of it.
+        material = baseMaterial.clone();
+      } else {
+        const materialOptions = {
+          side:
+            settings.doubleSided || options.useTransparentTexture
+              ? THREE.DoubleSide
+              : THREE.FrontSide,
+          transparent: !!options.useTransparentTexture,
+          vertexColors: !!options.vertexColors,
+        };
+        material =
+          materialType === 'physical'
+            ? new THREE.MeshPhysicalMaterial(materialOptions)
+            : materialType === 'basic'
+              ? new THREE.MeshBasicMaterial(materialOptions)
+              : new THREE.MeshStandardMaterial(materialOptions);
+        if (baseMaterial) {
+          // Keep the color and texture of the original material.
+          if (baseMaterial.color && material.color) {
+            material.color.copy(baseMaterial.color);
+          }
+          if (baseMaterial.map) material.map = baseMaterial.map;
+        }
+        if (materialType !== 'basic') {
+          // Start with neutral values so that an unconfigured material is
+          // visible.
+          material.metalness = 0;
+          material.roughness = 1;
+        }
+      }
+      const standardMaterial = material;
+      if (settings.doubleSided !== undefined) {
+        material.side = settings.doubleSided
+          ? THREE.DoubleSide
+          : THREE.FrontSide;
+      }
+      if (settings.baseColor !== undefined) {
+        const color = new THREE.Color();
+        const components = objectsRenderingService.hexNumberToRGBArray(
+          objectsRenderingService.rgbOrHexToHexNumber(settings.baseColor)
+        );
+        color.setRGB(
+          components[0] / 255,
+          components[1] / 255,
+          components[2] / 255,
+          THREE.SRGBColorSpace
+        );
+        if (standardMaterial.color) standardMaterial.color.copy(color);
+      }
+      if (materialType !== 'basic') {
+        if (settings.metallic !== undefined)
+          standardMaterial.metalness = settings.metallic;
+        if (settings.roughness !== undefined)
+          standardMaterial.roughness = settings.roughness;
+        if (settings.emissiveColor !== undefined) {
+          const emissiveComponents =
+            objectsRenderingService.hexNumberToRGBArray(
+              objectsRenderingService.rgbOrHexToHexNumber(
+                settings.emissiveColor
+              )
+            );
+          standardMaterial.emissive.setRGB(
+            emissiveComponents[0] / 255,
+            emissiveComponents[1] / 255,
+            emissiveComponents[2] / 255,
+            THREE.SRGBColorSpace
+          );
+        }
+        if (settings.emissiveIntensity !== undefined)
+          standardMaterial.emissiveIntensity = settings.emissiveIntensity;
+        if (settings.normalScale !== undefined && standardMaterial.normalScale)
+          standardMaterial.normalScale.setScalar(settings.normalScale);
+        if (settings.aoIntensity !== undefined)
+          standardMaterial.aoMapIntensity = settings.aoIntensity;
+        if (settings.displacementScale !== undefined)
+          standardMaterial.displacementScale = settings.displacementScale;
+        if (settings.displacementBias !== undefined)
+          standardMaterial.displacementBias = settings.displacementBias;
+        if (settings.envMapIntensity !== undefined)
+          standardMaterial.envMapIntensity = settings.envMapIntensity;
+      }
+      if (settings.opacity !== undefined) {
+        material.opacity = settings.opacity;
+        material.transparent = material.transparent || settings.opacity < 1;
+      }
+      if (settings.alphaCutoff !== undefined && settings.alphaCutoff > 0) {
+        material.alphaTest = settings.alphaCutoff;
+        material.transparent = true;
+      }
+      if (materialType === 'physical') {
+        if (settings.ior !== undefined) material.ior = settings.ior;
+        if (settings.transmission !== undefined) {
+          material.transmission = settings.transmission;
+          if (settings.transmission > 0) material.transparent = true;
+        }
+        if (settings.clearcoat !== undefined)
+          material.clearcoat = settings.clearcoat;
+      }
+
+      const textures = settings.textures || {};
+      /** @type {Array<[string, string | undefined]>} */
+      const textureSlots = [
+        ['baseColor', textures.baseColor],
+        ['metallicRoughness', textures.metallicRoughness],
+        ['metallic', textures.metallic],
+        ['roughness', textures.roughness],
+        ['normal', textures.normal],
+        ['ao', textures.ao],
+        ['emissive', textures.emissive],
+        ['height', textures.height],
+        ['opacity', textures.opacity],
+      ];
+      await Promise.all(
+        textureSlots.map(async ([slotName, resourceName]) => {
+          if (resourceName === undefined) return;
+          const texture = await getPBRThreeTexture(
+            project,
+            pixiResourcesLoader,
+            resourceName,
+            isColorTextureSlot(slotName)
+          );
+          switch (slotName) {
+            case 'baseColor':
+              standardMaterial.map = texture;
+              break;
+            case 'metallicRoughness':
+              standardMaterial.metalnessMap = texture;
+              standardMaterial.roughnessMap = texture;
+              break;
+            case 'metallic':
+              standardMaterial.metalnessMap = texture;
+              break;
+            case 'roughness':
+              standardMaterial.roughnessMap = texture;
+              break;
+            case 'normal':
+              standardMaterial.normalMap = texture;
+              break;
+            case 'ao':
+              standardMaterial.aoMap = texture;
+              break;
+            case 'emissive':
+              standardMaterial.emissiveMap = texture;
+              break;
+            case 'height':
+              standardMaterial.displacementMap = texture;
+              break;
+            case 'opacity':
+              standardMaterial.alphaMap = texture;
+              if (texture) material.transparent = true;
+              break;
+          }
+        })
+      );
+      return material;
+    };
+
+    /**
+     * Return the PBR material built with the given settings (cached to avoid
+     * rebuilding the same material for every instance).
+     * @returns {Promise<THREE.Material>}
+     */
+    const getPBRMaterial = (
+      project,
+      pixiResourcesLoader,
+      settings,
+      options
+    ) => {
+      const cacheKey = JSON.stringify([settings, options]);
+      let promise = pbrMaterialPromises[cacheKey];
+      if (!promise) {
+        promise = pbrMaterialPromises[cacheKey] = createPBRMaterial(
+          project,
+          pixiResourcesLoader,
+          settings,
+          options
+        ).catch((error) => {
+          delete pbrMaterialPromises[cacheKey];
+          throw error;
+        });
+      }
+      return promise;
     };
 
     class RenderedCube3DObject2DInstance extends RenderedInstance {
@@ -3157,6 +3813,7 @@ module.exports = {
       _backFaceUpThroughWhichAxisRotation = 'X';
       _shouldUseTransparentTexture = false;
       _materialType = '';
+      _pbrConfigJson = '';
       _tint = '';
 
       constructor(
@@ -3198,6 +3855,27 @@ module.exports = {
         const getFaceMaterial = async (project, faceIndex) => {
           if (!this._faceVisibilities[faceIndex]) {
             return getTransparentMaterial();
+          }
+
+          const pbrConfig = parsePBRConfig(this._pbrConfigJson);
+          if (pbrConfig && pbrConfig.enabled !== false) {
+            const faceName = faceIndexToFaceName[faceIndex];
+            const settings = getPBRSettingsForTarget(pbrConfig, faceName);
+            const textures = { ...(settings.textures || {}) };
+            if (textures.baseColor === undefined) {
+              textures.baseColor = this._faceResourceNames[faceIndex];
+            }
+            settings.textures = textures;
+            return await getPBRMaterial(
+              project,
+              this._pixiResourcesLoader,
+              settings,
+              {
+                materialType: pbrConfig.material || 'standard',
+                useTransparentTexture: this._shouldUseTransparentTexture,
+                vertexColors: true,
+              }
+            );
           }
 
           return await this._pixiResourcesLoader.getThreeMaterial(
@@ -3297,6 +3975,11 @@ module.exports = {
         const materialType = object.content.materialType;
         if (this._materialType !== materialType) {
           this._materialType = materialType;
+          materialsDirty = true;
+        }
+        const pbrConfigJson = object.content.pbrConfig || '';
+        if (this._pbrConfigJson !== pbrConfigJson) {
+          this._pbrConfigJson = pbrConfigJson;
           materialsDirty = true;
         }
         const tint = object.content.tint || '255;255;255';
@@ -4031,6 +4714,9 @@ module.exports = {
 
       /** @type {THREE.Object3D | null} */
       _clonedModel3D = null;
+      /** @type {WeakMap<THREE.Mesh, THREE.Material[]> | null} */
+      _originalMaterialsByMesh = null;
+      _pbrConfigJson = '';
 
       constructor(
         project,
@@ -4348,15 +5034,85 @@ module.exports = {
             .get3DModel(this._project, modelResourceName)
             .then((model3d) => {
               if (this._wasDestroyed) return;
-              this._clonedModel3D = THREE_ADDONS.SkeletonUtils.clone(
-                model3d.scene
-              );
+              const clonedModel3D = (this._clonedModel3D =
+                THREE_ADDONS.SkeletonUtils.clone(model3d.scene));
+              // Remember the materials of the model to restart from them
+              // whenever the PBR settings change.
+              const originalMaterialsByMesh = new WeakMap();
+              this._originalMaterialsByMesh = originalMaterialsByMesh;
+              clonedModel3D.traverse((node) => {
+                /** @type {any} */
+                const mesh = node;
+                if (!mesh.material) return;
+                originalMaterialsByMesh.set(
+                  mesh,
+                  Array.isArray(mesh.material)
+                    ? mesh.material.slice()
+                    : [mesh.material]
+                );
+              });
+              this._applyPBRMaterials();
 
               this._updateDefaultTransformation();
             });
         }
 
+        // @ts-ignore - getPBRConfig exists on Model3DObjectConfiguration.
+        const pbrConfigJson = object.getPBRConfig ? object.getPBRConfig() : '';
+        if (this._pbrConfigJson !== pbrConfigJson) {
+          this._pbrConfigJson = pbrConfigJson;
+          this._applyPBRMaterials();
+        }
+
         this._updateThreeObjectPosition();
+      }
+
+      /**
+       * Give a PBR material to every mesh of the model, according to the PBR
+       * settings of the object (and of each mesh).
+       */
+      _applyPBRMaterials() {
+        const clonedModel = this._clonedModel3D;
+        if (!clonedModel) {
+          return;
+        }
+        const pbrConfig = parsePBRConfig(this._pbrConfigJson);
+        if (!pbrConfig || pbrConfig.enabled === false) {
+          return;
+        }
+        clonedModel.traverse((node) => {
+          /** @type {any} */
+          const mesh = node;
+          if (!mesh.material) {
+            return;
+          }
+          const isArray = Array.isArray(mesh.material);
+          const originalMaterials =
+            (this._originalMaterialsByMesh &&
+              this._originalMaterialsByMesh.get(mesh)) ||
+            (isArray ? mesh.material : [mesh.material]);
+          const settings = getPBRSettingsForTarget(pbrConfig, mesh.name || '');
+          Promise.all(
+            originalMaterials.map((material) =>
+              createPBRMaterial(
+                this._project,
+                this._pixiResourcesLoader,
+                settings,
+                {
+                  materialType: pbrConfig.material || 'standard',
+                  useTransparentTexture: false,
+                  vertexColors: !!material.vertexColors,
+                  // Work on a copy to keep the material of the model (shared
+                  // with the other instances) untouched.
+                  baseMaterial: material,
+                }
+              )
+            )
+          ).then((newMaterials) => {
+            if (this._wasDestroyed) return;
+            mesh.material = isArray ? newMaterials : newMaterials[0];
+          });
+        });
       }
 
       _updateThreeObjectPosition() {

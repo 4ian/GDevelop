@@ -201,4 +201,18 @@ gd::ResourceWorkerInObjectsWorker GD_CORE_API GetResourceWorkerOnObjects(
     const gd::Project &project, gd::ArbitraryResourceWorker &worker,
     std::function<bool(const gd::Object &)> &shouldCheckObject);
 
+/**
+ * \brief Expose the images referenced in a PBR material configuration.
+ *
+ * PBR material configurations are stored as JSON (see the "PBR Material
+ * System" of the 3D objects) and contain maps of texture slots, holding
+ * image resource names. This helper exposes every image found in these
+ * "textures" maps, so that resources can be renamed or removed safely.
+ *
+ * \return true if the JSON was updated (because resources were renamed), in
+ * which case `pbrConfigJson` holds the new configuration.
+ */
+bool GD_CORE_API ExposePBRConfigResources(gd::ArbitraryResourceWorker &worker,
+                                          gd::String &pbrConfigJson);
+
 }  // namespace gd

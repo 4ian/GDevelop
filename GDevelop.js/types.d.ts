@@ -3168,6 +3168,7 @@ export class Model3DObjectConfiguration extends ObjectConfiguration {
   getRotationZ(): number;
   getModelResourceName(): string;
   getMaterialType(): string;
+  getPBRConfig(): string;
   getOriginLocation(): string;
   getCenterLocation(): string;
   shouldKeepAspectRatio(): boolean;

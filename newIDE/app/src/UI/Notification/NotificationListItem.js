@@ -24,6 +24,7 @@ const notificationTypeToIcon = {
   'one-game-feedback-received': <Annotation />,
   'multiple-game-feedback-received': <Annotation />,
   'claimable-asset-pack': <Cart />,
+  'claimable-game-template': <Cart />,
   'game-sessions-achievement': <Gaming />,
   'team-invitation': <Users />,
 };
@@ -94,6 +95,14 @@ const getNotificationPrimaryTextByType = (
       </Trans>
     );
   }
+  if (notification.type === 'claimable-game-template') {
+    return (
+      <Trans>
+        The game template {notification.data.privateGameTemplateName} is now
+        available, go claim it in the shop!
+      </Trans>
+    );
+  }
   if (notification.type === 'team-invitation') {
     return (
       <Trans>
@@ -132,6 +141,12 @@ const getNotificationPrimaryTextByType = (
   }
   return null;
 };
+
+// Notifications of types unknown to this version are not displayed,
+// so they must not be counted as unseen either.
+export const isNotificationDisplayable = (
+  notification: Notification
+): boolean => !!getNotificationPrimaryTextByType(notification);
 
 const getNotificationClickCallback = ({
   notification,
@@ -186,6 +201,16 @@ const getNotificationClickCallback = ({
       addRouteArguments({
         'initial-dialog': 'store',
         'asset-pack': notification.data.privateAssetPackId,
+      });
+      onMarkNotificationAsSeen();
+      onCloseNotificationList();
+    };
+  }
+  if (notification.type === 'claimable-game-template') {
+    return () => {
+      addRouteArguments({
+        'initial-dialog': 'store',
+        'game-template': notification.data.privateGameTemplateId,
       });
       onMarkNotificationAsSeen();
       onCloseNotificationList();

@@ -208,6 +208,7 @@ const ProfileDialog = ({ onClose }: Props) => {
               <SubscriptionDetails
                 onManageSubscription={onManageSubscription}
                 isManageSubscriptionLoading={isManageSubscriptionLoading}
+                onOpenStore={onClose}
               />
             )}
             {!isStudentAccount && !isTeacherAccount && (

@@ -3979,6 +3979,7 @@ namespace gdjs {
             } else {
               if (isTextObject(runtimeObject)) {
                 runtimeObject.setWrapping(false);
+                console.log('Reset text wrapping');
               }
               runtimeObject.setWidth(runtimeObject.getOriginalWidth());
               runtimeObject.setHeight(runtimeObject.getOriginalHeight());
@@ -8170,38 +8171,40 @@ namespace gdjs {
       let isAreaHovered = false;
       if (this.state === 'idle') {
         editor.setCursorIcon('');
-        const intersects = editor._recastFromCursor(this.children);
-        for (const intersect of intersects) {
-          for (let index = 0; index < this.buttons.length; index++) {
-            const button = this.buttons[index];
+        if (editor.getSelectedObjects().length > 0) {
+          const intersects = editor._recastFromCursor(this.children);
+          for (const intersect of intersects) {
+            for (let index = 0; index < this.buttons.length; index++) {
+              const button = this.buttons[index];
 
-            if (intersect.object.parent === button) {
-              hoverredButtonLocation = index;
+              if (intersect.object.parent === button) {
+                hoverredButtonLocation = index;
 
-              const isVertical =
-                (index & (ButtonLocation.Left | ButtonLocation.Right)) === 0;
-              const isHorizontal =
-                (index & (ButtonLocation.Top | ButtonLocation.Bottom)) === 0;
+                const isVertical =
+                  (index & (ButtonLocation.Left | ButtonLocation.Right)) === 0;
+                const isHorizontal =
+                  (index & (ButtonLocation.Top | ButtonLocation.Bottom)) === 0;
 
+                editor.setCursorIcon(
+                  isVertical
+                    ? 'ns-resize'
+                    : isHorizontal
+                      ? 'ew-resize'
+                      : !!(index & ButtonLocation.Top) ===
+                          !!(index & ButtonLocation.Left)
+                        ? 'nwse-resize'
+                        : 'nesw-resize'
+                );
+                break;
+              }
+            }
+            if (intersect.object.parent === this.rotationButton) {
+              isRotationButtonHovered = true;
               editor.setCursorIcon(
-                isVertical
-                  ? 'ns-resize'
-                  : isHorizontal
-                    ? 'ew-resize'
-                    : (index & ButtonLocation.Top) ===
-                        (index & ButtonLocation.Left)
-                      ? 'nwse-resize'
-                      : 'nesw-resize'
+                `url("${getSvgIconUrl(editor.getRuntimeGame(), 'InGameEditor-rotate24_black')}"),auto`
               );
               break;
             }
-          }
-          if (intersect.object.parent === this.rotationButton) {
-            isRotationButtonHovered = true;
-            editor.setCursorIcon(
-              `url("${getSvgIconUrl(editor.getRuntimeGame(), 'InGameEditor-rotate24_black')}"),auto`
-            );
-            break;
           }
         }
         if (!hoverredButtonLocation && !isRotationButtonHovered) {

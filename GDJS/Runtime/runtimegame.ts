@@ -200,6 +200,7 @@ namespace gdjs {
     _eventsBasedObjectDatas: Map<String, EventsBasedObjectData>;
     _effectsManager: EffectsManager;
     _namedEasingsManager: gdjs.NamedEasingsManager;
+    _textureQuality3DManager: gdjs.TextureQuality3DManager;
     _maxFPS: integer;
     _minFPS: integer;
     _gameResolutionWidth: integer;
@@ -340,6 +341,7 @@ namespace gdjs {
         : null;
       this._effectsManager = new gdjs.EffectsManager();
       this._namedEasingsManager = new gdjs.NamedEasingsManager(data);
+      this._textureQuality3DManager = new gdjs.TextureQuality3DManager(this);
       this._maxFPS = this._data.properties.maxFPS;
       this._minFPS = this._data.properties.minFPS;
       this._gameResolutionWidth = this._data.properties.windowWidth;
@@ -574,6 +576,16 @@ namespace gdjs {
 
     getNamedEasingsManager(): gdjs.NamedEasingsManager {
       return this._namedEasingsManager;
+    }
+
+    /**
+     * Get the manager handling the advanced quality of 3D textures
+     * (GPU capabilities detection, texture filtering, mipmaps, anisotropy,
+     * texture resizing and GPU memory tracking).
+     * @return The texture quality (3D) manager for the game.
+     */
+    getTextureQuality3DManager(): gdjs.TextureQuality3DManager {
+      return this._textureQuality3DManager;
     }
 
     /**
@@ -1452,6 +1464,7 @@ namespace gdjs {
       this._sceneStack.dispose();
       this._renderer.dispose(removeCanvas);
       this._resourcesLoader.dispose();
+      this._textureQuality3DManager.dispose();
 
       this._wasDisposed = true;
     }
@@ -1816,7 +1829,7 @@ namespace gdjs {
       extensionName: string,
       propertyName: string
     ): string | null {
-      for (let property of this._data.properties.extensionProperties) {
+      for (let property of this._data.properties.extensionProperties || []) {
         if (
           property.extension === extensionName &&
           property.property === propertyName

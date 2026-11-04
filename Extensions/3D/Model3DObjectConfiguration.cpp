@@ -22,6 +22,7 @@ using namespace std;
 Model3DObjectConfiguration::Model3DObjectConfiguration()
     : width(100), height(100), depth(100), rotationX(90), rotationY(0),
       rotationZ(90), modelResourceName(""), materialType("StandardWithoutMetalness"),
+      pbrConfig(""),
       originLocation("ModelOrigin"), centerLocation("CenteredOnZ"),
       keepAspectRatio(true), crossfadeDuration(0.1f), isCastingShadow(true), isReceivingShadow(true) {}
 
@@ -53,6 +54,10 @@ bool Model3DObjectConfiguration::UpdateProperty(const gd::String &propertyName,
   }
   if (propertyName == "modelResourceName") {
     modelResourceName = newValue;
+    return true;
+  }
+  if (propertyName == "pbrConfig") {
+    pbrConfig = newValue;
     return true;
   }
   if (propertyName == "materialType") {
@@ -234,6 +239,14 @@ Model3DObjectConfiguration::GetProperties() const {
       .SetLabel(_("Shadow receiving"))
       .SetGroup(_("Lighting"));
 
+  // The PBR configuration is edited with the PBR Material Editor (the
+  // property itself is hidden and only stores its JSON).
+  objectProperties["pbrConfig"]
+      .SetValue(pbrConfig)
+      .SetType("pbrConfig")
+      .SetLabel(_("PBR material"))
+      .SetHidden();
+
 
 
   return objectProperties;
@@ -264,6 +277,7 @@ void Model3DObjectConfiguration::DoUnserializeFrom(
   rotationZ = content.GetDoubleAttribute("rotationZ");
   modelResourceName = content.GetStringAttribute("modelResourceName");
   materialType = content.GetStringAttribute("materialType");
+  pbrConfig = content.GetStringAttribute("pbrConfig");
   originLocation = content.GetStringAttribute("originLocation");
   centerLocation = content.GetStringAttribute("centerLocation");
   keepAspectRatio = content.GetBoolAttribute("keepAspectRatio");
@@ -295,6 +309,7 @@ void Model3DObjectConfiguration::DoSerializeTo(
   content.SetAttribute("rotationZ", rotationZ);
   content.SetAttribute("modelResourceName", modelResourceName);
   content.SetAttribute("materialType", materialType);
+  content.SetAttribute("pbrConfig", pbrConfig);
   content.SetAttribute("originLocation", originLocation);
   content.SetAttribute("centerLocation", centerLocation);
   content.SetAttribute("keepAspectRatio", keepAspectRatio);
@@ -315,6 +330,7 @@ void Model3DObjectConfiguration::DoSerializeTo(
 void Model3DObjectConfiguration::ExposeResources(
     gd::ArbitraryResourceWorker &worker) {
   worker.ExposeModel3D(modelResourceName);
+  gd::ExposePBRConfigResources(worker, pbrConfig);
 }
 
 const gd::String &

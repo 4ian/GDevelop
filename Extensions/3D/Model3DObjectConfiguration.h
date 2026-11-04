@@ -156,6 +156,7 @@ public:
 
   const gd::String& GetModelResourceName() const { return modelResourceName; };
   const gd::String& GetMaterialType() const { return materialType; };
+  const gd::String& GetPBRConfig() const { return pbrConfig; };
   const gd::String& GetOriginLocation() const { return originLocation; };
   const gd::String& GetCenterLocation() const { return centerLocation; };
 
@@ -180,6 +181,7 @@ private:
 
   gd::String modelResourceName;
   gd::String materialType;
+  gd::String pbrConfig;
   gd::String originLocation;
   gd::String centerLocation;
 

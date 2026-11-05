@@ -54,10 +54,14 @@ describe('gdjs.evtTools.object.hitBoxesCollisionTest', function () {
 
     const benchmarkSuite = makeBenchmarkSuite({
       benchmarksCount: 30,
-      // About the same duration for each objects count, with a brute-force
-      // test of every pair of objects.
+      // Batches long enough to measure both testing every pair of objects
+      // and the grid (proportional to the number of objects) well above the
+      // timer precision (0.1ms).
       iterationsCount: Math.ceil(
-        1000000 / (enemiesCount * (bulletsCount || enemiesCount))
+        Math.max(
+          1000000 / (enemiesCount * (bulletsCount || enemiesCount)),
+          100000 / (enemiesCount + (bulletsCount || enemiesCount))
+        )
       ),
     });
     benchmarkSuite.add(name, () => {

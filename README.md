@@ -1,4 +1,332 @@
-![GDevelop logo](https://raw.githubusercontent.com/4ian/GDevelop/master/newIDE/GDevelop%20banner.png "GDevelop logo")
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Crystal Cavern</title>
+  <style>
+    body {
+      margin: 0;
+      background: #0a0a1a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+      color: #fff;
+    }
+    canvas {
+      border: 2px solid #4af;
+      border-radius: 8px;
+      box-shadow: 0 0 30px rgba(68, 170, 255, 0.4);
+    }
+  </style>
+</head>
+<body>
+<canvas id="game" width="480" height="640"></canvas>
+
+<script>
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+const W = canvas.width;
+const H = canvas.height;
+
+// ===== GAME STATE =====
+let state = 'start'; // start, playing, gameover
+let score = 0;
+let best = localStorage.getItem('crystalBest') || 0;
+let spawnTimer = 0;
+let difficulty = 1;
+
+// ===== PLAYER =====
+const player = {
+  x: W / 2,
+  y: H - 60,
+  w: 36,
+  h: 36,
+  speed: 6,
+  color: '#4af'
+};
+
+// ===== INPUT =====
+const keys = {};
+document.addEventListener('keydown', e => {
+  keys[e.key] = true;
+  if (e.key === ' ' || e.key === 'Enter') {
+    if (state === 'start' || state === 'gameover') startGame();
+  }
+});
+document.addEventListener('keyup', e => keys[e.key] = false);
+
+// ===== OBJECTS =====
+let crystals = [];
+let rocks = [];
+
+function spawnCrystal() {
+  crystals.push({
+    x: 20 + Math.random() * (W - 40),
+    y: -20,
+    size: 14,
+    speed: 2 + Math.random() * 1.5,
+    phase: Math.random() * Math.PI * 2
+  });
+}
+
+function spawnRock() {
+  rocks.push({
+    x: 20 + Math.random() * (W - 40),
+    y: -30,
+    size: 16 + Math.random() * 14,
+    speed: 3 + Math.random() * 2 * difficulty,
+    rot: 0
+  });
+}
+
+// ===== GAME LOOP =====
+function startGame() {
+  state = 'playing';
+  score = 0;
+  difficulty = 1;
+  crystals = [];
+  rocks = [];
+  spawnTimer = 0;
+  player.x = W / 2;
+}
+
+function update() {
+  if (state !== 'playing') return;
+
+  // Move player
+  if (keys['ArrowLeft'] || keys['a'] || keys['A']) player.x -= player.speed;
+  if (keys['ArrowRight'] || keys['d'] || keys['D']) player.x += player.speed;
+  player.x = Math.max(player.w / 2, Math.min(W - player.w / 2, player.x));
+
+  // Difficulty ramps up with score
+  difficulty = 1 + Math.floor(score / 100) * 0.3;
+
+  // Spawn objects
+  spawnTimer++;
+  if (spawnTimer % Math.max(20, 50 - Math.floor(score / 10)) === 0) {
+    spawnCrystal();
+  }
+  if (spawnTimer % Math.max(35, 90 - Math.floor(score / 5)) === 0) {
+    spawnRock();
+  }
+
+  // Update crystals
+  for (let i = crystals.length - 1; i >= 0; i--) {
+    const c = crystals[i];
+    c.y += c.speed;
+    c.phase += 0.1;
+
+    // Collision with player
+    if (Math.hypot(c.x - player.x, c.y - player.y) < player.w / 2 + c.size) {
+      crystals.splice(i, 1);
+      score += 10;
+      continue;
+    }
+    if (c.y > H + 20) crystals.splice(i, 1);
+  }
+
+  // Update rocks
+  for (let i = rocks.length - 1; i >= 0; i--) {
+    const r = rocks[i];
+    r.y += r.speed;
+    r.rot += 0.05;
+
+    // Collision with player
+    if (Math.hypot(r.x - player.x, r.y - player.y) < player.w / 2 + r.size * 0.7) {
+      gameOver();
+      return;
+    }
+    if (r.y > H + 40) rocks.splice(i, 1);
+  }
+
+  // Passive score for survival
+  if (spawnTimer % 60 === 0) score += 1;
+}
+
+function gameOver() {
+  state = 'gameover';
+  if (score > best) {
+    best = score;
+    localStorage.setItem('crystalBest', best);
+  }
+}
+
+// ===== RENDERING =====
+function drawBackground() {
+  // Gradient cavern
+  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, '#0a0a1a');
+  grad.addColorStop(1, '#1a1030');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Stars
+  ctx.fillStyle = 'rgba(255,255,255,0.15)';
+  for (let i = 0; i < 40; i++) {
+    const x = (i * 97) % W;
+    const y = (i * 173) % H;
+    ctx.fillRect(x, y, 2, 2);
+  }
+}
+
+function drawPlayer() {
+  ctx.save();
+  ctx.shadowColor = '#4af';
+  ctx.shadowBlur = 20;
+  ctx.fillStyle = player.color;
+  ctx.beginPath();
+  ctx.arc(player.x, player.y, player.w / 2, 0, Math.PI * 2);
+  ctx.fill();
+  // Eyes
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = '#fff';
+  ctx.beginPath();
+  ctx.arc(player.x - 6, player.y - 4, 3, 0, Math.PI * 2);
+  ctx.arc(player.x + 6, player.y - 4, 3, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#000';
+  ctx.beginPath();
+  ctx.arc(player.x - 6, player.y - 4, 1.5, 0, Math.PI * 2);
+  ctx.arc(player.x + 6, player.y - 4, 1.5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawCrystal(c) {
+  ctx.save();
+  ctx.translate(c.x, c.y);
+  ctx.rotate(c.phase * 0.5);
+  ctx.shadowColor = '#0ff';
+  ctx.shadowBlur = 15;
+
+  // Diamond shape
+  ctx.fillStyle = '#0ff';
+  ctx.beginPath();
+  ctx.moveTo(0, -c.size);
+  ctx.lineTo(c.size * 0.7, 0);
+  ctx.lineTo(0, c.size);
+  ctx.lineTo(-c.size * 0.7, 0);
+  ctx.closePath();
+  ctx.fill();
+
+  // Highlight
+  ctx.fillStyle = 'rgba(255,255,255,0.6)';
+  ctx.beginPath();
+  ctx.moveTo(0, -c.size);
+  ctx.lineTo(c.size * 0.3, -c.size * 0.3);
+  ctx.lineTo(0, 0);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawRock(r) {
+  ctx.save();
+  ctx.translate(r.x, r.y);
+  ctx.rotate(r.rot);
+  ctx.fillStyle = '#666';
+  ctx.beginPath();
+  for (let i = 0; i < 7; i++) {
+    const angle = (i / 7) * Math.PI * 2;
+    const rad = r.size * (0.75 + Math.random() * 0.05);
+    const x = Math.cos(angle) * rad;
+    const y = Math.sin(angle) * rad;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = '#444';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawUI() {
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 20px Arial';
+  ctx.textAlign = 'left';
+  ctx.fillText('Score: ' + score, 15, 30);
+  ctx.textAlign = 'right';
+  ctx.fillStyle = '#0ff';
+  ctx.fillText('Best: ' + best, W - 15, 30);
+}
+
+function drawStartScreen() {
+  ctx.fillStyle = 'rgba(0,0,0,0.7)';
+  ctx.fillRect(0, 0, W, H);
+  ctx.textAlign = 'center';
+
+  ctx.fillStyle = '#0ff';
+  ctx.font = 'bold 42px Arial';
+  ctx.shadowColor = '#0ff';
+  ctx.shadowBlur = 20;
+  ctx.fillText('CRYSTAL', W / 2, H / 2 - 100);
+  ctx.fillText('CAVERN', W / 2, H / 2 - 50);
+
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = '#fff';
+  ctx.font = '18px Arial';
+  ctx.fillText('Collect crystals. Dodge rocks.', W / 2, H / 2 + 10);
+
+  ctx.fillStyle = '#4af';
+  ctx.font = 'bold 16px Arial';
+  ctx.fillText('← → or A/D to move', W / 2, H / 2 + 50);
+
+  ctx.fillStyle = '#ff0';
+  ctx.font = 'bold 22px Arial';
+  ctx.fillText('Press SPACE to start', W / 2, H / 2 + 110);
+}
+
+function drawGameOver() {
+  ctx.fillStyle = 'rgba(0,0,0,0.75)';
+  ctx.fillRect(0, 0, W, H);
+  ctx.textAlign = 'center';
+
+  ctx.fillStyle = '#f44';
+  ctx.font = 'bold 44px Arial';
+  ctx.shadowColor = '#f44';
+  ctx.shadowBlur = 20;
+  ctx.fillText('GAME OVER', W / 2, H / 2 - 50);
+
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 26px Arial';
+  ctx.fillText('Score: ' + score, W / 2, H / 2 + 10);
+  ctx.fillStyle = '#0ff';
+  ctx.fillText('Best: ' + best, W / 2, H / 2 + 50);
+
+  ctx.fillStyle = '#ff0';
+  ctx.font = 'bold 20px Arial';
+  ctx.fillText('Press SPACE to play again', W / 2, H / 2 + 120);
+}
+
+function render() {
+  drawBackground();
+
+  if (state === 'playing' || state === 'gameover') {
+    crystals.forEach(drawCrystal);
+    rocks.forEach(drawRock);
+    drawPlayer();
+    drawUI();
+  }
+
+  if (state === 'start') drawStartScreen();
+  if (state === 'gameover') drawGameOver();
+}
+
+// ===== MAIN LOOP =====
+function loop() {
+  update();
+  render();
+  requestAnimationFrame(loop);
+}
+
+loop();
+</script>
+</body>
+</html>![GDevelop logo](https://raw.githubusercontent.com/4ian/GDevelop/master/newIDE/GDevelop%20banner.png "GDevelop logo")
 
 GDevelop is a **full-featured, no-code, open-source** game development software. You can build **2D, 3D and multiplayer games** for mobile (iOS, Android), desktop and the web. GDevelop is designed to be fast and incredibly intuitive: make games using an easy-to-understand yet powerful event-based system and modular behaviors. Create with AI that assists or builds alongside you.
 

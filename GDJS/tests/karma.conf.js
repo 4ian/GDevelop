@@ -360,6 +360,13 @@ module.exports = function (config) {
         served: true,
         nocache: false,
       },
+      {
+        pattern: './GDJS/tests/games/capabilities/assets/spineboy.*',
+        watched: false,
+        included: false,
+        served: true,
+        nocache: false,
+      },
 
       ...(config.benchmarksOnly ? [] : testFiles),
       ...(config.enableBenchmarks || config.benchmarksOnly

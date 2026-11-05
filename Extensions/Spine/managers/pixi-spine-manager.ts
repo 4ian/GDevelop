@@ -31,6 +31,7 @@ namespace gdjs {
      * The atlas page textures are tracked separately by the SpineAtlasManager.
      */
     private _loadedSpines = new gdjs.ResourceCache<SpineAssetAliases>();
+    private _unloadingSpines = new Map<string, Promise<void>>();
 
     /**
      * @param resourceLoader The resources loader of the game.
@@ -65,6 +66,11 @@ namespace gdjs {
       const skeletonAlias = skeletonUrl;
 
       try {
+        const pendingUnload = this._unloadingSpines.get(skeletonAlias);
+        if (pendingUnload) {
+          await pendingUnload;
+        }
+
         const game = this._resourceLoader.getRuntimeGame();
         const embeddedResourcesNames = game.getEmbeddedResourcesNames(
           resource.name
@@ -91,6 +97,12 @@ namespace gdjs {
           );
         }
 
+        const pendingUnloadAfterAtlas =
+          this._unloadingSpines.get(skeletonAlias);
+        if (pendingUnloadAfterAtlas) {
+          await pendingUnloadAfterAtlas;
+        }
+
         PIXI.Assets.setPreferences({
           preferWorkers: false,
           crossOrigin: this._resourceLoader.checkIfCredentialsRequired(
@@ -100,6 +112,7 @@ namespace gdjs {
             : 'anonymous',
         });
         PIXI.Assets.add({ alias: skeletonAlias, src: skeletonUrl });
+        PIXI.Assets.resolver.prefer();
         await PIXI.Assets.load(skeletonAlias);
 
         this._loadedSpines.set(resource, { skeletonAlias, atlasAlias });
@@ -108,6 +121,7 @@ namespace gdjs {
           `Error while preloading spine resource ${resource.name}: ${error}`
         );
         await PIXI.Assets.unload(skeletonAlias).catch(() => {});
+        PIXI.Assets.resolver.prefer();
         throw error;
       }
     }
@@ -139,6 +153,7 @@ namespace gdjs {
      */
     dispose(): void {
       this._loadedSpines.clear();
+      this._unloadingSpines.clear();
     }
 
     unloadResource(resourceData: ResourceData): void {
@@ -152,7 +167,16 @@ namespace gdjs {
             delete skeletonCache[cacheKey];
           }
         }
-        PIXI.Assets.unload(aliases.skeletonAlias).catch(() => {});
+        const skeletonAlias = aliases.skeletonAlias;
+        const unloadPromise = PIXI.Assets.unload(skeletonAlias)
+          .catch(() => {})
+          .then(() => {
+            PIXI.Assets.resolver.prefer();
+            if (this._unloadingSpines.get(skeletonAlias) === unloadPromise) {
+              this._unloadingSpines.delete(skeletonAlias);
+            }
+          });
+        this._unloadingSpines.set(skeletonAlias, unloadPromise);
         this._loadedSpines.delete(resourceData);
       }
     }

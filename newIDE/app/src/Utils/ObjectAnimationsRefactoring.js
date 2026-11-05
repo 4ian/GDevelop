@@ -1,6 +1,7 @@
 // @flow
 import { mapFor } from './MapFor';
 import { getInstancesInLayoutForObject } from './Layout';
+import { renameAnimationNameInObjectStateMachines } from '../ObjectEditor/AnimationStateMachineEditor/StateMachineUtils';
 const gd: libGDevelop = global.gd;
 
 /**
@@ -79,6 +80,9 @@ export const renameObjectAnimationReferences = (
       newName
     );
   }
+  // Keep the animation states of the animation state machine (if any) in
+  // sync with the renamed animation.
+  renameAnimationNameInObjectStateMachines(object, oldName, newName);
 };
 
 /**

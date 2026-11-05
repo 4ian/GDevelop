@@ -189,6 +189,8 @@ module.exports = function (config) {
 
       //Extensions:
       `${gdjsRuntimePath}/Extensions/DraggableBehavior/draggableruntimebehavior.js`,
+      `${gdjsRuntimePath}/Extensions/AnimationStateMachine/statemachinelogic.js`,
+      `${gdjsRuntimePath}/Extensions/AnimationStateMachine/animationstatemachinebehavior.js`,
       `${gdjsRuntimePath}/Extensions/AnchorBehavior/anchorruntimebehavior.js`,
       `${gdjsRuntimePath}/Extensions/PlatformBehavior/platformerobjectruntimebehavior.js`,
       `${gdjsRuntimePath}/Extensions/PlatformBehavior/platformruntimebehavior.js`,

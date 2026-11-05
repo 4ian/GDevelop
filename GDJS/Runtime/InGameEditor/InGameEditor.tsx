@@ -1349,8 +1349,7 @@ namespace gdjs {
       this._instancePositions.clear();
       this._instanceAngles.clear();
       this._changeHappened = false;
-      // TODO
-      return changeHappened || true;
+      return changeHappened;
     }
 
     translate(
@@ -1376,7 +1375,7 @@ namespace gdjs {
         selectedInstance.setX(Math.round(newX));
         selectedInstance.setY(Math.round(newY));
       }
-      return;
+      this._changeHappened = true;
     }
 
     rotate(
@@ -1427,6 +1426,7 @@ namespace gdjs {
         selectedInstance.setX(newX);
         selectedInstance.setY(newY);
       }
+      this._changeHappened = true;
     }
 
     resize(
@@ -1470,10 +1470,6 @@ namespace gdjs {
         const initialUnrotatedInstanceCenterY =
           (initialUnrotatedInstanceAABB.max[1] +
             initialUnrotatedInstanceAABB.min[1]) /
-          2;
-        const initialUnrotatedInstanceCenterZ =
-          (initialUnrotatedInstanceAABB.max[2] +
-            initialUnrotatedInstanceAABB.min[2]) /
           2;
 
         const initialInstanceOriginPosition =
@@ -1558,6 +1554,7 @@ namespace gdjs {
           selectedInstance.getHeight()
         );
       }
+      this._changeHappened = true;
     }
 
     _getOrCreateUnrotatedInstanceAABB(instance: gdjs.RuntimeObject): AABB3D {
@@ -4066,10 +4063,9 @@ namespace gdjs {
       raycaster.setFromCamera(normalizedDeviceCoordinates, threeCamera);
     }
 
-    _recastFromCursor(
+    _raycastFromCursorOnTopLayer(
       objects: Array<THREE.Object3D>
     ): Array<THREE.Intersection> {
-      // TODO Using the top layer only works for selection controls.
       const topLayer = this.getTopLayer();
       if (!topLayer) {
         return [];
@@ -7608,8 +7604,6 @@ namespace gdjs {
       this.dummyThreeObject.removeFromParent();
       this.editor.getEditorGrid().setVisible(false);
       this._isShown = false;
-      // this._draggedSelectedObject = null;
-      // this._objectToDuplicateOnDrag = null;
     }
 
     isShown(): boolean {
@@ -7968,6 +7962,7 @@ namespace gdjs {
     TopRight = Top | Right,
     BottomRight = Bottom | Right,
     BottomLeft = Bottom | Left,
+    Rotation = 16,
   }
 
   const buttonLocations = [
@@ -8173,39 +8168,32 @@ namespace gdjs {
       if (this.state === 'idle') {
         editor.setCursorIcon('');
         if (editor.getSelectedObjects().length > 0) {
-          const intersects = editor._recastFromCursor(this.children);
-          for (const intersect of intersects) {
-            for (let index = 0; index < this.buttons.length; index++) {
-              const button = this.buttons[index];
-
-              if (intersect.object.parent === button) {
-                hoverredButtonLocation = index;
-
-                const isVertical =
-                  (index & (ButtonLocation.Left | ButtonLocation.Right)) === 0;
-                const isHorizontal =
-                  (index & (ButtonLocation.Top | ButtonLocation.Bottom)) === 0;
-
-                editor.setCursorIcon(
-                  isVertical
-                    ? 'ns-resize'
-                    : isHorizontal
-                      ? 'ew-resize'
-                      : !!(index & ButtonLocation.Top) ===
-                          !!(index & ButtonLocation.Left)
-                        ? 'nwse-resize'
-                        : 'nesw-resize'
-                );
-                break;
-              }
-            }
-            if (intersect.object.parent === this.rotationButton) {
-              isRotationButtonHovered = true;
-              editor.setCursorIcon(
-                `url("${getSvgIconUrl(editor.getRuntimeGame(), 'InGameEditor-rotate24_black')}"),auto`
-              );
-              break;
-            }
+          const buttonLocation = this._getButtonUnderCursor(editor);
+          if (buttonLocation === ButtonLocation.Rotation) {
+            isRotationButtonHovered = true;
+            editor.setCursorIcon(
+              `url("${getSvgIconUrl(editor.getRuntimeGame(), 'InGameEditor-rotate24_black')}"),auto`
+            );
+          } else if (buttonLocation !== null) {
+            hoverredButtonLocation = buttonLocation;
+            const isVertical =
+              (buttonLocation &
+                (ButtonLocation.Left | ButtonLocation.Right)) ===
+              0;
+            const isHorizontal =
+              (buttonLocation &
+                (ButtonLocation.Top | ButtonLocation.Bottom)) ===
+              0;
+            editor.setCursorIcon(
+              isVertical
+                ? 'ns-resize'
+                : isHorizontal
+                  ? 'ew-resize'
+                  : !!(buttonLocation & ButtonLocation.Top) ===
+                      !!(buttonLocation & ButtonLocation.Left)
+                    ? 'nwse-resize'
+                    : 'nesw-resize'
+            );
           }
         }
         if (!hoverredButtonLocation && !isRotationButtonHovered) {
@@ -8579,6 +8567,25 @@ namespace gdjs {
           editor.getRuntimeGame().getGameResolutionHeight()
         );
       }
+    }
+
+    private _getButtonUnderCursor(
+      editor: gdjs.InGameEditor
+    ): ButtonLocation | null {
+      const intersects = editor._raycastFromCursorOnTopLayer(this.children);
+      for (const intersect of intersects) {
+        for (const buttonLocation of buttonLocations) {
+          const button = this.buttons[buttonLocation];
+
+          if (intersect.object.parent === button) {
+            return buttonLocation;
+          }
+        }
+        if (intersect.object.parent === this.rotationButton) {
+          return ButtonLocation.Rotation;
+        }
+      }
+      return null;
     }
 
     hasActuallyMoved(): boolean {

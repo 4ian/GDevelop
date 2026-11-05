@@ -985,7 +985,6 @@ export default class SceneEditor extends React.Component<Props, State> {
         ...this.state.instancesEditorSettings,
         editorMode: newMode,
       });
-      this.props.setEditorMode(newMode);
     } else {
       const gameEditorMode =
         newMode === '3d-editor' ? 'embedded-game' : 'instances-editor';
@@ -998,6 +997,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       // Call the setGameEditorMode from mainframe so it can make some global changes. (ex: hot reload)
       this.props.setGameEditorMode(gameEditorMode);
     }
+    this.props.setEditorMode(newMode);
   };
 
   setGameEditorMode = (newMode: 'instances-editor' | 'embedded-game') => {

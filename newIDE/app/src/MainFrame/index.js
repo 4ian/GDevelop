@@ -3190,8 +3190,8 @@ const MainFrame = (props: Props): React.MixedElement => {
           isForInGameEdition: !!isForInGameEdition,
           isForGameplayTest: false,
           editorId: isForInGameEdition ? isForInGameEdition.editorId : '',
-          editorCameraState3D: isForInGameEdition
-            ? isForInGameEdition.editorCameraState3D
+          editorCameraState: isForInGameEdition
+            ? isForInGameEdition.editorCameraState
             : null,
           inGameEditorSettings: isForInGameEdition
             ? inGameEditorSettings
@@ -3339,11 +3339,11 @@ const MainFrame = (props: Props): React.MixedElement => {
       shouldReloadLibraries,
       shouldReloadResources,
       shouldHardReload,
-      editorCameraState3D,
+      editorCameraState,
     }: {|
       ...PreviewInGameEditorTarget,
       ...HotReloadSteps,
-      editorCameraState3D: EditorCameraState | null,
+      editorCameraState: EditorCameraState | null,
     |}) => {
       await _launchPreview({
         networkPreview: false,
@@ -3360,7 +3360,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           forcedExternalLayoutName: externalLayoutName,
           eventsBasedObjectType,
           eventsBasedObjectVariantName,
-          editorCameraState3D,
+          editorCameraState,
         },
         numberOfWindows: 0,
       });

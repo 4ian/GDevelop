@@ -373,15 +373,21 @@ export default class LocalPreviewLauncher extends React.Component<
         });
       }
     }
-    if (previewOptions.editorCameraState3D) {
+    const editorCameraState = previewOptions.editorCameraState;
+    if (editorCameraState) {
       previewExportOptions.setEditorCameraState3D(
-        previewOptions.editorCameraState3D.cameraMode,
-        previewOptions.editorCameraState3D.positionX,
-        previewOptions.editorCameraState3D.positionY,
-        previewOptions.editorCameraState3D.positionZ,
-        previewOptions.editorCameraState3D.rotationAngle,
-        previewOptions.editorCameraState3D.elevationAngle,
-        previewOptions.editorCameraState3D.distance
+        editorCameraState.camera3D.cameraMode,
+        editorCameraState.camera3D.positionX,
+        editorCameraState.camera3D.positionY,
+        editorCameraState.camera3D.positionZ,
+        editorCameraState.camera3D.rotationAngle,
+        editorCameraState.camera3D.elevationAngle,
+        editorCameraState.camera3D.distance
+      );
+      previewExportOptions.setEditorCameraState2D(
+        editorCameraState.camera2D.centerX,
+        editorCameraState.camera2D.centerY,
+        editorCameraState.camera2D.zoom
       );
     }
     if (previewOptions.inGameEditorSettings) {

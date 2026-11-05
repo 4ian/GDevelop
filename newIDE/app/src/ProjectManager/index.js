@@ -1097,6 +1097,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       },
       [
         project,
+        onExternalEventsAdded,
         onProjectItemModified,
         editName,
         scrollToItem,
@@ -1609,6 +1610,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         onSceneAdded,
         onDeleteLayouts,
         addExternalEvents,
+        onExternalEventsAdded,
         onDeleteExternalEventsList,
         addExternalLayout,
         onExternalLayoutAdded,

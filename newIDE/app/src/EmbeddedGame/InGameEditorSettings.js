@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
+import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { useShortcutMap } from '../KeyboardShortcuts';
 import {
   getCommandNamesHandledByInGameEditor,
@@ -21,6 +22,11 @@ export type InGameEditorSettings = {
    * means that the command has no shortcut.
    */
   shortcuts: { [CommandName]: string },
+  /**
+   * When disabled, the in-game editor is only used as the 3D editor,
+   * whatever the editor mode of the scene settings.
+   */
+  isRealTime2DEditorEnabled: boolean,
 };
 
 const commandNamesHandledByInGameEditor = getCommandNamesHandledByInGameEditor();
@@ -37,6 +43,8 @@ export const useInGameEditorSettings = (): InGameEditorSettings => {
   const toolbarBackgroundColor = gdevelopTheme.toolbar.backgroundColor;
   const toolbarSeparatorColor = gdevelopTheme.toolbar.separatorColor;
   const textColorPrimary = gdevelopTheme.text.color.primary;
+  const isRealTime2DEditorEnabled = React.useContext(PreferencesContext).values
+    .useRealTime2DEditor;
 
   const shortcutMap = useShortcutMap();
   const shortcuts = React.useMemo(
@@ -61,6 +69,7 @@ export const useInGameEditorSettings = (): InGameEditorSettings => {
         textColorPrimary,
       },
       shortcuts,
+      isRealTime2DEditorEnabled,
     }),
     [
       iconButtonSelectedBackgroundColor,
@@ -69,6 +78,7 @@ export const useInGameEditorSettings = (): InGameEditorSettings => {
       toolbarSeparatorColor,
       textColorPrimary,
       shortcuts,
+      isRealTime2DEditorEnabled,
     ]
   );
 

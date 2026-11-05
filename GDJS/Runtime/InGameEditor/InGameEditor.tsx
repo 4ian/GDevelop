@@ -541,6 +541,11 @@ namespace gdjs {
      * is not listed keeps its default shortcut, an empty string removes it.
      */
     shortcuts?: { [commandName: string]: string };
+    /**
+     * When disabled, the in-game editor is only used as the 3D editor,
+     * whatever the editor mode of the scene settings.
+     */
+    isRealTime2DEditorEnabled?: boolean;
   };
 
   const defaultInGameEditorSettings: InGameEditorSettings = {
@@ -1358,6 +1363,9 @@ namespace gdjs {
       translationY: float
     ) {
       for (const selectedInstance of selectedObjects) {
+        if (this.editor.isInstanceLocked(selectedInstance)) {
+          continue;
+        }
         const initialInstanceOriginPosition =
           this._getOrCreateInstanceOriginPosition(selectedInstance);
         const initialInstanceOriginX = initialInstanceOriginPosition[0];
@@ -1379,6 +1387,9 @@ namespace gdjs {
       fixedPointY: float
     ) {
       for (const selectedInstance of selectedObjects) {
+        if (this.editor.isInstanceLocked(selectedInstance)) {
+          continue;
+        }
         const initialAABB = this._getOrCreateInstanceAABB(selectedInstance);
         const initialCenterX = (initialAABB.min[0] + initialAABB.max[0]) / 2;
         const initialCenterY = (initialAABB.min[1] + initialAABB.max[1]) / 2;
@@ -1435,6 +1446,9 @@ namespace gdjs {
       const hasRotatedInstance = areAnyInstancesNotStraight(selectedObjects);
 
       for (const selectedInstance of selectedObjects) {
+        if (this.editor.isInstanceLocked(selectedInstance)) {
+          continue;
+        }
         const initialUnrotatedInstanceAABB =
           this._getOrCreateUnrotatedInstanceAABB(selectedInstance);
         const initialUnrotatedInstanceWidth =
@@ -1757,7 +1771,7 @@ namespace gdjs {
         this,
         this._objectMover3D
       );
-      this._selectionControls = this._selectionControls2D;
+      this._selectionControls = this._selectionControls3D;
 
       this._selectionBoxElement = document.createElement('div');
       this._selectionBoxElement.style.position = 'fixed';
@@ -1783,6 +1797,7 @@ namespace gdjs {
       });
 
       this._applyInGameEditorSettings();
+      this._applyEditorMode();
       this.onProjectDataChange(projectData);
 
       // Uncomment to get access to the runtime game from the console and do
@@ -1873,6 +1888,7 @@ namespace gdjs {
         ...inGameEditorSettings,
       };
       this._applyInGameEditorSettings();
+      this._applyEditorMode();
     }
 
     getRuntimeGame() {
@@ -2352,6 +2368,9 @@ namespace gdjs {
     }
 
     getEditorMode(): '2d-editor' | '3d-editor' {
+      if (!this._inGameEditorSettings.isRealTime2DEditorEnabled) {
+        return '3d-editor';
+      }
       return this._instancesEditorSettings
         ? this._instancesEditorSettings.editorMode || '2d-editor'
         : '2d-editor';
@@ -2380,15 +2399,25 @@ namespace gdjs {
             : '2d-editor';
       }
       // end of compatibility code
-      if (this._instancesEditorSettings.editorMode === '3d-editor') {
-        this._selectionControls2D.remove();
-        this._selectionControls = this._selectionControls3D;
-      } else {
-        this._selectionControls3D.remove();
-        this._selectionControls = this._selectionControls2D;
-      }
       this._editorGrid.setVisible(false);
       this._editorGrid.setSettings(this._instancesEditorSettings);
+      this._applyEditorMode();
+    }
+
+    private _applyEditorMode() {
+      const editorMode = this.getEditorMode();
+      const selectionControls =
+        editorMode === '3d-editor'
+          ? this._selectionControls3D
+          : this._selectionControls2D;
+      if (selectionControls !== this._selectionControls) {
+        this._selectionControls.remove();
+        this._selectionControls = selectionControls;
+        // Selection boxes are different in 2D and 3D: they are recreated.
+        this._selectionBoxes.forEach((box) => box.setVisible(false));
+        this._selectionBoxes.clear();
+      }
+      this._editorGrid.setEditorMode(editorMode);
     }
 
     getEditorGrid(): EditorGrid {
@@ -2945,15 +2974,16 @@ namespace gdjs {
               ])
             ) as FloatPoint
           );
-          if (!projectedSelectionBox.vertices.every(Boolean)) {
-            return;
-          }
-          for (const object of editedInstanceContainer.getAdhocListOfAllInstances()) {
-            if (
-              !is3D(object) &&
-              isAABBInsidePolygon(projectedSelectionBox, object.getAABB())
-            ) {
-              objects.add(object);
+          // A corner over the horizon can't be projected on the ground:
+          // 2D objects are not selected, but 3D objects still are.
+          if (projectedSelectionBox.vertices.every(Boolean)) {
+            for (const object of editedInstanceContainer.getAdhocListOfAllInstances()) {
+              if (
+                !is3D(object) &&
+                isAABBInsidePolygon(projectedSelectionBox, object.getAABB())
+              ) {
+                objects.add(object);
+              }
             }
           }
           for (const selectThreeObject of this._selectionBox.select()) {
@@ -5244,7 +5274,7 @@ namespace gdjs {
     normal: 'Z' | 'Y' | 'X' = 'Z';
     position = new THREE.Vector3();
     divisionsCount = 10;
-    editorMode: '3d-editor' | '2d-editor' = '2d-editor';
+    editorMode: '3d-editor' | '2d-editor' = '3d-editor';
 
     isForcefullyHidden = true;
     gridWidth: float = 0;
@@ -5280,7 +5310,14 @@ namespace gdjs {
       this.isSnappingEnabledByDefault = instancesEditorSettings.snap;
       this.gridType = instancesEditorSettings.gridType;
       this.divisionsCount = 10;
-      this.editorMode = instancesEditorSettings.editorMode || '2d-editor';
+      this.rebuildGrid();
+    }
+
+    setEditorMode(editorMode: '3d-editor' | '2d-editor'): void {
+      if (this.editorMode === editorMode) {
+        return;
+      }
+      this.editorMode = editorMode;
       this.rebuildGrid();
     }
 
@@ -7882,8 +7919,12 @@ namespace gdjs {
         ) + 1
       );
 
-      const selectedObjects = this.editor.getSelectedObjects();
-      if (selectedObjects.length === 0) {
+      const lastEditableSelectedObject = this.editor.getLastSelectedObject({
+        ignoreIf: (object) =>
+          this.editor.isInstanceLocked(object) ||
+          this.editor.isInstanceSealed(object),
+      });
+      if (!lastEditableSelectedObject) {
         this.remove();
         return;
       }
@@ -8097,6 +8138,10 @@ namespace gdjs {
     }
 
     step(editor: InGameEditor) {
+      const movableObjectsOnly = {
+        ignoreIf: (object: gdjs.RuntimeObject) =>
+          editor.isInstanceLocked(object),
+      };
       const currentScene = editor.getCurrentScene();
       if (!currentScene) {
         return;
@@ -8111,15 +8156,13 @@ namespace gdjs {
       if (!threeCamera || !threeScene) {
         return;
       }
-      {
-        const selectionAABB = editor.getSelectionAABB();
-        if (selectionAABB) {
-          this.update(
-            selectionAABB,
-            threeCamera,
-            editor.getRuntimeGame().getGameResolutionHeight()
-          );
-        }
+      const movableSelectionAABB = editor.getSelectionAABB(movableObjectsOnly);
+      if (movableSelectionAABB) {
+        this.update(
+          movableSelectionAABB,
+          threeCamera,
+          editor.getRuntimeGame().getGameResolutionHeight()
+        );
       }
 
       const inputManager = editor.getRuntimeGame().getInputManager();
@@ -8130,7 +8173,7 @@ namespace gdjs {
       let isAreaHovered = false;
       if (this.state === 'idle') {
         editor.setCursorIcon('');
-        if (editor.getSelectedObjects().length > 0) {
+        if (movableSelectionAABB) {
           const buttonLocation = this._getButtonUnderCursor(editor);
           if (buttonLocation === ButtonLocation.Rotation) {
             isRotationButtonHovered = true;
@@ -8204,7 +8247,7 @@ namespace gdjs {
         this.state = 'idle';
         this.draggedButtonLocation = null;
         this._hasActuallyMoved = false;
-        const selectionAABB = editor.getSelectionAABB();
+        const selectionAABB = editor.getSelectionAABB(movableObjectsOnly);
         if (!selectionAABB) {
           return;
         }
@@ -8511,7 +8554,7 @@ namespace gdjs {
         );
       }
       {
-        const selectionAABB = editor.getSelectionAABB();
+        const selectionAABB = editor.getSelectionAABB(movableObjectsOnly);
         if (!selectionAABB) {
           return;
         }
@@ -8721,11 +8764,9 @@ namespace gdjs {
         const indices = new Uint16Array(segmentCount * 2);
         const positions = new Float32Array(segmentCount * 3);
 
-        indices[0] = 0;
-        indices[indices.length - 1] = 0;
         for (let index = 0; index < segmentCount; index++) {
-          indices[index * 2 + 1] = index;
-          indices[index * 2 + 2] = index;
+          indices[index * 2] = index;
+          indices[index * 2 + 1] = (index + 1) % segmentCount;
         }
 
         for (let index = 0; index < segmentCount; index++) {

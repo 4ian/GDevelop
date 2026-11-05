@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 
 /**
  * Write the benchmark results sent by the browser (see `reportBenchmarkResult`
@@ -18,6 +19,48 @@ function BenchmarkResultsReporter(config) {
   };
 }
 BenchmarkResultsReporter.$inject = ['config'];
+
+/**
+ * Write the images sent by the rendering snapshots (see
+ * `tests/rendering-snapshots.js`): the expected images when updating them
+ * (`--updateRenderingSnapshots`), or the images drawn and their differences
+ * with the expected ones when they don't match.
+ */
+function RenderingSnapshotsMiddleware(config) {
+  const expectedImagesPath = path.join(
+    config.basePath,
+    'GDJS/tests/rendering-snapshots'
+  );
+  const resultsPath = path.join(
+    config.basePath,
+    'GDJS/tests/rendering-snapshots-results'
+  );
+  // Results of a previous run would be mistaken for the ones of this run.
+  fs.rmSync(resultsPath, { recursive: true, force: true });
+
+  return (request, response, next) => {
+    const match =
+      /^\/rendering-snapshots\/(baseline|actual|diff)\/([a-z0-9-]+)$/.exec(
+        request.url
+      );
+    if (request.method !== 'POST' || !match) return next();
+    const [, kind, snapshotName] = match;
+    const chunks = [];
+    request.on('data', (chunk) => chunks.push(chunk));
+    request.on('end', () => {
+      const image = Buffer.from(Buffer.concat(chunks).toString(), 'base64');
+      const imagePath =
+        kind === 'baseline'
+          ? path.join(expectedImagesPath, `${snapshotName}.png`)
+          : path.join(resultsPath, `${snapshotName}.${kind}.png`);
+      fs.mkdirSync(path.dirname(imagePath), { recursive: true });
+      fs.writeFileSync(imagePath, image);
+      response.writeHead(200);
+      response.end();
+    });
+  };
+}
+RenderingSnapshotsMiddleware.$inject = ['config'];
 
 module.exports = function (config) {
   // The built game engine to test, relative to the repository root. Changed
@@ -88,12 +131,20 @@ module.exports = function (config) {
       require('karma-mocha'),
       require('karma-sinon'),
       { 'reporter:benchmark-results': ['type', BenchmarkResultsReporter] },
+      {
+        'middleware:rendering-snapshots': [
+          'factory',
+          RenderingSnapshotsMiddleware,
+        ],
+      },
     ],
+    middleware: ['rendering-snapshots'],
     reporters: config.benchmarkResultsFile
       ? ['dots', 'benchmark-results']
       : ['progress'],
     client: {
       args: config.grep ? ['--grep', config.grep] : [],
+      renderingSnapshots: { update: !!config.updateRenderingSnapshots },
       mocha: {
         reporter: 'html',
         timeout: 10000, // Give a bit more time for CIs (the default 2s can be too low sometimes, as a real browser is involved).
@@ -255,6 +306,13 @@ module.exports = function (config) {
       `${gdjsRuntimePath}/Extensions/3D/DepthOfFieldEffect.js`,
       `${gdjsRuntimePath}/Extensions/3D/N8AOEffect.js`,
       `${gdjsRuntimePath}/Extensions/3D/DirectionalLight.js`,
+      `${gdjsRuntimePath}/Extensions/3D/AmbientLight.js`,
+      `${gdjsRuntimePath}/Extensions/3D/HemisphereLight.js`,
+      `${gdjsRuntimePath}/Extensions/3D/LinearFog.js`,
+      `${gdjsRuntimePath}/Extensions/3D/ExponentialFog.js`,
+      `${gdjsRuntimePath}/Extensions/3D/ExposureEffect.js`,
+      `${gdjsRuntimePath}/Extensions/3D/HueAndSaturationEffect.js`,
+      `${gdjsRuntimePath}/Extensions/3D/ToneMappingEffect.js`,
       `${gdjsRuntimePath}/Extensions/3D/Scene3DTools.js`,
       `${gdjsRuntimePath}/InGameEditor/InGameEditor.js`,
       {
@@ -345,6 +403,13 @@ module.exports = function (config) {
         included: false,
         served: true,
         nocache: false,
+      },
+      {
+        pattern: './GDJS/tests/rendering-snapshots/*.png',
+        watched: false,
+        included: false,
+        served: true,
+        nocache: true,
       },
       {
         pattern: './GDJS/tests/tests-utils/simple-tiled-map/*.json',

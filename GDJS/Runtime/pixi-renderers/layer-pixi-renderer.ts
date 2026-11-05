@@ -1646,6 +1646,12 @@ namespace gdjs {
         const texture: any = threeRenderer.properties.get(
           this._threePlaneTexture
         );
+        if (!texture.__webglInit) {
+          // Otherwise, Three.js would create its own WebGL texture when the
+          // plane is first drawn, replacing this one: the first frame drawn
+          // (the only one in a gameplay test screenshot) would miss the 2D objects.
+          threeRenderer.initTexture(this._threePlaneTexture);
+        }
         texture.__webglTexture = glTexture.texture;
       }
     }

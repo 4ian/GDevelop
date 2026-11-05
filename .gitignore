@@ -35,3 +35,4 @@
 Thumbs.db
 .claude
 /GDJS/tests/.benchmark-runtimes
+/GDJS/tests/rendering-snapshots-results

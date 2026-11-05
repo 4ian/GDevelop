@@ -21,6 +21,7 @@ import HotReloadPreviewButton, {
 } from '../HotReload/HotReloadPreviewButton';
 import EffectsList from '../EffectsList';
 import VariablesList from '../VariablesList/VariablesList';
+import { AnimationStateMachineTab } from './AnimationStateMachineEditor';
 import { sendBehaviorsEditorShown } from '../Utils/Analytics/EventSender';
 import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessage';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
@@ -31,6 +32,7 @@ const gd: libGDevelop = global.gd;
 
 export type ObjectEditorTab =
   | 'properties'
+  | 'stateMachine'
   | 'behaviors'
   | 'variables'
   | 'effects';
@@ -294,6 +296,11 @@ const InnerDialog = (props: InnerDialogProps) => {
               value: 'properties',
             },
             {
+              label: <Trans>State Machine</Trans>,
+              value: 'stateMachine',
+              id: 'state-machine-tab',
+            },
+            {
               label: <Trans>Behaviors</Trans>,
               value: 'behaviors',
               id: 'behaviors-tab',
@@ -366,6 +373,16 @@ const InnerDialog = (props: InnerDialogProps) => {
           />
         </Column>
       ) : null}
+      {currentTab === 'stateMachine' && (
+        <AnimationStateMachineTab
+          object={object}
+          project={project}
+          onUpdated={() => {
+            forceUpdate();
+            notifyOfChange();
+          }}
+        />
+      )}
       {currentTab === 'behaviors' && (
         <BehaviorsEditor
           objects={[object]}

@@ -1357,12 +1357,6 @@ namespace gdjs {
       translationX: float,
       translationY: float
     ) {
-      console.log(
-        selectedObjects.length,
-        'Translation',
-        translationX,
-        translationY
-      );
       for (const selectedInstance of selectedObjects) {
         const initialInstanceOriginPosition =
           this._getOrCreateInstanceOriginPosition(selectedInstance);
@@ -1388,7 +1382,6 @@ namespace gdjs {
         const initialAABB = this._getOrCreateInstanceAABB(selectedInstance);
         const initialCenterX = (initialAABB.min[0] + initialAABB.max[0]) / 2;
         const initialCenterY = (initialAABB.min[1] + initialAABB.max[1]) / 2;
-        console.log('Rotate around', fixedPointX, fixedPointY);
         const initialAngle = this._getOrCreateInstanceAngle(selectedInstance);
         const initialInstanceOriginPosition =
           this._getOrCreateInstanceOriginPosition(selectedInstance);
@@ -1437,16 +1430,6 @@ namespace gdjs {
       fixedPointX: float,
       fixedPointY: float
     ) {
-      console.log(
-        selectedObjects.length,
-        'Anchor',
-        fixedPointX,
-        fixedPointY,
-        'Scale',
-        scaleX,
-        scaleY
-      );
-
       const inputManager = this.editor.getRuntimeGame().getInputManager();
       const proportional = isShiftPressed(inputManager);
       const hasRotatedInstance = areAnyInstancesNotStraight(selectedObjects);
@@ -1544,15 +1527,6 @@ namespace gdjs {
         if (is3D(selectedInstance)) {
           selectedInstance.setDepth(Math.round(newDepth));
         }
-
-        console.log(
-          'Position',
-          selectedInstance.getX(),
-          selectedInstance.getY(),
-          'Size',
-          selectedInstance.getWidth(),
-          selectedInstance.getHeight()
-        );
       }
       this._changeHappened = true;
     }
@@ -2387,7 +2361,6 @@ namespace gdjs {
       instancesEditorSettings: InstancesEditorSettings
     ) {
       if (this._instancesEditorSettings) {
-        console.log('updateInstancesEditorSettings', instancesEditorSettings);
         Object.assign(this._instancesEditorSettings, instancesEditorSettings);
       } else {
         this._instancesEditorSettings = instancesEditorSettings;
@@ -3336,11 +3309,6 @@ namespace gdjs {
       this._updateInstances(updatedInstances);
       this._addInstances(addedInstances);
 
-      console.log(
-        'sendInstanceChanges',
-        this._selection.getSelectedObjects().length,
-        [...updatedInstances]
-      );
       debuggerClient.sendInstanceChanges({
         isSendingBackSelectionForDefaultSize: options
           ? options.isSendingBackSelectionForDefaultSize || false
@@ -3976,7 +3944,6 @@ namespace gdjs {
             } else {
               if (isTextObject(runtimeObject)) {
                 runtimeObject.setWrapping(false);
-                console.log('Reset text wrapping');
               }
               runtimeObject.setWidth(runtimeObject.getOriginalWidth());
               runtimeObject.setHeight(runtimeObject.getOriginalHeight());
@@ -5453,7 +5420,6 @@ namespace gdjs {
         this.isSnappingEnabledByDefault &&
         !noGridSnap
       ) {
-        console.log('Actually round');
         this.roundPosition(
           newPos,
           this.gridWidth,
@@ -7028,7 +6994,6 @@ namespace gdjs {
         !this._selectionControlsMovementTotalDelta
       ) {
         const changeHappened = this._objectMover.endMove();
-        console.log('endMove', changeHappened);
         this.editor._sendSelectionUpdate({
           hasSelectedObjectBeenModified: changeHappened,
         });
@@ -7809,7 +7774,6 @@ namespace gdjs {
         this._draggedSelectedObjectTotalDelta.translationY = 0;
         this._draggedSelectedObjectTotalDelta.translationZ = 0;
       }
-      console.log('move duplicated selection');
       this._objectMover.move(
         this.editor.getSelectedObjects() as Array<gdjs.RuntimeObject>,
         this._draggedSelectedObjectTotalDelta
@@ -7933,7 +7897,6 @@ namespace gdjs {
       }
       this.selectionHandle.removeFromParent();
       this._isShown = false;
-      console.log('Remove selection');
     }
 
     isShown(): boolean {
@@ -8215,20 +8178,14 @@ namespace gdjs {
       this.isHovered = !!hoverredButtonLocation || isRotationButtonHovered;
       const selectedObjects = editor.getSelectedObjects();
       if (selectedObjects.length === 0) {
-        console.log('Selection is empty');
         return;
       }
 
       if (!isLeftButtonPressed || editor.isLeftMouseButtonCaptured()) {
-        if (editor.isLeftMouseButtonCaptured()) {
-          console.log('Left mouse button captured');
-        }
-
         if (this.state === 'idle') {
           return;
         }
         const changeHappened = this._objectMover.endMove();
-        console.log('endMove', changeHappened);
         editor._sendSelectionUpdate({
           hasSelectedObjectBeenModified: changeHappened,
         });
@@ -8240,8 +8197,6 @@ namespace gdjs {
       }
 
       if (editor.isMouseLeftButtonJustPressed()) {
-        console.log('Mouse left button just pressed');
-
         this.state = 'idle';
         this.draggedButtonLocation = null;
         this._hasActuallyMoved = false;
@@ -8252,13 +8207,11 @@ namespace gdjs {
         if (hoverredButtonLocation) {
           this.state = 'resizing';
           this.draggedButtonLocation = hoverredButtonLocation;
-          console.log('Start resizing', this.draggedButtonLocation);
         } else if (isRotationButtonHovered) {
           this.state = 'rotating';
         } else if (isAreaHovered) {
           this.state = 'panning';
           this.hasDuplicatedSelection = false;
-          console.log('Start dragging');
         }
         if (this.state !== 'idle') {
           this.initialCursorPosition[0] = gdjs.evtTools.input.getCursorX(
@@ -8275,7 +8228,6 @@ namespace gdjs {
           this.initialSelectionAABB.min[1] = selectionAABB.min[1];
           this.initialSelectionAABB.max[0] = selectionAABB.max[0];
           this.initialSelectionAABB.max[1] = selectionAABB.max[1];
-          console.log('Start move');
           this._objectMover.startMove();
         }
       }
@@ -8295,7 +8247,6 @@ namespace gdjs {
         ) {
           editor._duplicateSelectedObjects();
           this.hasDuplicatedSelection = true;
-          console.log('Duplicate selection');
         }
 
         const cursorX = gdjs.evtTools.input.getCursorX(currentScene, '', 0);
@@ -8346,7 +8297,6 @@ namespace gdjs {
           );
         }
       } else if (this.state === 'resizing') {
-        console.log('Resizing', this.draggedButtonLocation);
         if (!this.draggedButtonLocation) {
           return;
         }

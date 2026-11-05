@@ -69,9 +69,7 @@ export const prepareInstancesEditorSettings = (
     editorMode:
       object.editorMode ||
       // Compatibility with GD <= 5.6.286
-      object.gameEditorMode === 'embedded-game'
-        ? '3d-editor'
-        : '2d-editor',
+      (object.gameEditorMode === 'embedded-game' ? '3d-editor' : '2d-editor'),
     // end of compatibility code
   };
 };

@@ -8165,6 +8165,7 @@ namespace gdjs {
             // Allow to grab objects that are not selected.
             if (
               editor.isMouseLeftButtonJustPressed() &&
+              !editor.isLeftMouseButtonCaptured() &&
               !isShiftPressed(inputManager) &&
               !editor.getSelectedObjects().includes(objectUnderCursor)
             ) {
@@ -8196,7 +8197,10 @@ namespace gdjs {
         return;
       }
 
-      if (editor.isMouseLeftButtonJustPressed()) {
+      if (
+        editor.isMouseLeftButtonJustPressed() &&
+        !editor.isLeftMouseButtonCaptured()
+      ) {
         this.state = 'idle';
         this.draggedButtonLocation = null;
         this._hasActuallyMoved = false;

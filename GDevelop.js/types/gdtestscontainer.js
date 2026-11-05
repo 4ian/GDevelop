@@ -9,6 +9,8 @@ declare class gdTestsContainer {
   clearTests(): void;
   moveTest(oldIndex: number, newIndex: number): void;
   getRootFolder(): gdTestFolderOrTest;
+  serializeFolderStructureTo(element: gdSerializerElement): void;
+  unserializeFolderStructureFrom(element: gdSerializerElement): void;
   getTestsCount(): number;
   getTestPosition(test: gdTest): number;
   delete(): void;

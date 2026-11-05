@@ -30,13 +30,14 @@ export type ProjectItemFolderTreeViewItemProps = {|
     newFolder: ProjectItemFolderOrItem
   ) => void,
   addItemInFolder: (folder: ProjectItemFolderOrItem, i18n: I18nType) => void,
-  // Called with the name of the first item created by a paste.
-  onItemsAdded: (name: string) => void,
-  // Remove items of this kind from the project, once the user confirmed.
-  // Resolves to true if they were removed.
+  // Called with the names of the items created by a paste.
+  onItemsAdded: (names: Array<string>) => void,
+  // Remove items of this kind from the project, with the folder they are
+  // deleted with (empty by then), once the user confirmed. Resolves to true
+  // if they were removed.
   deleteItems: (
     items: Array<any>,
-    options: {| folderName?: string |}
+    options: {| folder?: ProjectItemFolderOrItem |}
   ) => Promise<boolean>,
 |};
 
@@ -176,12 +177,12 @@ export class ProjectItemFolderTreeViewItemContent
       this._removeFolderWithoutItems();
       return;
     }
-    this.props
-      .deleteItems(items, { folderName: this.folder.getFolderName() })
-      .then(isRemoved => {
-        // The removed items left their folders: only empty folders remain.
-        if (isRemoved) this._removeFolderWithoutItems();
-      });
+    this.props.deleteItems(items, { folder: this.folder }).then(isRemoved => {
+      if (isRemoved) {
+        this.props.onFolderRemoved();
+        this.inFolder.onFolderStructureModified();
+      }
+    });
   }
 
   _removeFolderWithoutItems(): void {

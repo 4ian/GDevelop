@@ -17,11 +17,11 @@ import {
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 
 export type ExternalLayoutTreeViewItemCallbacks = {|
-  onExternalLayoutAdded: (name: string) => void,
+  onExternalLayoutAdded: (names: Array<string>) => void,
   // Resolves to true once removed (after the user confirmed).
   onDeleteExternalLayouts: (
     Array<gdExternalLayout>,
-    options?: {| folderName?: string |}
+    options?: {| folder?: ProjectItemFolderOrItem |}
   ) => Promise<boolean>,
   onRenameExternalLayout: (string, string) => void,
   onOpenExternalLayout: string => void,

@@ -538,7 +538,8 @@ const getTreeViewItemRightButton = (i18n: I18nType) => (item: TreeViewItem) =>
 export type ProjectManagerItemCategory =
   | 'scenes'
   | 'externalLayouts'
-  | 'externalEvents';
+  | 'externalEvents'
+  | 'gameplayTests';
 
 export type ProjectManagerInterface = {|
   forceUpdateList: () => void,
@@ -571,9 +572,13 @@ type Props = {|
   toggleProjectManager: () => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
-  onSceneAdded: (name: string) => void,
-  onExternalLayoutAdded: (name: string) => void,
-  onExternalEventsAdded: (name: string) => void,
+  onSceneAdded: (names: Array<string>) => void,
+  onExternalLayoutAdded: (names: Array<string>) => void,
+  onExternalEventsAdded: (names: Array<string>) => void,
+  onGameplayTestAdded: (names: Array<string>) => void,
+  // Called after any change made from the project manager, which can have
+  // organized the items in folders.
+  onFoldersModified: () => void,
   onUndo: () => void,
   onRedo: () => void,
 
@@ -629,6 +634,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       onSceneAdded,
       onExternalLayoutAdded,
       onExternalEventsAdded,
+      onGameplayTestAdded,
+      onFoldersModified,
       onUndo,
       onRedo,
     },
@@ -659,10 +666,11 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         // The folders may have been reorganized: the first scene of the list
         // is the one started when no first scene is set.
         if (project) syncLayoutsOrderWithFolders(project);
+        onFoldersModified();
         forceUpdate();
         if (treeViewRef.current) treeViewRef.current.forceUpdateList();
       },
-      [project, forceUpdate]
+      [project, forceUpdate, onFoldersModified]
     );
 
     const [searchText, setSearchText] = React.useState('');
@@ -830,17 +838,35 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           );
           rootFolderId = externalLayoutsRootFolderId;
           datasetAttribute = 'data-external-layout';
-        } else {
+        } else if (category === 'externalEvents') {
           if (!project.hasExternalEventsNamed(name)) return;
           itemId = getExternalEventsTreeViewItemId(
             project.getExternalEvents(name)
           );
           rootFolderId = externalEventsRootFolderId;
           datasetAttribute = 'data-external-events';
+        } else {
+          if (!project.getTests().hasTestNamed(name)) return;
+          itemId = getGameplayTestTreeViewItemId(
+            project.getTests().getTest(name)
+          );
+          rootFolderId = gameplayTestsRootFolderId;
+          datasetAttribute = 'data-gameplay-test';
         }
 
+        const kind =
+          category === 'scenes'
+            ? sceneFoldersKind
+            : category === 'externalLayouts'
+            ? externalLayoutFoldersKind
+            : category === 'externalEvents'
+            ? externalEventsFoldersKind
+            : gameplayTestFoldersKind;
+        const folderIds = getFoldersAscendanceWithoutRootFolder(
+          kind.getRootFolder(project).getItemNamed(name)
+        ).map(folder => getFolderTreeViewItemId(kind, folder));
         if (treeViewRef.current) {
-          treeViewRef.current.openItems([itemId, rootFolderId]);
+          treeViewRef.current.openItems([itemId, ...folderIds, rootFolderId]);
         }
         // Wait for the tree view to (re-)render with the item before
         // scrolling to and flashing its row.
@@ -869,10 +895,11 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
 
     const onProjectItemModified = React.useCallback(
       () => {
+        onFoldersModified();
         forceUpdate();
         triggerUnsavedChanges();
       },
-      [forceUpdate, triggerUnsavedChanges]
+      [forceUpdate, triggerUnsavedChanges, onFoldersModified]
     );
 
     const editName = React.useCallback(
@@ -962,10 +989,9 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         newScene.updateBehaviorsSharedData(project);
         addDefaultLightToAllLayers(newScene);
 
-        onSceneAdded(newName);
-
-        onProjectItemModified();
         placeNewItemInFolder(sceneFoldersKind, newName, folder);
+        onSceneAdded([newName]);
+        onProjectItemModified();
 
         const sceneItemId = getSceneTreeViewItemId(newScene);
         if (treeViewRef.current) {
@@ -1071,9 +1097,9 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           newName,
           index + 1
         );
-        onExternalEventsAdded(newName);
-        onProjectItemModified();
         placeNewItemInFolder(externalEventsFoldersKind, newName, folder);
+        onExternalEventsAdded([newName]);
+        onProjectItemModified();
 
         const externalEventsItemId = getExternalEventsTreeViewItemId(
           newExternalEvents
@@ -1114,8 +1140,9 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         );
         const newTest = project.getTests().insertNewTest(newName, index + 1);
         newTest.setSource(DEFAULT_GAMEPLAY_TEST_SOURCE);
-        onProjectItemModified();
         placeNewItemInFolder(gameplayTestFoldersKind, newName, folder);
+        onGameplayTestAdded([newName]);
+        onProjectItemModified();
 
         const gameplayTestItemId = getGameplayTestTreeViewItemId(newTest);
         if (treeViewRef.current) {
@@ -1134,6 +1161,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       },
       [
         project,
+        onGameplayTestAdded,
         onProjectItemModified,
         editName,
         scrollToItem,
@@ -1154,10 +1182,9 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           index + 1
         );
 
-        onExternalLayoutAdded(newName);
-
-        onProjectItemModified();
         placeNewItemInFolder(externalLayoutFoldersKind, newName, folder);
+        onExternalLayoutAdded([newName]);
+        onProjectItemModified();
 
         const externalLayoutItemId = getExternalLayoutTreeViewItemId(
           newExternalLayout
@@ -1520,6 +1547,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
               expandFolders,
               onMovedFolderOrItemToAnotherFolder: animateClosestVisibleParent,
               onNewFolderCreated,
+              onGameplayTestAdded,
               onDeleteGameplayTests,
               onRenameGameplayTest,
               onOpenGameplayTest,
@@ -1539,6 +1567,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         expandFolders,
         animateClosestVisibleParent,
         onNewFolderCreated,
+        onGameplayTestAdded,
         onDeleteGameplayTests,
         onRenameGameplayTest,
         onOpenGameplayTest,
@@ -1597,7 +1626,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                 i18n,
                 folder
               ),
-            onItemsAdded: () => {},
+            onItemsAdded: onGameplayTestAdded,
             deleteItems: onDeleteGameplayTests,
           };
         }
@@ -1616,6 +1645,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         onExternalLayoutAdded,
         onDeleteExternalLayouts,
         addGameplayTest,
+        onGameplayTestAdded,
         onDeleteGameplayTests,
       ]
     );

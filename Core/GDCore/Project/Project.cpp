@@ -374,6 +374,17 @@ void Project::RemoveLayout(const gd::String& name) {
   scenes.erase(scene);
 }
 
+void Project::SerializeLayoutsFoldersTo(SerializerElement& element) const {
+  layoutsRootFolder->SerializeTo(element);
+}
+
+void Project::UnserializeLayoutsFoldersFrom(const SerializerElement& element) {
+  layoutsRootFolder->UnserializeFrom(element, [this](const gd::String& name) {
+    return HasLayoutNamed(name) ? &GetLayout(name) : nullptr;
+  });
+  layoutsRootFolder->AddMissingItems(scenes);
+}
+
 bool Project::HasExternalEventsNamed(const gd::String& name) const {
   return (find_if(externalEvents.begin(),
                   externalEvents.end(),
@@ -447,6 +458,21 @@ void Project::RemoveExternalEvents(const gd::String& name) {
 
   externalEventsRootFolder->RemoveRecursivelyItemNamed(name);
   externalEvents.erase(events);
+}
+
+void Project::SerializeExternalEventsFoldersTo(
+    SerializerElement& element) const {
+  externalEventsRootFolder->SerializeTo(element);
+}
+
+void Project::UnserializeExternalEventsFoldersFrom(
+    const SerializerElement& element) {
+  externalEventsRootFolder->UnserializeFrom(
+      element, [this](const gd::String& name) {
+        return HasExternalEventsNamed(name) ? &GetExternalEvents(name)
+                                            : nullptr;
+      });
+  externalEventsRootFolder->AddMissingItems(externalEvents);
 }
 
 void Project::MoveLayout(std::size_t oldIndex, std::size_t newIndex) {
@@ -579,6 +605,21 @@ void Project::RemoveExternalLayout(const gd::String& name) {
 
   externalLayoutsRootFolder->RemoveRecursivelyItemNamed(name);
   externalLayouts.erase(externalLayout);
+}
+
+void Project::SerializeExternalLayoutsFoldersTo(
+    SerializerElement& element) const {
+  externalLayoutsRootFolder->SerializeTo(element);
+}
+
+void Project::UnserializeExternalLayoutsFoldersFrom(
+    const SerializerElement& element) {
+  externalLayoutsRootFolder->UnserializeFrom(
+      element, [this](const gd::String& name) {
+        return HasExternalLayoutNamed(name) ? &GetExternalLayout(name)
+                                            : nullptr;
+      });
+  externalLayoutsRootFolder->AddMissingItems(externalLayouts);
 }
 
 void Project::SwapEventsFunctionsExtensions(std::size_t first,

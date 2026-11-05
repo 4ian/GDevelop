@@ -158,6 +158,17 @@ class GD_CORE_API TestsContainer : private SerializableWithNameList<gd::Test> {
   };
 
   /**
+   * \brief Replace the folder structure by the serialized one. The tests it
+   * does not hold are added at its end.
+   */
+  void UnserializeFolderStructureFrom(const SerializerElement& element) {
+    rootFolder->UnserializeFrom(element, [this](const gd::String& name) {
+      return HasTestNamed(name) ? &GetTest(name) : nullptr;
+    });
+    rootFolder->AddMissingItems(elements);
+  };
+
+  /**
    * \brief Unserialize the folder structure saved in the child `childName` of
    * `parentElement` (if any), once the tests are unserialized.
    */

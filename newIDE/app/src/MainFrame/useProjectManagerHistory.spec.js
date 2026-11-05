@@ -8,6 +8,7 @@ import useProjectManagerHistory, {
   type ProjectManagerRenameCommand,
   type UseProjectManagerHistoryResult,
 } from './useProjectManagerHistory';
+import { removeFolderAndSubFolders } from '../Utils/Folders';
 
 const gd: libGDevelop = global.gd;
 
@@ -73,6 +74,34 @@ describe('useProjectManagerHistory', () => {
     project.insertNewLayout('Scene2', 1);
     return project;
   };
+  const getLayoutNames = (project: gdProject) =>
+    Array.from({ length: project.getLayoutsCount() }, (_, i) =>
+      project.getLayoutAt(i).getName()
+    );
+  // The scenes folders: a folder as an object, a scene as its name.
+  const getScenesFolders = (project: gdProject) => {
+    const read = (node: gdLayoutFolderOrLayout): any =>
+      node.isFolder()
+        ? {
+            folder: node.getFolderName(),
+            children: Array.from({ length: node.getChildrenCount() }, (_, i) =>
+              read(node.getChildAt(i))
+            ),
+          }
+        : node.getItem().getName();
+    return read(project.getLayoutsRootFolder()).children;
+  };
+  const moveToFolder = (
+    root: gdLayoutFolderOrLayout,
+    itemName: string,
+    folder: gdLayoutFolderOrLayout,
+    position: number
+  ) =>
+    root.moveFolderOrItemToAnotherFolder(
+      root.getItemChild(itemName),
+      folder,
+      position
+    );
 
   it('has nothing to undo/redo and does not crash when there is no project yet', async () => {
     const { resultRef, call } = renderProjectManagerHistoryTester(null);
@@ -83,7 +112,7 @@ describe('useProjectManagerHistory', () => {
     expect(result.canRedo).toBe(false);
 
     // recordAddition/recordRename/undo must be safe no-ops without a project.
-    await call(r => r.recordAddition('scenes', 'SomeScene'));
+    await call(r => r.recordAddition('scenes', ['SomeScene']));
     expect(await call(r => r.undo(null, noopOptions))).toBe(null);
   });
 
@@ -98,7 +127,7 @@ describe('useProjectManagerHistory', () => {
     rerenderWithProject(project);
 
     project.insertNewLayout('Scene3', 2);
-    await call(r => r.recordAddition('scenes', 'Scene3'));
+    await call(r => r.recordAddition('scenes', ['Scene3']));
 
     expect(await call(r => r.canUndo)).toBe(true);
     const change = await call(r => r.undo(project, noopOptions));
@@ -118,7 +147,7 @@ describe('useProjectManagerHistory', () => {
     const { call } = renderProjectManagerHistoryTester(project);
 
     project.insertNewLayout('Scene3', 2);
-    await call(r => r.recordAddition('scenes', 'Scene3'));
+    await call(r => r.recordAddition('scenes', ['Scene3']));
 
     expect(await call(r => r.canUndo)).toBe(true);
     expect(await call(r => r.canRedo)).toBe(false);
@@ -170,7 +199,7 @@ describe('useProjectManagerHistory', () => {
 
     const { call } = renderProjectManagerHistoryTester(project);
     project.insertNewLayout('Scene3', 2);
-    await call(r => r.recordAddition('scenes', 'Scene3'));
+    await call(r => r.recordAddition('scenes', ['Scene3']));
     await call(r => r.undo(project, noopOptions));
     await call(r => r.redo(project, noopOptions));
 
@@ -197,8 +226,9 @@ describe('useProjectManagerHistory', () => {
     scene2.setBackgroundColor(10, 20, 30);
     const { call } = renderProjectManagerHistoryTester(project);
 
-    await call(r => r.recordDeletion('scenes', 'Scene2'));
+    await call(r => r.recordDeletion('scenes', ['Scene2']));
     project.removeLayout('Scene2');
+    await call(r => r.completeDeletion());
 
     const undoChange = await call(r => r.undo(project, noopOptions));
     expect(undoChange).toEqual({ targetKey: 'scenes', itemName: 'Scene2' });
@@ -265,9 +295,9 @@ describe('useProjectManagerHistory', () => {
     const { call } = renderProjectManagerHistoryTester(project);
 
     project.insertNewExternalLayout('ExternalLayout1', 0);
-    await call(r => r.recordAddition('externalLayouts', 'ExternalLayout1'));
+    await call(r => r.recordAddition('externalLayouts', ['ExternalLayout1']));
     project.insertNewExternalEvents('ExternalEvents1', 0);
-    await call(r => r.recordAddition('externalEvents', 'ExternalEvents1'));
+    await call(r => r.recordAddition('externalEvents', ['ExternalEvents1']));
 
     // Undo is a single stack shared across target kinds: the most recent
     // action (the external events) is undone first.
@@ -295,8 +325,9 @@ describe('useProjectManagerHistory', () => {
     // Edited after the history was seeded, like in its own editor.
     project.getLayout('Scene2').setBackgroundColor(10, 20, 30);
 
-    await call(r => r.recordDeletion('scenes', 'Scene2'));
+    await call(r => r.recordDeletion('scenes', ['Scene2']));
     project.removeLayout('Scene2');
+    await call(r => r.completeDeletion());
     await call(r => r.undo(project, noopOptions));
     expect(project.getLayout('Scene2').getBackgroundColorRed()).toBe(10);
 
@@ -323,7 +354,7 @@ describe('useProjectManagerHistory', () => {
       })
     );
     project.insertNewLayout('Scene3', 2);
-    await call(r => r.recordAddition('scenes', 'Scene3'));
+    await call(r => r.recordAddition('scenes', ['Scene3']));
 
     const scene1Ptr = project.getLayout('GameScene').ptr;
     await call(r => r.undo(project, noopOptions));
@@ -340,9 +371,10 @@ describe('useProjectManagerHistory', () => {
     project.setFirstLayout('Scene1');
     const { call } = renderProjectManagerHistoryTester(project);
 
-    await call(r => r.recordDeletion('scenes', 'Scene1'));
+    await call(r => r.recordDeletion('scenes', ['Scene1']));
     project.setFirstLayout('');
     project.removeLayout('Scene1');
+    await call(r => r.completeDeletion());
 
     await call(r => r.undo(project, noopOptions));
     expect(project.getFirstLayout()).toBe('Scene1');
@@ -356,9 +388,9 @@ describe('useProjectManagerHistory', () => {
     const project = makeProject();
     const { call, resultRef } = renderProjectManagerHistoryTester(project);
     project.insertNewLayout('Scene3', 2);
-    await call(r => r.recordAddition('scenes', 'Scene3'));
+    await call(r => r.recordAddition('scenes', ['Scene3']));
     project.insertNewLayout('Scene4', 3);
-    await call(r => r.recordAddition('scenes', 'Scene4'));
+    await call(r => r.recordAddition('scenes', ['Scene4']));
 
     const waitResolvers = [];
     const onWillRemoveItems = () =>
@@ -375,7 +407,7 @@ describe('useProjectManagerHistory', () => {
       // Recorded while the first undo waits for the tabs to close.
       project.insertNewLayout('Scene5', 4);
       if (resultRef.current)
-        resultRef.current.recordAddition('scenes', 'Scene5');
+        resultRef.current.recordAddition('scenes', ['Scene5']);
       waitResolvers.forEach(resolve => resolve());
       const results = await Promise.all([first, second]);
       return results.filter(Boolean).length;
@@ -398,7 +430,7 @@ describe('useProjectManagerHistory', () => {
     const project = makeProject();
     const { call } = renderProjectManagerHistoryTester(project);
     project.insertNewExternalEvents('A', 0);
-    await call(r => r.recordAddition('externalEvents', 'A'));
+    await call(r => r.recordAddition('externalEvents', ['A']));
     // Duplicated (or pasted, or created by the AI) without a record.
     project.insertNewExternalEvents('A2', 1);
 
@@ -417,8 +449,9 @@ describe('useProjectManagerHistory', () => {
     project.getLayout('Scene2').setBackgroundColor(10, 20, 30);
     const { resultRef, call } = renderProjectManagerHistoryTester(project);
 
-    await call(r => r.recordDeletion('scenes', 'Scene2'));
+    await call(r => r.recordDeletion('scenes', ['Scene2']));
     project.removeLayout('Scene2');
+    await call(r => r.completeDeletion());
     // A scene with the same name, created outside the history.
     project.insertNewLayout('Scene2', 1);
 
@@ -441,7 +474,7 @@ describe('useProjectManagerHistory', () => {
     const project = makeProject();
     const { call } = renderProjectManagerHistoryTester(project);
     project.insertNewLayout('Scene3', 2);
-    await call(r => r.recordAddition('scenes', 'Scene3'));
+    await call(r => r.recordAddition('scenes', ['Scene3']));
 
     const removals = [];
     const onWillRemoveItems = jest.fn(
@@ -475,6 +508,186 @@ describe('useProjectManagerHistory', () => {
       })
     );
     expect(onWillRemoveItems).toHaveBeenCalledTimes(1);
+
+    project.delete();
+  });
+  it('restores a deleted scene in its folder', async () => {
+    const project = makeProject();
+    const root = project.getLayoutsRootFolder();
+    const folder = root.insertNewFolder('Levels', 0);
+    moveToFolder(root, 'Scene2', folder, 0);
+    const { call } = renderProjectManagerHistoryTester(project);
+
+    await call(r => r.recordDeletion('scenes', ['Scene2']));
+    project.removeLayout('Scene2');
+    await call(r => r.completeDeletion());
+    expect(getScenesFolders(project)).toEqual([
+      { folder: 'Levels', children: [] },
+      'Scene1',
+    ]);
+
+    await call(r => r.undo(project, noopOptions));
+    expect(getScenesFolders(project)).toEqual([
+      { folder: 'Levels', children: ['Scene2'] },
+      'Scene1',
+    ]);
+    await call(r => r.redo(project, noopOptions));
+    expect(getScenesFolders(project)).toEqual([
+      { folder: 'Levels', children: [] },
+      'Scene1',
+    ]);
+
+    project.delete();
+  });
+
+  it('records the folders changed from the project manager as a step, even as the first change', async () => {
+    const project = makeProject();
+    const { resultRef, call } = renderProjectManagerHistoryTester(project);
+    expect(resultRef.current && resultRef.current.canUndo).toBe(false);
+
+    const root = project.getLayoutsRootFolder();
+    const folder = root.insertNewFolder('Levels', 0);
+    moveToFolder(root, 'Scene1', folder, 0);
+    await call(r => r.syncFolders());
+    expect(resultRef.current && resultRef.current.canUndo).toBe(true);
+    // Nothing more to record.
+    await call(r => r.syncFolders());
+
+    expect(await call(r => r.undo(project, noopOptions))).toEqual({
+      targetKey: 'scenes',
+      itemName: null,
+    });
+    expect(getScenesFolders(project)).toEqual(['Scene1', 'Scene2']);
+    expect(resultRef.current && resultRef.current.canUndo).toBe(false);
+    await call(r => r.redo(project, noopOptions));
+    expect(getScenesFolders(project)).toEqual([
+      { folder: 'Levels', children: ['Scene1'] },
+      'Scene2',
+    ]);
+
+    project.delete();
+  });
+
+  it('ignores items added, removed or renamed outside the history when checking the folders', async () => {
+    const project = makeProject();
+    const { resultRef, call } = renderProjectManagerHistoryTester(project);
+    await call(r => r.syncFolders());
+
+    project.insertNewLayout('Scene3', 2);
+    await call(r => r.syncFolders());
+    project.getLayout('Scene1').setName('Scene1Renamed');
+    await call(r => r.syncFolders());
+    project.removeLayout('Scene2');
+    await call(r => r.syncFolders());
+    expect(resultRef.current && resultRef.current.canUndo).toBe(false);
+
+    project.delete();
+  });
+
+  it('undoes the deletion of a folder with its scenes in one step', async () => {
+    const project = makeProject();
+    const root = project.getLayoutsRootFolder();
+    const folder = root.insertNewFolder('Levels', 0);
+    moveToFolder(root, 'Scene1', folder, 0);
+    moveToFolder(root, 'Scene2', folder, 1);
+    const { resultRef, call } = renderProjectManagerHistoryTester(project);
+
+    await call(r => r.recordDeletion('scenes', ['Scene1', 'Scene2']));
+    project.removeLayout('Scene1');
+    project.removeLayout('Scene2');
+    removeFolderAndSubFolders(folder);
+    await call(r => r.completeDeletion());
+    expect(getScenesFolders(project)).toEqual([]);
+
+    expect(await call(r => r.undo(project, noopOptions))).toEqual({
+      targetKey: 'scenes',
+      itemName: 'Scene1',
+    });
+    expect(resultRef.current && resultRef.current.canUndo).toBe(false);
+    expect(getLayoutNames(project)).toEqual(['Scene1', 'Scene2']);
+    expect(getScenesFolders(project)).toEqual([
+      { folder: 'Levels', children: ['Scene1', 'Scene2'] },
+    ]);
+    await call(r => r.redo(project, noopOptions));
+    expect(getLayoutNames(project)).toEqual([]);
+    expect(getScenesFolders(project)).toEqual([]);
+
+    project.delete();
+  });
+
+  it('undoes the addition of several scenes put in a new folder in one step', async () => {
+    const project = makeProject();
+    const { call } = renderProjectManagerHistoryTester(project);
+    await call(r => r.syncFolders());
+
+    const root = project.getLayoutsRootFolder();
+    project.insertNewLayout('A', 2);
+    project.insertNewLayout('B', 3);
+    const folder = root.insertNewFolder('Pasted', 0);
+    moveToFolder(root, 'A', folder, 0);
+    moveToFolder(root, 'B', folder, 1);
+    await call(r => r.recordAddition('scenes', ['A', 'B']));
+
+    await call(r => r.undo(project, noopOptions));
+    expect(getLayoutNames(project)).toEqual(['Scene1', 'Scene2']);
+    expect(getScenesFolders(project)).toEqual(['Scene1', 'Scene2']);
+    await call(r => r.redo(project, noopOptions));
+    expect(getLayoutNames(project)).toEqual(['Scene1', 'Scene2', 'A', 'B']);
+    expect(getScenesFolders(project)).toEqual([
+      { folder: 'Pasted', children: ['A', 'B'] },
+      'Scene1',
+      'Scene2',
+    ]);
+
+    project.delete();
+  });
+  it('restores a deleted gameplay test in its folder, and reverts its rename through the callback', async () => {
+    const project = makeProject();
+    const tests = project.getTests();
+    tests.insertNewTest('T1', 0);
+    tests.insertNewTest('T2', 1).setSource('// Source');
+    const root = tests.getRootFolder();
+    const folder = root.insertNewFolder('Smoke', 0);
+    root.moveFolderOrItemToAnotherFolder(root.getItemChild('T2'), folder, 0);
+    const { call } = renderProjectManagerHistoryTester(project);
+
+    await call(r => r.recordDeletion('gameplayTests', ['T2']));
+    tests.removeTest('T2');
+    await call(r => r.completeDeletion());
+    expect(tests.hasTestNamed('T2')).toBe(false);
+
+    expect(await call(r => r.undo(project, noopOptions))).toEqual({
+      targetKey: 'gameplayTests',
+      itemName: 'T2',
+    });
+    expect(tests.getTest('T2').getSource()).toBe('// Source');
+    const restoredFolder = root.getChildAt(0);
+    expect(restoredFolder.getFolderName()).toBe('Smoke');
+    expect(
+      restoredFolder
+        .getChildAt(0)
+        .getItem()
+        .getName()
+    ).toBe('T2');
+
+    const applied = [];
+    await call(r =>
+      r.recordRename({
+        type: 'renameGameplayTest',
+        oldName: 'T2',
+        newName: 'T3',
+      })
+    );
+    expect(
+      await call(r =>
+        r.undo(project, {
+          applyRenameCommand: (command, direction) => {
+            applied.push([command.type, direction]);
+          },
+        })
+      )
+    ).toEqual({ targetKey: 'gameplayTests', itemName: 'T2' });
+    expect(applied).toEqual([['renameGameplayTest', 'undo']]);
 
     project.delete();
   });

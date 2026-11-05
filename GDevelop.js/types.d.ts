@@ -681,6 +681,12 @@ export class Project extends EmscriptenObject {
   getLayoutsRootFolder(): LayoutFolderOrLayout;
   getExternalLayoutsRootFolder(): ExternalLayoutFolderOrExternalLayout;
   getExternalEventsRootFolder(): ExternalEventsFolderOrExternalEvents;
+  serializeLayoutsFoldersTo(element: SerializerElement): void;
+  unserializeLayoutsFoldersFrom(element: SerializerElement): void;
+  serializeExternalLayoutsFoldersTo(element: SerializerElement): void;
+  unserializeExternalLayoutsFoldersFrom(element: SerializerElement): void;
+  serializeExternalEventsFoldersTo(element: SerializerElement): void;
+  unserializeExternalEventsFoldersFrom(element: SerializerElement): void;
 }
 
 export class LayoutFolderOrLayout extends EmscriptenObject {
@@ -1035,6 +1041,8 @@ export class TestsContainer extends EmscriptenObject {
   clearTests(): void;
   moveTest(oldIndex: number, newIndex: number): void;
   getRootFolder(): TestFolderOrTest;
+  serializeFolderStructureTo(element: SerializerElement): void;
+  unserializeFolderStructureFrom(element: SerializerElement): void;
   getTestsCount(): number;
   getTestPosition(test: Test): number;
 }

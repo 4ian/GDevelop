@@ -714,6 +714,12 @@ interface Project {
     [Ref] LayoutFolderOrLayout GetLayoutsRootFolder();
     [Ref] ExternalLayoutFolderOrExternalLayout GetExternalLayoutsRootFolder();
     [Ref] ExternalEventsFolderOrExternalEvents GetExternalEventsRootFolder();
+    void SerializeLayoutsFoldersTo([Ref] SerializerElement element);
+    void UnserializeLayoutsFoldersFrom([Const, Ref] SerializerElement element);
+    void SerializeExternalLayoutsFoldersTo([Ref] SerializerElement element);
+    void UnserializeExternalLayoutsFoldersFrom([Const, Ref] SerializerElement element);
+    void SerializeExternalEventsFoldersTo([Ref] SerializerElement element);
+    void UnserializeExternalEventsFoldersFrom([Const, Ref] SerializerElement element);
 };
 
 interface LayoutFolderOrLayout {
@@ -1223,6 +1229,8 @@ interface TestsContainer {
     void ClearTests();
     void MoveTest(unsigned long oldIndex, unsigned long newIndex);
     [Ref] TestFolderOrTest GetRootFolder();
+    void SerializeFolderStructureTo([Ref] SerializerElement element);
+    void UnserializeFolderStructureFrom([Const, Ref] SerializerElement element);
     unsigned long GetTestsCount();
     unsigned long GetTestPosition([Const, Ref] Test test);
 };

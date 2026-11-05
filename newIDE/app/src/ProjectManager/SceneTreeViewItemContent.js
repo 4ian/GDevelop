@@ -28,11 +28,11 @@ const styles = {
 };
 
 export type SceneTreeViewItemCallbacks = {|
-  onSceneAdded: (name: string) => void,
+  onSceneAdded: (names: Array<string>) => void,
   // Resolves to true once removed (after the user confirmed).
   onDeleteLayouts: (
     Array<gdLayout>,
-    options?: {| folderName?: string |}
+    options?: {| folder?: ProjectItemFolderOrItem |}
   ) => Promise<boolean>,
   onRenameLayout: (string, string) => void,
   onOpenLayout: (
@@ -340,7 +340,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
 
     this.inFolder.onFolderStructureModified();
     this.props.editName(getSceneTreeViewItemId(newScene));
-    this.props.onSceneAdded(newName);
+    this.props.onSceneAdded([newName]);
   }
 
   getRightButton(i18n: I18nType): any {

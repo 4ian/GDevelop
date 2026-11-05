@@ -5665,11 +5665,46 @@ const openProjectManagerItem = async (editor, name) => {
   await sleep(1500);
 };
 
+/**
+ * Run `fn(project, gd, ...args)` in the page, with the project found from the
+ * project manager (always mounted, unlike a scene editor).
+ */
+const evaluateWithProject = (editor, fn, ...args) =>
+  editor.page.evaluate(
+    (source, ...args) => {
+      const element = document.getElementById('project-manager');
+      const fiberKey = Object.keys(element).find(key =>
+        key.startsWith('__reactFiber$')
+      );
+      let fiber = fiberKey ? element[fiberKey] : null;
+      while (
+        fiber &&
+        !(
+          fiber.memoizedProps &&
+          fiber.memoizedProps.project &&
+          fiber.memoizedProps.project.ptr
+        )
+      )
+        fiber = fiber.return;
+      if (!fiber) throw new Error('No project found from the project manager');
+      // eslint-disable-next-line no-undef
+      const libGD = gd;
+      // eslint-disable-next-line no-new-func
+      return new Function('return ' + source)()(
+        fiber.memoizedProps.project,
+        libGD,
+        ...args
+      );
+    },
+    fn.toString(),
+    ...args
+  );
+
 const getSceneNames = editor =>
-  evaluateWithSceneEditor(editor, props => {
+  evaluateWithProject(editor, project => {
     const names = [];
-    for (let i = 0; i < props.project.getLayoutsCount(); i++)
-      names.push(props.project.getLayoutAt(i).getName());
+    for (let i = 0; i < project.getLayoutsCount(); i++)
+      names.push(project.getLayoutAt(i).getName());
     return names;
   });
 
@@ -5677,7 +5712,9 @@ const deleteProjectManagerItem = async (editor, name) => {
   const item = await getProjectManagerItemHandle(editor, name);
   await item.click({ button: 'right' });
   await editor.clickMenuItem(/^delete/i);
-  // The native confirmation is accepted by the script.
+  await sleep(500);
+  if (await editor.page.$('[role="dialog"]'))
+    await editor.clickButtonWithText('[role="dialog"]', /^confirm$/i);
   await editor.waitUntil(
     `${name} deleted`,
     async () => !(await hasProjectManagerItem(editor, name))
@@ -5826,6 +5863,302 @@ scenarios['undoing a scene creation closes its tab'] = async editor => {
     );
   };
 }
+
+/** The folder tree of a kind of project items: folders as objects, items as names. */
+const getProjectManagerFolders = (editor, kind) =>
+  evaluateWithProject(
+    editor,
+    (project, gd, kind) => {
+      const root =
+        kind === 'scenes'
+          ? project.getLayoutsRootFolder()
+          : kind === 'externalLayouts'
+          ? project.getExternalLayoutsRootFolder()
+          : kind === 'gameplayTests'
+          ? project.getTests().getRootFolder()
+          : project.getExternalEventsRootFolder();
+      const read = node =>
+        node.isFolder()
+          ? {
+              folder: node.getFolderName(),
+              children: Array.from(
+                { length: node.getChildrenCount() },
+                (_, i) => read(node.getChildAt(i))
+              ),
+            }
+          : node.getItem().getName();
+      return read(root).children;
+    },
+    kind
+  );
+
+/** Add a folder at the root of a kind, from the context menu of its root row. */
+const addProjectManagerFolder = async (editor, rootLabel, name) => {
+  const root = await getProjectManagerItemHandle(editor, rootLabel);
+  await root.click({ button: 'right' });
+  await editor.clickMenuItem(/^add a folder/i);
+  await sleep(800);
+  await editor.page.keyboard.down('Control');
+  await editor.page.keyboard.press('a');
+  await editor.page.keyboard.up('Control');
+  await editor.page.keyboard.type(name);
+  await editor.page.keyboard.press('Enter');
+  await editor.waitUntil(`folder ${name} created`, () =>
+    hasProjectManagerItem(editor, name)
+  );
+  await sleep(500);
+};
+const addScenesFolderFromProjectManager = (editor, name) =>
+  addProjectManagerFolder(editor, 'Scenes', name);
+
+const addGameplayTestFromProjectManager = async (editor, name) => {
+  await editor.page.evaluate(() => {
+    document.getElementById('add-new-gameplay-test-button').click();
+  });
+  await sleep(800);
+  await editor.page.keyboard.type(name);
+  await editor.page.keyboard.press('Enter');
+  await editor.waitUntil(`${name} created`, () =>
+    hasProjectManagerItem(editor, name)
+  );
+  await sleep(500);
+};
+
+/** Click the arrow of a collapsed folder row to show its content. */
+const expandProjectManagerFolder = async (editor, name) => {
+  const row = await getProjectManagerItemHandle(editor, name);
+  const arrow = await row.evaluateHandle(element => {
+    let parent = element.parentElement;
+    while (parent && !parent.querySelector('button')) {
+      parent = parent.parentElement;
+    }
+    return parent ? parent.querySelector('button') : null;
+  });
+  if (!arrow.asElement()) throw new Error(`No arrow for the folder ${name}`);
+  await arrow.asElement().click();
+  await sleep(500);
+};
+
+const moveProjectManagerItemToFolder = async (editor, name, folderPath) => {
+  const item = await getProjectManagerItemHandle(editor, name);
+  await item.click({ button: 'right' });
+  await editor.clickSubmenuItem(
+    /^move to folder/i,
+    new RegExp(`^${folderPath}$`)
+  );
+  await sleep(800);
+};
+
+const copyProjectManagerItem = async (editor, name) => {
+  const item = await getProjectManagerItemHandle(editor, name);
+  await item.click({ button: 'right' });
+  await editor.clickMenuItem(/^copy/i);
+  await sleep(300);
+};
+
+const pasteInProjectManager = async (editor, name) => {
+  const item = await getProjectManagerItemHandle(editor, name);
+  await item.click({ button: 'right' });
+  await editor.clickMenuItem(/^paste/i);
+  await sleep(800);
+  // The first pasted node is being renamed: keep its name.
+  await editor.page.keyboard.press('Enter');
+  await sleep(500);
+};
+
+scenarios[
+  'a scene deleted from a folder of the project manager comes back in its folder'
+] = async editor => {
+  await openProjectManager(editor);
+  await addScenesFolderFromProjectManager(editor, 'Levels');
+  await moveProjectManagerItemToFolder(editor, 'Scene', 'Levels');
+  expectEqual(
+    await getProjectManagerFolders(editor, 'scenes'),
+    [{ folder: 'Levels', children: ['Scene'] }],
+    'folders after the move'
+  );
+  await expandProjectManagerFolder(editor, 'Levels');
+  await deleteProjectManagerItem(editor, 'Scene');
+  await pressUndoInProjectManager(editor, false);
+  expectEqual(
+    await getProjectManagerFolders(editor, 'scenes'),
+    [{ folder: 'Levels', children: ['Scene'] }],
+    'folders after the undo'
+  );
+  // The folder is opened to show the restored scene.
+  await editor.waitUntil('scene back', () =>
+    hasProjectManagerItem(editor, 'Scene')
+  );
+  expectEqual(editor.fatalErrors, [], 'fatal errors');
+};
+
+scenarios[
+  'moving a scene to a folder of the project manager can be undone and redone'
+] = async editor => {
+  await openProjectManager(editor);
+  await addScenesFolderFromProjectManager(editor, 'Levels');
+  await moveProjectManagerItemToFolder(editor, 'Scene', 'Levels');
+  expectEqual(
+    await getProjectManagerFolders(editor, 'scenes'),
+    [{ folder: 'Levels', children: ['Scene'] }],
+    'folders after the move'
+  );
+  await pressUndoInProjectManager(editor, false);
+  expectEqual(
+    await getProjectManagerFolders(editor, 'scenes'),
+    [{ folder: 'Levels', children: [] }, 'Scene'],
+    'folders after the undo'
+  );
+  await pressUndoInProjectManager(editor, true);
+  expectEqual(
+    await getProjectManagerFolders(editor, 'scenes'),
+    [{ folder: 'Levels', children: ['Scene'] }],
+    'folders after the redo'
+  );
+  expectEqual(editor.fatalErrors, [], 'fatal errors');
+};
+
+scenarios[
+  'creating and renaming a folder of the project manager can be undone'
+] = async editor => {
+  await openProjectManager(editor);
+  await addScenesFolderFromProjectManager(editor, 'Levels');
+  await renameProjectManagerItem(editor, 'Levels', 'Menus');
+  expectEqual(
+    await getProjectManagerFolders(editor, 'scenes'),
+    [{ folder: 'Menus', children: [] }, 'Scene'],
+    'folders after the rename'
+  );
+  await pressUndoInProjectManager(editor, false);
+  expectEqual(
+    await getProjectManagerFolders(editor, 'scenes'),
+    [{ folder: 'Levels', children: [] }, 'Scene'],
+    'folders after the undo of the rename'
+  );
+  // The folder was created as "NewFolder" then renamed: two more steps.
+  await pressUndoInProjectManager(editor, false);
+  await pressUndoInProjectManager(editor, false);
+  expectEqual(
+    await getProjectManagerFolders(editor, 'scenes'),
+    ['Scene'],
+    'folders after the undo of the creation'
+  );
+  expectEqual(editor.fatalErrors, [], 'fatal errors');
+};
+
+scenarios[
+  'deleting a folder of the project manager with its scenes is undone in one step'
+] = async editor => {
+  await openProjectManager(editor);
+  await addSceneFromProjectManager(editor, 'Scene2');
+  await addScenesFolderFromProjectManager(editor, 'Levels');
+  await moveProjectManagerItemToFolder(editor, 'Scene', 'Levels');
+  await moveProjectManagerItemToFolder(editor, 'Scene2', 'Levels');
+  expectEqual(
+    await getProjectManagerFolders(editor, 'scenes'),
+    [{ folder: 'Levels', children: ['Scene2', 'Scene'] }],
+    'folders before the deletion'
+  );
+  await deleteProjectManagerItem(editor, 'Levels');
+  expectEqual(await getSceneNames(editor), [], 'scenes after the deletion');
+  await pressUndoInProjectManager(editor, false);
+  await editor.waitUntil('scenes back', () =>
+    hasProjectManagerItem(editor, 'Scene2')
+  );
+  expectEqual(
+    await getSceneNames(editor),
+    ['Scene2', 'Scene'],
+    'scenes after the undo'
+  );
+  expectEqual(
+    await getProjectManagerFolders(editor, 'scenes'),
+    [{ folder: 'Levels', children: ['Scene2', 'Scene'] }],
+    'folders after the undo'
+  );
+  expectEqual(editor.fatalErrors, [], 'fatal errors');
+};
+
+scenarios[
+  'a gameplay test deleted from a folder of the project manager comes back in its folder, with its rename undoable'
+] = async editor => {
+  await openProjectManager(editor);
+  await addGameplayTestFromProjectManager(editor, 'MyTest');
+  await addProjectManagerFolder(editor, 'Gameplay tests', 'Smoke');
+  await moveProjectManagerItemToFolder(editor, 'MyTest', 'Smoke');
+  expectEqual(
+    await getProjectManagerFolders(editor, 'gameplayTests'),
+    [{ folder: 'Smoke', children: ['MyTest'] }],
+    'folders after the move'
+  );
+  await expandProjectManagerFolder(editor, 'Smoke');
+  await renameProjectManagerItem(editor, 'MyTest', 'MyTest2');
+  await deleteProjectManagerItem(editor, 'MyTest2');
+  await pressUndoInProjectManager(editor, false);
+  expectEqual(
+    await getProjectManagerFolders(editor, 'gameplayTests'),
+    [{ folder: 'Smoke', children: ['MyTest2'] }],
+    'folders after the undo of the deletion'
+  );
+  await editor.waitUntil('test back', () =>
+    hasProjectManagerItem(editor, 'MyTest2')
+  );
+  await pressUndoInProjectManager(editor, false);
+  expectEqual(
+    await getProjectManagerFolders(editor, 'gameplayTests'),
+    [{ folder: 'Smoke', children: ['MyTest'] }],
+    'folders after the undo of the rename'
+  );
+  expectEqual(editor.fatalErrors, [], 'fatal errors');
+};
+
+scenarios[
+  'pasting a folder of scenes in the project manager is undone in one step'
+] = async editor => {
+  await openProjectManager(editor);
+  await addSceneFromProjectManager(editor, 'Scene2');
+  await addScenesFolderFromProjectManager(editor, 'Levels');
+  await moveProjectManagerItemToFolder(editor, 'Scene', 'Levels');
+  await moveProjectManagerItemToFolder(editor, 'Scene2', 'Levels');
+  await copyProjectManagerItem(editor, 'Levels');
+  await pasteInProjectManager(editor, 'Levels');
+  expectEqual(
+    (await getSceneNames(editor)).sort(),
+    ['Scene', 'Scene2', 'Scene3', 'Scene4'],
+    'scenes after the paste'
+  );
+  // Pasted inside the folder: a copy of it, with its 2 scenes.
+  const countFolders = nodes =>
+    nodes.reduce(
+      (count, node) =>
+        typeof node === 'string'
+          ? count
+          : count + 1 + countFolders(node.children),
+      0
+    );
+  expectEqual(
+    countFolders(await getProjectManagerFolders(editor, 'scenes')),
+    2,
+    'folders after the paste'
+  );
+  await pressUndoInProjectManager(editor, false);
+  expectEqual(
+    (await getSceneNames(editor)).sort(),
+    ['Scene', 'Scene2'],
+    'scenes after the undo'
+  );
+  expectEqual(
+    await getProjectManagerFolders(editor, 'scenes'),
+    [{ folder: 'Levels', children: ['Scene2', 'Scene'] }],
+    'folders after the undo'
+  );
+  await pressUndoInProjectManager(editor, true);
+  expectEqual(
+    (await getSceneNames(editor)).sort(),
+    ['Scene', 'Scene2', 'Scene3', 'Scene4'],
+    'scenes after the redo'
+  );
+  expectEqual(editor.fatalErrors, [], 'fatal errors');
+};
 
 const externalLayoutFixtureSetup = project => {
   project.externalLayouts = [

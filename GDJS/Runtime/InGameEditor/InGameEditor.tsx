@@ -7900,13 +7900,14 @@ namespace gdjs {
       editorGrid.setTreeScene(threeScene);
       editorGrid.setVisible(true);
       // Allow a stable grid divisions count when orbitting the camera in 3D.
+      const cameraZ = gdjs.scene3d.camera.getCameraZ(currentScene, '', 0);
       const cameraDistance = cameraCenter
         ? Math.hypot(
             topLayer.getCameraX() - cameraCenter[0],
             topLayer.getCameraY() - cameraCenter[1],
-            topLayer.getCameraZ(null)
+            cameraZ
           )
-        : Math.abs(topLayer.getCameraZ(null));
+        : Math.abs(cameraZ);
       const zoomFactor = Math.min(
         Number.MAX_SAFE_INTEGER,
         (0.5 * topLayer.getHeight()) /

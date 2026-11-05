@@ -24,6 +24,12 @@ const jsExtensions = [
     objectsRenderingServiceModules: {},
   },
   {
+    name: 'AnimationStateMachine',
+    // $FlowFixMe[cannot-resolve-module]
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/AnimationStateMachine/JsExtension.js'),
+    objectsRenderingServiceModules: {},
+  },
+  {
     name: 'FacebookInstantGames',
     // $FlowFixMe[cannot-resolve-module]
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/FacebookInstantGames/JsExtension.js'),

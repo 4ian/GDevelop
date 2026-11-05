@@ -807,7 +807,7 @@ export const runGameplayTests = async ({
               onCaptureFinished: async () => {},
               inAppTutorialMessageInPreview: '',
               inAppTutorialMessagePositionInPreview: '',
-              editorCameraState3D: null,
+              editorCameraState: null,
               inGameEditorSettings: null,
               numberOfWindows: 0,
               previewWindows: null,

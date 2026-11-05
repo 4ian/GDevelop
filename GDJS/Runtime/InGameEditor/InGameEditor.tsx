@@ -1715,8 +1715,8 @@ namespace gdjs {
     private _pressedOriginalCursorY: float = 0;
     private _previousCursorX: float = 0;
     private _previousCursorY: float = 0;
-    private _pressedRightButtonTime: number = 0;
-    private _pressedMiddleButtonTime: number = 0;
+    _pressedRightButtonTime: number = 0;
+    _pressedMiddleButtonTime: number = 0;
 
     private _lastClickOnObjectUnderCursor: {
       object: gdjs.RuntimeObject | null;
@@ -2522,7 +2522,7 @@ namespace gdjs {
 
     setZoom(zoom: float) {
       if (!this._currentScene) return;
-      this._getEditorCamera().setZoom(zoom);
+      this._getEditorCamera().setTopDownAndZoom(zoom);
     }
 
     getSelectionAABB(options?: {
@@ -2689,7 +2689,7 @@ namespace gdjs {
         return;
       }
 
-      this._getEditorCamera().switchToOrbitAroundObject(object);
+      this._getEditorCamera().centerViewOnObject(object);
     }
 
     setVisibleScreenArea(visibleScreenArea: ScreenArea) {
@@ -4524,33 +4524,6 @@ namespace gdjs {
       }
     }
 
-    private _handlePointerLock() {
-      const inputManager = this._runtimeGame.getInputManager();
-      const renderer = this._runtimeGame.getRenderer();
-      const isRightButtonPressed = inputManager.isMouseButtonPressed(1);
-      const isMiddleButtonPressed = inputManager.isMouseButtonPressed(2);
-
-      // Request pointer lock when right or middle button is pressed,
-      // but only after the delay to ensure it's not a click.
-      if (
-        (isRightButtonPressed &&
-          Date.now() - this._pressedRightButtonTime >
-            pressAndReleaseForClickDuration) ||
-        (isMiddleButtonPressed &&
-          Date.now() - this._pressedMiddleButtonTime >
-            pressAndReleaseForClickDuration)
-      ) {
-        renderer.requestPointerLock('in-game-editor');
-      }
-
-      // Exit pointer lock as soon as we can.
-      if (!isRightButtonPressed && !isMiddleButtonPressed) {
-        if (renderer.isPointerLocked()) {
-          renderer.exitPointerLock('in-game-editor');
-        }
-      }
-    }
-
     updateTargetFramerate(elapsedTime: float) {
       const inputManager = this._runtimeGame.getInputManager();
       if (
@@ -4581,6 +4554,7 @@ namespace gdjs {
       }
     }
 
+    // TODO Shouldit alsocheck `isCapturedLeftMouseButtonPressed`?
     isMouseLeftButtonJustPressed() {
       const inputManager = this._runtimeGame.getInputManager();
       return (
@@ -4592,6 +4566,7 @@ namespace gdjs {
       if (!this._unregisterContextLostListener) {
         this._setupWebGLContextLostListener();
       }
+      this.setCursorIcon('');
 
       const objectUnderCursor: gdjs.RuntimeObject | null =
         this.getObjectUnderCursor();
@@ -4638,7 +4613,6 @@ namespace gdjs {
       }
 
       this._capturedLeftMouseButton.update(inputManager);
-      this._handlePointerLock();
       this._handleTransformControlsMode();
       this._handleCameraMovement();
       this._selectionControls.step();
@@ -5532,7 +5506,12 @@ namespace gdjs {
 
   /** @category In-Game Editor */
   export type EditorCameraState = {
-    cameraMode: 'free' | 'orbit';
+    camera2D: EditorCameraState2D;
+    camera3D: EditorCameraState3D;
+  };
+
+  type EditorCameraState3D = {
+    cameraMode: 'free' | 'orbit' | '2d-camera';
     positionX: float;
     positionY: float;
     positionZ: float;
@@ -5541,10 +5520,17 @@ namespace gdjs {
     distance: float;
   };
 
+  type EditorCameraState2D = {
+    centerX: float;
+    centerY: float;
+    zoom: float;
+  };
+
   class EditorCamera implements CameraControl {
     editor: gdjs.InGameEditor;
     orbitCameraControl: OrbitCameraControl;
     freeCameraControl: FreeCameraControl;
+    cameraControl2D: CameraControl2D;
     private _hasChanged = false;
     private _hadChanged = false;
 
@@ -5552,7 +5538,16 @@ namespace gdjs {
       this.editor = editor;
       this.orbitCameraControl = new OrbitCameraControl(this);
       this.freeCameraControl = new FreeCameraControl(this);
+      this.cameraControl2D = new CameraControl2D(this);
       this.orbitCameraControl.setEnabled(false);
+    }
+
+    getRotationAngle(): number {
+      return this.getActiveCamera().getRotationAngle();
+    }
+
+    getElevationAngle(): number {
+      return this.getActiveCamera().getElevationAngle();
     }
 
     isFreeCamera(): boolean {
@@ -5560,21 +5555,30 @@ namespace gdjs {
     }
 
     private getActiveCamera() {
-      return this.isFreeCamera()
-        ? this.freeCameraControl
-        : this.orbitCameraControl;
+      return this.editor.getEditorMode() === '3d-editor'
+        ? this.isFreeCamera()
+          ? this.freeCameraControl
+          : this.orbitCameraControl
+        : this.cameraControl2D;
     }
 
-    switchToOrbitAroundObject(object: gdjs.RuntimeObject): void {
-      this.switchToOrbitAroundPosition(
-        object.getCenterXInScene(),
-        object.getCenterYInScene(),
-        is3D(object) ? object.getUnrotatedAABBMinZ() : 0
-      );
+    centerViewOnObject(object: gdjs.RuntimeObject): void {
+      if (this.editor.getEditorMode() === '3d-editor') {
+        this.switchToOrbitAroundPosition(
+          object.getCenterXInScene(),
+          object.getCenterYInScene(),
+          is3D(object) ? object.getUnrotatedAABBMinZ() : 0
+        );
+      } else {
+        const aabb: AABB3D = { min: [0, 0, 0], max: [0, 0, 0] };
+        getInstanceAABB(object, aabb);
+        this.cameraControl2D.cameraCenterX = (aabb.min[0] + aabb.max[0]) / 2;
+        this.cameraControl2D.cameraCenterY = (aabb.min[1] + aabb.max[1]) / 2;
+      }
       this.onHasCameraChanged();
     }
 
-    switchToOrbitAroundPosition(
+    private switchToOrbitAroundPosition(
       targetX: float,
       targetY: float,
       targetZ: float
@@ -5633,11 +5637,6 @@ namespace gdjs {
       this.onHasCameraChanged();
     }
 
-    setOrbitDistance(distance: number): void {
-      this.orbitCameraControl.distance = distance;
-      this.onHasCameraChanged();
-    }
-
     /**
      * Move the camera, keeping its orientation, so that the AABB of the objects
      * fits in the given area of the screen (e.g. the space between the editor panels).
@@ -5673,8 +5672,8 @@ namespace gdjs {
 
       // Keep the orientation of the camera that is currently used.
       const activeCamera = this.getActiveCamera();
-      const yaw = gdjs.toRad(activeCamera.rotationAngle + 90);
-      const elevation = gdjs.toRad(activeCamera.elevationAngle);
+      const yaw = gdjs.toRad(activeCamera.getRotationAngle() + 90);
+      const elevation = gdjs.toRad(activeCamera.getElevationAngle());
       const forward: Point3D = [
         -Math.cos(yaw) * Math.cos(elevation),
         -Math.sin(yaw) * Math.cos(elevation),
@@ -5797,10 +5796,13 @@ namespace gdjs {
         centerY + rightOffset * right[1] + upOffset * up[1],
         centerZ + rightOffset * right[2] + upOffset * up[2]
       );
-      this.setOrbitDistance(farDistance);
+      this.orbitCameraControl.distance = farDistance;
+      this.onHasCameraChanged();
     }
 
     step(): void {
+      this._handlePointerLock();
+
       const runtimeGame = this.editor.getRuntimeGame();
       const inputManager = runtimeGame.getInputManager();
 
@@ -5851,14 +5853,53 @@ namespace gdjs {
         this.switchToOrbitAroundZ0(maxDistance);
       }
 
-      this.orbitCameraControl.step();
-      this.freeCameraControl.step();
+      if (this.editor.getEditorMode() === '3d-editor') {
+        this.orbitCameraControl.step();
+        this.freeCameraControl.step();
+      } else {
+        this.cameraControl2D.step();
+      }
 
       if (this._hadChanged && !this._hasChanged) {
         this._sendCameraState();
       }
       this._hadChanged = this._hasChanged;
       this._hasChanged = false;
+    }
+
+    private _handlePointerLock() {
+      const runtimeGame = this.editor.getRuntimeGame();
+      const renderer = runtimeGame.getRenderer();
+
+      if (this.editor.getEditorMode() === '2d-editor') {
+        if (renderer.isPointerLocked()) {
+          renderer.exitPointerLock('in-game-editor');
+        }
+        return;
+      }
+      const inputManager = runtimeGame.getInputManager();
+      const isRightButtonPressed = inputManager.isMouseButtonPressed(1);
+      const isMiddleButtonPressed = inputManager.isMouseButtonPressed(2);
+
+      // Request pointer lock when right or middle button is pressed,
+      // but only after the delay to ensure it's not a click.
+      if (
+        (isRightButtonPressed &&
+          Date.now() - this.editor._pressedRightButtonTime >
+            pressAndReleaseForClickDuration) ||
+        (isMiddleButtonPressed &&
+          Date.now() - this.editor._pressedMiddleButtonTime >
+            pressAndReleaseForClickDuration)
+      ) {
+        renderer.requestPointerLock('in-game-editor');
+      }
+
+      // Exit pointer lock as soon as we can.
+      if (!isRightButtonPressed && !isMiddleButtonPressed) {
+        if (renderer.isPointerLocked()) {
+          renderer.exitPointerLock('in-game-editor');
+        }
+      }
     }
 
     onHasCameraChanged() {
@@ -5874,12 +5915,30 @@ namespace gdjs {
       this.onHasCameraChanged();
     }
 
-    setZoom(zoom: float): void {
-      const distance = this._getCameraZFromZoom(zoom);
-      this.switchToOrbitAroundPosition(this.getAnchorX(), this.getAnchorY(), 0);
-      this.resetRotationToTopDown();
-      this.setOrbitDistance(distance);
+    setTopDownAndZoom(zoom: float): void {
+      if (this.editor.getEditorMode() === '3d-editor') {
+        const distance = this._getCameraZFromZoom(zoom);
+        this.switchToOrbitAroundPosition(
+          this.getAnchorX(),
+          this.getAnchorY(),
+          0
+        );
+        this.resetRotationToTopDown();
+        this.orbitCameraControl.distance = distance;
+      } else {
+        this.cameraControl2D.cameraZoom = zoom;
+      }
       this.onHasCameraChanged();
+    }
+
+    setTopDownAndCenter(x: float, y: float, z: float): void {
+      if (this.editor.getEditorMode() === '3d-editor') {
+        this.switchToOrbitAroundPosition(x, y, z);
+        this.resetRotationToTopDown();
+      } else {
+        this.cameraControl2D.cameraCenterX = x;
+        this.cameraControl2D.cameraCenterY = y;
+      }
     }
 
     getAnchorX(): float {
@@ -6001,18 +6060,16 @@ namespace gdjs {
         (isContentWider
           ? editorWidth / sceneAreaWidth
           : editorHeight / sceneAreaHeight);
-      const distance = this._getCameraZFromZoom(zoom);
 
       const sceneAreaCenterX = (sceneArea.maxX + sceneArea.minX) / 2;
       const sceneAreaCenterY = (sceneArea.maxY + sceneArea.minY) / 2;
 
-      this.switchToOrbitAroundPosition(
+      this.setTopDownAndCenter(
         sceneAreaCenterX,
         sceneAreaCenterY,
         sceneArea.minZ
       );
-      this.resetRotationToTopDown();
-      this.setOrbitDistance(distance);
+      this.setTopDownAndZoom(zoom);
       this.onHasCameraChanged();
     }
 
@@ -6035,23 +6092,26 @@ namespace gdjs {
       );
     };
 
-    getCameraRotation(): float {
-      return this.getActiveCamera().rotationAngle;
-    }
-
     getCameraState(): EditorCameraState {
-      return this.getActiveCamera()._getCameraState();
+      return {
+        camera3D: (this.isFreeCamera()
+          ? this.freeCameraControl
+          : this.orbitCameraControl
+        )._getCameraState(),
+        camera2D: this.cameraControl2D._getCameraState(),
+      };
     }
 
     restoreCameraState(cameraState: EditorCameraState) {
-      if (cameraState.cameraMode === 'free') {
+      this.cameraControl2D._restoreCameraState(cameraState.camera2D);
+      if (cameraState.camera3D.cameraMode === 'free') {
         this.orbitCameraControl.setEnabled(false);
         this.freeCameraControl.setEnabled(true);
-        this.freeCameraControl._restoreCameraState(cameraState);
+        this.freeCameraControl._restoreCameraState(cameraState.camera3D);
       } else {
         this.freeCameraControl.setEnabled(false);
         this.orbitCameraControl.setEnabled(true);
-        this.orbitCameraControl._restoreCameraState(cameraState);
+        this.orbitCameraControl._restoreCameraState(cameraState.camera3D);
       }
       this.onHasCameraChanged();
     }
@@ -6074,6 +6134,8 @@ namespace gdjs {
     getAnchorX(): float;
     getAnchorY(): float;
     getAnchorZ(): float;
+    getRotationAngle(): float;
+    getElevationAngle(): float;
   }
 
   class OrbitCameraControl implements CameraControl {
@@ -6095,6 +6157,14 @@ namespace gdjs {
 
     constructor(editorCamera: EditorCamera) {
       this._editorCamera = editorCamera;
+    }
+
+    getRotationAngle(): number {
+      return this.rotationAngle;
+    }
+
+    getElevationAngle(): number {
+      return this.elevationAngle;
     }
 
     isEnabled(): boolean {
@@ -6304,7 +6374,7 @@ namespace gdjs {
       this._editorCamera.onHasCameraChanged();
     }
 
-    _getCameraState(): EditorCameraState {
+    _getCameraState(): EditorCameraState3D {
       return {
         cameraMode: 'orbit',
         positionX: this.target.x,
@@ -6316,7 +6386,7 @@ namespace gdjs {
       };
     }
 
-    _restoreCameraState(cameraState: EditorCameraState): void {
+    _restoreCameraState(cameraState: EditorCameraState3D): void {
       if (cameraState.cameraMode !== 'orbit') {
         return;
       }
@@ -6351,6 +6421,14 @@ namespace gdjs {
 
     constructor(editorCamera: EditorCamera) {
       this._editorCamera = editorCamera;
+    }
+
+    getRotationAngle(): number {
+      return this.rotationAngle;
+    }
+
+    getElevationAngle(): number {
+      return this.elevationAngle;
     }
 
     isEnabled(): boolean {
@@ -6620,7 +6698,7 @@ namespace gdjs {
       this._editorCamera.onHasCameraChanged();
     }
 
-    _getCameraState(): EditorCameraState {
+    _getCameraState(): EditorCameraState3D {
       return {
         cameraMode: 'free',
         positionX: this.position.x,
@@ -6632,7 +6710,7 @@ namespace gdjs {
       };
     }
 
-    _restoreCameraState(cameraState: EditorCameraState): void {
+    _restoreCameraState(cameraState: EditorCameraState3D): void {
       if (cameraState.cameraMode !== 'free') {
         return;
       }
@@ -6641,6 +6719,200 @@ namespace gdjs {
       this.position.z = cameraState.positionZ;
       this.rotationAngle = cameraState.rotationAngle;
       this.elevationAngle = cameraState.elevationAngle;
+      this._editorCamera.onHasCameraChanged();
+    }
+  }
+
+  class CameraControl2D implements CameraControl {
+    private _editorCamera: EditorCamera;
+    private _isEnabled: boolean = true;
+    cameraCenterX: float = 0;
+    cameraCenterY: float = 0;
+    cameraZoom: float = 1;
+
+    private _lastCursorX: float = 0;
+    private _lastCursorY: float = 0;
+
+    private _gestureActiveTouchIds: Array<integer> = [];
+
+    constructor(editorCamera: EditorCamera) {
+      this._editorCamera = editorCamera;
+    }
+
+    getRotationAngle(): number {
+      return 0;
+    }
+
+    getElevationAngle(): number {
+      return 90;
+    }
+
+    isEnabled(): boolean {
+      return this._isEnabled;
+    }
+
+    setEnabled(isEnabled: boolean): void {
+      this._isEnabled = isEnabled;
+      this._editorCamera.onHasCameraChanged();
+    }
+
+    step(): void {
+      const runtimeGame = this._editorCamera.editor.getRuntimeGame();
+      const inputManager = runtimeGame.getInputManager();
+      const isLeftButtonPressed = inputManager.isMouseButtonPressed(0);
+      const isMiddleButtonPressed = inputManager.isMouseButtonPressed(2);
+      const currentScene = this._editorCamera.editor.getCurrentScene();
+      if (!currentScene) {
+        return;
+      }
+      const cursorX = gdjs.evtTools.input.getCursorX(currentScene, '', 0);
+      const cursorY = gdjs.evtTools.input.getCursorY(currentScene, '', 0);
+
+      if (this._isEnabled) {
+        // Drag the camera.
+        if (
+          isMiddleButtonPressed ||
+          (isSpacePressed(inputManager) && isLeftButtonPressed)
+        ) {
+          this.cameraCenterX -= cursorX - this._lastCursorX;
+          this.cameraCenterY -= cursorY - this._lastCursorY;
+          this._editorCamera.onHasCameraChanged();
+          this._editorCamera.editor.setCursorIcon('grab');
+        }
+        if (isSpacePressed(inputManager)) {
+          this._editorCamera.editor.setCursorIcon('grab');
+          this._editorCamera.editor.captureLeftMouseButton();
+        }
+
+        // Mouse wheel: movement on the plane or forward/backward movement.
+        const wheelDeltaY = inputManager.getMouseWheelDelta();
+        if (wheelDeltaY !== 0 && shouldZoom(inputManager)) {
+          this.zoomOnCursorBy(Math.pow(2, Math.sign(wheelDeltaY) / 8));
+          this._editorCamera.onHasCameraChanged();
+        }
+
+        // Movement with keyboard: zoom in/out.
+        if (isControlOrCmdPressed(inputManager)) {
+          if (inputManager.wasKeyJustPressed(EQUAL_KEY)) {
+            this.zoomBy(zoomInFactor);
+          } else if (inputManager.wasKeyJustPressed(MINUS_KEY)) {
+            this.zoomBy(zoomOutFactor);
+          }
+        }
+
+        // TODO Handle touch controls
+
+        // Touch gestures
+        const touchIds = getCurrentTouchIdentifiers(inputManager);
+        const touchCount = touchIds.length;
+
+        if (touchCount === 0) {
+          this._gestureActiveTouchIds = [];
+        } else if (!areSameTouchesSet(this._gestureActiveTouchIds, touchIds)) {
+          // Start or reinitialize gesture tracking
+          this._gestureActiveTouchIds = touchIds.slice();
+        } else {
+          // Process ongoing gesture
+        }
+      } else {
+        // Reset gesture tracking when camera control is disabled.
+        this._gestureActiveTouchIds = [];
+      }
+
+      // Make sure the camera is up to date before we save the cursor position.
+      this._editorCamera.updateCamera(currentScene, currentScene.getLayer(''));
+      this._lastCursorX = gdjs.evtTools.input.getCursorX(currentScene, '', 0);
+      this._lastCursorY = gdjs.evtTools.input.getCursorY(currentScene, '', 0);
+    }
+
+    getAnchorX(): float {
+      return this.cameraCenterX;
+    }
+
+    getAnchorY(): float {
+      return this.cameraCenterY;
+    }
+
+    getAnchorZ(): float {
+      return 0;
+    }
+
+    setCameraZoomFromZ(cameraZ: float): void {
+      const currentScene = this._editorCamera.editor.getCurrentScene();
+      if (!currentScene) {
+        return;
+      }
+      setCameraZ(currentScene, cameraZ, '', 0);
+      this.cameraZoom = currentScene.getLayer('').getCameraZoom();
+    }
+
+    /**
+     * Zoom and scroll so that the cursor stays on the same position scene-wise.
+     */
+    private zoomOnCursorBy(zoomFactor: number) {
+      const currentScene = this._editorCamera.editor.getCurrentScene();
+      if (!currentScene) {
+        return;
+      }
+      const beforeZoomCursorX = gdjs.evtTools.input.getCursorX(
+        currentScene,
+        '',
+        0
+      );
+      const beforeZoomCursorY = gdjs.evtTools.input.getCursorY(
+        currentScene,
+        '',
+        0
+      );
+
+      this.cameraZoom *= zoomFactor;
+      currentScene.getLayer('').setCameraZoom(this.cameraZoom);
+
+      const afterZoomCursorX = gdjs.evtTools.input.getCursorX(
+        currentScene,
+        '',
+        0
+      );
+      const afterZoomCursorY = gdjs.evtTools.input.getCursorY(
+        currentScene,
+        '',
+        0
+      );
+
+      // Compensate for the cursor change in position
+      this.cameraCenterX += beforeZoomCursorX - afterZoomCursorX;
+      this.cameraCenterY += beforeZoomCursorY - afterZoomCursorY;
+    }
+
+    updateCamera(currentScene: RuntimeScene, layer: RuntimeLayer): void {
+      const layerName = layer.getName();
+      layer.setCameraX(this.cameraCenterX);
+      layer.setCameraY(this.cameraCenterY);
+      layer.setCameraZoom(this.cameraZoom);
+      setCameraRotationX(currentScene, 0, layerName, 0);
+      setCameraRotationY(currentScene, 0, layerName, 0);
+      layer.setCameraRotation(0);
+    }
+
+    zoomBy(zoomFactor: float): void {
+      this.cameraZoom *= zoomFactor;
+      this._editorCamera.onHasCameraChanged();
+    }
+
+    resetRotationToTopDown(): void {}
+
+    _getCameraState(): EditorCameraState2D {
+      return {
+        centerX: this.cameraCenterX,
+        centerY: this.cameraCenterY,
+        zoom: this.cameraZoom,
+      };
+    }
+
+    _restoreCameraState(cameraState: EditorCameraState2D): void {
+      this.cameraCenterX = cameraState.centerX;
+      this.cameraCenterY = cameraState.centerY;
+      this.cameraZoom = cameraState.zoom;
       this._editorCamera.onHasCameraChanged();
     }
   }
@@ -7515,7 +7787,7 @@ namespace gdjs {
               // Choose the plan that faces the camera.
               const cameraRotation = Math.abs(
                 gdjs.evtTools.common.angleDifference(
-                  this.editor._getEditorCamera().getCameraRotation(),
+                  this.editor._getEditorCamera().getRotationAngle(),
                   0
                 )
               );
@@ -8129,7 +8401,6 @@ namespace gdjs {
       let isRotationButtonHovered = false;
       let isAreaHovered = false;
       if (this.state === 'idle') {
-        editor.setCursorIcon('');
         if (editor.getSelectedObjects().length > 0) {
           const buttonLocation = this._getButtonUnderCursor(editor);
           if (buttonLocation === ButtonLocation.Rotation) {

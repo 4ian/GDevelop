@@ -92,15 +92,22 @@ type SwitchToSceneEditionOptions = {|
   ...HotReloadSteps,
 |};
 
-export type EditorCameraState = {|
-  cameraMode: 'free' | 'orbit',
-  positionX: number,
-  positionY: number,
-  positionZ: number,
-  rotationAngle: number,
-  elevationAngle: number,
-  distance: number,
-|};
+export type EditorCameraState = {
+  camera2D: {
+    centerX: number,
+    centerY: number,
+    zoom: number,
+  },
+  camera3D: {
+    cameraMode: 'free' | 'orbit',
+    positionX: number,
+    positionY: number,
+    positionZ: number,
+    rotationAngle: number,
+    elevationAngle: number,
+    distance: number,
+  },
+};
 
 let onSetEmbededGameFramePreviewLocation:
   | null
@@ -209,7 +216,7 @@ type Props = {|
   onLaunchPreviewForInGameEdition: ({|
     ...PreviewInGameEditorTarget,
     ...HotReloadSteps,
-    editorCameraState3D: EditorCameraState | null,
+    editorCameraState: EditorCameraState | null,
   |}) => Promise<void>,
   // Shown at the bottom of the game, above it (like indicators).
   children?: React.Node,
@@ -508,7 +515,7 @@ export const EmbeddedGameFrame = ({
             shouldReloadResources,
             shouldHardReload,
             reasons,
-            editorCameraState3D: cameraStates.current.get(editorId) || null,
+            editorCameraState: cameraStates.current.get(editorId) || null,
           }).finally(() => {
             // A game that is (re)loading must tell the editor it started before
             // anything else is exported: an export erases the files it is still

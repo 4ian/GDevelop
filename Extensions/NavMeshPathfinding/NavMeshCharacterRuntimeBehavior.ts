@@ -7,13 +7,18 @@ namespace gdjs {
         throw new Error('No default export found in Recast.');
       }
 
-      // Without it, RecastNav would instantiate a second WebAssembly module:
+      const recastModule =
+        (await initializeRecast()) as typeof RecastNav.RawModule;
+      // The tiles of navigation meshes are built with the low level functions
+      // of the module (see `NavMeshTileBuilder`). RecastNav is given the same
+      // module: otherwise, it would instantiate a second WebAssembly module,
       // the "compat" build embedded in `A_recast-navigation-generators.js`.
       // The vendored `init` expects a function returning the module, but the
       // typings of `@recast-navigation/core` declare the module itself.
       await RecastNav.init(
-        initializeRecast as unknown as Parameters<typeof RecastNav.init>[0]
+        (() => recastModule) as unknown as Parameters<typeof RecastNav.init>[0]
       );
+      gdjs.NavMeshTileBuilder.recastModule = recastModule;
     } catch (err) {
       console.error('Unable to load Recast navigation mesh library.', err);
       throw err;
@@ -204,6 +209,8 @@ namespace gdjs {
     moveTo(x: float, y: float, z: float): void {
       this._path = [];
       this._manager.rebuildNavMeshIfNeeded();
+      this._manager.buildTilesAround(this.owner.getX(), this.owner.getY());
+      this._manager.buildTilesAround(x, y);
       if (!this._manager.navMesh || !this._agent) {
         this._pathFound = false;
         return;
@@ -288,6 +295,18 @@ namespace gdjs {
       } else if (hasTeleported) {
         this._agent.teleport(agentInitialPosition);
       }
+    }
+
+    /**
+     * Search the path to the destination again, for instance after the
+     * navigation mesh changed.
+     */
+    refreshPath(): void {
+      if (!this._agent || !this._pathFound || this._reachedEnd) {
+        return;
+      }
+      this._path = [];
+      this._agent.requestMoveTarget(this._agent.target());
     }
 
     teleportAgentToObjectIfNeeded(): void {

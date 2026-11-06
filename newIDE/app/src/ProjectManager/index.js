@@ -117,6 +117,7 @@ import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/Even
 import { useProjectItemsSelection } from './UseProjectItemsSelection';
 import { getProjectItemFoldersKind } from './ProjectItemFoldersKinds';
 import { useBulkProjectItemsOperations } from './UseBulkProjectItemsOperations';
+import { flashElement } from '../UI/UndoRedoFlash';
 
 const electron = optionalRequire('electron');
 
@@ -534,9 +535,23 @@ const editItem = (item: TreeViewItem) => {
 const getTreeViewItemRightButton = (i18n: I18nType) => (item: TreeViewItem) =>
   item.content.getRightButton(i18n);
 
+export type ProjectManagerItemCategory =
+  | 'scenes'
+  | 'externalLayouts'
+  | 'externalEvents'
+  | 'gameplayTests';
+
 export type ProjectManagerInterface = {|
   forceUpdateList: () => void,
   focusSearchBar: () => void,
+  /**
+   * Open, scroll to and briefly highlight the row of the given item - used
+   * to reveal the effect of an undo/redo acting on the project manager.
+   */
+  scrollToAndFlashItem: (
+    category: ProjectManagerItemCategory,
+    name: string
+  ) => void,
 |};
 
 type Props = {|
@@ -557,8 +572,15 @@ type Props = {|
   toggleProjectManager: () => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
-  onSceneAdded: () => void,
-  onExternalLayoutAdded: () => void,
+  onSceneAdded: (names: Array<string>) => void,
+  onExternalLayoutAdded: (names: Array<string>) => void,
+  onExternalEventsAdded: (names: Array<string>) => void,
+  onGameplayTestAdded: (names: Array<string>) => void,
+  // Called after any change made from the project manager, which can have
+  // organized the items in folders.
+  onFoldersModified: () => void,
+  onUndo: () => void,
+  onRedo: () => void,
 
   // Main menu
   mainMenuCallbacks: MainMenuCallbacks,
@@ -611,6 +633,11 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       onExtensionInstalled,
       onSceneAdded,
       onExternalLayoutAdded,
+      onExternalEventsAdded,
+      onGameplayTestAdded,
+      onFoldersModified,
+      onUndo,
+      onRedo,
     },
     ref
   ) => {
@@ -639,10 +666,11 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         // The folders may have been reorganized: the first scene of the list
         // is the one started when no first scene is set.
         if (project) syncLayoutsOrderWithFolders(project);
+        onFoldersModified();
         forceUpdate();
         if (treeViewRef.current) treeViewRef.current.forceUpdateList();
       },
-      [project, forceUpdate]
+      [project, forceUpdate, onFoldersModified]
     );
 
     const [searchText, setSearchText] = React.useState('');
@@ -783,14 +811,95 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       focusSearchBar: () => {
         if (searchBarRef.current) searchBarRef.current.focus();
       },
+      scrollToAndFlashItem: (
+        category: ProjectManagerItemCategory,
+        name: string
+      ) => {
+        if (!project) return;
+
+        // Undo/redo can restore an item that was deleted, or remove one that
+        // was just added: look it up by name now, rather than trusting an id
+        // computed before the change, since undoing/redoing a project
+        // manager step recreates every item of the affected list (so a
+        // pointer-based id computed earlier is already stale). If the item
+        // doesn't exist any more, there's nothing to scroll to or flash -
+        // the project manager being opened, with the row now gone, is
+        // enough to see the effect.
+        let itemId, rootFolderId, datasetAttribute;
+        if (category === 'scenes') {
+          if (!project.hasLayoutNamed(name)) return;
+          itemId = getSceneTreeViewItemId(project.getLayout(name));
+          rootFolderId = scenesRootFolderId;
+          datasetAttribute = 'data-scene';
+        } else if (category === 'externalLayouts') {
+          if (!project.hasExternalLayoutNamed(name)) return;
+          itemId = getExternalLayoutTreeViewItemId(
+            project.getExternalLayout(name)
+          );
+          rootFolderId = externalLayoutsRootFolderId;
+          datasetAttribute = 'data-external-layout';
+        } else if (category === 'externalEvents') {
+          if (!project.hasExternalEventsNamed(name)) return;
+          itemId = getExternalEventsTreeViewItemId(
+            project.getExternalEvents(name)
+          );
+          rootFolderId = externalEventsRootFolderId;
+          datasetAttribute = 'data-external-events';
+        } else {
+          if (!project.getTests().hasTestNamed(name)) return;
+          itemId = getGameplayTestTreeViewItemId(
+            project.getTests().getTest(name)
+          );
+          rootFolderId = gameplayTestsRootFolderId;
+          datasetAttribute = 'data-gameplay-test';
+        }
+
+        const kind =
+          category === 'scenes'
+            ? sceneFoldersKind
+            : category === 'externalLayouts'
+            ? externalLayoutFoldersKind
+            : category === 'externalEvents'
+            ? externalEventsFoldersKind
+            : gameplayTestFoldersKind;
+        const folderIds = getFoldersAscendanceWithoutRootFolder(
+          kind.getRootFolder(project).getItemNamed(name)
+        ).map(folder => getFolderTreeViewItemId(kind, folder));
+        if (treeViewRef.current) {
+          treeViewRef.current.openItems([itemId, ...folderIds, rootFolderId]);
+        }
+        // Wait for the tree view to (re-)render with the item before
+        // scrolling to and flashing its row.
+        setTimeout(() => {
+          if (treeViewRef.current)
+            treeViewRef.current.scrollToItemFromId(itemId);
+          // Scoped to the project manager's own tree view: the same
+          // data-scene/data-external-layout/data-external-events attributes
+          // are also set on unrelated elements elsewhere (e.g. open editor
+          // tabs in the title bar), so a document-wide query could match
+          // the wrong element.
+          const projectManagerElement = document.getElementById(
+            'project-manager'
+          );
+          if (!projectManagerElement) return;
+          const element = Array.from(
+            projectManagerElement.querySelectorAll(`[${datasetAttribute}]`)
+          ).find(
+            candidate => candidate.getAttribute(datasetAttribute) === name
+          );
+          if (!element) return;
+          flashElement(element);
+        }, 100); // A few ms is enough for a new render to be done.
+      },
     }));
 
     const onProjectItemModified = React.useCallback(
       () => {
+        onFoldersModified();
         forceUpdate();
         triggerUnsavedChanges();
       },
-      [forceUpdate, triggerUnsavedChanges]
+      [forceUpdate, triggerUnsavedChanges, onFoldersModified]
     );
 
     const editName = React.useCallback(
@@ -880,10 +989,9 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         newScene.updateBehaviorsSharedData(project);
         addDefaultLightToAllLayers(newScene);
 
-        onSceneAdded();
-
-        onProjectItemModified();
         placeNewItemInFolder(sceneFoldersKind, newName, folder);
+        onSceneAdded([newName]);
+        onProjectItemModified();
 
         const sceneItemId = getSceneTreeViewItemId(newScene);
         if (treeViewRef.current) {
@@ -989,8 +1097,9 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           newName,
           index + 1
         );
-        onProjectItemModified();
         placeNewItemInFolder(externalEventsFoldersKind, newName, folder);
+        onExternalEventsAdded([newName]);
+        onProjectItemModified();
 
         const externalEventsItemId = getExternalEventsTreeViewItemId(
           newExternalEvents
@@ -1014,6 +1123,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       },
       [
         project,
+        onExternalEventsAdded,
         onProjectItemModified,
         editName,
         scrollToItem,
@@ -1030,8 +1140,9 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         );
         const newTest = project.getTests().insertNewTest(newName, index + 1);
         newTest.setSource(DEFAULT_GAMEPLAY_TEST_SOURCE);
-        onProjectItemModified();
         placeNewItemInFolder(gameplayTestFoldersKind, newName, folder);
+        onGameplayTestAdded([newName]);
+        onProjectItemModified();
 
         const gameplayTestItemId = getGameplayTestTreeViewItemId(newTest);
         if (treeViewRef.current) {
@@ -1050,6 +1161,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       },
       [
         project,
+        onGameplayTestAdded,
         onProjectItemModified,
         editName,
         scrollToItem,
@@ -1070,10 +1182,9 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           index + 1
         );
 
-        onExternalLayoutAdded();
-
-        onProjectItemModified();
         placeNewItemInFolder(externalLayoutFoldersKind, newName, folder);
+        onExternalLayoutAdded([newName]);
+        onProjectItemModified();
 
         const externalLayoutItemId = getExternalLayoutTreeViewItemId(
           newExternalLayout
@@ -1137,9 +1248,11 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
               selectedItems[0].content.paste();
             }
           });
+          keyboardShortcutsRef.current.setShortcutCallback('onUndo', onUndo);
+          keyboardShortcutsRef.current.setShortcutCallback('onRedo', onRedo);
         }
       },
-      [editName, selectedItems]
+      [editName, selectedItems, onUndo, onRedo]
     );
 
     const sceneTreeViewItemProps = React.useMemo<?SceneTreeViewItemProps>(
@@ -1350,12 +1463,14 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
               expandFolders,
               onMovedFolderOrItemToAnotherFolder: animateClosestVisibleParent,
               onNewFolderCreated,
+              onExternalEventsAdded,
               onDeleteExternalEventsList,
               onRenameExternalEvents,
               onOpenExternalEvents,
             }
           : null,
       [
+        onExternalEventsAdded,
         project,
         unsavedChanges,
         preferences,
@@ -1432,6 +1547,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
               expandFolders,
               onMovedFolderOrItemToAnotherFolder: animateClosestVisibleParent,
               onNewFolderCreated,
+              onGameplayTestAdded,
               onDeleteGameplayTests,
               onRenameGameplayTest,
               onOpenGameplayTest,
@@ -1451,6 +1567,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         expandFolders,
         animateClosestVisibleParent,
         onNewFolderCreated,
+        onGameplayTestAdded,
         onDeleteGameplayTests,
         onRenameGameplayTest,
         onOpenGameplayTest,
@@ -1481,7 +1598,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                 i18n,
                 folder
               ),
-            onItemsAdded: () => {},
+            onItemsAdded: onExternalEventsAdded,
             deleteItems: onDeleteExternalEventsList,
           };
         }
@@ -1509,7 +1626,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                 i18n,
                 folder
               ),
-            onItemsAdded: () => {},
+            onItemsAdded: onGameplayTestAdded,
             deleteItems: onDeleteGameplayTests,
           };
         }
@@ -1522,11 +1639,13 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         onSceneAdded,
         onDeleteLayouts,
         addExternalEvents,
+        onExternalEventsAdded,
         onDeleteExternalEventsList,
         addExternalLayout,
         onExternalLayoutAdded,
         onDeleteExternalLayouts,
         addGameplayTest,
+        onGameplayTestAdded,
         onDeleteGameplayTests,
       ]
     );
@@ -2045,6 +2164,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     value={searchText}
                     onChange={setSearchText}
                     placeholder={t`Search in project`}
+                    onUndo={onUndo}
+                    onRedo={onRedo}
                   />
                 </Column>
               </Line>

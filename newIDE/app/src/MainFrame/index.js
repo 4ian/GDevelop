@@ -17,7 +17,16 @@ import PreviewIcon from '../UI/CustomSvgIcons/Preview';
 import ProjectTitlebar from './ProjectTitlebar';
 import PreferencesDialog from './Preferences/PreferencesDialog';
 import AboutDialog from './AboutDialog';
-import ProjectManager from '../ProjectManager';
+import ProjectManager, {
+  type ProjectManagerInterface,
+} from '../ProjectManager';
+import useProjectManagerHistory, {
+  type ProjectManagerRenameCommand,
+  type ProjectManagerHistoryChange,
+  type ProjectManagerHistoryTargetKey,
+} from './useProjectManagerHistory';
+import { type ProjectItemFolderOrItem } from '../ProjectManager/ProjectItemFolders';
+import { removeFolderAndSubFolders } from '../Utils/Folders';
 import LoaderModal from '../UI/LoaderModal';
 import CloseConfirmDialog from '../UI/CloseConfirmDialog';
 import ProfileDialog from '../Profile/ProfileDialog';
@@ -531,6 +540,8 @@ const MainFrame = (props: Props): React.MixedElement => {
   const [projectManagerOpen, openProjectManager] = React.useState<boolean>(
     false
   );
+  const projectManagerHistory = useProjectManagerHistory(state.currentProject);
+  const projectManagerRef = React.useRef<?ProjectManagerInterface>(null);
   const [languageDialogOpen, openLanguageDialog] = React.useState<boolean>(
     false
   );
@@ -1837,13 +1848,13 @@ const MainFrame = (props: Props): React.MixedElement => {
       folderName != null ? folder : count === 1 ? single : several
     );
 
-  /** Where the removed items come from, to say it when confirming. */
-  type ItemsRemovalOptions = {| folderName?: string |};
+  /** The folder the items are deleted with, if any: removed after them. */
+  type ItemsRemovalOptions = {| folder?: ProjectItemFolderOrItem |};
 
   /** Resolves to true once removed, false if the user did not confirm. */
   const deleteLayouts = async (
     layouts: Array<gdLayout>,
-    { folderName }: ItemsRemovalOptions = {}
+    { folder }: ItemsRemovalOptions = {}
   ): Promise<boolean> => {
     const { currentProject } = state;
     if (!currentProject || layouts.length === 0) return false;
@@ -1851,26 +1862,27 @@ const MainFrame = (props: Props): React.MixedElement => {
     const names = layouts.map(layout => layout.getName());
     const answer = await confirmItemsRemoval({
       count: names.length,
-      folderName,
+      folderName: folder ? folder.getFolderName() : null,
       single: {
         title: t`Remove scene`,
-        message: t`Are you sure you want to remove this scene? This can't be undone.`,
+        message: t`Are you sure you want to remove this scene?`,
       },
       several: {
         title: t`Remove scenes`,
         message: t`Are you sure you want to remove these ${
           names.length
-        } scenes? This can't be undone.`,
+        } scenes?`,
       },
       folder: {
         title: t`Remove folder and scenes`,
         message: t`Are you sure you want to remove this folder and all its content (scenes ${names.join(
           ', '
-        )})? This can't be undone.`,
+        )})?`,
       },
     });
     if (!answer) return false;
 
+    projectManagerHistory.recordDeletion('scenes', names);
     // One after the other: each scene closes its own editors first.
     return layouts
       .reduce(
@@ -1885,6 +1897,8 @@ const MainFrame = (props: Props): React.MixedElement => {
         Promise.resolve()
       )
       .then(() => {
+        if (folder) removeFolderAndSubFolders(folder);
+        projectManagerHistory.completeDeletion();
         _onProjectItemModified();
         return true;
       });
@@ -1893,7 +1907,7 @@ const MainFrame = (props: Props): React.MixedElement => {
   /** Resolves to true once removed, false if the user did not confirm. */
   const deleteExternalLayouts = async (
     externalLayouts: Array<gdExternalLayout>,
-    { folderName }: ItemsRemovalOptions = {}
+    { folder }: ItemsRemovalOptions = {}
   ): Promise<boolean> => {
     if (!state.currentProject || externalLayouts.length === 0) return false;
 
@@ -1902,26 +1916,27 @@ const MainFrame = (props: Props): React.MixedElement => {
     );
     const answer = await confirmItemsRemoval({
       count: names.length,
-      folderName,
+      folderName: folder ? folder.getFolderName() : null,
       single: {
         title: t`Remove external layout`,
-        message: t`Are you sure you want to remove this external layout? This can't be undone.`,
+        message: t`Are you sure you want to remove this external layout?`,
       },
       several: {
         title: t`Remove external layouts`,
         message: t`Are you sure you want to remove these ${
           names.length
-        } external layouts? This can't be undone.`,
+        } external layouts?`,
       },
       folder: {
         title: t`Remove folder and external layouts`,
         message: t`Are you sure you want to remove this folder and all its content (external layouts ${names.join(
           ', '
-        )})? This can't be undone.`,
+        )})?`,
       },
     });
     if (!answer) return false;
 
+    projectManagerHistory.recordDeletion('externalLayouts', names);
     return setState(state => ({
       ...state,
       editorTabs: externalLayouts.reduce(
@@ -1933,6 +1948,8 @@ const MainFrame = (props: Props): React.MixedElement => {
       const { currentProject } = state;
       if (currentProject)
         names.forEach(name => currentProject.removeExternalLayout(name));
+      if (folder) removeFolderAndSubFolders(folder);
+      projectManagerHistory.completeDeletion();
       _onProjectItemModified();
       return true;
     });
@@ -1941,7 +1958,7 @@ const MainFrame = (props: Props): React.MixedElement => {
   /** Resolves to true once removed, false if the user did not confirm. */
   const deleteExternalEventsList = async (
     externalEventsList: Array<gdExternalEvents>,
-    { folderName }: ItemsRemovalOptions = {}
+    { folder }: ItemsRemovalOptions = {}
   ): Promise<boolean> => {
     if (!state.currentProject || externalEventsList.length === 0) return false;
 
@@ -1950,26 +1967,27 @@ const MainFrame = (props: Props): React.MixedElement => {
     );
     const answer = await confirmItemsRemoval({
       count: names.length,
-      folderName,
+      folderName: folder ? folder.getFolderName() : null,
       single: {
         title: t`Remove external events`,
-        message: t`Are you sure you want to remove these external events? This can't be undone.`,
+        message: t`Are you sure you want to remove these external events?`,
       },
       several: {
         title: t`Remove external events`,
         message: t`Are you sure you want to remove these ${
           names.length
-        } external events? This can't be undone.`,
+        } external events?`,
       },
       folder: {
         title: t`Remove folder and external events`,
         message: t`Are you sure you want to remove this folder and all its content (external events ${names.join(
           ', '
-        )})? This can't be undone.`,
+        )})?`,
       },
     });
     if (!answer) return false;
 
+    projectManagerHistory.recordDeletion('externalEvents', names);
     return setState(state => ({
       ...state,
       editorTabs: externalEventsList.reduce(
@@ -1981,6 +1999,8 @@ const MainFrame = (props: Props): React.MixedElement => {
       const { currentProject } = state;
       if (currentProject)
         names.forEach(name => currentProject.removeExternalEvents(name));
+      if (folder) removeFolderAndSubFolders(folder);
+      projectManagerHistory.completeDeletion();
       _onProjectItemModified();
       return true;
     });
@@ -1990,33 +2010,36 @@ const MainFrame = (props: Props): React.MixedElement => {
   const deleteGameplayTests = async (
     scope: GameplayTestScope,
     tests: Array<gdTest>,
-    { folderName }: ItemsRemovalOptions = {}
+    { folder }: ItemsRemovalOptions = {}
   ): Promise<boolean> => {
     if (!state.currentProject || tests.length === 0) return false;
 
     const testNames = tests.map(test => test.getName());
     const answer = await confirmItemsRemoval({
       count: testNames.length,
-      folderName,
+      folderName: folder ? folder.getFolderName() : null,
       single: {
         title: t`Remove gameplay test`,
-        message: t`Are you sure you want to remove this gameplay test? This can't be undone.`,
+        message: t`Are you sure you want to remove this gameplay test?`,
       },
       several: {
         title: t`Remove gameplay tests`,
         message: t`Are you sure you want to remove these ${
           testNames.length
-        } gameplay tests? This can't be undone.`,
+        } gameplay tests?`,
       },
       folder: {
         title: t`Remove folder and gameplay tests`,
         message: t`Are you sure you want to remove this folder and all its content (gameplay tests ${testNames.join(
           ', '
-        )})? This can't be undone.`,
+        )})?`,
       },
     });
     if (!answer) return false;
 
+    // The project manager only shows the tests of the project.
+    if (scope.type === 'project')
+      projectManagerHistory.recordDeletion('gameplayTests', testNames);
     return setState(state => ({
       ...state,
       editorTabs: testNames.reduce(
@@ -2032,6 +2055,8 @@ const MainFrame = (props: Props): React.MixedElement => {
       const testsContainer = getTestsContainer(state.currentProject, scope);
       if (testsContainer)
         testNames.forEach(testName => testsContainer.removeTest(testName));
+      if (folder) removeFolderAndSubFolders(folder);
+      projectManagerHistory.completeDeletion();
       _onProjectItemModified();
       return true;
     });
@@ -2063,6 +2088,12 @@ const MainFrame = (props: Props): React.MixedElement => {
 
     const test = testsContainer.getTest(oldName);
     test.setName(uniqueNewName);
+    if (scope.type === 'project')
+      projectManagerHistory.recordRename({
+        type: 'renameGameplayTest',
+        oldName,
+        newName: uniqueNewName,
+      });
     setState(state => ({
       ...state,
       editorTabs: getEditorTabsWithRenamedProjectItem(
@@ -2492,7 +2523,8 @@ const MainFrame = (props: Props): React.MixedElement => {
   );
 
   const onSceneAdded = React.useCallback(
-    () => {
+    (names: Array<string>) => {
+      projectManagerHistory.recordAddition('scenes', names);
       notifyChangesToInGameEditor({
         shouldReloadProjectData: true,
         shouldReloadLibraries: false,
@@ -2501,11 +2533,12 @@ const MainFrame = (props: Props): React.MixedElement => {
         reasons: ['scene-added'],
       });
     },
-    [notifyChangesToInGameEditor]
+    [notifyChangesToInGameEditor, projectManagerHistory]
   );
 
   const onExternalLayoutAdded = React.useCallback(
-    () => {
+    (names: Array<string>) => {
+      projectManagerHistory.recordAddition('externalLayouts', names);
       notifyChangesToInGameEditor({
         shouldReloadProjectData: true,
         shouldReloadLibraries: false,
@@ -2514,8 +2547,29 @@ const MainFrame = (props: Props): React.MixedElement => {
         reasons: ['external-layout-added'],
       });
     },
-    [notifyChangesToInGameEditor]
+    [notifyChangesToInGameEditor, projectManagerHistory]
   );
+
+  const onExternalEventsAdded = React.useCallback(
+    (names: Array<string>) => {
+      projectManagerHistory.recordAddition('externalEvents', names);
+    },
+    [projectManagerHistory]
+  );
+
+  const onGameplayTestAdded = React.useCallback(
+    (names: Array<string>) => {
+      projectManagerHistory.recordAddition('gameplayTests', names);
+    },
+    [projectManagerHistory]
+  );
+
+  // Stable: the project manager rebuilds its tree when its callbacks change.
+  const projectManagerHistoryRef = React.useRef(projectManagerHistory);
+  projectManagerHistoryRef.current = projectManagerHistory;
+  const onProjectManagerFoldersModified = React.useCallback(() => {
+    projectManagerHistoryRef.current.syncFolders();
+  }, []);
 
   const onEffectAdded = React.useCallback(
     () => {
@@ -2603,6 +2657,11 @@ const MainFrame = (props: Props): React.MixedElement => {
     );
 
     renameLayoutInProject(currentProject, oldName, uniqueNewName);
+    projectManagerHistory.recordRename({
+      type: 'renameScene',
+      oldName,
+      newName: uniqueNewName,
+    });
     if (inAppTutorialOrchestratorRef.current) {
       inAppTutorialOrchestratorRef.current.changeData(oldName, uniqueNewName);
     }
@@ -2651,6 +2710,11 @@ const MainFrame = (props: Props): React.MixedElement => {
       oldName,
       uniqueNewName
     );
+    projectManagerHistory.recordRename({
+      type: 'renameExternalLayout',
+      oldName,
+      newName: uniqueNewName,
+    });
     setState(state => ({
       ...state,
       editorTabs: getEditorTabsWithRenamedProjectItem(
@@ -2697,6 +2761,11 @@ const MainFrame = (props: Props): React.MixedElement => {
       oldName,
       uniqueNewName
     );
+    projectManagerHistory.recordRename({
+      type: 'renameExternalEvents',
+      oldName,
+      newName: uniqueNewName,
+    });
     setState(state => ({
       ...state,
       editorTabs: getEditorTabsWithRenamedProjectItem(
@@ -2713,6 +2782,244 @@ const MainFrame = (props: Props): React.MixedElement => {
       _onProjectItemModified();
     });
   };
+
+  /**
+   * Revert/re-apply a project manager rename command (a scene, external
+   * layout or external events renamed - a whole-project refactoring, so it
+   * can't be captured by a snapshot of the targets like an add/delete).
+   */
+  const applyProjectManagerRenameCommand = (
+    command: ProjectManagerRenameCommand,
+    direction: 'undo' | 'redo'
+  ): boolean => {
+    const { currentProject } = state;
+    if (!currentProject) return false;
+
+    const fromName = direction === 'undo' ? command.newName : command.oldName;
+    const toName = direction === 'undo' ? command.oldName : command.newName;
+
+    if (command.type === 'renameScene') {
+      // The name can be taken by a scene added outside the history.
+      if (
+        !currentProject.hasLayoutNamed(fromName) ||
+        currentProject.hasLayoutNamed(toName)
+      )
+        return false;
+      renameLayoutInProject(currentProject, fromName, toName);
+      if (inAppTutorialOrchestratorRef.current) {
+        inAppTutorialOrchestratorRef.current.changeData(fromName, toName);
+      }
+      setState(state => ({
+        ...state,
+        editorTabs: getEditorTabsWithRenamedProjectItem(
+          state.editorTabs,
+          currentProject,
+          editorTab =>
+            getRenamedLayoutTabProjectItemName(editorTab, fromName, toName)
+        ),
+      })).then(() => {
+        notifyChangesToInGameEditor({
+          shouldReloadProjectData: true,
+          shouldReloadLibraries: false,
+          shouldReloadResources: false,
+          shouldHardReload: false,
+          reasons: ['renamed-scene'],
+        });
+        _onProjectItemModified();
+      });
+    } else if (command.type === 'renameExternalLayout') {
+      if (
+        !currentProject.hasExternalLayoutNamed(fromName) ||
+        currentProject.hasExternalLayoutNamed(toName)
+      )
+        return false;
+      const externalLayout = currentProject.getExternalLayout(fromName);
+      externalLayout.setName(toName);
+      gd.WholeProjectRefactorer.renameExternalLayout(
+        currentProject,
+        fromName,
+        toName
+      );
+      setState(state => ({
+        ...state,
+        editorTabs: getEditorTabsWithRenamedProjectItem(
+          state.editorTabs,
+          currentProject,
+          editorTab =>
+            getRenamedExternalLayoutTabProjectItemName(
+              editorTab,
+              fromName,
+              toName
+            )
+        ),
+      })).then(() => {
+        notifyChangesToInGameEditor({
+          shouldReloadProjectData: true,
+          shouldReloadLibraries: false,
+          shouldReloadResources: false,
+          shouldHardReload: false,
+          reasons: ['renamed-external-layout'],
+        });
+        _onProjectItemModified();
+      });
+    } else if (command.type === 'renameGameplayTest') {
+      const testsContainer = currentProject.getTests();
+      if (
+        !testsContainer.hasTestNamed(fromName) ||
+        testsContainer.hasTestNamed(toName)
+      )
+        return false;
+      testsContainer.getTest(fromName).setName(toName);
+      setState(state => ({
+        ...state,
+        editorTabs: getEditorTabsWithRenamedProjectItem(
+          state.editorTabs,
+          currentProject,
+          editorTab =>
+            getRenamedGameplayTestTabProjectItemName(
+              editorTab,
+              getGameplayTestProjectItemName({ type: 'project' }, fromName),
+              getGameplayTestProjectItemName({ type: 'project' }, toName)
+            )
+        ),
+      })).then(() => {
+        _onProjectItemModified();
+      });
+    } else {
+      if (
+        !currentProject.hasExternalEventsNamed(fromName) ||
+        currentProject.hasExternalEventsNamed(toName)
+      )
+        return false;
+      const externalEvents = currentProject.getExternalEvents(fromName);
+      externalEvents.setName(toName);
+      gd.WholeProjectRefactorer.renameExternalEvents(
+        currentProject,
+        fromName,
+        toName
+      );
+      setState(state => ({
+        ...state,
+        editorTabs: getEditorTabsWithRenamedProjectItem(
+          state.editorTabs,
+          currentProject,
+          editorTab =>
+            getRenamedExternalEventsTabProjectItemName(
+              editorTab,
+              fromName,
+              toName
+            )
+        ),
+      })).then(() => {
+        _onProjectItemModified();
+      });
+    }
+    return true;
+  };
+
+  /**
+   * After a project manager undo/redo, make sure its effect can be seen:
+   * open the project manager and reveal the affected item.
+   */
+  const revealProjectManagerHistoryChange = (
+    change: ProjectManagerHistoryChange
+  ) => {
+    // Undo/redo mutates the project directly (unlike a normal add/delete/
+    // rename, which goes through callbacks that already refresh the UI) -
+    // the project manager's tree view and the rest of the app need to be
+    // told about it explicitly.
+    if (projectManagerRef.current) projectManagerRef.current.forceUpdateList();
+    _onProjectItemModified();
+    if (change.targetKey === 'scenes') {
+      notifyChangesToInGameEditor({
+        shouldReloadProjectData: true,
+        shouldReloadLibraries: false,
+        shouldReloadResources: false,
+        shouldHardReload: false,
+        reasons: ['project-manager-undo-redo'],
+      });
+    }
+
+    openProjectManager(true);
+    // Wait for the project manager to (re-)open/render before scrolling to
+    // and flashing the affected row.
+    const { itemName } = change;
+    if (!itemName) return;
+    setTimeout(() => {
+      if (projectManagerRef.current) {
+        projectManagerRef.current.scrollToAndFlashItem(
+          change.targetKey,
+          itemName
+        );
+      }
+    }, 100);
+  };
+
+  // Like a deletion from the project manager: the editors opened on the
+  // items are closed before the items are removed by an undo/redo.
+  const closeTabsOfProjectManagerItems = async (
+    targetKey: ProjectManagerHistoryTargetKey,
+    itemNames: Array<string>
+  ) => {
+    const { currentProject } = state;
+    if (!currentProject) return;
+    for (const name of itemNames) {
+      if (targetKey === 'scenes') {
+        if (currentProject.hasLayoutNamed(name))
+          await onWillDeleteScene({ scene: currentProject.getLayout(name) });
+      } else if (targetKey === 'externalLayouts') {
+        if (currentProject.hasExternalLayoutNamed(name))
+          await onWillDeleteScene({
+            externalLayout: currentProject.getExternalLayout(name),
+          });
+      } else if (targetKey === 'externalEvents') {
+        if (currentProject.hasExternalEventsNamed(name)) {
+          const externalEvents = currentProject.getExternalEvents(name);
+          await setState(state => ({
+            ...state,
+            editorTabs: closeExternalEventsTabs(
+              state.editorTabs,
+              externalEvents
+            ),
+          }));
+        }
+      } else if (targetKey === 'gameplayTests') {
+        if (currentProject.getTests().hasTestNamed(name)) {
+          await setState(state => ({
+            ...state,
+            editorTabs: closeGameplayTestTabs(
+              state.editorTabs,
+              getGameplayTestProjectItemName({ type: 'project' }, name)
+            ),
+          }));
+        }
+      }
+    }
+  };
+
+  const onProjectManagerUndo = React.useCallback(
+    async () => {
+      const change = await projectManagerHistory.undo(state.currentProject, {
+        applyRenameCommand: applyProjectManagerRenameCommand,
+        onWillRemoveItems: closeTabsOfProjectManagerItems,
+      });
+      if (change) revealProjectManagerHistoryChange(change);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [projectManagerHistory, state.currentProject]
+  );
+
+  const onProjectManagerRedo = React.useCallback(
+    async () => {
+      const change = await projectManagerHistory.redo(state.currentProject, {
+        applyRenameCommand: applyProjectManagerRenameCommand,
+        onWillRemoveItems: closeTabsOfProjectManagerItems,
+      });
+      if (change) revealProjectManagerHistoryChange(change);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [projectManagerHistory, state.currentProject]
+  );
 
   const renameEventsFunctionsExtension = (oldName: string, newName: string) => {
     const { currentProject } = state;
@@ -3960,6 +4267,20 @@ const MainFrame = (props: Props): React.MixedElement => {
     },
     [notifyChangesToInGameEditor, openExternalLayout]
   );
+
+  const onUndoExtractAsExternalLayout = async (name: string) => {
+    const { currentProject } = state;
+    if (!currentProject || !currentProject.hasExternalLayoutNamed(name)) return;
+    await onWillDeleteScene({
+      externalLayout: currentProject.getExternalLayout(name),
+    });
+    currentProject.removeExternalLayout(name);
+    _onProjectItemModified();
+  };
+
+  const onRedoExtractAsExternalLayout = (name: string) => {
+    _onProjectItemModified();
+  };
 
   const _onReloadEventsFunctionsExtensionsAsync = React.useCallback(
     async () => {
@@ -6354,6 +6675,8 @@ const MainFrame = (props: Props): React.MixedElement => {
     renameResourcesInProject: renameResourcesInProject,
     openBehaviorEvents: openBehaviorEvents,
     onExtractAsExternalLayout: onExtractAsExternalLayout,
+    onUndoExtractAsExternalLayout: onUndoExtractAsExternalLayout,
+    onRedoExtractAsExternalLayout: onRedoExtractAsExternalLayout,
     onExtractAsEventBasedObject: onExtractAsEventBasedObject,
     onEventBasedObjectTypeChanged: onEventBasedObjectTypeChanged,
     onOpenEventBasedObjectEditor: onOpenEventBasedObjectEditor,
@@ -6477,6 +6800,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         }
       >
         <ProjectManager
+          ref={projectManagerRef}
           project={currentProject}
           onChangeProjectName={onChangeProjectName}
           onSaveProjectProperties={onSaveProjectProperties}
@@ -6510,6 +6834,15 @@ const MainFrame = (props: Props): React.MixedElement => {
           onExtensionInstalled={onExtensionInstalled}
           onSceneAdded={onSceneAdded}
           onExternalLayoutAdded={onExternalLayoutAdded}
+          onExternalEventsAdded={onExternalEventsAdded}
+          onFoldersModified={onProjectManagerFoldersModified}
+          onGameplayTestAdded={onGameplayTestAdded}
+          onUndo={() => {
+            onProjectManagerUndo();
+          }}
+          onRedo={() => {
+            onProjectManagerRedo();
+          }}
           onShareProject={() => {
             openShareDialog();
           }}

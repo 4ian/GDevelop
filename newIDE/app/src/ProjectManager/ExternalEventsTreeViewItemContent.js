@@ -17,10 +17,11 @@ import {
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 
 export type ExternalEventsTreeViewItemCallbacks = {|
+  onExternalEventsAdded: (names: Array<string>) => void,
   // Resolves to true once removed (after the user confirmed).
   onDeleteExternalEventsList: (
     Array<gdExternalEvents>,
-    options?: {| folderName?: string |}
+    options?: {| folder?: ProjectItemFolderOrItem |}
   ) => Promise<boolean>,
   onRenameExternalEvents: (string, string) => void,
   onOpenExternalEvents: string => void,
@@ -95,7 +96,8 @@ export class ExternalEventsTreeViewItemContent implements TreeViewItemContent {
     this.inFolder = new ProjectItemInFolder(
       externalEventsFoldersKind,
       folderOrItem,
-      props
+      props,
+      props.onExternalEventsAdded
     );
     this.props = props;
   }

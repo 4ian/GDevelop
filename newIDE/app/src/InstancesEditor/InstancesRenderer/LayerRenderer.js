@@ -42,6 +42,10 @@ export default class LayerRenderer {
     y: number,
   |}) => void;
   onInstanceDoubleClicked: gdInitialInstance => void;
+  /** The size of an instance without custom size can be known late (a
+   * texture or a model loaded after a while). */
+  onInstanceDefaultSizeChanged: gdInitialInstance => void;
+  _lastDefaultSizes: Map<number, string>;
   onOverInstance: gdInitialInstance => void;
   onOutInstance: gdInitialInstance => void;
   onMoveInstance: (gdInitialInstance, number, number) => void;
@@ -110,6 +114,7 @@ export default class LayerRenderer {
     onInstanceClicked,
     onInstanceRightClicked,
     onInstanceDoubleClicked,
+    onInstanceDefaultSizeChanged,
     onOverInstance,
     onOutInstance,
     onMoveInstance,
@@ -133,6 +138,7 @@ export default class LayerRenderer {
       y: number,
     |}) => void,
     onInstanceDoubleClicked: gdInitialInstance => void,
+    onInstanceDefaultSizeChanged: gdInitialInstance => void,
     onOverInstance: gdInitialInstance => void,
     onOutInstance: gdInitialInstance => void,
     onMoveInstance: (gdInitialInstance, number, number) => void,
@@ -153,6 +159,8 @@ export default class LayerRenderer {
     this.onInstanceClicked = onInstanceClicked;
     this.onInstanceRightClicked = onInstanceRightClicked;
     this.onInstanceDoubleClicked = onInstanceDoubleClicked;
+    this.onInstanceDefaultSizeChanged = onInstanceDefaultSizeChanged;
+    this._lastDefaultSizes = new Map();
     this.onOverInstance = onOverInstance;
     this.onOutInstance = onOutInstance;
     this.onMoveInstance = onMoveInstance;
@@ -212,6 +220,7 @@ export default class LayerRenderer {
           const time = performance.now();
           renderedInstance.update();
           const duration = performance.now() - time;
+          this._notifyIfDefaultSizeChanged(instance, renderedInstance);
 
           increaseInstanceUpdate(
             this._basicProfilingCounters,
@@ -307,6 +316,18 @@ export default class LayerRenderer {
       0
     );
   };
+
+  _notifyIfDefaultSizeChanged(
+    instance: gdInitialInstance,
+    renderedInstance: RenderedInstance | Rendered3DInstance
+  ) {
+    const defaultSize = `${renderedInstance.getDefaultWidth()},${renderedInstance.getDefaultHeight()},${renderedInstance.getDefaultDepth()}`;
+    const lastDefaultSize = this._lastDefaultSizes.get(instance.ptr);
+    if (lastDefaultSize === defaultSize) return;
+    this._lastDefaultSizes.set(instance.ptr, defaultSize);
+    if (lastDefaultSize !== undefined)
+      this.onInstanceDefaultSizeChanged(instance);
+  }
 
   getUnrotatedInstanceSize = (instance: gdInitialInstance): any => {
     const renderedInstance = this.getOrCreateRendererOfInstance(instance);

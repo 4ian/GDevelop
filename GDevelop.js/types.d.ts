@@ -540,6 +540,10 @@ export class ObjectsContainer extends EmscriptenObject {
   getRootFolder(): ObjectFolderOrObject;
   getAllObjectFolderOrObjects(): VectorObjectFolderOrObject;
   getObjectGroups(): ObjectGroupsContainer;
+  serializeObjectsTo(element: SerializerElement): void;
+  unserializeObjectsFrom(project: Project, element: SerializerElement): void;
+  serializeFoldersTo(element: SerializerElement): void;
+  unserializeFoldersFrom(project: Project, element: SerializerElement): void;
   getTypeOfBehavior(layout: ObjectsContainer, name: string, searchInGroups: boolean): string;
   getTypeOfObject(layout: ObjectsContainer, name: string, searchInGroups: boolean): string;
   getBehaviorsOfObject(layout: ObjectsContainer, name: string, searchInGroups: boolean): VectorString;
@@ -677,6 +681,12 @@ export class Project extends EmscriptenObject {
   getLayoutsRootFolder(): LayoutFolderOrLayout;
   getExternalLayoutsRootFolder(): ExternalLayoutFolderOrExternalLayout;
   getExternalEventsRootFolder(): ExternalEventsFolderOrExternalEvents;
+  serializeLayoutsFoldersTo(element: SerializerElement): void;
+  unserializeLayoutsFoldersFrom(element: SerializerElement): void;
+  serializeExternalLayoutsFoldersTo(element: SerializerElement): void;
+  unserializeExternalLayoutsFoldersFrom(element: SerializerElement): void;
+  serializeExternalEventsFoldersTo(element: SerializerElement): void;
+  unserializeExternalEventsFoldersFrom(element: SerializerElement): void;
 }
 
 export class LayoutFolderOrLayout extends EmscriptenObject {
@@ -852,6 +862,7 @@ export class BehaviorsSharedData extends EmscriptenObject {
   getProperties(): MapStringPropertyDescriptor;
   updateProperty(name: string, value: string): boolean;
   initializeContent(): void;
+  serializeTo(element: SerializerElement): void;
   isFolded(): boolean;
   setFolded(folded: boolean): void;
 }
@@ -1030,6 +1041,8 @@ export class TestsContainer extends EmscriptenObject {
   clearTests(): void;
   moveTest(oldIndex: number, newIndex: number): void;
   getRootFolder(): TestFolderOrTest;
+  serializeFolderStructureTo(element: SerializerElement): void;
+  unserializeFolderStructureFrom(element: SerializerElement): void;
   getTestsCount(): number;
   getTestPosition(test: Test): number;
 }

@@ -405,6 +405,9 @@ namespace gdjs {
         projectData.layouts
       );
       this._namedEasingsManager = new gdjs.NamedEasingsManager(projectData);
+      // The texture quality settings are saved in the project data: reload
+      // them and apply them again to the textures that are already loaded.
+      this._textureQuality3DManager.reloadSettingsFromProject(this);
     }
 
     private _updateSceneAndExtensionsData(): void {

@@ -161,16 +161,45 @@ namespace gdjs {
   /**
    * Information about a tracked texture, used for diagnostics.
    *
+   * Memory field semantics (estimates for uncompressed RGBA textures,
+   * mipmaps included when generated):
+   *
+   * - `memoryBytes` is a *per-texture* estimate: the memory of this texture's
+   *   images at their current size. Textures sharing the same source (like
+   *   the clones of a 3D model texture) are backed by one GPU allocation and
+   *   report (about) the same value: this field is **not additive** over
+   *   shared sources.
+   * - `sourceMemoryBytes` is the *unique-source* estimate: the memory of the
+   *   shared GPU allocation behind `sourceId` (the biggest per-texture
+   *   estimate of its tracked textures).
+   * - `uniqueSourceMemoryBytes` attributes `sourceMemoryBytes` to exactly one
+   *   entry per source (the first tracked texture of that source; 0 for the
+   *   other entries sharing it), so this field **is additive**: summing it
+   *   over all the entries gives `TextureQuality3DReport.textureMemoryBytes`.
+   *
+   * The estimates follow the current `texture.image` of each texture (so a
+   * downscaled texture is estimated at its downscaled size). Original images
+   * kept outside the textures (by the resource managers or by the internal
+   * resized-images cache) are CPU-side and are not counted here.
+   *
    * @category 3D > Textures
    */
   export interface TextureQuality3DTextureEntry {
     id: string;
+    /** The id of the shared GPU allocation (the Three.js `Source`). */
+    sourceId: string;
     label: string;
     kind: TextureQuality3DTextureKind;
     width: integer;
     height: integer;
-    /** Estimated GPU memory used by the texture (and its mipmaps). */
+    /** Per-texture estimate (not additive over shared sources). */
     memoryBytes: integer;
+    /** Unique-source estimate (additive over the entries). */
+    uniqueSourceMemoryBytes: integer;
+    /** The estimated GPU memory of the shared source. */
+    sourceMemoryBytes: integer;
+    /** The number of tracked textures sharing `sourceId`. */
+    sharedSourceCount: integer;
     mipmaps: boolean;
     anisotropy: float;
     minFilter: integer;
@@ -187,7 +216,12 @@ namespace gdjs {
     capabilities: TextureQuality3DGpuCapabilities | null;
     /** The number of tracked textures. */
     textureCount: integer;
-    /** The estimated GPU memory used by the tracked textures, in bytes. */
+    /**
+     * The estimated GPU memory used by the tracked textures, in bytes.
+     * Each shared source is counted once (this equals both
+     * `TextureQuality3DManager.getTextureMemoryBytes()` and the sum of the
+     * entries' `uniqueSourceMemoryBytes`).
+     */
     textureMemoryBytes: integer;
     /** The details of each tracked texture, sorted by memory usage. */
     textures: Array<TextureQuality3DTextureEntry>;
@@ -353,6 +387,8 @@ namespace gdjs {
     kind: TextureQuality3DTextureKind;
     keepNearestFilter: boolean;
     respectSamplerSettings: boolean;
+    /** The per-texture memory estimate (see `TextureQuality3DTextureEntry`). */
+    memoryBytes: integer;
   };
 
   type TrackedSourceEntry = {
@@ -380,7 +416,27 @@ namespace gdjs {
    * @category 3D > Textures
    */
   export class TextureQuality3DManager {
+    /**
+     * The effective settings: `Runtime Override ?? Project Setting ??
+     * Manager Default` (the project settings already fall back to the
+     * manager defaults, see `loadSettingsFromProject`).
+     */
     private _settings: TextureQuality3DSettings;
+    /** The settings saved in the project, refreshed on project data reload. */
+    private _projectSettings: TextureQuality3DSettings;
+    /**
+     * The settings changed at runtime (by the actions of the 3D extension or
+     * by `setRuntimeOverride`). They have priority over the project settings,
+     * survive the hot-reload of the same running project, and are never
+     * written into the persisted project settings.
+     */
+    private _runtimeOverrides: Partial<TextureQuality3DSettings> = {};
+    /**
+     * Identifies the project currently loaded in the runtime (its
+     * `projectUuid`), to avoid leaking runtime overrides into another
+     * project loaded later into the same runtime.
+     */
+    private _projectKey: string;
     private _capabilities: TextureQuality3DGpuCapabilities | null = null;
 
     // Tracking of the GPU memory used by the textures. A texture is registered
@@ -391,14 +447,18 @@ namespace gdjs {
     private _trackedSources = new Map<string, TrackedSourceEntry>();
     private _totalMemoryBytes = 0;
     private _isMemoryBudgetWarningLogged = false;
+    private _isDisposed = false;
 
     // Cache of the images that were already downscaled, to avoid doing the
     // work twice when a source is shared between several textures.
     private _resizedImages = new WeakMap<object, any>();
 
     constructor(runtimeGame: gdjs.RuntimeGame) {
-      this._settings =
+      this._projectSettings =
         gdjs.TextureQuality3DManager.loadSettingsFromProject(runtimeGame);
+      this._settings = { ...this._projectSettings };
+      this._projectKey =
+        gdjs.TextureQuality3DManager._getProjectKey(runtimeGame);
       if (this._settings.enabled) {
         logger.log(
           'Advanced Texture Quality 3D is enabled with the preset "' +
@@ -473,30 +533,145 @@ namespace gdjs {
     }
 
     /**
-     * Return the current settings.
+     * Return the effective settings (`Runtime Override ?? Project Setting ??
+     * Manager Default`).
      */
     getSettings(): TextureQuality3DSettings {
       return { ...this._settings };
     }
 
     /**
-     * Change the settings and apply them again to the textures that are
-     * already loaded.
+     * Return the settings saved in the project (without the runtime
+     * overrides).
+     */
+    getProjectSettings(): TextureQuality3DSettings {
+      return { ...this._projectSettings };
+    }
+
+    /**
+     * Return the settings overridden at runtime (empty if none).
+     */
+    getRuntimeOverrides(): Partial<TextureQuality3DSettings> {
+      return { ...this._runtimeOverrides };
+    }
+
+    /**
+     * Set one runtime override. The value has priority over the project
+     * setting (and over the manager default) until it is removed with
+     * `removeRuntimeOverride` or `clearRuntimeOverrides`.
+     */
+    setRuntimeOverride<K extends SettingKey>(
+      key: K,
+      value: TextureQuality3DSettings[K]
+    ): void {
+      (this._runtimeOverrides as any)[key] = value;
+      this._isMemoryBudgetWarningLogged = false;
+      this._recomputeEffectiveSettings();
+      this._reapplyToTrackedTextures();
+    }
+
+    /**
+     * Remove one runtime override: its effective value returns to the latest
+     * project setting (or to the manager default if the project does not
+     * define it). Return false if this setting was not overridden.
+     */
+    removeRuntimeOverride(key: SettingKey): boolean {
+      if (!(key in this._runtimeOverrides)) return false;
+      delete (this._runtimeOverrides as any)[key];
+      this._isMemoryBudgetWarningLogged = false;
+      this._recomputeEffectiveSettings();
+      this._reapplyToTrackedTextures();
+      return true;
+    }
+
+    /**
+     * Remove all the runtime overrides: the effective settings return to the
+     * project settings. This is also what starts a new runtime session for a
+     * project (overrides never leak into another project or another run).
+     */
+    clearRuntimeOverrides(): void {
+      if (Object.keys(this._runtimeOverrides).length === 0) return;
+      this._runtimeOverrides = {};
+      this._isMemoryBudgetWarningLogged = false;
+      this._recomputeEffectiveSettings();
+      this._reapplyToTrackedTextures();
+    }
+
+    /**
+     * Recalculate the effective settings from the project settings and the
+     * runtime overrides (`Runtime Override ?? Project Setting ?? Manager
+     * Default`).
+     */
+    private _recomputeEffectiveSettings(): void {
+      this._settings = { ...this._projectSettings, ...this._runtimeOverrides };
+    }
+
+    /**
+     * Identify the project loaded in the runtime. A project without a
+     * `projectUuid` is identified as "unknown" (a project change can then not
+     * be detected automatically: use `clearRuntimeOverrides` explicitly).
+     */
+    private static _getProjectKey(runtimeGame: gdjs.RuntimeGame): string {
+      return runtimeGame._data.properties.projectUuid || '';
+    }
+
+    /**
+     * Re-read the settings saved in the project and apply the effective
+     * settings (project settings and runtime overrides) again to the
+     * textures that are already loaded.
+     *
+     * This is called when the project data is replaced while the game is
+     * running (see `gdjs.RuntimeGame.setProjectData`), which is what the
+     * hot-reload of the editor does. The runtime overrides are preserved and
+     * keep their priority: only the project settings are refreshed. Loading
+     * a *different* project into the same runtime starts a new session for
+     * it: its runtime overrides are cleared so that overrides never leak
+     * from one project to another.
+     *
+     * This only deals with the settings: disposing the manager or restoring
+     * resources are separate responsibilities (see `dispose` and the
+     * resources managers).
+     */
+    reloadSettingsFromProject(runtimeGame: gdjs.RuntimeGame): void {
+      if (this._isDisposed) return;
+      const newProjectKey =
+        gdjs.TextureQuality3DManager._getProjectKey(runtimeGame);
+      if (newProjectKey !== this._projectKey) {
+        this._projectKey = newProjectKey;
+        this._runtimeOverrides = {};
+      }
+      this._projectSettings =
+        gdjs.TextureQuality3DManager.loadSettingsFromProject(runtimeGame);
+      this._isMemoryBudgetWarningLogged = false;
+      this._recomputeEffectiveSettings();
+      this._reapplyToTrackedTextures();
+    }
+
+    /**
+     * Change the settings at runtime and apply them again to the textures
+     * that are already loaded. Each given setting becomes a runtime
+     * override: it keeps its value across the hot-reload of the project and
+     * can be removed individually with `removeRuntimeOverride`. The preset is
+     * marked as "custom" (unless explicitly given), as the settings no
+     * longer exactly match a preset.
      */
     updateSettings(patch: Partial<TextureQuality3DSettings>): void {
-      this._settings = {
-        ...this._settings,
+      this._runtimeOverrides = {
+        ...this._runtimeOverrides,
         ...patch,
         preset: patch.preset !== undefined ? patch.preset : 'custom',
       };
       this._isMemoryBudgetWarningLogged = false;
+      this._recomputeEffectiveSettings();
       this._reapplyToTrackedTextures();
     }
 
     /**
      * Apply a preset (see `gdjs.textureQuality3dPresets`) and apply it again
-     * to the textures that are already loaded. Return false if the preset does
-     * not exist.
+     * to the textures that are already loaded. Return false if the preset
+     * does not exist. A preset is a complete configuration: it replaces any
+     * previous runtime override (and can itself be removed setting by
+     * setting).
      */
     setPreset(presetName: string): boolean {
       const presetSettings = gdjs.textureQuality3dPresets[presetName];
@@ -504,11 +679,12 @@ namespace gdjs {
         logger.warn('Unknown texture quality preset: "' + presetName + '".');
         return false;
       }
-      this._settings = {
+      this._runtimeOverrides = {
         ...presetSettings,
         preset: presetName as TextureQuality3DPreset,
       };
       this._isMemoryBudgetWarningLogged = false;
+      this._recomputeEffectiveSettings();
       this._reapplyToTrackedTextures();
       return true;
     }
@@ -589,10 +765,17 @@ namespace gdjs {
      * Return the maximum texture resolution that textures must respect,
      * taking both the settings and the hard limit of the GPU into account.
      * 0 means "no limit".
+     *
+     * Cube map faces are limited by `GL.MAX_CUBE_MAP_TEXTURE_SIZE`, which can
+     * be smaller than `GL.MAX_TEXTURE_SIZE`: pass 'cubemap' as the kind for
+     * them. Every other texture uses `GL.MAX_TEXTURE_SIZE`.
      */
-    getMaxTextureResolution(): integer {
-      const deviceMax = this._capabilities
-        ? this._capabilities.maxTextureSize
+    getMaxTextureResolution(kind?: TextureQuality3DTextureKind): integer {
+      const capabilities = this._capabilities;
+      const deviceMax = capabilities
+        ? kind === 'cubemap'
+          ? capabilities.maxCubemapSize
+          : capabilities.maxTextureSize
         : 0;
       let maxResolution = this._settings.maxTextureResolution;
       if (deviceMax > 0 && (maxResolution === 0 || maxResolution > deviceMax)) {
@@ -618,7 +801,7 @@ namespace gdjs {
       if (this._settings.enabled) {
         // The resolution cap is useful even for 3D models with respected
         // samplers: it reduces the GPU memory usage.
-        this._fitTextureResolution(texture);
+        this._fitTextureResolution(texture, applyOptions.kind);
 
         const canChangeSampler =
           !applyOptions.respectSamplerSettings ||
@@ -778,29 +961,40 @@ namespace gdjs {
       const maxAnisotropy = this._capabilities
         ? this._capabilities.maxAnisotropy
         : 0;
-      if (maxAnisotropy <= 0) {
-        // Anisotropic filtering is not supported: keep it disabled.
-        texture.anisotropy = 1;
-        return;
+      let newAnisotropy = 1;
+      if (maxAnisotropy > 0) {
+        const wantedAnisotropy =
+          settings.anisotropy === 0 ? maxAnisotropy : settings.anisotropy;
+        newAnisotropy = Math.max(1, Math.min(wantedAnisotropy, maxAnisotropy));
       }
-      const wantedAnisotropy =
-        settings.anisotropy === 0 ? maxAnisotropy : settings.anisotropy;
-      texture.anisotropy = Math.max(
-        1,
-        Math.min(wantedAnisotropy, maxAnisotropy)
-      );
+      if (texture.anisotropy !== newAnisotropy) {
+        texture.anisotropy = newAnisotropy;
+        // Three.js only sends the sampler parameters (including the
+        // anisotropy) to the GPU when the texture is (re)uploaded - which is
+        // only triggered by `needsUpdate`. Set it only when the value really
+        // changed, to avoid useless (and costly) texture re-uploads.
+        texture.needsUpdate = true;
+      }
     }
 
     /**
      * Downscale the image (or the 6 images of a cube texture) if it is bigger
      * than the maximum texture resolution, so that less GPU memory is used.
      */
-    private _fitTextureResolution(texture: THREE.Texture): boolean {
-      const maxResolution = this.getMaxTextureResolution();
-      if (maxResolution <= 0) return false;
-
+    private _fitTextureResolution(
+      texture: THREE.Texture,
+      kind?: TextureQuality3DTextureKind
+    ): boolean {
       const image: any = texture.image;
       if (!image) return false;
+
+      // Cube map faces are limited by `GL.MAX_CUBE_MAP_TEXTURE_SIZE`, which
+      // can be smaller than `GL.MAX_TEXTURE_SIZE`.
+      const isCubeMap = kind === 'cubemap' || (!kind && Array.isArray(image));
+      const maxResolution = this.getMaxTextureResolution(
+        isCubeMap ? 'cubemap' : 'image'
+      );
+      if (maxResolution <= 0) return false;
 
       if (Array.isArray(image)) {
         // Cube texture: fit each face.
@@ -905,13 +1099,8 @@ namespace gdjs {
       const sourceId = texture.source.uuid;
       let sourceEntry = this._trackedSources.get(sourceId);
       if (!sourceEntry) {
-        sourceEntry = { memoryBytes, textureIds: new Set() };
+        sourceEntry = { memoryBytes: 0, textureIds: new Set() };
         this._trackedSources.set(sourceId, sourceEntry);
-        this._totalMemoryBytes += memoryBytes;
-      } else if (sourceEntry.memoryBytes !== memoryBytes) {
-        // The texture was resized or its mipmaps were changed.
-        this._totalMemoryBytes += memoryBytes - sourceEntry.memoryBytes;
-        sourceEntry.memoryBytes = memoryBytes;
       }
       sourceEntry.textureIds.add(textureId);
 
@@ -923,6 +1112,7 @@ namespace gdjs {
           kind: options.kind || 'image',
           keepNearestFilter: !!options.keepNearestFilter,
           respectSamplerSettings: !!options.respectSamplerSettings,
+          memoryBytes,
         };
         this._trackedTextures.set(textureId, entry);
         texture.addEventListener('dispose', () => {
@@ -933,7 +1123,11 @@ namespace gdjs {
         entry.kind = options.kind || entry.kind;
         entry.keepNearestFilter = !!options.keepNearestFilter;
         entry.respectSamplerSettings = !!options.respectSamplerSettings;
+        // The texture may have been resized (or restored) since it was
+        // first tracked.
+        entry.memoryBytes = memoryBytes;
       }
+      this._updateSourceMemory(sourceId);
 
       const settings = this._settings;
       if (
@@ -953,6 +1147,30 @@ namespace gdjs {
     }
 
     /**
+     * Recalculate the memory estimate of a (shared) source from the per-texture
+     * estimates of its tracked textures, and adjust the total by the
+     * difference. Counting each source once keeps the totals correct whatever
+     * the number of textures sharing it, and repeated calls never accumulate
+     * errors (the total always converges to the sum of the source estimates).
+     */
+    private _updateSourceMemory(sourceId: string): void {
+      const sourceEntry = this._trackedSources.get(sourceId);
+      if (!sourceEntry) return;
+      let memoryBytes = 0;
+      for (const textureId of sourceEntry.textureIds) {
+        const entry = this._trackedTextures.get(textureId);
+        // The biggest member estimate wins: the shared GPU allocation must
+        // accommodate every tracked texture using it.
+        if (entry && entry.memoryBytes > memoryBytes) {
+          memoryBytes = entry.memoryBytes;
+        }
+      }
+      this._totalMemoryBytes += memoryBytes - sourceEntry.memoryBytes;
+      sourceEntry.memoryBytes = memoryBytes;
+      if (this._totalMemoryBytes < 0) this._totalMemoryBytes = 0;
+    }
+
+    /**
      * Forget a texture that was disposed, and free its memory from the
      * accounting (once no tracked texture shares its source anymore).
      */
@@ -968,6 +1186,11 @@ namespace gdjs {
         this._trackedSources.delete(entry.sourceId);
         this._totalMemoryBytes -= sourceEntry.memoryBytes;
         if (this._totalMemoryBytes < 0) this._totalMemoryBytes = 0;
+      } else {
+        // The source is still used by other textures, but its estimate can
+        // shrink (for example when the disposed texture was the only one
+        // generating mipmaps).
+        this._updateSourceMemory(entry.sourceId);
       }
     }
 
@@ -1059,6 +1282,11 @@ namespace gdjs {
     getReport(): TextureQuality3DReport {
       const textures: Array<TextureQuality3DTextureEntry> = [];
       if (this._settings.diagnostics) {
+        // Attribute the memory of each source to exactly one entry (the
+        // first tracked texture of the source), so that summing
+        // `uniqueSourceMemoryBytes` over the entries gives
+        // `textureMemoryBytes` even when textures share a source.
+        const sourcesWithAttributedMemory = new Set<string>();
         for (const entry of this._trackedTextures.values()) {
           const image: any = entry.texture.image;
           const faces: Array<any> = Array.isArray(image) ? image : [image];
@@ -1070,13 +1298,20 @@ namespace gdjs {
             height = Math.max(height, face.naturalHeight || face.height || 0);
           }
           const sourceEntry = this._trackedSources.get(entry.sourceId);
+          const sourceMemoryBytes = sourceEntry ? sourceEntry.memoryBytes : 0;
+          const isNewSource = !sourcesWithAttributedMemory.has(entry.sourceId);
+          if (isNewSource) sourcesWithAttributedMemory.add(entry.sourceId);
           textures.push({
             id: entry.texture.uuid,
+            sourceId: entry.sourceId,
             label: entry.label,
             kind: entry.kind,
             width,
             height,
-            memoryBytes: sourceEntry ? sourceEntry.memoryBytes : 0,
+            memoryBytes: entry.memoryBytes,
+            uniqueSourceMemoryBytes: isNewSource ? sourceMemoryBytes : 0,
+            sourceMemoryBytes,
+            sharedSourceCount: sourceEntry ? sourceEntry.textureIds.size : 1,
             mipmaps: entry.texture.generateMipmaps,
             anisotropy: entry.texture.anisotropy,
             minFilter: entry.texture.minFilter,
@@ -1114,6 +1349,7 @@ namespace gdjs {
      * model manager.
      */
     dispose(): void {
+      this._isDisposed = true;
       this._trackedTextures.clear();
       this._trackedSources.clear();
       this._totalMemoryBytes = 0;
@@ -1179,6 +1415,40 @@ namespace gdjs {
       getManager(runtimeScene).updateSettings({
         maxTextureResolution: Math.max(0, Math.round(maxResolution)),
       });
+    };
+
+    /**
+     * Set one runtime override: the setting keeps its value across the
+     * hot-reload of the project until it is removed.
+     */
+    export const setRuntimeOverride = (
+      runtimeScene: RuntimeScene,
+      settingName: string,
+      value: TextureQuality3DSettings[SettingKey]
+    ): void => {
+      getManager(runtimeScene).setRuntimeOverride(
+        settingName as SettingKey,
+        value as any
+      );
+    };
+
+    /**
+     * Remove one runtime override: its effective value returns to the
+     * project setting.
+     */
+    export const removeRuntimeOverride = (
+      runtimeScene: RuntimeScene,
+      settingName: string
+    ): void => {
+      getManager(runtimeScene).removeRuntimeOverride(settingName as SettingKey);
+    };
+
+    /**
+     * Remove all the runtime overrides: the effective settings return to the
+     * project settings.
+     */
+    export const clearRuntimeOverrides = (runtimeScene: RuntimeScene): void => {
+      getManager(runtimeScene).clearRuntimeOverrides();
     };
 
     /**

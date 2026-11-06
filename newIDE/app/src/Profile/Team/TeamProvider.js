@@ -419,7 +419,8 @@ const TeamProvider = ({ children }: Props): React.Node => {
       team && members && admins && invitations
         ? team.seats -
           members.filter(member => !member.deactivatedAt).length -
-          admins.length -
+          // The team owner holds the plan and does not occupy a seat.
+          (admins.length - 1) -
           invitations.length
         : null,
     [team, members, admins, invitations]

@@ -22,9 +22,11 @@ import {
 import {
   listInvoiceablePurchases,
   generatePurchaseInvoice,
+  getGiftClaimUrl,
   type PurchaseWithProductName,
   type ProductType,
 } from '../Utils/GDevelopServices/Shop';
+import CopyGiftLinkButton from '../AssetStore/Gift/CopyGiftLinkButton';
 import { selectMessageByLocale } from '../Utils/i18n/MessageByLocale';
 import { openBlobDownloadUrl } from '../Utils/BlobDownloadUrlHolder';
 
@@ -71,40 +73,65 @@ const getPurchaseDetails = (
   )}`;
 };
 
-type InvoiceRowProps = {|
+const getGiftStatus = (
+  i18n: I18nType,
+  purchase: PurchaseWithProductName
+): ?React.Node => {
+  if (!purchase.isGift) return null;
+  const { claimedAt } = purchase;
+  return claimedAt ? (
+    <Trans>Gift - activated on {i18n.date(claimedAt)}</Trans>
+  ) : (
+    <Trans>Gift - not activated yet</Trans>
+  );
+};
+
+type PurchaseRowProps = {|
   title: React.Node,
   details: string,
+  giftStatus?: ?React.Node,
+  giftClaimUrl?: ?string,
   isDownloading: boolean,
   disabled: boolean,
   onDownload: () => Promise<void>,
 |};
 
-const InvoiceRow = ({
+const PurchaseRow = ({
   title,
   details,
+  giftStatus,
+  giftClaimUrl,
   isDownloading,
   disabled,
   onDownload,
-}: InvoiceRowProps) => (
+}: PurchaseRowProps) => (
   <LineStackLayout noMargin alignItems="center" justifyContent="space-between">
     <Column noMargin>
       <Text noMargin>{title}</Text>
       <Text noMargin size="body-small" color="secondary">
         {details}
       </Text>
+      {giftStatus && (
+        <Text noMargin size="body-small" color="secondary">
+          {giftStatus}
+        </Text>
+      )}
     </Column>
-    <FlatButton
-      leftIcon={
-        isDownloading ? (
-          <CircularProgress size={16} />
-        ) : (
-          <Download fontSize="small" />
-        )
-      }
-      label={<Trans>Download invoice</Trans>}
-      disabled={disabled}
-      onClick={onDownload}
-    />
+    <LineStackLayout noMargin alignItems="center">
+      {giftClaimUrl && <CopyGiftLinkButton giftClaimUrl={giftClaimUrl} />}
+      <FlatButton
+        leftIcon={
+          isDownloading ? (
+            <CircularProgress size={16} />
+          ) : (
+            <Download fontSize="small" />
+          )
+        }
+        label={<Trans>Download invoice</Trans>}
+        disabled={disabled}
+        onClick={onDownload}
+      />
+    </LineStackLayout>
   </LineStackLayout>
 );
 
@@ -112,7 +139,7 @@ type Props = {|
   onClose: () => void,
 |};
 
-const InvoicesDialog = ({ onClose }: Props): React.Node => {
+const PurchasesDialog = ({ onClose }: Props): React.Node => {
   const { getAuthorizationHeader, firebaseUser } = React.useContext(
     AuthenticatedUserContext
   );
@@ -190,7 +217,7 @@ const InvoicesDialog = ({ onClose }: Props): React.Node => {
     <I18n>
       {({ i18n }) => (
         <Dialog
-          title={<Trans>Invoices</Trans>}
+          title={<Trans>Purchases</Trans>}
           actions={[
             <FlatButton
               label={<Trans>Close</Trans>}
@@ -223,7 +250,7 @@ const InvoicesDialog = ({ onClose }: Props): React.Node => {
                 </Text>
               ) : (
                 subscriptionPayments.map(subscriptionPayment => (
-                  <InvoiceRow
+                  <PurchaseRow
                     key={subscriptionPayment.id}
                     title={
                       subscriptionPayment.planNameByLocale ? (
@@ -265,13 +292,20 @@ const InvoicesDialog = ({ onClose }: Props): React.Node => {
                 </Text>
               ) : (
                 invoiceablePurchases.map(invoiceablePurchase => (
-                  <InvoiceRow
+                  <PurchaseRow
                     key={invoiceablePurchase.id}
                     title={
                       invoiceablePurchase.productName ||
                       getProductTypeLabel(invoiceablePurchase.productType)
                     }
                     details={getPurchaseDetails(i18n, invoiceablePurchase)}
+                    giftStatus={getGiftStatus(i18n, invoiceablePurchase)}
+                    giftClaimUrl={
+                      invoiceablePurchase.isGift &&
+                      !invoiceablePurchase.claimedAt
+                        ? getGiftClaimUrl(invoiceablePurchase)
+                        : null
+                    }
                     isDownloading={downloadingId === invoiceablePurchase.id}
                     disabled={!!downloadingId}
                     onDownload={() =>
@@ -300,4 +334,4 @@ const InvoicesDialog = ({ onClose }: Props): React.Node => {
   );
 };
 
-export default InvoicesDialog;
+export default PurchasesDialog;

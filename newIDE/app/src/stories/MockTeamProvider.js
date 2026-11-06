@@ -314,7 +314,7 @@ export const MockTeamProvider = ({
     team && members && admins
       ? team.seats -
         members.filter(member => !member.deactivatedAt).length -
-        admins.length
+        (admins.length - 1)
       : null;
 
   const setAdmin = async (email: string, activate: boolean) => {

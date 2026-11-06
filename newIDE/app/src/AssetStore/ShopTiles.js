@@ -488,18 +488,32 @@ export const PrivateGameTemplateTile = ({
         noBorder
       >
         <Column noMargin expand noOverflowParent>
-          <ImageWithFallback
-            key={privateGameTemplateListingData.name}
-            style={{
-              ...styles.previewImage,
-              background: gdevelopTheme.paper.backgroundColor.light,
-            }}
-            src={privateGameTemplateListingData.thumbnailUrls[0]}
-            alt={`Preview image of game template ${
-              privateGameTemplateListingData.name
-            }`}
-            loading="lazy"
-          />
+          <div style={styles.thumbnailContainer}>
+            <ImageWithFallback
+              key={privateGameTemplateListingData.name}
+              style={{
+                ...styles.previewImage,
+                background: gdevelopTheme.paper.backgroundColor.light,
+              }}
+              src={privateGameTemplateListingData.thumbnailUrls[0]}
+              alt={`Preview image of game template ${
+                privateGameTemplateListingData.name
+              }`}
+              loading="lazy"
+            />
+            {privateGameTemplateListingData.redeemConditions && !owned && (
+              <div style={styles.redeemableContainer}>
+                <img
+                  src="res/small-diamond.svg"
+                  style={styles.redeemableDiamondIcon}
+                  alt="diamond"
+                />
+                <Text color="inherit" noMargin>
+                  <Trans>Claim this template</Trans>
+                </Text>
+              </div>
+            )}
+          </div>
           <div style={styles.priceTagContainer}>
             <ProductPriceTag
               productListingData={privateGameTemplateListingData}

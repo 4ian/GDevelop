@@ -302,7 +302,7 @@ const SubscriptionPlanPricingSummary = ({
                       helperMarkdownText={
                         !isUserCurrentOrLegacyPlan
                           ? i18n._(
-                              t`As a teacher, you will use one seat in the plan so make sure to include yourself!`
+                              t`Your own account is included for free. Count one seat per student and per additional teacher.`
                             )
                           : i18n._(t`Contact us at education@gdevelop.io if you want to update
                       your plan`)

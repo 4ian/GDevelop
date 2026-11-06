@@ -277,4 +277,5 @@ blocks:
             - cd GDJS
             - npm run build
             - sudo apt-get install -y libegl1 libgl1-mesa-dri libgbm1 xvfb
-            - cd tests && xvfb-run --auto-servernum npm run test:chromeHeadlessNoSandbox
+            # When a rendering snapshot differs, the images drawn are kept in the artifacts of the job.
+            - cd tests && xvfb-run --auto-servernum npm run test:chromeHeadlessNoSandbox || { [ -d rendering-snapshots-results ] && artifact push job rendering-snapshots-results; exit 1; }

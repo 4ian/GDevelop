@@ -28,6 +28,7 @@ import { formatPriceWithCurrency, getPlanIcon } from '../PlanSmallCard';
 import { selectMessageByLocale } from '../../../Utils/i18n/MessageByLocale';
 import FlatButton from '../../../UI/FlatButton';
 import CancelReasonDialog from '../CancelReasonDialog';
+import CancelSubscriptionConfirmationDialog from '../CancelSubscriptionConfirmationDialog';
 import { useBuyUpdateOrCancelPlan } from './useBuyUpdateOrCancelPlan';
 import { uniq } from 'lodash';
 
@@ -67,6 +68,7 @@ type Props = {|
   recommendedPlanId: ?string,
   onOpenPendingDialog: (open: boolean) => void,
   couponCode?: ?string,
+  onOpenStore?: ?() => void,
 |};
 
 export default function SubscriptionDialog({
@@ -76,6 +78,7 @@ export default function SubscriptionDialog({
   recommendedPlanId,
   onOpenPendingDialog,
   couponCode,
+  onOpenStore,
 }: Props): React.Node {
   const [
     educationPlanSeatsCount,
@@ -111,6 +114,8 @@ export default function SubscriptionDialog({
 
   const {
     buyUpdateOrCancelPlan,
+    cancelConfirmationDialogOpen,
+    setCancelConfirmationDialogOpen,
     cancelReasonDialogOpen,
     setCancelReasonDialogOpen,
     passwordPromptDialog,
@@ -495,6 +500,31 @@ export default function SubscriptionDialog({
             </Dialog>
           )}
           {passwordPromptDialog}
+          {cancelConfirmationDialogOpen && (
+            <CancelSubscriptionConfirmationDialog
+              userSubscriptionPlanEvenIfLegacy={
+                userSubscriptionPlanEvenIfLegacy
+              }
+              freeSubscriptionPlan={
+                availableSubscriptionPlansWithPrices
+                  ? availableSubscriptionPlansWithPrices.find(
+                      subscriptionPlanWithPricingSystems =>
+                        subscriptionPlanWithPricingSystems.id === 'free'
+                    )
+                  : null
+              }
+              onConfirm={() => {
+                setCancelConfirmationDialogOpen(false);
+                setCancelReasonDialogOpen(true);
+              }}
+              onClose={() => setCancelConfirmationDialogOpen(false)}
+              onOpenStore={() => {
+                setCancelConfirmationDialogOpen(false);
+                onClose();
+                if (onOpenStore) onOpenStore();
+              }}
+            />
+          )}
           {cancelReasonDialogOpen && (
             <CancelReasonDialog
               onClose={() => {

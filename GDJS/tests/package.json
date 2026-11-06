@@ -8,6 +8,8 @@
     "test": "karma start --browsers ChromeHeadless --single-run",
     "test:watch": "karma start --browsers ChromeHeadless",
     "test:chromeHeadlessNoSandbox": "karma start --browsers ChromeHeadlessNoSandbox --single-run",
+    "test:rendering-snapshots": "karma start --browsers ChromeHeadlessNoSandbox --single-run --grep \"Rendering snapshots\"",
+    "test:rendering-snapshots:update": "karma start --browsers ChromeHeadlessNoSandbox --single-run --grep \"Rendering snapshots\" --updateRenderingSnapshots",
     "test-benchmark": "karma start --browsers ChromeHeadless --single-run --enableBenchmarks",
     "test-benchmark:watch": "karma start --browsers ChromeHeadless --enableBenchmarks",
     "benchmark:compare": "node compare-benchmarks.js",

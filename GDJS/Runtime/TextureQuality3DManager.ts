@@ -346,6 +346,15 @@ namespace gdjs {
     filter === THREE.LinearMipmapNearestFilter ||
     filter === THREE.LinearMipmapLinearFilter;
 
+  type TextureSamplerState = {
+    magFilter: THREE.MagnificationTextureFilter;
+    minFilter: THREE.MinificationTextureFilter;
+    generateMipmaps: boolean;
+    wrapS: THREE.Wrapping;
+    wrapT: THREE.Wrapping;
+    anisotropy: float;
+  };
+
   type TrackedTextureEntry = {
     texture: THREE.Texture;
     sourceId: string;
@@ -353,13 +362,32 @@ namespace gdjs {
     kind: TextureQuality3DTextureKind;
     keepNearestFilter: boolean;
     respectSamplerSettings: boolean;
+    /**
+     * The sampler settings that existed before the manager modified the texture
+     * for the first time. They are kept so that disabling the system restores
+     * the texture exactly like it was loaded.
+     */
+    originalSampler?: TextureSamplerState;
   };
 
   type TrackedSourceEntry = {
+    /** The (shared) source of the tracked textures. */
+    source: THREE.Source<unknown>;
     /** The estimated GPU memory used by the (shared) source. */
     memoryBytes: integer;
     /** The uuid of each tracked texture using this source. */
     textureIds: Set<string>;
+    /**
+     * The image data of the source before the manager downscaled it (an image,
+     * a canvas, or the 6 faces of a cube texture). Kept so that raising the
+     * maximum texture resolution, or disabling the system, can restore the
+     * original image instead of the already downscaled one.
+     */
+    originalImage?: any;
+    /** The image data currently downscaled by the manager, if any. */
+    resizedImage?: any;
+    /** The settings the cached `resizedImage` was computed for. */
+    resizedImageKey?: string;
   };
 
   /**
@@ -392,9 +420,11 @@ namespace gdjs {
     private _totalMemoryBytes = 0;
     private _isMemoryBudgetWarningLogged = false;
 
-    // Cache of the images that were already downscaled, to avoid doing the
-    // work twice when a source is shared between several textures.
-    private _resizedImages = new WeakMap<object, any>();
+    // The sources whose textures are being disposed to force Three.js to
+    // reallocate their GPU texture when the image dimensions change. The
+    // "dispose" event listeners must keep these textures tracked during that
+    // internal operation.
+    private _sourcesBeingReallocated = new Set<string>();
 
     constructor(runtimeGame: gdjs.RuntimeGame) {
       this._settings =
@@ -605,6 +635,10 @@ namespace gdjs {
      * Apply the quality settings to a texture, resizing it if it is too big
      * for the settings or for the GPU, and track the GPU memory it uses.
      *
+     * When the system is disabled, the texture is restored to the sampler
+     * settings and image it had before the system modified it for the first
+     * time.
+     *
      * This is called by the image manager and the 3D model manager when a
      * texture is created.
      */
@@ -614,11 +648,18 @@ namespace gdjs {
     ): void {
       if (!texture) return;
       const applyOptions: TextureQuality3DApplyOptions = options || {};
+      const entry = this._getOrCreateTrackedTexture(texture, applyOptions);
 
       if (this._settings.enabled) {
+        // Record the sampler settings before modifying them for the first
+        // time, so that they can be restored when the system is disabled.
+        if (!entry.originalSampler) {
+          entry.originalSampler = this._captureSamplerState(texture);
+        }
+
         // The resolution cap is useful even for 3D models with respected
         // samplers: it reduces the GPU memory usage.
-        this._fitTextureResolution(texture);
+        this._fitTextureResolution(texture, entry);
 
         const canChangeSampler =
           !applyOptions.respectSamplerSettings ||
@@ -627,9 +668,13 @@ namespace gdjs {
           this._applySamplerSettings(texture, !!applyOptions.keepNearestFilter);
         }
         this._applyAnisotropy(texture);
+      } else {
+        // Disabling the system (or selecting `classic`) puts the texture back
+        // to the state it had before the system modified it.
+        this._restoreTexture(texture, entry);
       }
 
-      this._trackTexture(texture, applyOptions);
+      this._updateTrackedMemory(entry);
     }
 
     /**
@@ -792,44 +837,265 @@ namespace gdjs {
     }
 
     /**
-     * Downscale the image (or the 6 images of a cube texture) if it is bigger
-     * than the maximum texture resolution, so that less GPU memory is used.
+     * Return the sampler settings currently used by a texture.
      */
-    private _fitTextureResolution(texture: THREE.Texture): boolean {
-      const maxResolution = this.getMaxTextureResolution();
-      if (maxResolution <= 0) return false;
+    private _captureSamplerState(texture: THREE.Texture): TextureSamplerState {
+      return {
+        magFilter: texture.magFilter,
+        minFilter: texture.minFilter,
+        generateMipmaps: texture.generateMipmaps,
+        wrapS: texture.wrapS,
+        wrapT: texture.wrapT,
+        anisotropy: texture.anisotropy,
+      };
+    }
 
-      const image: any = texture.image;
-      if (!image) return false;
-
-      if (Array.isArray(image)) {
-        // Cube texture: fit each face.
-        let changed = false;
-        const resizedImages = image.map((face: any) => {
-          const resizedFace = this._fitImageResolution(face, maxResolution);
-          if (resizedFace !== face) changed = true;
-          return resizedFace;
-        });
-        if (changed) {
-          texture.image = resizedImages;
-          texture.needsUpdate = true;
+    /**
+     * Put a texture back to the state it had before the manager modified it:
+     * restore the sampler settings and the original image of its source.
+     */
+    private _restoreTexture(
+      texture: THREE.Texture,
+      entry: TrackedTextureEntry
+    ): void {
+      let changed = false;
+      const originalSampler = entry.originalSampler;
+      if (originalSampler) {
+        if (texture.magFilter !== originalSampler.magFilter) {
+          texture.magFilter = originalSampler.magFilter;
+          changed = true;
         }
-        return changed;
+        if (texture.minFilter !== originalSampler.minFilter) {
+          texture.minFilter = originalSampler.minFilter;
+          changed = true;
+        }
+        if (texture.generateMipmaps !== originalSampler.generateMipmaps) {
+          texture.generateMipmaps = originalSampler.generateMipmaps;
+          changed = true;
+        }
+        if (texture.wrapS !== originalSampler.wrapS) {
+          texture.wrapS = originalSampler.wrapS;
+          changed = true;
+        }
+        if (texture.wrapT !== originalSampler.wrapT) {
+          texture.wrapT = originalSampler.wrapT;
+          changed = true;
+        }
+        if (texture.anisotropy !== originalSampler.anisotropy) {
+          texture.anisotropy = originalSampler.anisotropy;
+          changed = true;
+        }
       }
 
-      const resizedImage = this._fitImageResolution(image, maxResolution);
-      if (resizedImage !== image) {
-        texture.image = resizedImage;
-        texture.needsUpdate = true;
-        return true;
+      const sourceEntry = this._trackedSources.get(entry.sourceId);
+      if (sourceEntry && sourceEntry.originalImage !== undefined) {
+        const originalImage = this._getOriginalImage(
+          sourceEntry,
+          texture.image
+        );
+        if (originalImage !== texture.image) {
+          this._installSourceImage(texture, entry, sourceEntry, originalImage);
+          changed = true;
+        }
       }
-      return false;
+
+      if (changed) {
+        texture.needsUpdate = true;
+      }
+    }
+
+    /**
+     * Return the image data that a source had before the manager downscaled
+     * it. If the data was replaced by something else than the manager, it is
+     * adopted as the new original image so that it is not overwritten by an
+     * outdated snapshot.
+     */
+    private _getOriginalImage(
+      sourceEntry: TrackedSourceEntry,
+      currentImage: any
+    ): any {
+      if (
+        sourceEntry.originalImage !== undefined &&
+        currentImage !== sourceEntry.originalImage &&
+        currentImage !== sourceEntry.resizedImage
+      ) {
+        sourceEntry.originalImage = currentImage;
+        sourceEntry.resizedImage = undefined;
+        sourceEntry.resizedImageKey = undefined;
+      }
+      return sourceEntry.originalImage !== undefined
+        ? sourceEntry.originalImage
+        : currentImage;
+    }
+
+    /**
+     * Return the original image downscaled to fit in `maxResolution` x
+     * `maxResolution`, using the cached downscale when it was computed for the
+     * same settings. Return the original image if it is small enough.
+     */
+    private _getResizedImage(
+      sourceEntry: TrackedSourceEntry,
+      originalImage: any,
+      maxResolution: integer
+    ): any {
+      const cacheKey = maxResolution + '|' + this._settings.resamplingQuality;
+      if (
+        sourceEntry.resizedImageKey === cacheKey &&
+        sourceEntry.resizedImage !== undefined
+      ) {
+        return sourceEntry.resizedImage;
+      }
+
+      const resizedImage = Array.isArray(originalImage)
+        ? // Cube texture: fit each face.
+          originalImage.map((face: any) =>
+            this._fitImageResolution(face, maxResolution)
+          )
+        : this._fitImageResolution(originalImage, maxResolution);
+
+      const unchanged = Array.isArray(originalImage)
+        ? (resizedImage as Array<any>).every(
+            (face: any, index: number) => face === originalImage[index]
+          )
+        : resizedImage === originalImage;
+      if (unchanged) {
+        // The image is small enough: forget any stale downscale.
+        sourceEntry.resizedImage = undefined;
+        sourceEntry.resizedImageKey = undefined;
+        return originalImage;
+      }
+
+      sourceEntry.resizedImage = resizedImage;
+      sourceEntry.resizedImageKey = cacheKey;
+      return resizedImage;
+    }
+
+    /**
+     * Return a key describing the dimensions of an image (or of the 6 faces of
+     * a cube texture), used to detect when the GPU texture must be allocated
+     * again.
+     */
+    private _getImageSizeKey(image: any): string {
+      const faces: Array<any> = Array.isArray(image) ? image : [image];
+      return faces
+        .map((face) =>
+          face
+            ? (face.naturalWidth || face.width || 0) +
+              'x' +
+              (face.naturalHeight || face.height || 0)
+            : '0x0'
+        )
+        .join('|');
+    }
+
+    /**
+     * Dispose the GPU textures of all the tracked textures sharing a source,
+     * so that Three.js allocates them again with the new image dimensions.
+     * The textures are kept tracked and must be marked with `needsUpdate`.
+     */
+    private _reallocateTexturesOfSource(sourceId: string): void {
+      this._sourcesBeingReallocated.add(sourceId);
+      try {
+        for (const otherEntry of this._trackedTextures.values()) {
+          if (otherEntry.sourceId === sourceId) {
+            otherEntry.texture.dispose();
+          }
+        }
+      } finally {
+        this._sourcesBeingReallocated.delete(sourceId);
+      }
+    }
+
+    /**
+     * Replace the image data of the source shared by the texture, and mark
+     * every tracked texture using this source for a re-upload (Three.js shares
+     * the image data between clones). Return true if the data changed.
+     */
+    private _installSourceImage(
+      texture: THREE.Texture,
+      entry: TrackedTextureEntry,
+      sourceEntry: TrackedSourceEntry,
+      image: any
+    ): boolean {
+      if (texture.image === image) {
+        if (image === sourceEntry.originalImage) {
+          sourceEntry.resizedImage = undefined;
+          sourceEntry.resizedImageKey = undefined;
+        }
+        return false;
+      }
+
+      // Three.js keeps the same GPU texture when only the image data changes,
+      // and updates it with `texSubImage2D`. A new size requires the texture to
+      // be allocated again, which is done by disposing the GPU textures first.
+      if (
+        this._getImageSizeKey(texture.image) !== this._getImageSizeKey(image)
+      ) {
+        this._reallocateTexturesOfSource(entry.sourceId);
+      }
+
+      texture.image = image;
+      if (image === sourceEntry.originalImage) {
+        sourceEntry.resizedImage = undefined;
+        sourceEntry.resizedImageKey = undefined;
+      }
+      for (const otherEntry of this._trackedTextures.values()) {
+        if (otherEntry.sourceId === entry.sourceId) {
+          otherEntry.texture.needsUpdate = true;
+        }
+      }
+      return true;
+    }
+
+    /**
+     * Downscale the image (or the 6 images of a cube texture) if it is bigger
+     * than the maximum texture resolution, or restore the original image if it
+     * fits again. The downscale is always computed from the original image, so
+     * that increasing the maximum resolution restores the full resolution.
+     */
+    private _fitTextureResolution(
+      texture: THREE.Texture,
+      entry: TrackedTextureEntry
+    ): boolean {
+      const sourceEntry = this._getOrCreateTrackedSource(entry);
+      const currentImage: any = texture.image;
+      if (!currentImage) return false;
+
+      const originalImage = this._getOriginalImage(sourceEntry, currentImage);
+      const maxResolution = this.getMaxTextureResolution();
+      if (maxResolution <= 0) {
+        // No limit: put the original image back if it was downscaled before.
+        return this._installSourceImage(
+          texture,
+          entry,
+          sourceEntry,
+          originalImage
+        );
+      }
+
+      const resizedImage = this._getResizedImage(
+        sourceEntry,
+        originalImage,
+        maxResolution
+      );
+      if (
+        resizedImage !== originalImage &&
+        sourceEntry.originalImage === undefined
+      ) {
+        // Keep a reference to the image before replacing it for the first time.
+        sourceEntry.originalImage = originalImage;
+      }
+      return this._installSourceImage(
+        texture,
+        entry,
+        sourceEntry,
+        resizedImage
+      );
     }
 
     /**
      * Return an image downscaled to fit in `maxResolution` x `maxResolution`,
-     * or the given image if it is small enough. The result is cached to avoid
-     * doing the same work again for shared sources.
+     * or the given image if it is small enough.
      */
     private _fitImageResolution(image: any, maxResolution: integer): any {
       if (!image || typeof image !== 'object') return image;
@@ -838,14 +1104,10 @@ namespace gdjs {
       if (width <= 0 || height <= 0) return image;
       if (width <= maxResolution && height <= maxResolution) return image;
 
-      const cachedImage = this._resizedImages.get(image);
-      if (cachedImage) return cachedImage;
-
       const scale = Math.min(maxResolution / width, maxResolution / height);
       const newWidth = Math.max(1, Math.round(width * scale));
       const newHeight = Math.max(1, Math.round(height * scale));
 
-      let resizedImage = image;
       try {
         const canvas = document.createElement('canvas');
         canvas.width = newWidth;
@@ -855,7 +1117,7 @@ namespace gdjs {
         context.imageSmoothingEnabled = true;
         context.imageSmoothingQuality = this._settings.resamplingQuality;
         context.drawImage(image, 0, 0, newWidth, newHeight);
-        resizedImage = canvas;
+        return canvas;
       } catch (error) {
         logger.warn(
           'Unable to downscale a texture to ' +
@@ -867,23 +1129,69 @@ namespace gdjs {
         );
         return image;
       }
-
-      this._resizedImages.set(image, resizedImage);
-      return resizedImage;
     }
 
     /**
      * Register a texture to track the GPU memory it uses, and keep the
-     * information needed for the diagnostics. The registration is dropped
-     * automatically when the texture is disposed.
+     * information needed for the diagnostics and the restoration of the
+     * original settings. The registration is dropped automatically when the
+     * texture is disposed.
      */
-    private _trackTexture(
+    private _getOrCreateTrackedTexture(
       texture: THREE.Texture,
       options: TextureQuality3DApplyOptions
-    ): void {
+    ): TrackedTextureEntry {
       const textureId = texture.uuid;
       let entry = this._trackedTextures.get(textureId);
+      if (!entry) {
+        entry = {
+          texture,
+          sourceId: texture.source.uuid,
+          label: options.label || 'texture',
+          kind: options.kind || 'image',
+          keepNearestFilter: !!options.keepNearestFilter,
+          respectSamplerSettings: !!options.respectSamplerSettings,
+        };
+        this._trackedTextures.set(textureId, entry);
+        texture.addEventListener('dispose', () => {
+          this._untrackTexture(textureId);
+        });
+      } else {
+        entry.label = options.label || entry.label;
+        entry.kind = options.kind || entry.kind;
+        entry.keepNearestFilter = !!options.keepNearestFilter;
+        entry.respectSamplerSettings = !!options.respectSamplerSettings;
+      }
+      this._getOrCreateTrackedSource(entry);
+      return entry;
+    }
 
+    /**
+     * Return the record of the source shared by the textures of an entry,
+     * creating it if needed.
+     */
+    private _getOrCreateTrackedSource(
+      entry: TrackedTextureEntry
+    ): TrackedSourceEntry {
+      let sourceEntry = this._trackedSources.get(entry.sourceId);
+      if (!sourceEntry) {
+        sourceEntry = {
+          source: entry.texture.source,
+          memoryBytes: 0,
+          textureIds: new Set(),
+        };
+        this._trackedSources.set(entry.sourceId, sourceEntry);
+      }
+      sourceEntry.textureIds.add(entry.texture.uuid);
+      return sourceEntry;
+    }
+
+    /**
+     * Refresh the GPU memory estimation of a tracked texture and of the source
+     * it shares with other textures, and warn if the memory budget is exceeded.
+     */
+    private _updateTrackedMemory(entry: TrackedTextureEntry): void {
+      const texture = entry.texture;
       const image: any = texture.image;
       const faces: Array<any> = Array.isArray(image) ? image : [image];
       let width = 0;
@@ -902,37 +1210,11 @@ namespace gdjs {
           (texture.generateMipmaps ? 4 / 3 : 1)
       );
 
-      const sourceId = texture.source.uuid;
-      let sourceEntry = this._trackedSources.get(sourceId);
-      if (!sourceEntry) {
-        sourceEntry = { memoryBytes, textureIds: new Set() };
-        this._trackedSources.set(sourceId, sourceEntry);
-        this._totalMemoryBytes += memoryBytes;
-      } else if (sourceEntry.memoryBytes !== memoryBytes) {
+      const sourceEntry = this._getOrCreateTrackedSource(entry);
+      if (sourceEntry.memoryBytes !== memoryBytes) {
         // The texture was resized or its mipmaps were changed.
         this._totalMemoryBytes += memoryBytes - sourceEntry.memoryBytes;
         sourceEntry.memoryBytes = memoryBytes;
-      }
-      sourceEntry.textureIds.add(textureId);
-
-      if (!entry) {
-        entry = {
-          texture,
-          sourceId,
-          label: options.label || 'texture',
-          kind: options.kind || 'image',
-          keepNearestFilter: !!options.keepNearestFilter,
-          respectSamplerSettings: !!options.respectSamplerSettings,
-        };
-        this._trackedTextures.set(textureId, entry);
-        texture.addEventListener('dispose', () => {
-          this._untrackTexture(textureId);
-        });
-      } else {
-        entry.label = options.label || entry.label;
-        entry.kind = options.kind || entry.kind;
-        entry.keepNearestFilter = !!options.keepNearestFilter;
-        entry.respectSamplerSettings = !!options.respectSamplerSettings;
       }
 
       const settings = this._settings;
@@ -959,16 +1241,30 @@ namespace gdjs {
     private _untrackTexture(textureId: string): void {
       const entry = this._trackedTextures.get(textureId);
       if (!entry) return;
+      if (this._sourcesBeingReallocated.has(entry.sourceId)) {
+        // The texture is disposed to reallocate its GPU texture with a new
+        // image size: it must stay tracked.
+        return;
+      }
       this._trackedTextures.delete(textureId);
 
       const sourceEntry = this._trackedSources.get(entry.sourceId);
       if (!sourceEntry) return;
       sourceEntry.textureIds.delete(textureId);
-      if (sourceEntry.textureIds.size === 0) {
-        this._trackedSources.delete(entry.sourceId);
-        this._totalMemoryBytes -= sourceEntry.memoryBytes;
-        if (this._totalMemoryBytes < 0) this._totalMemoryBytes = 0;
+      if (sourceEntry.textureIds.size > 0) return;
+
+      // No tracked texture uses this source anymore: put its original image
+      // back in case the source is still shared with a cache, then forget the
+      // retained images so that they can be collected.
+      if (
+        sourceEntry.originalImage !== undefined &&
+        sourceEntry.source.data !== sourceEntry.originalImage
+      ) {
+        sourceEntry.source.data = sourceEntry.originalImage;
       }
+      this._trackedSources.delete(entry.sourceId);
+      this._totalMemoryBytes -= sourceEntry.memoryBytes;
+      if (this._totalMemoryBytes < 0) this._totalMemoryBytes = 0;
     }
 
     /**

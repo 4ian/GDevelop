@@ -2280,7 +2280,7 @@ module.exports = {
           'SetMaxTextureResolution',
           _('Set the maximum texture resolution'),
           _(
-            'Set the maximum resolution of 3D textures: bigger textures are downscaled before being uploaded to the GPU, which reduces the GPU memory usage (0 for no limit).' 
+            'Set the maximum resolution of 3D textures: bigger textures are downscaled before being uploaded to the GPU, which reduces the GPU memory usage (0 for no limit). Raising the resolution restores the original image of the textures that are already loaded.'
           ),
           _('Set the maximum resolution of 3D textures to _PARAM0_ pixels'),
           _('Texture quality'),

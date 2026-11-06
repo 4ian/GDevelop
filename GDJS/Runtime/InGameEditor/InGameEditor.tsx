@@ -6751,7 +6751,11 @@ namespace gdjs {
     private _lastCursorX: float = 0;
     private _lastCursorY: float = 0;
 
+    // Touch gesture state
     private _gestureActiveTouchIds: Array<integer> = [];
+    private _gestureLastCentroidX: float = 0;
+    private _gestureLastCentroidY: float = 0;
+    private _gestureLastDistance: float = 0;
 
     constructor(editorCamera: EditorCamera) {
       this._editorCamera = editorCamera;

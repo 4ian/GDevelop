@@ -35,3 +35,6 @@
 Thumbs.db
 .claude
 /GDJS/tests/.benchmark-runtimes
+GDJS/tests/benchmarks/texture-quality-3d-manager.js
+GDJS/tests/benchmarks/texture-quality-3d-manager.md
+GDJS/tests/texture-quality-benchmark-report.js

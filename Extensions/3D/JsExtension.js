@@ -2288,7 +2288,12 @@ module.exports = {
           'res/actions/antialiasing.png'
         )
         .addCodeOnlyParameter('currentScene', '')
-        .addParameter('expression', _('Resolution (0 for unlimited)'), '', false)
+        .addParameter(
+          'expression',
+          _('Resolution (0 for unlimited)'),
+          '',
+          false
+        )
         .setDefaultValue('0')
         .getCodeExtraInformation()
         .setIncludeFile(textureQualityIncludeFile)
@@ -2301,13 +2306,20 @@ module.exports = {
           _(
             'Override the project maximum texture resolution until the override is removed. Use 0 for unlimited.'
           ),
-          _('Override the maximum texture resolution at runtime to _PARAM0_ pixels'),
+          _(
+            'Override the maximum texture resolution at runtime to _PARAM0_ pixels'
+          ),
           _('Texture quality'),
           'res/actions/antialiasing24.png',
           'res/actions/antialiasing.png'
         )
         .addCodeOnlyParameter('currentScene', '')
-        .addParameter('expression', _('Resolution (0 for unlimited)'), '', false)
+        .addParameter(
+          'expression',
+          _('Resolution (0 for unlimited)'),
+          '',
+          false
+        )
         .setDefaultValue('0')
         .getCodeExtraInformation()
         .setIncludeFile(textureQualityIncludeFile)
@@ -2338,7 +2350,9 @@ module.exports = {
         .addAction(
           'SetRuntimeTextureQualityEnabledOverride',
           _('Override texture quality enabled state at runtime'),
-          _('Override the project enabled state until the override is removed.'),
+          _(
+            'Override the project enabled state until the override is removed.'
+          ),
           _('Override texture quality enabled state at runtime: _PARAM0_'),
           _('Texture quality'),
           'res/actions/antialiasing24.png',
@@ -2463,7 +2477,7 @@ module.exports = {
           'MaxSupportedAnisotropy',
           _('Maximum anisotropy supported by the GPU'),
           _(
-            'Return the maximum level of anisotropic filtering supported by the GPU (0 if not supported).' 
+            'Return the maximum level of anisotropic filtering supported by the GPU (0 if not supported).'
           ),
           _('Texture quality'),
           'res/actions/antialiasing.png'

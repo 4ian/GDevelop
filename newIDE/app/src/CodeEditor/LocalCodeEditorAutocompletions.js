@@ -49,7 +49,7 @@ export const setupAutocompletions = (monaco: any): Promise<void> => {
 
             monaco.languages.typescript.javascriptDefaults.addExtraLib(
               content,
-              fullPath
+              monaco.Uri.file(fullPath).toString()
             );
           });
         }
@@ -84,7 +84,7 @@ export const setupAutocompletions = (monaco: any): Promise<void> => {
 
             monaco.languages.typescript.javascriptDefaults.addExtraLib(
               content,
-              fullPath
+              monaco.Uri.file(fullPath).toString()
             );
           });
         }

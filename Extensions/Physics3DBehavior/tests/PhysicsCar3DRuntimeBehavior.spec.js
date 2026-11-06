@@ -248,6 +248,125 @@ describe('gdjs.PhysicsCar3DRuntimeBehavior', () => {
     expect(getPhysicsCar3D(car).isOnFloor()).to.be(true);
   };
 
+  const getVehicleController = (car) =>
+    /** @type {Jolt.WheeledVehicleController} */ (
+      getPhysicsCar3D(car)._vehicleController
+    );
+
+  const getWheelSettings = (car, wheelIndex) =>
+    Jolt.castObject(
+      getVehicleController(car).GetConstraint().GetWheel(wheelIndex),
+      Jolt.WheelWV
+    ).GetSettings();
+
+  const simulateSteeringStick = (runtimeScene, car, stickForce, frameCount) => {
+    for (let index = 0; index < frameCount; index++) {
+      getPhysicsCar3D(car).simulateSteeringStick(stickForce);
+      runtimeScene.renderAndStep(frameDuration);
+    }
+  };
+
+  it('turns the wheels at the steer speed with the keys', () => {
+    const runtimeScene = createScene();
+    addPlatform(runtimeScene);
+    const car = addCar(runtimeScene, { z: 120 });
+    stepSeconds(runtimeScene, 1);
+    const carBehavior = getPhysicsCar3D(car);
+
+    // The beginning steer speed is 140°/s.
+    carBehavior.simulateRightKey();
+    runtimeScene.renderAndStep(frameDuration);
+    expect(carBehavior.getSteerAngle()).to.be.within(2.3, 2.4);
+
+    for (let index = 0; index < 30; index++) {
+      carBehavior.simulateRightKey();
+      runtimeScene.renderAndStep(frameDuration);
+    }
+    expect(carBehavior.getSteerAngle()).to.be.within(20, 69);
+
+    // The wheels go through the center when changing direction.
+    carBehavior.simulateLeftKey();
+    runtimeScene.renderAndStep(frameDuration);
+    expect(carBehavior.getSteerAngle()).to.be.within(-2.4, -2.3);
+  });
+
+  it('makes the steering stick position set the steer angle', () => {
+    const runtimeScene = createScene();
+    addPlatform(runtimeScene);
+    const car = addCar(runtimeScene, { z: 120 });
+    stepSeconds(runtimeScene, 1);
+
+    simulateSteeringStick(runtimeScene, car, 0.3, 120);
+    expect(getPhysicsCar3D(car).getSteerAngle()).to.be.within(20.9, 21.1);
+
+    simulateSteeringStick(runtimeScene, car, -0.5, 120);
+    expect(getPhysicsCar3D(car).getSteerAngle()).to.be.within(-35.1, -34.9);
+  });
+
+  it('straightens the wheels instantly unless a steer return speed is set', () => {
+    const runtimeScene = createScene();
+    addPlatform(runtimeScene);
+    const car = addCar(runtimeScene, { z: 120 });
+    stepSeconds(runtimeScene, 1);
+
+    simulateSteeringStick(runtimeScene, car, 0.5, 120);
+    runtimeScene.renderAndStep(frameDuration);
+    expect(getPhysicsCar3D(car).getSteerAngle()).to.be(0);
+
+    getPhysicsCar3D(car).setSteerReturnSpeed(60);
+    simulateSteeringStick(runtimeScene, car, 0.5, 120);
+    runtimeScene.renderAndStep(frameDuration);
+    expect(getPhysicsCar3D(car).getSteerAngle()).to.be.within(33.9, 34.1);
+    stepSeconds(runtimeScene, 1);
+    expect(getPhysicsCar3D(car).getSteerAngle()).to.be(0);
+  });
+
+  it('reduces the steer angle with the speed when a cornering force is set', () => {
+    const runtimeScene = createScene();
+    addPlatform(runtimeScene);
+    const car = addCar(runtimeScene, { z: 120 });
+    getPhysicsCar3D(car).setCorneringForceMax(2);
+    stepSeconds(runtimeScene, 1);
+
+    simulateSteeringStick(runtimeScene, car, 1, 120);
+    expect(getPhysicsCar3D(car).getSteerAngle()).to.be.within(69.9, 70.1);
+
+    getPhysics3D(car).setLinearVelocityX(1000);
+    getPhysicsCar3D(car).simulateSteeringStick(1);
+    runtimeScene.renderAndStep(frameDuration);
+    // At 10 m/s, the 0.8 m wheelbase allows atan(0.8 * 2 * 9.8 / 10²) + 1.5°.
+    expect(getPhysicsCar3D(car).getSteerAngle()).to.be.within(10, 12);
+  });
+
+  it('applies the steering, suspension and gear settings to the vehicle', () => {
+    const runtimeScene = createScene();
+    addPlatform(runtimeScene);
+    const car = addCar(runtimeScene, { z: 120 });
+    stepSeconds(runtimeScene, 1);
+    const carBehavior = getPhysicsCar3D(car);
+
+    // The wheel radius is 10 pixels and the world scale is 100 pixels per meter.
+    expect(getWheelSettings(car, 0).mSuspensionMaxLength).to.be.within(
+      0.149,
+      0.151
+    );
+    expect(getWheelSettings(car, 0).mSuspensionSpring.mFrequency).to.be(1.5);
+
+    carBehavior.setSteerAngleMax(30);
+    carBehavior.setSuspensionTravel(20);
+    carBehavior.setSuspensionFrequency(2);
+    carBehavior.setGearSwitchDuration(0.25);
+
+    expect(getWheelSettings(car, 0).mMaxSteerAngle).to.be.within(0.523, 0.524);
+    expect(getWheelSettings(car, 2).mMaxSteerAngle).to.be(0);
+    expect(getWheelSettings(car, 0).mSuspensionMaxLength).to.be.within(
+      0.299,
+      0.301
+    );
+    expect(getWheelSettings(car, 0).mSuspensionSpring.mFrequency).to.be(2);
+    expect(getVehicleController(car).GetTransmission().mSwitchTime).to.be(0.25);
+  });
+
   it('never changes the body type of an activated car', () => {
     const runtimeScene = createScene();
     addPlatform(runtimeScene);

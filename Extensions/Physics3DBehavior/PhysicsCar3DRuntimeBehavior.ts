@@ -26,6 +26,13 @@ namespace gdjs {
     behavior: gdjs.Physics3DRuntimeBehavior;
   };
 
+  /** in m/s², used to express the cornering force limit in g. */
+  const standardGravity = 9.8;
+  /** The tires need a slip angle to produce their full grip. */
+  const corneringSlipAngle = 1.5;
+  /** Keep the car able to steer at very high speed. */
+  const corneringSteerAngleMin = 2.5;
+
   /**
    * @category Behaviors > Physics 3D
    */
@@ -54,6 +61,10 @@ namespace gdjs {
     _steerAngleMax;
     private _beginningSteerSpeed: float;
     private _endSteerSpeed: float;
+    /** in degrees per second, 0 to straighten the wheels instantly. */
+    private _steerReturnSpeed: float;
+    /** in g, 0 for no limit. */
+    private _corneringForceMax: float;
     _gearRatios: Array<float>;
     _reverseGearRatios: Array<float>;
     private _backWheelOffsetX: float;
@@ -67,6 +78,17 @@ namespace gdjs {
     _hasBackWheelDrive: boolean;
     _hasFrontWheelDrive: boolean;
     _pitchRollAngleMax: float;
+    /** in pixels, 0 for half of the wheel radius. */
+    private _suspensionTravel: float;
+    /** in Hz */
+    private _suspensionFrequency: float;
+    private _suspensionDamping: float;
+    /** in seconds */
+    _gearSwitchDuration: float;
+    /** in RPM (rotation per minute) */
+    _gearShiftUpEngineSpeed: float;
+    /** in RPM (rotation per minute) */
+    _gearShiftDownEngineSpeed: float;
 
     // Mutable configuration
 
@@ -78,6 +100,8 @@ namespace gdjs {
     // State
 
     private _currentSteerRatio: float = 0;
+    /** In meters, computed from the wheel positions. */
+    private _wheelBase: float = 0;
     /** Used to make sure the car is stopped before going backward. */
     _previousForward = 1;
 
@@ -143,6 +167,16 @@ namespace gdjs {
       this._hasBackWheelDrive = behaviorData.hasBackWheelDrive;
       this._hasFrontWheelDrive = behaviorData.hasFrontWheelDrive;
       this._pitchRollAngleMax = behaviorData.pitchRollAngleMax;
+      this._steerReturnSpeed = behaviorData.steerReturnSpeed || 0;
+      this._corneringForceMax = behaviorData.corneringForceMax || 0;
+      this._suspensionTravel = behaviorData.suspensionTravel || 0;
+      this._suspensionFrequency = behaviorData.suspensionFrequency || 1.5;
+      this._suspensionDamping = behaviorData.suspensionDamping || 0.5;
+      this._gearSwitchDuration = behaviorData.gearSwitchDuration || 0.5;
+      this._gearShiftUpEngineSpeed =
+        behaviorData.gearShiftUpEngineSpeed || 4000;
+      this._gearShiftDownEngineSpeed =
+        behaviorData.gearShiftDownEngineSpeed || 2000;
     }
 
     private getVec3(x: float, y: float, z: float): Jolt.Vec3 {
@@ -289,6 +323,30 @@ namespace gdjs {
       }
       if (behaviorData.pitchRollAngleMax !== undefined) {
         this.setPitchRollAngleMax(behaviorData.pitchRollAngleMax);
+      }
+      if (behaviorData.steerReturnSpeed !== undefined) {
+        this.setSteerReturnSpeed(behaviorData.steerReturnSpeed);
+      }
+      if (behaviorData.corneringForceMax !== undefined) {
+        this.setCorneringForceMax(behaviorData.corneringForceMax);
+      }
+      if (behaviorData.suspensionTravel !== undefined) {
+        this.setSuspensionTravel(behaviorData.suspensionTravel);
+      }
+      if (behaviorData.suspensionFrequency !== undefined) {
+        this.setSuspensionFrequency(behaviorData.suspensionFrequency);
+      }
+      if (behaviorData.suspensionDamping !== undefined) {
+        this.setSuspensionDamping(behaviorData.suspensionDamping);
+      }
+      if (behaviorData.gearSwitchDuration !== undefined) {
+        this.setGearSwitchDuration(behaviorData.gearSwitchDuration);
+      }
+      if (behaviorData.gearShiftUpEngineSpeed !== undefined) {
+        this.setGearShiftUpEngineSpeed(behaviorData.gearShiftUpEngineSpeed);
+      }
+      if (behaviorData.gearShiftDownEngineSpeed !== undefined) {
+        this.setGearShiftDownEngineSpeed(behaviorData.gearShiftDownEngineSpeed);
       }
       return true;
     }
@@ -453,29 +511,7 @@ namespace gdjs {
       const steeringControl =
         this._steeringStickForce ||
         (this._hasPressedLeftKey ? -1 : 0) + (this._hasPressedRightKey ? 1 : 0);
-      if (steeringControl === 0) {
-        this._currentSteerRatio = 0;
-      } else {
-        const steerSpeed = gdjs.evtTools.common.lerp(
-          this._beginningSteerSpeed,
-          this._endSteerSpeed,
-          Math.abs(this._currentSteerRatio)
-        );
-        if (steeringControl < 0) {
-          // Avoid to much latency when changing of direction
-          this._currentSteerRatio = Math.min(0, this._currentSteerRatio);
-          this._currentSteerRatio +=
-            (steeringControl * steerSpeed * timeDelta) / this._steerAngleMax;
-          this._currentSteerRatio = Math.max(-1, this._currentSteerRatio);
-        }
-        if (steeringControl > 0) {
-          // Avoid to much latency when changing of direction
-          this._currentSteerRatio = Math.max(0, this._currentSteerRatio);
-          this._currentSteerRatio +=
-            (steeringControl * steerSpeed * timeDelta) / this._steerAngleMax;
-          this._currentSteerRatio = Math.min(1, this._currentSteerRatio);
-        }
-      }
+      this._updateSteerRatio(steeringControl, carBody, timeDelta);
 
       let brake = 0;
       const acceleratorControl =
@@ -539,6 +575,90 @@ namespace gdjs {
         this._acceleratorStickForce = 0;
         this._steeringStickForce = 0;
       }
+    }
+
+    private _updateSteerRatio(
+      steeringControl: float,
+      carBody: Jolt.Body,
+      timeDelta: float
+    ): void {
+      const targetRatio = steeringControl * this._getSteerRatioLimit(carBody);
+
+      const isGoingBack =
+        this._currentSteerRatio !== 0 &&
+        Math.sign(this._currentSteerRatio) !== Math.sign(targetRatio);
+      if (isGoingBack) {
+        // Go through the center first to avoid latency when changing direction.
+        this._currentSteerRatio =
+          this._steerReturnSpeed > 0
+            ? this._moveSteerRatioToward(0, this._steerReturnSpeed, timeDelta)
+            : 0;
+        if (this._currentSteerRatio !== 0) {
+          return;
+        }
+      }
+      if (Math.abs(this._currentSteerRatio) > Math.abs(targetRatio)) {
+        // The steering is reduced by the stick or the cornering force limit.
+        this._currentSteerRatio =
+          this._steerReturnSpeed > 0
+            ? this._moveSteerRatioToward(
+                targetRatio,
+                this._steerReturnSpeed,
+                timeDelta
+              )
+            : targetRatio;
+      } else {
+        const steerSpeed = gdjs.evtTools.common.lerp(
+          this._beginningSteerSpeed,
+          this._endSteerSpeed,
+          Math.abs(this._currentSteerRatio)
+        );
+        this._currentSteerRatio = this._moveSteerRatioToward(
+          targetRatio,
+          steerSpeed,
+          timeDelta
+        );
+      }
+    }
+
+    private _moveSteerRatioToward(
+      targetRatio: float,
+      steerSpeed: float,
+      timeDelta: float
+    ): float {
+      const maxChange = (steerSpeed * timeDelta) / this._steerAngleMax;
+      return gdjs.evtTools.common.clamp(
+        targetRatio,
+        this._currentSteerRatio - maxChange,
+        this._currentSteerRatio + maxChange
+      );
+    }
+
+    /**
+     * @returns The part of the max steer angle that can be used at the current
+     * speed without steering more than the tires can grip.
+     */
+    private _getSteerRatioLimit(carBody: Jolt.Body): float {
+      if (this._corneringForceMax <= 0 || this._wheelBase <= 0) {
+        return 1;
+      }
+      const velocity = carBody.GetLinearVelocity();
+      const squaredSpeed =
+        velocity.GetX() * velocity.GetX() + velocity.GetY() * velocity.GetY();
+      if (squaredSpeed === 0) {
+        return 1;
+      }
+      const steerAngle =
+        gdjs.toDegrees(
+          Math.atan(
+            (this._wheelBase * this._corneringForceMax * standardGravity) /
+              squaredSpeed
+          )
+        ) + corneringSlipAngle;
+      return Math.min(
+        1,
+        Math.max(steerAngle, corneringSteerAngleMin) / this._steerAngleMax
+      );
     }
 
     override onObjectHotReloaded() {}
@@ -636,6 +756,7 @@ namespace gdjs {
 
     setSteerAngleMax(steerAngleMax: float) {
       this._steerAngleMax = steerAngleMax;
+      this._updateWheels();
     }
 
     getBeginningSteerSpeed(): float {
@@ -652,6 +773,95 @@ namespace gdjs {
 
     setEndSteerSpeed(endSteerSpeed: float): void {
       this._endSteerSpeed = endSteerSpeed;
+    }
+
+    getSteerReturnSpeed(): float {
+      return this._steerReturnSpeed;
+    }
+
+    setSteerReturnSpeed(steerReturnSpeed: float): void {
+      this._steerReturnSpeed = steerReturnSpeed;
+    }
+
+    getCorneringForceMax(): float {
+      return this._corneringForceMax;
+    }
+
+    setCorneringForceMax(corneringForceMax: float): void {
+      this._corneringForceMax = corneringForceMax;
+    }
+
+    getSuspensionTravel(): float {
+      return this._suspensionTravel;
+    }
+
+    setSuspensionTravel(suspensionTravel: float): void {
+      this._suspensionTravel = suspensionTravel;
+      this._updateWheels();
+    }
+
+    getSuspensionFrequency(): float {
+      return this._suspensionFrequency;
+    }
+
+    setSuspensionFrequency(suspensionFrequency: float): void {
+      this._suspensionFrequency = suspensionFrequency;
+      this._updateWheels();
+    }
+
+    getSuspensionDamping(): float {
+      return this._suspensionDamping;
+    }
+
+    setSuspensionDamping(suspensionDamping: float): void {
+      this._suspensionDamping = suspensionDamping;
+      this._updateWheels();
+    }
+
+    getGearSwitchDuration(): float {
+      return this._gearSwitchDuration;
+    }
+
+    setGearSwitchDuration(gearSwitchDuration: float): void {
+      this._gearSwitchDuration = gearSwitchDuration;
+      if (!this._vehicleController) {
+        return;
+      }
+      this._applyGearSwitchSettings(this._vehicleController.GetTransmission());
+    }
+
+    getGearShiftUpEngineSpeed(): float {
+      return this._gearShiftUpEngineSpeed;
+    }
+
+    setGearShiftUpEngineSpeed(gearShiftUpEngineSpeed: float): void {
+      this._gearShiftUpEngineSpeed = gearShiftUpEngineSpeed;
+      if (!this._vehicleController) {
+        return;
+      }
+      this._applyGearSwitchSettings(this._vehicleController.GetTransmission());
+    }
+
+    getGearShiftDownEngineSpeed(): float {
+      return this._gearShiftDownEngineSpeed;
+    }
+
+    setGearShiftDownEngineSpeed(gearShiftDownEngineSpeed: float): void {
+      this._gearShiftDownEngineSpeed = gearShiftDownEngineSpeed;
+      if (!this._vehicleController) {
+        return;
+      }
+      this._applyGearSwitchSettings(this._vehicleController.GetTransmission());
+    }
+
+    _applyGearSwitchSettings(
+      transmission: Jolt.VehicleTransmissionSettings
+    ): void {
+      transmission.mSwitchTime = this._gearSwitchDuration;
+      transmission.mClutchReleaseTime = 0.6 * this._gearSwitchDuration;
+      transmission.mSwitchLatency = this._gearSwitchDuration;
+      transmission.mShiftUpRPM = this._gearShiftUpEngineSpeed;
+      transmission.mShiftDownRPM = this._gearShiftDownEngineSpeed;
     }
 
     invalidateShape(): void {
@@ -859,7 +1069,7 @@ namespace gdjs {
       }
       this._vehicleController
         .GetConstraint()
-        .SetMaxPitchRollAngle(pitchRollAngleMax);
+        .SetMaxPitchRollAngle(gdjs.toRad(pitchRollAngleMax));
     }
 
     isOnFloor() {
@@ -908,8 +1118,13 @@ namespace gdjs {
       const wheelOffsetZ =
         halfVehicleDepth +
         (-behavior.shapeOffsetZ + this._wheelOffsetZ) * shapeScale;
+      this._wheelBase = frontWheelOffsetX + backWheelOffsetX;
       const suspensionMinLength = wheelRadius;
-      const suspensionMaxLength = 1.5 * suspensionMinLength;
+      const suspensionMaxLength =
+        suspensionMinLength +
+        (this._suspensionTravel > 0
+          ? this._suspensionTravel * shapeScale
+          : wheelRadius / 2);
 
       const constraint = this._vehicleController.GetConstraint();
       const fl = constraint.GetWheel(0).GetSettings();
@@ -945,9 +1160,13 @@ namespace gdjs {
         wheel.mWidth = wheelWidth;
         wheel.mSuspensionMinLength = suspensionMinLength;
         wheel.mSuspensionMaxLength = suspensionMaxLength;
+        wheel.mSuspensionSpring.mFrequency = this._suspensionFrequency;
+        wheel.mSuspensionSpring.mDamping = this._suspensionDamping;
         wheel.mMaxBrakeTorque = this._brakeTorqueMax;
         if (index >= 2) {
           wheel.mMaxHandBrakeTorque = this._handBrakeTorqueMax;
+        } else {
+          wheel.mMaxSteerAngle = gdjs.toRad(this._steerAngleMax);
         }
       }
     }
@@ -1068,6 +1287,9 @@ namespace gdjs {
           this.carBehavior._engineTorqueMax;
         controllerSettings.mEngine.mMaxRPM = this.carBehavior._engineSpeedMax;
         controllerSettings.mEngine.mInertia = this.carBehavior._engineInertia;
+        this.carBehavior._applyGearSwitchSettings(
+          controllerSettings.mTransmission
+        );
         // vehicle.mController is a Ref (smart pointer).
         // It is destroyed with the vehicle.
         vehicle.mController = controllerSettings;

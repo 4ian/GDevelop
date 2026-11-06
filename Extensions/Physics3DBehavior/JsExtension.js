@@ -3149,6 +3149,78 @@ module.exports = {
           return true;
         }
 
+        if (propertyName === 'steerReturnSpeed') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getOrCreateChild('steerReturnSpeed')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'corneringForceMax') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getOrCreateChild('corneringForceMax')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'suspensionTravel') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getOrCreateChild('suspensionTravel')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'suspensionFrequency') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getOrCreateChild('suspensionFrequency')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'suspensionDamping') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getOrCreateChild('suspensionDamping')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'gearSwitchDuration') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getOrCreateChild('gearSwitchDuration')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'gearShiftUpEngineSpeed') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getOrCreateChild('gearShiftUpEngineSpeed')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'gearShiftDownEngineSpeed') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getOrCreateChild('gearShiftDownEngineSpeed')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
         return false;
       };
       behavior.getProperties = function (behaviorContent) {
@@ -3458,6 +3530,173 @@ module.exports = {
           )
           .setAdvanced(true);
 
+        if (!behaviorContent.hasChild('steerReturnSpeed')) {
+          behaviorContent.addChild('steerReturnSpeed').setDoubleValue(0);
+        }
+        behaviorProperties
+          .getOrCreate('steerReturnSpeed')
+          .setLabel(_('Steer return speed'))
+          .setDescription(
+            _(
+              'How fast the wheels straighten when the steering is released. 0 straightens them instantly.'
+            )
+          )
+          .setGroup(_('Steering'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getAngularSpeed())
+          .setValue(
+            behaviorContent
+              .getChild('steerReturnSpeed')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setAdvanced(true);
+
+        if (!behaviorContent.hasChild('corneringForceMax')) {
+          behaviorContent.addChild('corneringForceMax').setDoubleValue(0);
+        }
+        behaviorProperties
+          .getOrCreate('corneringForceMax')
+          .setLabel(_('Max cornering force (in g)'))
+          .setDescription(
+            _(
+              'Reduces the steer angle as the speed increases, to keep turning under this force. Around 2 feels like an arcade racing game. 0 for no limit.'
+            )
+          )
+          .setGroup(_('Steering'))
+          .setType('Number')
+          .setValue(
+            behaviorContent
+              .getChild('corneringForceMax')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setAdvanced(true);
+
+        if (!behaviorContent.hasChild('suspensionTravel')) {
+          behaviorContent.addChild('suspensionTravel').setDoubleValue(0);
+        }
+        behaviorProperties
+          .getOrCreate('suspensionTravel')
+          .setLabel(_('Suspension travel'))
+          .setDescription(
+            _(
+              'How much the wheels can move up and down. 0 uses half of the wheel radius.'
+            )
+          )
+          .setGroup(_('Wheels'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setValue(
+            behaviorContent
+              .getChild('suspensionTravel')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setAdvanced(true);
+
+        if (!behaviorContent.hasChild('suspensionFrequency')) {
+          behaviorContent.addChild('suspensionFrequency').setDoubleValue(1.5);
+        }
+        behaviorProperties
+          .getOrCreate('suspensionFrequency')
+          .setLabel(_('Suspension frequency (in Hz)'))
+          .setDescription(
+            _(
+              'The stiffness of the suspension. Increase it with the gravity scale, otherwise the car rests on its suspension stops.'
+            )
+          )
+          .setGroup(_('Wheels'))
+          .setType('Number')
+          .setValue(
+            behaviorContent
+              .getChild('suspensionFrequency')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setAdvanced(true);
+
+        if (!behaviorContent.hasChild('suspensionDamping')) {
+          behaviorContent.addChild('suspensionDamping').setDoubleValue(0.5);
+        }
+        behaviorProperties
+          .getOrCreate('suspensionDamping')
+          .setLabel(_('Suspension damping'))
+          .setDescription(
+            _('How fast the suspension stops bouncing. 1 removes any bounce.')
+          )
+          .setGroup(_('Wheels'))
+          .setType('Number')
+          .setValue(
+            behaviorContent
+              .getChild('suspensionDamping')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setAdvanced(true);
+
+        if (!behaviorContent.hasChild('gearSwitchDuration')) {
+          behaviorContent.addChild('gearSwitchDuration').setDoubleValue(0.5);
+        }
+        behaviorProperties
+          .getOrCreate('gearSwitchDuration')
+          .setLabel(_('Gear switch duration'))
+          .setDescription(
+            _('The time without engine power when switching gears.')
+          )
+          .setGroup(_('Speed'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getSecond())
+          .setValue(
+            behaviorContent
+              .getChild('gearSwitchDuration')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setAdvanced(true);
+
+        if (!behaviorContent.hasChild('gearShiftUpEngineSpeed')) {
+          behaviorContent
+            .addChild('gearShiftUpEngineSpeed')
+            .setDoubleValue(4000);
+        }
+        behaviorProperties
+          .getOrCreate('gearShiftUpEngineSpeed')
+          .setLabel(_('Engine speed to shift up'))
+          .setDescription(
+            _('The engine speed from which a higher gear is used.')
+          )
+          .setGroup(_('Speed'))
+          .setType('Number')
+          .setValue(
+            behaviorContent
+              .getChild('gearShiftUpEngineSpeed')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setAdvanced(true);
+
+        if (!behaviorContent.hasChild('gearShiftDownEngineSpeed')) {
+          behaviorContent
+            .addChild('gearShiftDownEngineSpeed')
+            .setDoubleValue(2000);
+        }
+        behaviorProperties
+          .getOrCreate('gearShiftDownEngineSpeed')
+          .setLabel(_('Engine speed to shift down'))
+          .setDescription(
+            _('The engine speed under which a lower gear is used.')
+          )
+          .setGroup(_('Speed'))
+          .setType('Number')
+          .setValue(
+            behaviorContent
+              .getChild('gearShiftDownEngineSpeed')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setAdvanced(true);
+
         return behaviorProperties;
       };
 
@@ -3487,6 +3726,16 @@ module.exports = {
         behaviorContent.addChild('hasBackWheelDrive').setBoolValue(false);
         behaviorContent.addChild('hasFrontWheelDrive').setBoolValue(true);
         behaviorContent.addChild('pitchRollAngleMax').setDoubleValue(90);
+        behaviorContent.addChild('steerReturnSpeed').setDoubleValue(0);
+        behaviorContent.addChild('corneringForceMax').setDoubleValue(0);
+        behaviorContent.addChild('suspensionTravel').setDoubleValue(0);
+        behaviorContent.addChild('suspensionFrequency').setDoubleValue(1.5);
+        behaviorContent.addChild('suspensionDamping').setDoubleValue(0.5);
+        behaviorContent.addChild('gearSwitchDuration').setDoubleValue(0.5);
+        behaviorContent.addChild('gearShiftUpEngineSpeed').setDoubleValue(4000);
+        behaviorContent
+          .addChild('gearShiftDownEngineSpeed')
+          .setDoubleValue(2000);
       };
       const aut = extension
         .addBehavior(

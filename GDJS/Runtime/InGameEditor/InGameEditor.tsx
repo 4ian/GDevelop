@@ -5234,9 +5234,9 @@ namespace gdjs {
     editorMode: '3d-editor' | '2d-editor' = '2d-editor';
 
     isForcefullyHidden = true;
-    gridWidth: float = 0;
-    gridHeight: float = 0;
-    gridDepth: float = 0;
+    gridWidth: float = 32;
+    gridHeight: float = 32;
+    gridDepth: float = 32;
     gridOffsetX: float = 0;
     gridOffsetY: float = 0;
     gridOffsetZ: float = 0;
@@ -5253,8 +5253,8 @@ namespace gdjs {
 
     setSettings(instancesEditorSettings: InstancesEditorSettings): void {
       this.isForcefullyHidden = !instancesEditorSettings.grid;
-      this.gridWidth = instancesEditorSettings.gridWidth || 0;
-      this.gridHeight = instancesEditorSettings.gridHeight || 0;
+      this.gridWidth = instancesEditorSettings.gridWidth || 32;
+      this.gridHeight = instancesEditorSettings.gridHeight || 32;
       this.gridDepth =
         instancesEditorSettings.gridDepth === undefined
           ? 32

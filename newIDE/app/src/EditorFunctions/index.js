@@ -6812,6 +6812,42 @@ const put3dInstances: EditorFunction = {
         );
       }
 
+      if (
+        (movedPositionCount > 0 || resizedCount > 0) &&
+        !(instancesRotationArray && instancesRotationArray.length >= 3)
+      ) {
+        // A tilt kept on a moved or resized instance (like a ramp reused as a
+        // road) makes the positions and sizes above misleading.
+        const tiltedInstances = Array.from(
+          existingInstanceStates.keys()
+        ).filter(
+          instance =>
+            instance.getRotationX() !== 0 || instance.getRotationY() !== 0
+        );
+        if (tiltedInstances.length > 0) {
+          const tilts = tiltedInstances
+            .slice(0, 5)
+            .map(
+              instance =>
+                `${instance
+                  .getPersistentUuid()
+                  .slice(0, 10)} at (${roundPosition(
+                  instance.getRotationX()
+                )}°, ${roundPosition(
+                  instance.getRotationY()
+                )}°, ${roundPosition(instance.getAngle())}°)`
+            )
+            .join(', ');
+          changes.push(
+            `Kept the tilt of ${tiltedInstances.length} instance${
+              tiltedInstances.length > 1 ? 's' : ''
+            }${ofObjectsSuffix} (${tilts}${
+              tiltedInstances.length > 5 ? ', ...' : ''
+            }): the space they occupy is not the one given above. Give a new rotation to lay them flat.`
+          );
+        }
+      }
+
       if (rotatedCount > 0 && instancesRotationArray) {
         changes.push(
           `Rotated ${rotatedCount} instance${

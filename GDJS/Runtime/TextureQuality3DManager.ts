@@ -346,12 +346,31 @@ namespace gdjs {
     filter === THREE.LinearMipmapNearestFilter ||
     filter === THREE.LinearMipmapLinearFilter;
 
+  // `wrapR` only exists on some Three.js texture classes (3D/array textures).
+  type TextureWithWrapR = THREE.Texture & { wrapR?: THREE.Wrapping };
+
+  const getTextureWrapR = (
+    texture: THREE.Texture
+  ): THREE.Wrapping | undefined => {
+    const wrapR = (texture as TextureWithWrapR).wrapR;
+    return typeof wrapR === 'number' ? wrapR : undefined;
+  };
+
+  const setTextureWrapR = (
+    texture: THREE.Texture,
+    wrapR: THREE.Wrapping
+  ): void => {
+    (texture as TextureWithWrapR).wrapR = wrapR;
+  };
+
   type TextureSamplerState = {
     magFilter: THREE.MagnificationTextureFilter;
     minFilter: THREE.MinificationTextureFilter;
     generateMipmaps: boolean;
     wrapS: THREE.Wrapping;
     wrapT: THREE.Wrapping;
+    /** Only present on texture classes supporting `wrapR`. */
+    wrapR?: THREE.Wrapping;
     anisotropy: float;
   };
 
@@ -368,6 +387,13 @@ namespace gdjs {
      * the texture exactly like it was loaded.
      */
     originalSampler?: TextureSamplerState;
+    /**
+     * `true` if `forceClampWrapping` clamped the wrapping of this texture. Used
+     * to restore the original wrapping when the setting is turned off, without
+     * overwriting wrapping changes made by other code while the setting was
+     * disabled.
+     */
+    wrappedByManager?: boolean;
   };
 
   type TrackedSourceEntry = {
@@ -686,6 +712,9 @@ namespace gdjs {
         if (canChangeSampler) {
           this._applySamplerSettings(texture, !!applyOptions.keepNearestFilter);
         }
+        // `forceClampWrapping` is independent from the model sampler handling:
+        // it overrides only wrapping modes, for every managed texture.
+        this._applyWrappingSettings(texture, entry);
         this._applyAnisotropy(texture);
       } else {
         // Disabling the system (or selecting `classic`) puts the texture back
@@ -715,7 +744,8 @@ namespace gdjs {
     }
 
     /**
-     * Apply the filtering, mipmap and wrapping settings to a texture.
+     * Apply the filtering and mipmap settings to a texture. The wrapping
+     * settings are handled separately by `_applyWrappingSettings`.
      */
     private _applySamplerSettings(
       texture: THREE.Texture,
@@ -817,7 +847,36 @@ namespace gdjs {
         }
       }
 
-      if (settings.forceClampWrapping) {
+      if (changed) {
+        texture.needsUpdate = true;
+      }
+    }
+
+    /**
+     * Apply the wrapping modes of the settings.
+     *
+     * `forceClampWrapping` deliberately takes precedence over the wrapping
+     * modes imported with a texture, including the samplers of glTF textures:
+     * it clamps `wrapS`, `wrapT` and, when the texture class supports it,
+     * `wrapR`, regardless of `respectSamplerSettings` and
+     * `overrideModelSamplers`. It only affects wrapping: filtering, mipmaps and
+     * anisotropy keep following their existing precedence.
+     *
+     * When the setting is turned off, the wrapping recorded before the manager
+     * first modified the texture is restored, but only if the manager did clamp
+     * it. This avoids leaving previously clamped textures clamped, while not
+     * overwriting wrapping changes made by other code when the manager never
+     * forced the wrapping.
+     */
+    private _applyWrappingSettings(
+      texture: THREE.Texture,
+      entry: TrackedTextureEntry
+    ): void {
+      const originalSampler = entry.originalSampler;
+      let changed = false;
+
+      if (this._settings.forceClampWrapping) {
+        entry.wrappedByManager = true;
         if (texture.wrapS !== THREE.ClampToEdgeWrapping) {
           texture.wrapS = THREE.ClampToEdgeWrapping;
           changed = true;
@@ -826,6 +885,28 @@ namespace gdjs {
           texture.wrapT = THREE.ClampToEdgeWrapping;
           changed = true;
         }
+        const wrapR = getTextureWrapR(texture);
+        if (wrapR !== undefined && wrapR !== THREE.ClampToEdgeWrapping) {
+          setTextureWrapR(texture, THREE.ClampToEdgeWrapping);
+          changed = true;
+        }
+      } else if (entry.wrappedByManager && originalSampler) {
+        if (texture.wrapS !== originalSampler.wrapS) {
+          texture.wrapS = originalSampler.wrapS;
+          changed = true;
+        }
+        if (texture.wrapT !== originalSampler.wrapT) {
+          texture.wrapT = originalSampler.wrapT;
+          changed = true;
+        }
+        if (originalSampler.wrapR !== undefined) {
+          const wrapR = getTextureWrapR(texture);
+          if (wrapR !== undefined && wrapR !== originalSampler.wrapR) {
+            setTextureWrapR(texture, originalSampler.wrapR);
+            changed = true;
+          }
+        }
+        entry.wrappedByManager = false;
       }
 
       if (changed) {
@@ -865,6 +946,7 @@ namespace gdjs {
         generateMipmaps: texture.generateMipmaps,
         wrapS: texture.wrapS,
         wrapT: texture.wrapT,
+        wrapR: getTextureWrapR(texture),
         anisotropy: texture.anisotropy,
       };
     }
@@ -901,11 +983,23 @@ namespace gdjs {
           texture.wrapT = originalSampler.wrapT;
           changed = true;
         }
+        if (originalSampler.wrapR !== undefined) {
+          const currentWrapR = getTextureWrapR(texture);
+          if (
+            currentWrapR !== undefined &&
+            currentWrapR !== originalSampler.wrapR
+          ) {
+            setTextureWrapR(texture, originalSampler.wrapR);
+            changed = true;
+          }
+        }
         if (texture.anisotropy !== originalSampler.anisotropy) {
           texture.anisotropy = originalSampler.anisotropy;
           changed = true;
         }
       }
+
+      entry.wrappedByManager = false;
 
       const group = entry.source;
       if (texture.source !== group.originalSource || group.managedSource) {

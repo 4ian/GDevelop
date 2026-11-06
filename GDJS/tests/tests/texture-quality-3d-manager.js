@@ -16,7 +16,7 @@ describe('gdjs.TextureQuality3DManager', () => {
   /**
    * Create a manager backed by a fake runtime game, so that the lifecycle can
    * be tested without a renderer or a resource loader.
-   * @param {Partial<gdjs.TextureQuality3DSettings>=} properties
+   * @param {Record<string, string>=} properties
    * @returns {gdjs.TextureQuality3DManager}
    */
   const makeManager = (properties = {}) => {
@@ -913,6 +913,259 @@ describe('gdjs.TextureQuality3DManager', () => {
       externalTexture.needsUpdate = true;
       renderer.initTexture(externalTexture);
       expect(gl.getError()).to.be(0);
+    });
+  });
+
+  describe('glTF wrapping precedence (TQ-006)', () => {
+    it('clamps a glTF texture whose sampler settings are respected', () => {
+      const manager = makeManager();
+      setCapabilities(manager);
+      manager.updateSettings({
+        enabled: true,
+        filtering: 'trilinear',
+        mipmapMode: 'forceOn',
+        overrideModelSamplers: false,
+        forceClampWrapping: true,
+        anisotropy: 8,
+      });
+
+      const texture = makeTexture(makeCanvas(64, 64));
+      texture.wrapS = THREE.MirroredRepeatWrapping;
+      manager.applyToTexture(texture, {
+        kind: 'model',
+        respectSamplerSettings: true,
+      });
+
+      expect(texture.wrapS).to.be(THREE.ClampToEdgeWrapping);
+      expect(texture.wrapT).to.be(THREE.ClampToEdgeWrapping);
+      // Only the wrapping is overridden: the imported filtering/mipmap
+      // settings are still respected.
+      expect(texture.magFilter).to.be(THREE.LinearFilter);
+      expect(texture.minFilter).to.be(THREE.LinearFilter);
+      expect(texture.generateMipmaps).to.be(false);
+      expect(texture.anisotropy).to.be(8);
+    });
+
+    it('clamps a glTF texture when model samplers are overridden', () => {
+      const manager = makeManager();
+      setCapabilities(manager);
+      manager.updateSettings({
+        enabled: true,
+        filtering: 'nearest',
+        mipmapMode: 'forceOff',
+        overrideModelSamplers: true,
+        forceClampWrapping: true,
+      });
+
+      const texture = makeTexture(makeCanvas(64, 64));
+      manager.applyToTexture(texture, {
+        kind: 'model',
+        respectSamplerSettings: true,
+      });
+
+      expect(texture.wrapS).to.be(THREE.ClampToEdgeWrapping);
+      expect(texture.wrapT).to.be(THREE.ClampToEdgeWrapping);
+      expect(texture.magFilter).to.be(THREE.NearestFilter);
+      expect(texture.minFilter).to.be(THREE.NearestFilter);
+    });
+
+    it('clamps a glTF texture without respected samplers', () => {
+      const manager = makeManager();
+      setCapabilities(manager);
+      manager.updateSettings({
+        enabled: true,
+        filtering: 'bilinear',
+        overrideModelSamplers: false,
+        forceClampWrapping: true,
+      });
+
+      const texture = makeTexture(makeCanvas(64, 64));
+      manager.applyToTexture(texture, {
+        kind: 'model',
+        respectSamplerSettings: false,
+      });
+
+      expect(texture.wrapS).to.be(THREE.ClampToEdgeWrapping);
+      expect(texture.wrapT).to.be(THREE.ClampToEdgeWrapping);
+      expect(texture.magFilter).to.be(THREE.LinearFilter);
+      expect(texture.minFilter).to.be(THREE.LinearFilter);
+    });
+
+    it('preserves the imported wrapping of a glTF texture when disabled', () => {
+      const manager = makeManager();
+      setCapabilities(manager);
+      manager.updateSettings({
+        enabled: true,
+        filtering: 'trilinear',
+        mipmapMode: 'forceOn',
+        overrideModelSamplers: false,
+        forceClampWrapping: false,
+      });
+
+      const texture = makeTexture(makeCanvas(64, 64));
+      texture.wrapS = THREE.MirroredRepeatWrapping;
+      manager.applyToTexture(texture, {
+        kind: 'model',
+        respectSamplerSettings: true,
+      });
+
+      expect(texture.wrapS).to.be(THREE.MirroredRepeatWrapping);
+      expect(texture.wrapT).to.be(THREE.RepeatWrapping);
+      expect(texture.magFilter).to.be(THREE.LinearFilter);
+      expect(texture.minFilter).to.be(THREE.LinearFilter);
+      expect(texture.generateMipmaps).to.be(false);
+    });
+
+    it('keeps clamping non-glTF textures', () => {
+      const manager = makeManager();
+      setCapabilities(manager);
+      manager.updateSettings({
+        enabled: true,
+        filtering: 'nearest',
+        forceClampWrapping: true,
+      });
+
+      const texture = makeTexture(makeCanvas(64, 64));
+      manager.applyToTexture(texture);
+
+      expect(texture.wrapS).to.be(THREE.ClampToEdgeWrapping);
+      expect(texture.wrapT).to.be(THREE.ClampToEdgeWrapping);
+      expect(texture.magFilter).to.be(THREE.NearestFilter);
+      expect(texture.minFilter).to.be(THREE.NearestFilter);
+    });
+
+    it('restores the imported wrapping when clamping is turned off', () => {
+      const manager = makeManager();
+      setCapabilities(manager);
+      manager.updateSettings({
+        enabled: true,
+        filtering: 'trilinear',
+        mipmapMode: 'forceOn',
+        overrideModelSamplers: false,
+        forceClampWrapping: true,
+      });
+
+      const texture = makeTexture(makeCanvas(64, 64));
+      texture.wrapS = THREE.MirroredRepeatWrapping;
+      manager.applyToTexture(texture, {
+        kind: 'model',
+        respectSamplerSettings: true,
+      });
+      expect(texture.wrapS).to.be(THREE.ClampToEdgeWrapping);
+
+      manager.updateSettings({ forceClampWrapping: false });
+      expect(texture.wrapS).to.be(THREE.MirroredRepeatWrapping);
+      expect(texture.wrapT).to.be(THREE.RepeatWrapping);
+      // Filtering/mipmaps were respected and are still untouched.
+      expect(texture.magFilter).to.be(THREE.LinearFilter);
+      expect(texture.minFilter).to.be(THREE.LinearFilter);
+      expect(texture.generateMipmaps).to.be(false);
+    });
+
+    it('reapplies clamping when turned on again', () => {
+      const manager = makeManager();
+      setCapabilities(manager);
+      manager.updateSettings({
+        enabled: true,
+        filtering: 'trilinear',
+        overrideModelSamplers: false,
+        forceClampWrapping: false,
+      });
+
+      const texture = makeTexture(makeCanvas(64, 64));
+      texture.wrapS = THREE.MirroredRepeatWrapping;
+      manager.applyToTexture(texture, {
+        kind: 'model',
+        respectSamplerSettings: true,
+      });
+      expect(texture.wrapS).to.be(THREE.MirroredRepeatWrapping);
+
+      manager.updateSettings({ forceClampWrapping: true });
+      expect(texture.wrapS).to.be(THREE.ClampToEdgeWrapping);
+      expect(texture.wrapT).to.be(THREE.ClampToEdgeWrapping);
+
+      manager.updateSettings({ forceClampWrapping: false });
+      expect(texture.wrapS).to.be(THREE.MirroredRepeatWrapping);
+      expect(texture.wrapT).to.be(THREE.RepeatWrapping);
+    });
+
+    it('keeps the precedence when settings are reapplied and presets change', () => {
+      const manager = makeManager();
+      setCapabilities(manager);
+      manager.updateSettings({
+        enabled: true,
+        overrideModelSamplers: false,
+        forceClampWrapping: true,
+      });
+
+      const texture = makeTexture(makeCanvas(64, 64));
+      texture.wrapS = THREE.MirroredRepeatWrapping;
+      manager.applyToTexture(texture, {
+        kind: 'model',
+        respectSamplerSettings: true,
+      });
+      expect(texture.wrapS).to.be(THREE.ClampToEdgeWrapping);
+
+      // Reapplication through a settings update and through applyToTexture.
+      manager.updateSettings({ anisotropy: 4 });
+      expect(texture.wrapS).to.be(THREE.ClampToEdgeWrapping);
+      manager.applyToTexture(texture, {
+        kind: 'model',
+        respectSamplerSettings: true,
+      });
+      expect(texture.wrapS).to.be(THREE.ClampToEdgeWrapping);
+
+      // Presets do not enable forceClampWrapping: importing their settings
+      // restores the original wrapping.
+      manager.setPreset('balanced');
+      expect(texture.wrapS).to.be(THREE.MirroredRepeatWrapping);
+      manager.setPreset('quality');
+      expect(texture.wrapS).to.be(THREE.MirroredRepeatWrapping);
+
+      // Turning it back on clamps again, and disabling the system restores it.
+      manager.updateSettings({ forceClampWrapping: true });
+      expect(texture.wrapS).to.be(THREE.ClampToEdgeWrapping);
+      manager.updateSettings({ enabled: false });
+      expect(texture.wrapS).to.be(THREE.MirroredRepeatWrapping);
+      manager.updateSettings({
+        enabled: true,
+        forceClampWrapping: true,
+      });
+      expect(texture.wrapS).to.be(THREE.ClampToEdgeWrapping);
+    });
+
+    it('clamps and restores wrapR when the texture supports it', () => {
+      const manager = makeManager();
+      setCapabilities(manager);
+      manager.updateSettings({ enabled: true, forceClampWrapping: true });
+
+      const texture = makeTexture(makeCanvas(64, 64));
+      /** @type {any} */
+      const textureWithWrapR = texture;
+      textureWithWrapR.wrapR = THREE.RepeatWrapping;
+      manager.applyToTexture(texture, {
+        kind: 'model',
+        respectSamplerSettings: true,
+      });
+
+      expect(textureWithWrapR.wrapR).to.be(THREE.ClampToEdgeWrapping);
+      manager.updateSettings({ forceClampWrapping: false });
+      expect(textureWithWrapR.wrapR).to.be(THREE.RepeatWrapping);
+    });
+
+    it('applies forceClampWrapping loaded from the project settings', () => {
+      const manager = makeManager({
+        enabled: 'true',
+        forceClampWrapping: 'true',
+      });
+      const texture = makeTexture(makeCanvas(64, 64));
+
+      manager.applyToTexture(texture, {
+        kind: 'model',
+        respectSamplerSettings: true,
+      });
+      expect(texture.wrapS).to.be(THREE.ClampToEdgeWrapping);
+      expect(texture.wrapT).to.be(THREE.ClampToEdgeWrapping);
     });
   });
 });

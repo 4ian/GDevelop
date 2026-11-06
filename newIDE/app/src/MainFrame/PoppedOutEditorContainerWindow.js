@@ -196,6 +196,7 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                         paneIdentifier: 'center',
                         gameEditorMode: props.gameEditorMode,
                         setGameEditorMode: props.setGameEditorMode,
+                        setEditorMode: props.setEditorMode,
                         isActive: true,
                         extraEditorProps: editorTab.extraEditorProps,
                         project: props.currentProject,

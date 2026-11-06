@@ -346,4 +346,40 @@ describe('gdjs.TextureQuality3DManager runtime overrides', () => {
       Math.min(999, Math.max(1, capabilities.maxAnisotropy))
     );
   });
+
+  it('exposes the dedicated runtime override and cube-capability actions', () => {
+    const calls = [];
+    const manager = {
+      setRuntimeOverride: (name, value) => calls.push(['set', name, value]),
+      removeRuntimeOverride: (name) => calls.push(['remove', name]),
+      getCapabilities: () => ({ maxCubemapSize: 1024 }),
+    };
+    const runtimeScene = /** @type {any} */ ({
+      getGame: () => ({ getTextureQuality3DManager: () => manager }),
+    });
+
+    gdjs.textureQuality3d.setRuntimeMaxTextureResolutionOverride(
+      runtimeScene,
+      512.4
+    );
+    gdjs.textureQuality3d.setRuntimeAnisotropyOverride(runtimeScene, 99);
+    gdjs.textureQuality3d.setRuntimeEnabledOverride(runtimeScene, false);
+    gdjs.textureQuality3d.removeRuntimeMaxTextureResolutionOverride(
+      runtimeScene
+    );
+    gdjs.textureQuality3d.removeRuntimeAnisotropyOverride(runtimeScene);
+    gdjs.textureQuality3d.removeRuntimeEnabledOverride(runtimeScene);
+
+    expect(calls).to.eql([
+      ['set', 'maxTextureResolution', 512],
+      ['set', 'anisotropy', 16],
+      ['set', 'enabled', false],
+      ['remove', 'maxTextureResolution'],
+      ['remove', 'anisotropy'],
+      ['remove', 'enabled'],
+    ]);
+    expect(
+      gdjs.textureQuality3d.getMaxSupportedCubemapSize(runtimeScene)
+    ).to.be(1024);
+  });
 });

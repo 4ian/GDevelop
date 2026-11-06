@@ -18,6 +18,8 @@ type OriginalState = {|
   anisotropy: number,
 |};
 
+const MAX_RESIZED_IMAGES_PER_SOURCE = 4;
+
 /**
  * Editor-only counterpart of the runtime texture-quality manager.
  *
@@ -32,13 +34,24 @@ export default class EditorTextureQuality3DManager {
   _trackedTextures: Set<any> = new Set();
   _originalStates: WeakMap<any, OriginalState> = new WeakMap();
   _options: WeakMap<any, TextureOptions> = new WeakMap();
+  _resizedImages: WeakMap<any, Map<string, any>> = new WeakMap();
+  _managedImages: WeakSet<any> = new WeakSet();
   _lastSettingsKey: string = '';
 
   setRenderer(project: gdProject, renderer: THREE.WebGLRenderer | null) {
-    if (this._project !== project) this._lastSettingsKey = '';
+    const changedProject = this._project !== project;
+    const changedRenderer = this._renderer !== renderer;
+    if (changedProject) this._lastSettingsKey = '';
     this._project = project;
     this._renderer = renderer;
-    this.refresh();
+    // This method is called from the render loop. Reapplying every frame would
+    // turn a quality setting into needless CPU work and texture uploads. A
+    // Project Properties edit calls refresh() explicitly instead.
+    if (changedProject || changedRenderer) this.refresh();
+  }
+
+  isForProject(project: gdProject): boolean {
+    return this._project === project;
   }
 
   track(texture: any, options?: TextureOptions) {
@@ -61,6 +74,7 @@ export default class EditorTextureQuality3DManager {
   }
 
   untrack(texture: any) {
+    this._restore(texture);
     this._trackedTextures.delete(texture);
     this._originalStates.delete(texture);
     this._options.delete(texture);
@@ -69,6 +83,8 @@ export default class EditorTextureQuality3DManager {
   dispose() {
     this._trackedTextures.forEach(texture => this._restore(texture));
     this._trackedTextures.clear();
+    this._resizedImages = new WeakMap();
+    this._managedImages = new WeakSet();
     this._project = null;
     this._renderer = null;
     this._lastSettingsKey = '';
@@ -83,11 +99,66 @@ export default class EditorTextureQuality3DManager {
     this._trackedTextures.forEach(texture => this._apply(texture, settings));
   }
 
+  getReport() {
+    const settings = this._project ? loadSettings(this._project) : null;
+    const sourceMemoryBytes = new Map();
+    let estimatedTextureMemoryBytes = 0;
+    let estimatedUniqueSourceMemoryBytes = 0;
+    let resizedTextureCount = 0;
+    this._trackedTextures.forEach(texture => {
+      const original = this._originalStates.get(texture);
+      const image = texture.image;
+      const width =
+        (image && (image.naturalWidth || image.videoWidth || image.width)) || 0;
+      const height =
+        (image && (image.naturalHeight || image.videoHeight || image.height)) ||
+        0;
+      const bytes = width * height * 4 * (texture.generateMipmaps ? 4 / 3 : 1);
+      estimatedTextureMemoryBytes += bytes;
+      const source = original ? original.image : image;
+      const previousBytes = sourceMemoryBytes.get(source) || 0;
+      if (bytes > previousBytes) sourceMemoryBytes.set(source, bytes);
+      if (original && texture.image !== original.image) resizedTextureCount++;
+    });
+    sourceMemoryBytes.forEach(bytes => {
+      estimatedUniqueSourceMemoryBytes += bytes;
+    });
+    return {
+      settings,
+      trackedTextureCount: this._trackedTextures.size,
+      resizedTextureCount,
+      uniqueSourceCount: sourceMemoryBytes.size,
+      estimatedTextureMemoryBytes,
+      estimatedUniqueSourceMemoryBytes,
+      maxAnisotropy: this._renderer
+        ? this._renderer.capabilities.getMaxAnisotropy()
+        : 0,
+      maxTextureSize: this._renderer
+        ? this._renderer.capabilities.maxTextureSize
+        : 0,
+      maxCubemapSize: this._renderer
+        ? this._renderer
+            .getContext()
+            .getParameter(this._renderer.getContext().MAX_CUBE_MAP_TEXTURE_SIZE)
+        : 0,
+    };
+  }
+
   _apply(texture: any, providedSettings?: any) {
     if (!this._project) return;
     const settings = providedSettings || loadSettings(this._project);
     const original = this._originalStates.get(texture);
     if (!original) return;
+    // Resource reloads or a model editor can replace a texture image while
+    // keeping the Texture object. Adopt that new external image as the source
+    // of truth, but never mistake our own private canvas for an external one.
+    if (
+      texture.image &&
+      texture.image !== original.image &&
+      !this._managedImages.has(texture.image)
+    ) {
+      original.image = texture.image;
+    }
     if (!settings.enabled) {
       this._restore(texture);
       return;
@@ -213,23 +284,37 @@ export default class EditorTextureQuality3DManager {
     const scale = limit / Math.max(width, height);
     const resizedWidth = Math.max(1, Math.round(width * scale));
     const resizedHeight = Math.max(1, Math.round(height * scale));
-    const oldImage = texture.image;
-    if (
-      oldImage &&
-      oldImage.__gdTextureQualitySource === image &&
-      oldImage.width === resizedWidth &&
-      oldImage.height === resizedHeight
-    )
-      return false;
+    const cacheKey =
+      resizedWidth +
+      'x' +
+      resizedHeight +
+      '|' +
+      (settings.resamplingQuality === 'low' ? 'low' : 'high');
+    let imagesBySettings = this._resizedImages.get(image);
+    if (!imagesBySettings) {
+      imagesBySettings = new Map();
+      this._resizedImages.set(image, imagesBySettings);
+    }
+    const cachedImage = imagesBySettings.get(cacheKey);
+    if (cachedImage) return this._set(texture, 'image', cachedImage);
     const canvas = document.createElement('canvas');
     canvas.width = resizedWidth;
     canvas.height = resizedHeight;
     const context = canvas.getContext('2d');
     if (!context) return false;
     context.imageSmoothingEnabled = settings.resamplingQuality !== 'low';
+    if (context.imageSmoothingQuality)
+      context.imageSmoothingQuality =
+        settings.resamplingQuality === 'low' ? 'low' : 'high';
     context.drawImage(image, 0, 0, resizedWidth, resizedHeight);
     // $FlowFixMe[prop-missing]
     canvas.__gdTextureQualitySource = image;
+    if (imagesBySettings.size >= MAX_RESIZED_IMAGES_PER_SOURCE) {
+      const oldestKey = imagesBySettings.keys().next().value;
+      if (oldestKey) imagesBySettings.delete(oldestKey);
+    }
+    imagesBySettings.set(cacheKey, canvas);
+    this._managedImages.add(canvas);
     return this._set(texture, 'image', canvas);
   }
 

@@ -388,6 +388,18 @@ export default class PixiResourcesLoader {
     editorTextureQuality3DManager.setRenderer(project, renderer);
   }
 
+  static refreshEditorTextureQualitySettings(project: gdProject) {
+    // Project-properties edits are applied outside the render loop. Refresh
+    // immediately when this is the active editor project; the renderer stays
+    // intact, so its capability limits remain available.
+    if (editorTextureQuality3DManager.isForProject(project))
+      editorTextureQuality3DManager.refresh();
+  }
+
+  static getEditorTextureQualityReport() {
+    return editorTextureQuality3DManager.getReport();
+  }
+
   /**
    * Forget and unload everything that was loaded (typically, when a project is closed).
    *
@@ -632,6 +644,7 @@ export default class PixiResourcesLoader {
     }
     if (loadedOrLoadingThreeTextures[resourceName]) {
       const threeTexture = await loadedOrLoadingThreeTextures[resourceName];
+      editorTextureQuality3DManager.untrack(threeTexture);
       threeTexture.dispose();
       delete loadedOrLoadingThreeTextures[resourceName];
     }

@@ -23,6 +23,7 @@ import {
   type GpuCapabilities,
 } from './settings';
 import { detectGpuCapabilities } from './gpuDetection';
+import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 
 type Props = {|
   project: gdProject,
@@ -80,6 +81,7 @@ const TextureQuality3DEditor = (props: Props) => {
       const newSettings = { ...settings, ...patch };
       newSettings.preset = findMatchingPreset(newSettings);
       saveSettings(project, newSettings);
+      PixiResourcesLoader.refreshEditorTextureQualitySettings(project);
       props.onSettingsUpdated();
       setSettings(newSettings);
     },
@@ -87,6 +89,7 @@ const TextureQuality3DEditor = (props: Props) => {
   );
 
   const warnings = getSettingsWarnings(settings, capabilities);
+  const editorReport = PixiResourcesLoader.getEditorTextureQualityReport();
   const isEnabled = settings.enabled;
 
   return (
@@ -368,6 +371,32 @@ const TextureQuality3DEditor = (props: Props) => {
               {warning}
             </AlertMessage>
           ))}
+          {editorReport.trackedTextureCount > 0 && (
+            <AlertMessage kind="info">
+              <Trans>Editor viewport textures</Trans>:{' '}
+              {editorReport.trackedTextureCount} (<Trans>resized</Trans>:{' '}
+              {editorReport.resizedTextureCount}, <Trans>unique sources</Trans>:{' '}
+              {editorReport.uniqueSourceCount}).{' '}
+              <Trans>Estimated texture memory</Trans>:{' '}
+              {(
+                editorReport.estimatedUniqueSourceMemoryBytes /
+                (1024 * 1024)
+              ).toFixed(1)}{' '}
+              MB.
+            </AlertMessage>
+          )}
+          {editorReport.trackedTextureCount > 0 &&
+            settings.memoryBudgetMb > 0 &&
+            editorReport.estimatedUniqueSourceMemoryBytes >
+              settings.memoryBudgetMb * 1024 * 1024 && (
+              <AlertMessage kind="warning">
+                <Trans>
+                  The estimated editor viewport texture memory is above the
+                  configured GPU memory budget. This is an estimate, not
+                  measured GPU VRAM.
+                </Trans>
+              </AlertMessage>
+            )}
         </ColumnStackLayout>
       )}
     </I18n>

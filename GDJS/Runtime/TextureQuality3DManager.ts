@@ -1840,6 +1840,62 @@ namespace gdjs {
       );
     };
 
+    /** Set a persistent runtime resolution override (0 means unlimited). */
+    export const setRuntimeMaxTextureResolutionOverride = (
+      runtimeScene: RuntimeScene,
+      maxResolution: float
+    ): void => {
+      getManager(runtimeScene).setRuntimeOverride(
+        'maxTextureResolution',
+        Math.max(0, Math.round(maxResolution))
+      );
+    };
+
+    /** Set a persistent runtime anisotropy override (0 means automatic). */
+    export const setRuntimeAnisotropyOverride = (
+      runtimeScene: RuntimeScene,
+      anisotropy: float
+    ): void => {
+      getManager(runtimeScene).setRuntimeOverride(
+        'anisotropy',
+        Math.min(16, Math.max(0, Math.round(anisotropy)))
+      );
+    };
+
+    /** Set a persistent runtime enabled-state override. */
+    export const setRuntimeEnabledOverride = (
+      runtimeScene: RuntimeScene,
+      enabled: boolean
+    ): void => {
+      getManager(runtimeScene).setRuntimeOverride('enabled', enabled);
+    };
+
+    /** Return one setting to the project value after a runtime override. */
+    export const removeRuntimeQualityOverride = (
+      runtimeScene: RuntimeScene,
+      settingName: string
+    ): void => {
+      getManager(runtimeScene).removeRuntimeOverride(settingName as SettingKey);
+    };
+
+    export const removeRuntimeMaxTextureResolutionOverride = (
+      runtimeScene: RuntimeScene
+    ): void => {
+      getManager(runtimeScene).removeRuntimeOverride('maxTextureResolution');
+    };
+
+    export const removeRuntimeAnisotropyOverride = (
+      runtimeScene: RuntimeScene
+    ): void => {
+      getManager(runtimeScene).removeRuntimeOverride('anisotropy');
+    };
+
+    export const removeRuntimeEnabledOverride = (
+      runtimeScene: RuntimeScene
+    ): void => {
+      getManager(runtimeScene).removeRuntimeOverride('enabled');
+    };
+
     /**
      * Remove one runtime override: its effective value returns to the
      * project setting.
@@ -1896,6 +1952,14 @@ namespace gdjs {
     ): float => {
       const capabilities = getManager(runtimeScene).getCapabilities();
       return capabilities ? capabilities.maxTextureSize : 0;
+    };
+
+    /** The maximum cube-map face size supported by the current GPU. */
+    export const getMaxSupportedCubemapSize = (
+      runtimeScene: RuntimeScene
+    ): float => {
+      const capabilities = getManager(runtimeScene).getCapabilities();
+      return capabilities ? capabilities.maxCubemapSize : 0;
     };
   }
 }

@@ -2295,6 +2295,127 @@ module.exports = {
         .setFunctionName('gdjs.textureQuality3d.setMaxTextureResolution');
 
       extension
+        .addAction(
+          'SetRuntimeTextureQualityResolutionOverride',
+          _('Override the maximum texture resolution at runtime'),
+          _(
+            'Override the project maximum texture resolution until the override is removed. Use 0 for unlimited.'
+          ),
+          _('Override the maximum texture resolution at runtime to _PARAM0_ pixels'),
+          _('Texture quality'),
+          'res/actions/antialiasing24.png',
+          'res/actions/antialiasing.png'
+        )
+        .addCodeOnlyParameter('currentScene', '')
+        .addParameter('expression', _('Resolution (0 for unlimited)'), '', false)
+        .setDefaultValue('0')
+        .getCodeExtraInformation()
+        .setIncludeFile(textureQualityIncludeFile)
+        .setFunctionName(
+          'gdjs.textureQuality3d.setRuntimeMaxTextureResolutionOverride'
+        );
+
+      extension
+        .addAction(
+          'SetRuntimeTextureQualityAnisotropyOverride',
+          _('Override anisotropic filtering at runtime'),
+          _(
+            'Override the project anisotropy until the override is removed. Use 0 for the GPU maximum.'
+          ),
+          _('Override anisotropic filtering at runtime to _PARAM0_'),
+          _('Texture quality'),
+          'res/actions/antialiasing24.png',
+          'res/actions/antialiasing.png'
+        )
+        .addCodeOnlyParameter('currentScene', '')
+        .addParameter('expression', _('Level (0 for automatic)'), '', false)
+        .setDefaultValue('0')
+        .getCodeExtraInformation()
+        .setIncludeFile(textureQualityIncludeFile)
+        .setFunctionName('gdjs.textureQuality3d.setRuntimeAnisotropyOverride');
+
+      extension
+        .addAction(
+          'SetRuntimeTextureQualityEnabledOverride',
+          _('Override texture quality enabled state at runtime'),
+          _('Override the project enabled state until the override is removed.'),
+          _('Override texture quality enabled state at runtime: _PARAM0_'),
+          _('Texture quality'),
+          'res/actions/antialiasing24.png',
+          'res/actions/antialiasing.png'
+        )
+        .addCodeOnlyParameter('currentScene', '')
+        .addParameter('yesorno', _('Enabled?'), '', false)
+        .setDefaultValue('true')
+        .getCodeExtraInformation()
+        .setIncludeFile(textureQualityIncludeFile)
+        .setFunctionName('gdjs.textureQuality3d.setRuntimeEnabledOverride');
+
+      extension
+        .addAction(
+          'ClearRuntimeTextureQualityResolutionOverride',
+          _('Clear the runtime maximum texture resolution override'),
+          _('Return the maximum texture resolution to the project setting.'),
+          _('Clear the runtime maximum texture resolution override'),
+          _('Texture quality'),
+          'res/actions/antialiasing24.png',
+          'res/actions/antialiasing.png'
+        )
+        .addCodeOnlyParameter('currentScene', '')
+        .getCodeExtraInformation()
+        .setIncludeFile(textureQualityIncludeFile)
+        .setFunctionName(
+          'gdjs.textureQuality3d.removeRuntimeMaxTextureResolutionOverride'
+        );
+
+      extension
+        .addAction(
+          'ClearRuntimeTextureQualityAnisotropyOverride',
+          _('Clear the runtime anisotropy override'),
+          _('Return anisotropic filtering to the project setting.'),
+          _('Clear the runtime anisotropy override'),
+          _('Texture quality'),
+          'res/actions/antialiasing24.png',
+          'res/actions/antialiasing.png'
+        )
+        .addCodeOnlyParameter('currentScene', '')
+        .getCodeExtraInformation()
+        .setIncludeFile(textureQualityIncludeFile)
+        .setFunctionName(
+          'gdjs.textureQuality3d.removeRuntimeAnisotropyOverride'
+        );
+
+      extension
+        .addAction(
+          'ClearRuntimeTextureQualityEnabledOverride',
+          _('Clear the runtime enabled-state override'),
+          _('Return the texture quality enabled state to the project setting.'),
+          _('Clear the runtime texture quality enabled-state override'),
+          _('Texture quality'),
+          'res/actions/antialiasing24.png',
+          'res/actions/antialiasing.png'
+        )
+        .addCodeOnlyParameter('currentScene', '')
+        .getCodeExtraInformation()
+        .setIncludeFile(textureQualityIncludeFile)
+        .setFunctionName('gdjs.textureQuality3d.removeRuntimeEnabledOverride');
+
+      extension
+        .addAction(
+          'ClearTextureQualityRuntimeOverrides',
+          _('Clear texture quality runtime overrides'),
+          _('Return all texture quality settings to the project values.'),
+          _('Clear all texture quality runtime overrides'),
+          _('Texture quality'),
+          'res/actions/antialiasing24.png',
+          'res/actions/antialiasing.png'
+        )
+        .addCodeOnlyParameter('currentScene', '')
+        .getCodeExtraInformation()
+        .setIncludeFile(textureQualityIncludeFile)
+        .setFunctionName('gdjs.textureQuality3d.clearRuntimeOverrides');
+
+      extension
         .addCondition(
           'IsTextureQualityEnabled',
           _('Texture quality system enabled'),
@@ -2364,6 +2485,20 @@ module.exports = {
         .addCodeOnlyParameter('currentScene', '')
         .setIncludeFile(textureQualityIncludeFile)
         .setFunctionName('gdjs.textureQuality3d.getMaxSupportedTextureSize');
+
+      extension
+        .addExpression(
+          'MaxSupportedCubemapSize',
+          _('Maximum cube-map texture size supported by the GPU'),
+          _(
+            'Return the maximum size (in pixels) supported for each face of a cube-map texture.'
+          ),
+          _('Texture quality'),
+          'res/actions/antialiasing.png'
+        )
+        .addCodeOnlyParameter('currentScene', '')
+        .setIncludeFile(textureQualityIncludeFile)
+        .setFunctionName('gdjs.textureQuality3d.getMaxSupportedCubemapSize');
     }
     {
       const effect = extension

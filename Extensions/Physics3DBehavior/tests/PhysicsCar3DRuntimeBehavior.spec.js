@@ -266,6 +266,30 @@ describe('gdjs.PhysicsCar3DRuntimeBehavior', () => {
     }
   };
 
+  it('turns the wheels at the steer speed with the keys', () => {
+    const runtimeScene = createScene();
+    addPlatform(runtimeScene);
+    const car = addCar(runtimeScene, { z: 120 });
+    stepSeconds(runtimeScene, 1);
+    const carBehavior = getPhysicsCar3D(car);
+
+    // The beginning steer speed is 140°/s.
+    carBehavior.simulateRightKey();
+    runtimeScene.renderAndStep(frameDuration);
+    expect(carBehavior.getSteerAngle()).to.be.within(2.3, 2.4);
+
+    for (let index = 0; index < 30; index++) {
+      carBehavior.simulateRightKey();
+      runtimeScene.renderAndStep(frameDuration);
+    }
+    expect(carBehavior.getSteerAngle()).to.be.within(20, 69);
+
+    // The wheels go through the center when changing direction.
+    carBehavior.simulateLeftKey();
+    runtimeScene.renderAndStep(frameDuration);
+    expect(carBehavior.getSteerAngle()).to.be.within(-2.4, -2.3);
+  });
+
   it('makes the steering stick position set the steer angle', () => {
     const runtimeScene = createScene();
     addPlatform(runtimeScene);

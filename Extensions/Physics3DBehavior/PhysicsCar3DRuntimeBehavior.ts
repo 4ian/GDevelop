@@ -584,26 +584,30 @@ namespace gdjs {
     ): void {
       const targetRatio = steeringControl * this._getSteerRatioLimit(carBody);
 
-      if (
-        targetRatio * this._currentSteerRatio <= 0 ||
-        Math.abs(this._currentSteerRatio) > Math.abs(targetRatio)
-      ) {
+      const isGoingBack =
+        this._currentSteerRatio !== 0 &&
+        Math.sign(this._currentSteerRatio) !== Math.sign(targetRatio);
+      if (isGoingBack) {
         // Go through the center first to avoid latency when changing direction.
-        const returnRatio =
-          targetRatio * this._currentSteerRatio < 0 ? 0 : targetRatio;
+        this._currentSteerRatio =
+          this._steerReturnSpeed > 0
+            ? this._moveSteerRatioToward(0, this._steerReturnSpeed, timeDelta)
+            : 0;
+        if (this._currentSteerRatio !== 0) {
+          return;
+        }
+      }
+      if (Math.abs(this._currentSteerRatio) > Math.abs(targetRatio)) {
+        // The steering is reduced by the stick or the cornering force limit.
         this._currentSteerRatio =
           this._steerReturnSpeed > 0
             ? this._moveSteerRatioToward(
-                returnRatio,
+                targetRatio,
                 this._steerReturnSpeed,
                 timeDelta
               )
-            : returnRatio;
-      }
-      if (
-        targetRatio * this._currentSteerRatio >= 0 &&
-        Math.abs(this._currentSteerRatio) < Math.abs(targetRatio)
-      ) {
+            : targetRatio;
+      } else {
         const steerSpeed = gdjs.evtTools.common.lerp(
           this._beginningSteerSpeed,
           this._endSteerSpeed,

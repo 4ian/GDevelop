@@ -2,13 +2,16 @@
 import * as THREE from 'three';
 import EditorTextureQuality3DManager from './EditorTextureQuality3DManager';
 
-const makeProject = values => ({
-  getExtensionProperties: () => ({
-    getValue: (_namespace, key) => values[key] || '',
-  }),
-});
+type StringValues = { [key: string]: string };
 
-const makeRenderer = maximum => ({
+const makeProject = (values: StringValues): gdProject =>
+  (({
+    getExtensionProperties: () => ({
+      getValue: (_namespace: string, key: string) => values[key] || '',
+    }),
+  }: any): gdProject);
+
+const makeRenderer = (maximum: number): any => ({
   capabilities: {
     maxTextureSize: 4096,
     getMaxAnisotropy: () => maximum,
@@ -28,7 +31,7 @@ describe('EditorTextureQuality3DManager', () => {
       createElement: jest.fn(() => {
         const context = {
           imageSmoothingEnabled: true,
-          drawImage: jest.fn(),
+          drawImage: jest.fn<Array<any>, void>(),
         };
         return {
           width: 0,

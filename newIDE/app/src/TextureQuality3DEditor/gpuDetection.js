@@ -1,6 +1,25 @@
 // @flow
 import { type GpuCapabilities } from './settings';
 
+// The vendored DOM lib (flow-libs/dom.js) only declares `WebGLRenderingContext`
+// (WebGL 1). Describe just the WebGL 2 API used below.
+type WebGL2Context = {
+  getSupportedExtensions(): Array<string> | null,
+  getExtension(name: string): any,
+  getShaderPrecisionFormat(
+    shaderType: number,
+    precisionType: number
+  ): { precision: number, ... } | null,
+  getParameter(pname: number): any,
+  +FRAGMENT_SHADER: number,
+  +HIGH_FLOAT: number,
+  +MAX_TEXTURE_SIZE: number,
+  +MAX_CUBE_MAP_TEXTURE_SIZE: number,
+  +MAX_3D_TEXTURE_SIZE: number,
+  +MAX_SAMPLES: number,
+  +RENDERER: number,
+};
+
 /**
  * Detect the capabilities of the GPU used by the editor, by creating a
  * temporary WebGL 2 context - the same way the game engine does it at
@@ -10,10 +29,10 @@ import { type GpuCapabilities } from './settings';
  * texture quality settings can be checked against what the GPU supports.
  */
 export const detectGpuCapabilities = (): ?GpuCapabilities => {
-  let gl: ?WebGL2RenderingContext = null;
+  let gl: ?WebGL2Context = null;
   try {
     const canvas = document.createElement('canvas');
-    gl = canvas.getContext('webgl2');
+    gl = (canvas.getContext('webgl2'): any);
     if (!gl) return null;
 
     const supportedExtensions = gl.getSupportedExtensions() || [];
@@ -23,7 +42,7 @@ export const detectGpuCapabilities = (): ?GpuCapabilities => {
     );
 
     const supportedCompressedFormats = [];
-    const compressedFormatLabels = {
+    const compressedFormatLabels: { [extensionName: string]: string } = {
       WEBGL_compressed_texture_s3tc: 'S3TC (DXT)',
       WEBGL_compressed_texture_s3tc_srgb: 'S3TC sRGB',
       WEBGL_compressed_texture_astc: 'ASTC',

@@ -1,6 +1,9 @@
 // @flow
 import * as THREE from 'three';
-import { loadSettings } from '../TextureQuality3DEditor/settings';
+import {
+  loadSettings,
+  type TextureQuality3DSettings,
+} from '../TextureQuality3DEditor/settings';
 
 type TextureOptions = {|
   respectSamplerSettings?: boolean,
@@ -20,6 +23,18 @@ type OriginalState = {|
 
 const MAX_RESIZED_IMAGES_PER_SOURCE = 4;
 
+export type EditorTextureQualityReport = {|
+  settings: TextureQuality3DSettings | null,
+  trackedTextureCount: number,
+  resizedTextureCount: number,
+  uniqueSourceCount: number,
+  estimatedTextureMemoryBytes: number,
+  estimatedUniqueSourceMemoryBytes: number,
+  maxAnisotropy: number,
+  maxTextureSize: number,
+  maxCubemapSize: number,
+|};
+
 /**
  * Editor-only counterpart of the runtime texture-quality manager.
  *
@@ -29,6 +44,7 @@ const MAX_RESIZED_IMAGES_PER_SOURCE = 4;
  * attached only to editor Three.js textures.
  */
 export default class EditorTextureQuality3DManager {
+  // $FlowFixMe[value-as-type] - `three` is an untyped module.
   _renderer: THREE.WebGLRenderer | null = null;
   _project: gdProject | null = null;
   _trackedTextures: Set<any> = new Set();
@@ -38,6 +54,7 @@ export default class EditorTextureQuality3DManager {
   _managedImages: WeakSet<any> = new WeakSet();
   _lastSettingsKey: string = '';
 
+  // $FlowFixMe[value-as-type] - `three` is an untyped module.
   setRenderer(project: gdProject, renderer: THREE.WebGLRenderer | null) {
     const changedProject = this._project !== project;
     const changedRenderer = this._renderer !== renderer;
@@ -99,9 +116,9 @@ export default class EditorTextureQuality3DManager {
     this._trackedTextures.forEach(texture => this._apply(texture, settings));
   }
 
-  getReport() {
+  getReport(): EditorTextureQualityReport {
     const settings = this._project ? loadSettings(this._project) : null;
-    const sourceMemoryBytes = new Map();
+    const sourceMemoryBytes: Map<any, number> = new Map();
     let estimatedTextureMemoryBytes = 0;
     let estimatedUniqueSourceMemoryBytes = 0;
     let resizedTextureCount = 0;
@@ -123,6 +140,9 @@ export default class EditorTextureQuality3DManager {
     sourceMemoryBytes.forEach(bytes => {
       estimatedUniqueSourceMemoryBytes += bytes;
     });
+    // Use a local copy of the field: refinements of `this._renderer` are lost
+    // after calling a method on it (which could have changed the field).
+    const renderer = this._renderer;
     return {
       settings,
       trackedTextureCount: this._trackedTextures.size,
@@ -130,16 +150,12 @@ export default class EditorTextureQuality3DManager {
       uniqueSourceCount: sourceMemoryBytes.size,
       estimatedTextureMemoryBytes,
       estimatedUniqueSourceMemoryBytes,
-      maxAnisotropy: this._renderer
-        ? this._renderer.capabilities.getMaxAnisotropy()
-        : 0,
-      maxTextureSize: this._renderer
-        ? this._renderer.capabilities.maxTextureSize
-        : 0,
-      maxCubemapSize: this._renderer
-        ? this._renderer
+      maxAnisotropy: renderer ? renderer.capabilities.getMaxAnisotropy() : 0,
+      maxTextureSize: renderer ? renderer.capabilities.maxTextureSize : 0,
+      maxCubemapSize: renderer
+        ? renderer
             .getContext()
-            .getParameter(this._renderer.getContext().MAX_CUBE_MAP_TEXTURE_SIZE)
+            .getParameter(renderer.getContext().MAX_CUBE_MAP_TEXTURE_SIZE)
         : 0,
     };
   }
@@ -322,7 +338,7 @@ export default class EditorTextureQuality3DManager {
     const original = this._originalStates.get(texture);
     if (!original) return;
     let changed = false;
-    [
+    const keys: Array<$Keys<OriginalState>> = [
       'image',
       'magFilter',
       'minFilter',
@@ -331,7 +347,8 @@ export default class EditorTextureQuality3DManager {
       'wrapT',
       'wrapR',
       'anisotropy',
-    ].forEach(key => {
+    ];
+    keys.forEach(key => {
       if (original[key] !== undefined)
         changed = this._set(texture, key, original[key]) || changed;
     });

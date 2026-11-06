@@ -63,7 +63,7 @@ const findMatchingPreset = (
   return 'custom';
 };
 
-const TextureQuality3DEditor = (props: Props) => {
+const TextureQuality3DEditor = (props: Props): React.Node => {
   const { project } = props;
   const [settings, setSettings] = React.useState<TextureQuality3DSettings>(() =>
     loadSettings(project)
@@ -77,7 +77,7 @@ const TextureQuality3DEditor = (props: Props) => {
   }, []);
 
   const updateSettings = React.useCallback(
-    (patch: $Shape<TextureQuality3DSettings>) => {
+    (patch: Partial<TextureQuality3DSettings>) => {
       const newSettings = { ...settings, ...patch };
       newSettings.preset = findMatchingPreset(newSettings);
       saveSettings(project, newSettings);

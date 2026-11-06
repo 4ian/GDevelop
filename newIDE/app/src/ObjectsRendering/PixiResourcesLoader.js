@@ -11,7 +11,9 @@ import { loadFontFace } from '../Utils/FontFaceLoader';
 import { checkIfCredentialsRequired } from '../Utils/CrossOrigin';
 import { dracoDecoderPath } from '../Utils/DracoDecoder';
 import { type ResourceKind } from '../ResourcesList/ResourceSource';
-import EditorTextureQuality3DManager from './EditorTextureQuality3DManager';
+import EditorTextureQuality3DManager, {
+  type EditorTextureQualityReport,
+} from './EditorTextureQuality3DManager';
 const gd: libGDevelop = global.gd;
 
 type SpineTextureAtlasOrLoadingError = {|
@@ -396,7 +398,7 @@ export default class PixiResourcesLoader {
       editorTextureQuality3DManager.refresh();
   }
 
-  static getEditorTextureQualityReport() {
+  static getEditorTextureQualityReport(): EditorTextureQualityReport {
     return editorTextureQuality3DManager.getReport();
   }
 

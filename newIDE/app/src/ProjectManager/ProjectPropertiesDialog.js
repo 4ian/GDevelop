@@ -20,6 +20,7 @@ import HelpButton from '../UI/HelpButton';
 import { ResponsiveLineStackLayout, ColumnStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
 import ExtensionsProperties from './ExtensionsProperties';
+import TextureQuality3DEditor from '../TextureQuality3DEditor';
 import { useSerializableObjectCancelableEditor } from '../Utils/SerializableObjectCancelableEditor';
 import RaisedButton from '../UI/RaisedButton';
 import Window from '../Utils/Window';
@@ -40,7 +41,11 @@ import PlatformSpecificAssets, {
 } from '../PlatformSpecificAssetsEditor/PlatformSpecificAssets';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
-type ProjectPropertiesTab = 'properties' | 'loading-screen' | 'icons';
+type ProjectPropertiesTab =
+  | 'properties'
+  | 'loading-screen'
+  | 'icons'
+  | 'texture-quality-3d';
 
 type Props = {|
   project: gdProject,
@@ -324,7 +329,7 @@ const ProjectPropertiesDialog = (props: Props) => {
   const defaultVersion = '1.0.0';
 
   const [currentTab, setCurrentTab] = React.useState<
-    'properties' | 'loading-screen' | 'icons'
+    'properties' | 'loading-screen' | 'icons' | 'texture-quality-3d'
   >(props.initialTab);
 
   const {
@@ -452,6 +457,10 @@ const ProjectPropertiesDialog = (props: Props) => {
                   {
                     label: <Trans>Icons</Trans>,
                     value: 'icons',
+                  },
+                  {
+                    label: <Trans>3D Texture Quality</Trans>,
+                    value: 'texture-quality-3d',
                   },
                 ]}
               />
@@ -951,6 +960,12 @@ const ProjectPropertiesDialog = (props: Props) => {
                 projectScopedContainersAccessor={
                   props.projectScopedContainersAccessor
                 }
+              />
+            )}
+            {currentTab === 'texture-quality-3d' && (
+              <TextureQuality3DEditor
+                project={project}
+                onSettingsUpdated={notifyOfChange}
               />
             )}
             {currentTab === 'icons' && (

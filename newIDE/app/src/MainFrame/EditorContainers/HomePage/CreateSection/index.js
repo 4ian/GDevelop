@@ -343,8 +343,7 @@ const CreateSection = ({
     options?: { skipConfirmation: boolean }
   ) => {
     if (storageProviderName !== 'Cloud') return;
-    const projectName = fileMetadata.name;
-    if (!projectName) return; // Only cloud projects can be deleted, and all cloud projects have names.
+    const projectName = fileMetadata.name || i18n._(t`Unknown game`);
 
     const isCurrentProjectOpened =
       !!project &&

@@ -402,7 +402,8 @@ export const generateOnSaveProjectAs = (
   if (!saveAsLocation)
     throw new Error('A location was not chosen before saving as.');
   const { name } = saveAsLocation;
-  if (!name) throw new Error('A name was not chosen before saving as.');
+  if (!name || !name.trim())
+    throw new Error('A name was not chosen before saving as.');
   if (!authenticatedUser.authenticated) {
     return { wasSaved: false, fileMetadata: null };
   }

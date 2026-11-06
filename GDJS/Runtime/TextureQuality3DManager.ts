@@ -778,17 +778,20 @@ namespace gdjs {
       const maxAnisotropy = this._capabilities
         ? this._capabilities.maxAnisotropy
         : 0;
-      if (maxAnisotropy <= 0) {
-        // Anisotropic filtering is not supported: keep it disabled.
-        texture.anisotropy = 1;
-        return;
+      let newAnisotropy = 1;
+      if (maxAnisotropy > 0) {
+        const wantedAnisotropy =
+          settings.anisotropy === 0 ? maxAnisotropy : settings.anisotropy;
+        newAnisotropy = Math.max(1, Math.min(wantedAnisotropy, maxAnisotropy));
       }
-      const wantedAnisotropy =
-        settings.anisotropy === 0 ? maxAnisotropy : settings.anisotropy;
-      texture.anisotropy = Math.max(
-        1,
-        Math.min(wantedAnisotropy, maxAnisotropy)
-      );
+      if (texture.anisotropy !== newAnisotropy) {
+        texture.anisotropy = newAnisotropy;
+        // Three.js only sends the sampler parameters (including the
+        // anisotropy) to the GPU when the texture is (re)uploaded - which is
+        // only triggered by `needsUpdate`. Set it only when the value really
+        // changed, to avoid useless (and costly) texture re-uploads.
+        texture.needsUpdate = true;
+      }
     }
 
     /**

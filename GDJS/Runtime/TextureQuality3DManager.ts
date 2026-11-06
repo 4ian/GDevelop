@@ -357,7 +357,7 @@ namespace gdjs {
 
   type TrackedTextureEntry = {
     texture: THREE.Texture;
-    sourceId: string;
+    source: TrackedSourceEntry;
     label: string;
     kind: TextureQuality3DTextureKind;
     keepNearestFilter: boolean;
@@ -371,24 +371,42 @@ namespace gdjs {
   };
 
   type TrackedSourceEntry = {
-    /** The (shared) source of the tracked textures. */
-    source: THREE.Source<unknown>;
-    /** The estimated GPU memory used by the (shared) source. */
+    /**
+     * The source as it existed before the manager managed any of its textures.
+     * It is never modified by the manager: external textures sharing it keep
+     * their own image data and GPU allocation.
+     */
+    originalSource: THREE.Source<unknown>;
+    /**
+     * The image data of the original source when it was first downscaled (an
+     * image, a canvas, or the 6 faces of a cube texture). Used as the baseline
+     * of every downscale, so that raising the maximum texture resolution (or
+     * disabling the system) restores the original image.
+     */
+    originalImage?: any;
+    /**
+     * A source created and owned by the manager, holding the downscaled image.
+     * The textures managed by the manager are switched to it instead of
+     * modifying the original source.
+     */
+    managedSource?: THREE.Source<unknown>;
+    /** The settings the managed source was computed for. */
+    managedKey?: string;
+    /** The estimated GPU memory used by the textures of this group. */
     memoryBytes: integer;
     /** The uuid of each tracked texture using this source. */
     textureIds: Set<string>;
-    /**
-     * The image data of the source before the manager downscaled it (an image,
-     * a canvas, or the 6 faces of a cube texture). Kept so that raising the
-     * maximum texture resolution, or disabling the system, can restore the
-     * original image instead of the already downscaled one.
-     */
-    originalImage?: any;
-    /** The image data currently downscaled by the manager, if any. */
-    resizedImage?: any;
-    /** The settings the cached `resizedImage` was computed for. */
-    resizedImageKey?: string;
   };
+
+  /**
+   * Associate a source created by the manager with the original source it was
+   * derived from. A WeakMap is used so that the sources can still be collected
+   * when nothing references them anymore.
+   */
+  const managedSourceOrigins = new WeakMap<
+    THREE.Source<unknown>,
+    THREE.Source<unknown>
+  >();
 
   /**
    * The manager handling the advanced texture quality of 3D textures:
@@ -414,17 +432,18 @@ namespace gdjs {
     // Tracking of the GPU memory used by the textures. A texture is registered
     // as soon as it is created (even when the system is disabled) so that the
     // diagnostics and the runtime actions always work. Textures sharing the
-    // same source (like the textures of cloned 3D models) are counted once.
+    // same original source (like the textures of cloned 3D models) are grouped
+    // and counted once.
     private _trackedTextures = new Map<string, TrackedTextureEntry>();
     private _trackedSources = new Map<string, TrackedSourceEntry>();
     private _totalMemoryBytes = 0;
     private _isMemoryBudgetWarningLogged = false;
 
-    // The sources whose textures are being disposed to force Three.js to
-    // reallocate their GPU texture when the image dimensions change. The
+    // The groups whose textures are being disposed to move them to another
+    // source (or to force Three.js to reallocate their GPU texture). The
     // "dispose" event listeners must keep these textures tracked during that
     // internal operation.
-    private _sourcesBeingReallocated = new Set<string>();
+    private _sourcesBeingReallocated = new Set<TrackedSourceEntry>();
 
     constructor(runtimeGame: gdjs.RuntimeGame) {
       this._settings =
@@ -852,7 +871,8 @@ namespace gdjs {
 
     /**
      * Put a texture back to the state it had before the manager modified it:
-     * restore the sampler settings and the original image of its source.
+     * restore the sampler settings and move its source group back to the
+     * original source.
      */
     private _restoreTexture(
       texture: THREE.Texture,
@@ -887,16 +907,10 @@ namespace gdjs {
         }
       }
 
-      const sourceEntry = this._trackedSources.get(entry.sourceId);
-      if (sourceEntry && sourceEntry.originalImage !== undefined) {
-        const originalImage = this._getOriginalImage(
-          sourceEntry,
-          texture.image
-        );
-        if (originalImage !== texture.image) {
-          this._installSourceImage(texture, entry, sourceEntry, originalImage);
-          changed = true;
-        }
+      const group = entry.source;
+      if (texture.source !== group.originalSource || group.managedSource) {
+        this._useOriginalSource(group);
+        changed = true;
       }
 
       if (changed) {
@@ -905,27 +919,23 @@ namespace gdjs {
     }
 
     /**
-     * Return the image data that a source had before the manager downscaled
-     * it. If the data was replaced by something else than the manager, it is
-     * adopted as the new original image so that it is not overwritten by an
-     * outdated snapshot.
+     * Return the image data that the original source had before the manager
+     * downscaled it. If the original source was replaced by something else,
+     * the new data is adopted as the baseline so that an outdated copy is not
+     * restored.
      */
-    private _getOriginalImage(
-      sourceEntry: TrackedSourceEntry,
-      currentImage: any
-    ): any {
+    private _getOriginalImage(group: TrackedSourceEntry): any {
+      const originalImage = group.originalSource.data;
       if (
-        sourceEntry.originalImage !== undefined &&
-        currentImage !== sourceEntry.originalImage &&
-        currentImage !== sourceEntry.resizedImage
+        group.originalImage === undefined ||
+        (originalImage !== group.originalImage &&
+          originalImage !== group.managedSource?.data)
       ) {
-        sourceEntry.originalImage = currentImage;
-        sourceEntry.resizedImage = undefined;
-        sourceEntry.resizedImageKey = undefined;
+        group.originalImage = originalImage;
+        group.managedSource = undefined;
+        group.managedKey = undefined;
       }
-      return sourceEntry.originalImage !== undefined
-        ? sourceEntry.originalImage
-        : currentImage;
+      return group.originalImage;
     }
 
     /**
@@ -934,16 +944,13 @@ namespace gdjs {
      * same settings. Return the original image if it is small enough.
      */
     private _getResizedImage(
-      sourceEntry: TrackedSourceEntry,
+      group: TrackedSourceEntry,
       originalImage: any,
       maxResolution: integer
     ): any {
       const cacheKey = maxResolution + '|' + this._settings.resamplingQuality;
-      if (
-        sourceEntry.resizedImageKey === cacheKey &&
-        sourceEntry.resizedImage !== undefined
-      ) {
-        return sourceEntry.resizedImage;
+      if (group.managedSource && group.managedKey === cacheKey) {
+        return group.managedSource.data;
       }
 
       const resizedImage = Array.isArray(originalImage)
@@ -958,22 +965,12 @@ namespace gdjs {
             (face: any, index: number) => face === originalImage[index]
           )
         : resizedImage === originalImage;
-      if (unchanged) {
-        // The image is small enough: forget any stale downscale.
-        sourceEntry.resizedImage = undefined;
-        sourceEntry.resizedImageKey = undefined;
-        return originalImage;
-      }
-
-      sourceEntry.resizedImage = resizedImage;
-      sourceEntry.resizedImageKey = cacheKey;
-      return resizedImage;
+      return unchanged ? originalImage : resizedImage;
     }
 
     /**
      * Return a key describing the dimensions of an image (or of the 6 faces of
-     * a cube texture), used to detect when the GPU texture must be allocated
-     * again.
+     * a cube texture), used to detect when a managed source can be reused.
      */
     private _getImageSizeKey(image: any): string {
       const faces: Array<any> = Array.isArray(image) ? image : [image];
@@ -989,62 +986,96 @@ namespace gdjs {
     }
 
     /**
-     * Dispose the GPU textures of all the tracked textures sharing a source,
-     * so that Three.js allocates them again with the new image dimensions.
-     * The textures are kept tracked and must be marked with `needsUpdate`.
+     * Mark every tracked texture of a group for a re-upload. Used when the
+     * manager-owned source is updated in place (same dimensions).
      */
-    private _reallocateTexturesOfSource(sourceId: string): void {
-      this._sourcesBeingReallocated.add(sourceId);
-      try {
-        for (const otherEntry of this._trackedTextures.values()) {
-          if (otherEntry.sourceId === sourceId) {
-            otherEntry.texture.dispose();
-          }
+    private _markGroupTexturesNeedsUpdate(group: TrackedSourceEntry): void {
+      for (const otherEntry of this._trackedTextures.values()) {
+        if (otherEntry.source === group) {
+          otherEntry.texture.needsUpdate = true;
         }
-      } finally {
-        this._sourcesBeingReallocated.delete(sourceId);
       }
     }
 
     /**
-     * Replace the image data of the source shared by the texture, and mark
-     * every tracked texture using this source for a re-upload (Three.js shares
-     * the image data between clones). Return true if the data changed.
+     * Move every tracked texture of a group to another source. The old GPU
+     * texture of each texture is disposed first, so that Three.js allocates a
+     * texture matching the new source. The textures are kept tracked during
+     * the operation.
      */
-    private _installSourceImage(
-      texture: THREE.Texture,
-      entry: TrackedTextureEntry,
-      sourceEntry: TrackedSourceEntry,
-      image: any
+    private _switchTexturesToSource(
+      group: TrackedSourceEntry,
+      targetSource: THREE.Source<unknown>
     ): boolean {
-      if (texture.image === image) {
-        if (image === sourceEntry.originalImage) {
-          sourceEntry.resizedImage = undefined;
-          sourceEntry.resizedImageKey = undefined;
+      this._sourcesBeingReallocated.add(group);
+      let changed = false;
+      try {
+        for (const otherEntry of this._trackedTextures.values()) {
+          if (otherEntry.source !== group) continue;
+          const texture = otherEntry.texture;
+          if (texture.source === targetSource) continue;
+          texture.dispose();
+          texture.source = targetSource;
+          texture.needsUpdate = true;
+          changed = true;
         }
-        return false;
+      } finally {
+        this._sourcesBeingReallocated.delete(group);
+      }
+      return changed;
+    }
+
+    /**
+     * Move a group back to its original source, and forget the manager-owned
+     * source (which can still be referenced by an external clone of a managed
+     * texture, so it must not be modified).
+     */
+    private _useOriginalSource(group: TrackedSourceEntry): boolean {
+      group.managedSource = undefined;
+      group.managedKey = undefined;
+      return this._switchTexturesToSource(group, group.originalSource);
+    }
+
+    /**
+     * Return the manager-owned source holding the downscaled image, creating it
+     * when needed. The original source is never modified.
+     *
+     * When the dimensions are unchanged (for example a resampling quality
+     * change), the existing owned source is reused and its data is replaced:
+     * this is a content-only update, which Three.js handles with
+     * `texSubImage2D` and therefore requires `needsUpdate` on every texture
+     * using it. When the dimensions change, a **new** source is created
+     * instead, so that an external clone of a managed texture still references
+     * a valid, unchanged source.
+     */
+    private _getManagedSource(
+      group: TrackedSourceEntry,
+      image: any,
+      maxResolution: integer
+    ): THREE.Source<unknown> {
+      const cacheKey = maxResolution + '|' + this._settings.resamplingQuality;
+      const managedSource = group.managedSource;
+      if (managedSource) {
+        if (managedSource.data === image) {
+          group.managedKey = cacheKey;
+          return managedSource;
+        }
+        if (
+          this._getImageSizeKey(managedSource.data) ===
+          this._getImageSizeKey(image)
+        ) {
+          managedSource.data = image;
+          group.managedKey = cacheKey;
+          this._markGroupTexturesNeedsUpdate(group);
+          return managedSource;
+        }
       }
 
-      // Three.js keeps the same GPU texture when only the image data changes,
-      // and updates it with `texSubImage2D`. A new size requires the texture to
-      // be allocated again, which is done by disposing the GPU textures first.
-      if (
-        this._getImageSizeKey(texture.image) !== this._getImageSizeKey(image)
-      ) {
-        this._reallocateTexturesOfSource(entry.sourceId);
-      }
-
-      texture.image = image;
-      if (image === sourceEntry.originalImage) {
-        sourceEntry.resizedImage = undefined;
-        sourceEntry.resizedImageKey = undefined;
-      }
-      for (const otherEntry of this._trackedTextures.values()) {
-        if (otherEntry.sourceId === entry.sourceId) {
-          otherEntry.texture.needsUpdate = true;
-        }
-      }
-      return true;
+      const newSource = new THREE.Source<unknown>(image);
+      group.managedSource = newSource;
+      group.managedKey = cacheKey;
+      managedSourceOrigins.set(newSource, group.originalSource);
+      return newSource;
     }
 
     /**
@@ -1057,40 +1088,31 @@ namespace gdjs {
       texture: THREE.Texture,
       entry: TrackedTextureEntry
     ): boolean {
-      const sourceEntry = this._getOrCreateTrackedSource(entry);
-      const currentImage: any = texture.image;
-      if (!currentImage) return false;
+      const group = entry.source;
+      const originalImage = this._getOriginalImage(group);
+      if (!originalImage) return false;
 
-      const originalImage = this._getOriginalImage(sourceEntry, currentImage);
       const maxResolution = this.getMaxTextureResolution();
       if (maxResolution <= 0) {
         // No limit: put the original image back if it was downscaled before.
-        return this._installSourceImage(
-          texture,
-          entry,
-          sourceEntry,
-          originalImage
-        );
+        return this._useOriginalSource(group);
       }
 
       const resizedImage = this._getResizedImage(
-        sourceEntry,
+        group,
         originalImage,
         maxResolution
       );
-      if (
-        resizedImage !== originalImage &&
-        sourceEntry.originalImage === undefined
-      ) {
-        // Keep a reference to the image before replacing it for the first time.
-        sourceEntry.originalImage = originalImage;
+      if (resizedImage === originalImage) {
+        return this._useOriginalSource(group);
       }
-      return this._installSourceImage(
-        texture,
-        entry,
-        sourceEntry,
-        resizedImage
+
+      const targetSource = this._getManagedSource(
+        group,
+        resizedImage,
+        maxResolution
       );
+      return this._switchTexturesToSource(group, targetSource);
     }
 
     /**
@@ -1142,17 +1164,19 @@ namespace gdjs {
       options: TextureQuality3DApplyOptions
     ): TrackedTextureEntry {
       const textureId = texture.uuid;
+      const group = this._getOrCreateSourceGroup(texture.source);
       let entry = this._trackedTextures.get(textureId);
       if (!entry) {
         entry = {
           texture,
-          sourceId: texture.source.uuid,
+          source: group,
           label: options.label || 'texture',
           kind: options.kind || 'image',
           keepNearestFilter: !!options.keepNearestFilter,
           respectSamplerSettings: !!options.respectSamplerSettings,
         };
         this._trackedTextures.set(textureId, entry);
+        group.textureIds.add(textureId);
         texture.addEventListener('dispose', () => {
           this._untrackTexture(textureId);
         });
@@ -1162,33 +1186,35 @@ namespace gdjs {
         entry.keepNearestFilter = !!options.keepNearestFilter;
         entry.respectSamplerSettings = !!options.respectSamplerSettings;
       }
-      this._getOrCreateTrackedSource(entry);
       return entry;
     }
 
     /**
-     * Return the record of the source shared by the textures of an entry,
-     * creating it if needed.
+     * Return the group of the original source behind a texture source. A source
+     * created by the manager (holding a downscaled image) is mapped back to the
+     * original source it was derived from, so that late clones of a managed
+     * texture still use the original image as their baseline.
      */
-    private _getOrCreateTrackedSource(
-      entry: TrackedTextureEntry
+    private _getOrCreateSourceGroup(
+      source: THREE.Source<unknown>
     ): TrackedSourceEntry {
-      let sourceEntry = this._trackedSources.get(entry.sourceId);
-      if (!sourceEntry) {
-        sourceEntry = {
-          source: entry.texture.source,
+      const originalSource = managedSourceOrigins.get(source) || source;
+      let group = this._trackedSources.get(originalSource.uuid);
+      if (!group) {
+        group = {
+          originalSource,
+          originalImage: originalSource.data,
           memoryBytes: 0,
           textureIds: new Set(),
         };
-        this._trackedSources.set(entry.sourceId, sourceEntry);
+        this._trackedSources.set(originalSource.uuid, group);
       }
-      sourceEntry.textureIds.add(entry.texture.uuid);
-      return sourceEntry;
+      return group;
     }
 
     /**
      * Refresh the GPU memory estimation of a tracked texture and of the source
-     * it shares with other textures, and warn if the memory budget is exceeded.
+     * group it belongs to, and warn if the memory budget is exceeded.
      */
     private _updateTrackedMemory(entry: TrackedTextureEntry): void {
       const texture = entry.texture;
@@ -1210,7 +1236,7 @@ namespace gdjs {
           (texture.generateMipmaps ? 4 / 3 : 1)
       );
 
-      const sourceEntry = this._getOrCreateTrackedSource(entry);
+      const sourceEntry = entry.source;
       if (sourceEntry.memoryBytes !== memoryBytes) {
         // The texture was resized or its mipmaps were changed.
         this._totalMemoryBytes += memoryBytes - sourceEntry.memoryBytes;
@@ -1236,33 +1262,25 @@ namespace gdjs {
 
     /**
      * Forget a texture that was disposed, and free its memory from the
-     * accounting (once no tracked texture shares its source anymore).
+     * accounting (once no tracked texture uses its original source anymore).
+     * The original source is never modified, so external consumers sharing it
+     * are unaffected.
      */
     private _untrackTexture(textureId: string): void {
       const entry = this._trackedTextures.get(textureId);
       if (!entry) return;
-      if (this._sourcesBeingReallocated.has(entry.sourceId)) {
-        // The texture is disposed to reallocate its GPU texture with a new
-        // image size: it must stay tracked.
+      if (this._sourcesBeingReallocated.has(entry.source)) {
+        // The texture is disposed to move it to another source: it must stay
+        // tracked.
         return;
       }
       this._trackedTextures.delete(textureId);
 
-      const sourceEntry = this._trackedSources.get(entry.sourceId);
-      if (!sourceEntry) return;
+      const sourceEntry = entry.source;
       sourceEntry.textureIds.delete(textureId);
       if (sourceEntry.textureIds.size > 0) return;
 
-      // No tracked texture uses this source anymore: put its original image
-      // back in case the source is still shared with a cache, then forget the
-      // retained images so that they can be collected.
-      if (
-        sourceEntry.originalImage !== undefined &&
-        sourceEntry.source.data !== sourceEntry.originalImage
-      ) {
-        sourceEntry.source.data = sourceEntry.originalImage;
-      }
-      this._trackedSources.delete(entry.sourceId);
+      this._trackedSources.delete(sourceEntry.originalSource.uuid);
       this._totalMemoryBytes -= sourceEntry.memoryBytes;
       if (this._totalMemoryBytes < 0) this._totalMemoryBytes = 0;
     }
@@ -1365,14 +1383,14 @@ namespace gdjs {
             width = Math.max(width, face.naturalWidth || face.width || 0);
             height = Math.max(height, face.naturalHeight || face.height || 0);
           }
-          const sourceEntry = this._trackedSources.get(entry.sourceId);
+          const sourceEntry = entry.source;
           textures.push({
             id: entry.texture.uuid,
             label: entry.label,
             kind: entry.kind,
             width,
             height,
-            memoryBytes: sourceEntry ? sourceEntry.memoryBytes : 0,
+            memoryBytes: sourceEntry.memoryBytes,
             mipmaps: entry.texture.generateMipmaps,
             anisotropy: entry.texture.anisotropy,
             minFilter: entry.texture.minFilter,
@@ -1405,11 +1423,21 @@ namespace gdjs {
     }
 
     /**
-     * To be called when the game is disposed: forget all the tracked textures.
-     * The textures themselves are disposed by the image manager and the 3D
-     * model manager.
+     * To be called when the game is disposed.
+     *
+     * Textures that are still alive are restored first (original source and
+     * sampler settings), so that dropping the tracking records never leaves
+     * them attached to a manager-owned downscaled source. The textures
+     * themselves are disposed by the image manager and the 3D model manager,
+     * which normally happens before this method.
      */
     dispose(): void {
+      // Snapshot the entries: restoring a group switches the source of every
+      // texture of the group, but does not change the tracked map.
+      const entries = Array.from(this._trackedTextures.values());
+      for (const entry of entries) {
+        this._restoreTexture(entry.texture, entry);
+      }
       this._trackedTextures.clear();
       this._trackedSources.clear();
       this._totalMemoryBytes = 0;

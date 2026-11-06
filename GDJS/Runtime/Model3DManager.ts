@@ -70,6 +70,13 @@ namespace gdjs {
       { entries: Set<SharedTextureEntry>; users: Set<string> }
     >();
     private _retainedTextures = new Set<THREE.Texture>();
+    // The source used by each retained texture when it was registered. The
+    // texture quality manager can switch a texture to a source it owns, so the
+    // cache cannot rely on `texture.source` when releasing it.
+    private _retainedTextureSources = new WeakMap<
+      THREE.Texture,
+      THREE.Source<unknown>
+    >();
 
     /**
      * Return the cached loading promise, or undefined if the key is absent.
@@ -137,9 +144,15 @@ namespace gdjs {
      */
     retain(texture: THREE.Texture, resourceName: string): void {
       this._retainedTextures.add(texture);
+      // Remember the source at retain time: the texture quality manager can
+      // later switch this texture to a source it owns, but the cache stays
+      // keyed by the source the model was loaded with.
+      const source =
+        this._retainedTextureSources.get(texture) || texture.source;
+      this._retainedTextureSources.set(texture, source);
       // UV transforms and channel overrides clone the Texture but keep its Source.
-      const source = this._sources.get(texture.source);
-      if (source) source.users.add(resourceName);
+      const sourceEntry = this._sources.get(source);
+      if (sourceEntry) sourceEntry.users.add(resourceName);
     }
 
     /**
@@ -150,14 +163,19 @@ namespace gdjs {
      */
     release(texture: THREE.Texture, resourceName: string): void {
       if (!this._retainedTextures.delete(texture)) return;
+      const source =
+        this._retainedTextureSources.get(texture) || texture.source;
+      this._retainedTextureSources.delete(texture);
       // Three.js reference-counts shared GPU allocations, so disposing this
       // texture leaves allocations used by other model textures intact.
       texture.dispose();
-      const source = this._sources.get(texture.source);
-      if (!source) return;
-      source.users.delete(resourceName);
-      if (source.users.size > 0) return;
-      source.entries.forEach((entry) => this._removeEntry(entry.key, entry));
+      const sourceEntry = this._sources.get(source);
+      if (!sourceEntry) return;
+      sourceEntry.users.delete(resourceName);
+      if (sourceEntry.users.size > 0) return;
+      sourceEntry.entries.forEach((entry) =>
+        this._removeEntry(entry.key, entry)
+      );
     }
 
     /** Dispose all retained textures and clear the cache when the game ends. */

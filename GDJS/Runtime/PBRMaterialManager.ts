@@ -529,16 +529,27 @@ namespace gdjs {
   export type PBRMaterialType = 'basic' | 'standard' | 'physical';
 
   /**
+   * The default index of refraction of a Three.js physical material. Setting
+   * it explicitly does not need the physical material (and so the heavier
+   * shader).
+   */
+  const defaultPhysicalMaterialIor = 1.5;
+
+  /**
    * `true` when the settings need the physical material (that is slower to
    * render but supports transmission, ior and clearcoat).
+   *
+   * Neutral values (0 for transmission and clearcoat, the default ior) do not
+   * need it: they would compile the heavy physical shader for nothing.
    */
   const settingsNeedPhysicalMaterial = (
     settings: PBRMaterialSettings | undefined
   ): boolean =>
     !!settings &&
-    (settings.transmission !== undefined ||
-      settings.ior !== undefined ||
-      settings.clearcoat !== undefined);
+    ((settings.transmission !== undefined && settings.transmission > 0) ||
+      (settings.clearcoat !== undefined && settings.clearcoat > 0) ||
+      (settings.ior !== undefined &&
+        settings.ior !== defaultPhysicalMaterialIor));
 
   const getThreeMaterialType = (material: THREE.Material): PBRMaterialType => {
     if ((material as THREE.MeshPhysicalMaterial).isMeshPhysicalMaterial) {
@@ -713,7 +724,29 @@ namespace gdjs {
         transparent: options.transparent === true,
       });
       this._uniqueMaterials.add(newMaterial);
-      copyCommonMaterialProperties(material, newMaterial);
+      const previousType = getThreeMaterialType(material);
+      if (
+        (targetType === 'standard' || targetType === 'physical') &&
+        (previousType === 'standard' || previousType === 'physical')
+      ) {
+        // Both materials are PBR materials: copy every PBR field (normal map,
+        // roughness, metalness, emissive, ...) so that they are not lost. A
+        // `MeshBasicMaterial` has none of these fields, so
+        // `copyCommonMaterialProperties` is still used for the other
+        // conversions.
+        copyStandardMaterialProperties(material, newMaterial, targetType);
+      } else {
+        copyCommonMaterialProperties(material, newMaterial);
+      }
+      // Textures are shared and owned by the image manager (they must not be
+      // disposed): keep tracking the new material for every resource the old
+      // one used, so that `onImageResourceUnloaded` still clears its slots
+      // (same loop as in `makeUniqueMaterialCopy`).
+      for (const entry of this._materialsByResource) {
+        if (entry[1].has(material)) {
+          entry[1].add(newMaterial);
+        }
+      }
       this._applySettings(newMaterial, settings);
       return newMaterial;
     }
@@ -1348,6 +1381,34 @@ namespace gdjs {
     if (fromStandard.map && toStandard.map !== undefined) {
       toStandard.map = fromStandard.map;
     }
+  };
+
+  /**
+   * Copy every PBR field (textures, factors, ...) of a standard/physical
+   * material into a new material of the other PBR type.
+   *
+   * `MeshPhysicalMaterial.prototype.copy` must not be called with a
+   * `MeshStandardMaterial` source: it would copy the physical fields
+   * (clearcoat, sheen, transmission, ...) as `undefined`. Calling
+   * `MeshStandardMaterial.prototype.copy` copies the fields shared by both
+   * types and leaves the physical fields to their defaults.
+   */
+  const copyStandardMaterialProperties = (
+    from: THREE.Material,
+    to: THREE.Material,
+    targetType: PBRMaterialType
+  ): void => {
+    THREE.MeshStandardMaterial.prototype.copy.call(
+      to as THREE.MeshStandardMaterial,
+      from as THREE.MeshStandardMaterial
+    );
+    // `MeshStandardMaterial.prototype.copy` resets the defines to the standard
+    // ones: restore the defines of the target type, otherwise a physical
+    // material would lose the `PHYSICAL` define (and its shader features).
+    (to as THREE.MeshStandardMaterial).defines =
+      targetType === 'physical'
+        ? { STANDARD: '', PHYSICAL: '' }
+        : { STANDARD: '' };
   };
 
   const clearTextureSlotsForResource = (

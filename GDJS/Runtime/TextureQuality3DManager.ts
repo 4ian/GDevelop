@@ -655,7 +655,7 @@ namespace gdjs {
       delete (this._runtimeOverrides as any)[key];
       this._isMemoryBudgetWarningLogged = false;
       this._recomputeEffectiveSettings();
-      this._reapplyToTrackedTextures();
+      this._reapplyToTrackedTextures(true);
       return true;
     }
 
@@ -669,7 +669,7 @@ namespace gdjs {
       this._runtimeOverrides = {};
       this._isMemoryBudgetWarningLogged = false;
       this._recomputeEffectiveSettings();
-      this._reapplyToTrackedTextures();
+      this._reapplyToTrackedTextures(true);
     }
 
     /**
@@ -719,7 +719,7 @@ namespace gdjs {
         gdjs.TextureQuality3DManager.loadSettingsFromProject(runtimeGame);
       this._isMemoryBudgetWarningLogged = false;
       this._recomputeEffectiveSettings();
-      this._reapplyToTrackedTextures();
+      this._reapplyToTrackedTextures(true);
     }
 
     /**
@@ -874,8 +874,15 @@ namespace gdjs {
       texture: THREE.Texture,
       options?: TextureQuality3DApplyOptions
     ): void {
+      this._applyToTexture(texture, options || {}, false);
+    }
+
+    private _applyToTexture(
+      texture: THREE.Texture,
+      applyOptions: TextureQuality3DApplyOptions,
+      isSynchronization: boolean
+    ): void {
       if (!texture) return;
-      const applyOptions: TextureQuality3DApplyOptions = options || {};
       const entry = this._getOrCreateTrackedTexture(texture, applyOptions);
 
       if (this._settings.enabled) {
@@ -887,7 +894,7 @@ namespace gdjs {
 
         // The resolution cap is useful even for 3D models with respected
         // samplers: it reduces the GPU memory usage.
-        this._fitTextureResolution(texture, entry);
+        this._fitTextureResolution(texture, entry, isSynchronization);
 
         const canChangeSampler =
           !applyOptions.respectSamplerSettings ||
@@ -899,7 +906,7 @@ namespace gdjs {
         // it overrides only wrapping modes, for every managed texture.
         this._applyWrappingSettings(texture, entry);
         this._applyAnisotropy(texture);
-      } else {
+      } else if (!isSynchronization) {
         // Disabling the system (or selecting `classic`) puts the texture back
         // to the state it had before the system modified it.
         this._restoreTexture(texture, entry);
@@ -911,15 +918,29 @@ namespace gdjs {
     /**
      * Apply the quality settings to a texture that was already tracked
      * (used when the settings change at runtime).
+     *
+     * `isSynchronization` is true when the effective settings merely return
+     * to the project settings (removed runtime overrides) or are refreshed
+     * from them (hot-reload of the project data). A synchronization only
+     * brings the tracked textures to the effective settings: it never
+     * restores content - a lifted resolution cap keeps the currently active
+     * resized image (an already downscaled image is never upscaled back, see
+     * `TQ-003`), and a disabled system is left untouched (restoring the
+     * textures is the separate `TQ-002` reaction, done by the explicit
+     * setting commands and by disposal).
      */
-    private _reapplyToTrackedTextures(): void {
+    private _reapplyToTrackedTextures(isSynchronization?: boolean): void {
       for (const entry of this._trackedTextures.values()) {
-        this.applyToTexture(entry.texture, {
-          label: entry.label,
-          kind: entry.kind,
-          keepNearestFilter: entry.keepNearestFilter,
-          respectSamplerSettings: entry.respectSamplerSettings,
-        });
+        this._applyToTexture(
+          entry.texture,
+          {
+            label: entry.label,
+            kind: entry.kind,
+            keepNearestFilter: entry.keepNearestFilter,
+            respectSamplerSettings: entry.respectSamplerSettings,
+          },
+          !!isSynchronization
+        );
       }
       for (const warning of this._collectWarnings()) {
         logger.warn(warning);
@@ -1366,7 +1387,8 @@ namespace gdjs {
      */
     private _fitTextureResolution(
       texture: THREE.Texture,
-      entry: TrackedTextureEntry
+      entry: TrackedTextureEntry,
+      isSynchronization: boolean
     ): boolean {
       const group = entry.source;
       const originalImage = this._getOriginalImage(group);
@@ -1375,7 +1397,10 @@ namespace gdjs {
       const maxResolution = this.getMaxTextureResolution(entry.kind);
       if (maxResolution <= 0) {
         // No limit: put the original image back if it was downscaled before.
-        return this._useOriginalSource(group);
+        // A synchronization keeps the currently active resized image instead
+        // (removing the resolution cap never upscales an already downscaled
+        // image, see `TQ-003`).
+        return isSynchronization ? false : this._useOriginalSource(group);
       }
 
       const resizedImage = this._getResizedImage(
@@ -1384,7 +1409,9 @@ namespace gdjs {
         maxResolution
       );
       if (resizedImage === originalImage) {
-        return this._useOriginalSource(group);
+        // The original image fits again: restore it, except when
+        // synchronizing (see above).
+        return isSynchronization ? false : this._useOriginalSource(group);
       }
 
       const targetSource = this._getManagedSource(

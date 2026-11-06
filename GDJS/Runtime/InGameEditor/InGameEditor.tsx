@@ -6784,11 +6784,20 @@ namespace gdjs {
           this._editorCamera.editor.captureLeftMouseButton();
         }
 
-        // Mouse wheel: movement on the plane or forward/backward movement.
+        // Mouse wheel: zoom and sroll.
         const wheelDeltaY = inputManager.getMouseWheelDelta();
+        const wheelDeltaX = inputManager.getMouseWheelDeltaX();
         if (wheelDeltaY !== 0 && shouldZoom(inputManager)) {
           this.zoomOnCursorBy(Math.pow(2, Math.sign(wheelDeltaY) / 8));
           this._editorCamera.onHasCameraChanged();
+        } else if (
+          wheelDeltaY !== 0 &&
+          shouldScrollHorizontally(inputManager)
+        ) {
+          this.cameraCenterX -= wheelDeltaY / this.cameraZoom;
+        } else if (wheelDeltaX !== 0 || wheelDeltaY !== 0) {
+          this.cameraCenterX -= wheelDeltaX / this.cameraZoom;
+          this.cameraCenterY -= wheelDeltaY / this.cameraZoom;
         }
 
         // Movement with keyboard: zoom in/out.

@@ -2201,6 +2201,306 @@ module.exports = {
       .setIncludeFile('Extensions/3D/Scene3DTools.js');
 
     {
+      // The advanced texture quality of 3D textures. The implementation is
+      // part of the engine itself (see `TextureQuality3DManager.js`) and the
+      // settings are saved in the project properties ("3D Texture Quality"
+      // tab).
+      const textureQualityIncludeFile = 'TextureQuality3DManager.js';
+
+      extension
+        .addAction(
+          'SetTextureQualityPreset',
+          _('Apply a texture quality preset'),
+          _(
+            'Apply a texture quality preset for 3D textures: "classic" (no changes), "performance", "balanced", "quality" or "ultra". Textures that are already loaded are updated too.'
+          ),
+          _('Apply the _PARAM0_ texture quality preset'),
+          _('Texture quality'),
+          'res/actions/antialiasing24.png',
+          'res/actions/antialiasing.png'
+        )
+        .addCodeOnlyParameter('currentScene', '')
+        .addParameter(
+          'stringWithSelector',
+          _('Preset'),
+          JSON.stringify([
+            'performance',
+            'balanced',
+            'quality',
+            'ultra',
+            'classic',
+          ]),
+          false
+        )
+        .setDefaultValue('"balanced"')
+        .getCodeExtraInformation()
+        .setIncludeFile(textureQualityIncludeFile)
+        .setFunctionName('gdjs.textureQuality3d.setPreset');
+
+      extension
+        .addAction(
+          'SetTextureQualityEnabled',
+          _('Enable the texture quality system'),
+          _(
+            'Enable or disable the advanced texture quality system. When disabled, 3D textures are left exactly like they are loaded.'
+          ),
+          _('Enable the advanced texture quality system: _PARAM0_'),
+          _('Texture quality'),
+          'res/actions/antialiasing24.png',
+          'res/actions/antialiasing.png'
+        )
+        .addCodeOnlyParameter('currentScene', '')
+        .addParameter('yesorno', _('Enabled?'), '', false)
+        .setDefaultValue('true')
+        .getCodeExtraInformation()
+        .setIncludeFile(textureQualityIncludeFile)
+        .setFunctionName('gdjs.textureQuality3d.setEnabled');
+
+      extension
+        .addAction(
+          'SetTextureAnisotropy',
+          _('Set the anisotropic filtering level'),
+          _(
+            'Set the level of anisotropic filtering of 3D textures (1 to 16, 0 for the maximum supported by the GPU). The value is clamped to what the GPU supports.'
+          ),
+          _('Set the anisotropic filtering level of 3D textures to _PARAM0_'),
+          _('Texture quality'),
+          'res/actions/antialiasing24.png',
+          'res/actions/antialiasing.png'
+        )
+        .addCodeOnlyParameter('currentScene', '')
+        .addParameter('expression', _('Level (0 for automatic)'), '', false)
+        .setDefaultValue('0')
+        .getCodeExtraInformation()
+        .setIncludeFile(textureQualityIncludeFile)
+        .setFunctionName('gdjs.textureQuality3d.setAnisotropy');
+
+      extension
+        .addAction(
+          'SetMaxTextureResolution',
+          _('Set the maximum texture resolution'),
+          _(
+            'Set the maximum resolution of 3D textures: bigger textures are downscaled before being uploaded to the GPU, which reduces the GPU memory usage (0 for no limit). Raising the resolution restores the original image of the textures that are already loaded.'
+          ),
+          _('Set the maximum resolution of 3D textures to _PARAM0_ pixels'),
+          _('Texture quality'),
+          'res/actions/antialiasing24.png',
+          'res/actions/antialiasing.png'
+        )
+        .addCodeOnlyParameter('currentScene', '')
+        .addParameter('expression', _('Resolution (0 for unlimited)'), '', false)
+        .setDefaultValue('0')
+        .getCodeExtraInformation()
+        .setIncludeFile(textureQualityIncludeFile)
+        .setFunctionName('gdjs.textureQuality3d.setMaxTextureResolution');
+
+      extension
+        .addAction(
+          'SetRuntimeTextureQualityResolutionOverride',
+          _('Override the maximum texture resolution at runtime'),
+          _(
+            'Override the project maximum texture resolution until the override is removed. Use 0 for unlimited.'
+          ),
+          _('Override the maximum texture resolution at runtime to _PARAM0_ pixels'),
+          _('Texture quality'),
+          'res/actions/antialiasing24.png',
+          'res/actions/antialiasing.png'
+        )
+        .addCodeOnlyParameter('currentScene', '')
+        .addParameter('expression', _('Resolution (0 for unlimited)'), '', false)
+        .setDefaultValue('0')
+        .getCodeExtraInformation()
+        .setIncludeFile(textureQualityIncludeFile)
+        .setFunctionName(
+          'gdjs.textureQuality3d.setRuntimeMaxTextureResolutionOverride'
+        );
+
+      extension
+        .addAction(
+          'SetRuntimeTextureQualityAnisotropyOverride',
+          _('Override anisotropic filtering at runtime'),
+          _(
+            'Override the project anisotropy until the override is removed. Use 0 for the GPU maximum.'
+          ),
+          _('Override anisotropic filtering at runtime to _PARAM0_'),
+          _('Texture quality'),
+          'res/actions/antialiasing24.png',
+          'res/actions/antialiasing.png'
+        )
+        .addCodeOnlyParameter('currentScene', '')
+        .addParameter('expression', _('Level (0 for automatic)'), '', false)
+        .setDefaultValue('0')
+        .getCodeExtraInformation()
+        .setIncludeFile(textureQualityIncludeFile)
+        .setFunctionName('gdjs.textureQuality3d.setRuntimeAnisotropyOverride');
+
+      extension
+        .addAction(
+          'SetRuntimeTextureQualityEnabledOverride',
+          _('Override texture quality enabled state at runtime'),
+          _('Override the project enabled state until the override is removed.'),
+          _('Override texture quality enabled state at runtime: _PARAM0_'),
+          _('Texture quality'),
+          'res/actions/antialiasing24.png',
+          'res/actions/antialiasing.png'
+        )
+        .addCodeOnlyParameter('currentScene', '')
+        .addParameter('yesorno', _('Enabled?'), '', false)
+        .setDefaultValue('true')
+        .getCodeExtraInformation()
+        .setIncludeFile(textureQualityIncludeFile)
+        .setFunctionName('gdjs.textureQuality3d.setRuntimeEnabledOverride');
+
+      extension
+        .addAction(
+          'ClearRuntimeTextureQualityResolutionOverride',
+          _('Clear the runtime maximum texture resolution override'),
+          _('Return the maximum texture resolution to the project setting.'),
+          _('Clear the runtime maximum texture resolution override'),
+          _('Texture quality'),
+          'res/actions/antialiasing24.png',
+          'res/actions/antialiasing.png'
+        )
+        .addCodeOnlyParameter('currentScene', '')
+        .getCodeExtraInformation()
+        .setIncludeFile(textureQualityIncludeFile)
+        .setFunctionName(
+          'gdjs.textureQuality3d.removeRuntimeMaxTextureResolutionOverride'
+        );
+
+      extension
+        .addAction(
+          'ClearRuntimeTextureQualityAnisotropyOverride',
+          _('Clear the runtime anisotropy override'),
+          _('Return anisotropic filtering to the project setting.'),
+          _('Clear the runtime anisotropy override'),
+          _('Texture quality'),
+          'res/actions/antialiasing24.png',
+          'res/actions/antialiasing.png'
+        )
+        .addCodeOnlyParameter('currentScene', '')
+        .getCodeExtraInformation()
+        .setIncludeFile(textureQualityIncludeFile)
+        .setFunctionName(
+          'gdjs.textureQuality3d.removeRuntimeAnisotropyOverride'
+        );
+
+      extension
+        .addAction(
+          'ClearRuntimeTextureQualityEnabledOverride',
+          _('Clear the runtime enabled-state override'),
+          _('Return the texture quality enabled state to the project setting.'),
+          _('Clear the runtime texture quality enabled-state override'),
+          _('Texture quality'),
+          'res/actions/antialiasing24.png',
+          'res/actions/antialiasing.png'
+        )
+        .addCodeOnlyParameter('currentScene', '')
+        .getCodeExtraInformation()
+        .setIncludeFile(textureQualityIncludeFile)
+        .setFunctionName('gdjs.textureQuality3d.removeRuntimeEnabledOverride');
+
+      extension
+        .addAction(
+          'ClearTextureQualityRuntimeOverrides',
+          _('Clear texture quality runtime overrides'),
+          _('Return all texture quality settings to the project values.'),
+          _('Clear all texture quality runtime overrides'),
+          _('Texture quality'),
+          'res/actions/antialiasing24.png',
+          'res/actions/antialiasing.png'
+        )
+        .addCodeOnlyParameter('currentScene', '')
+        .getCodeExtraInformation()
+        .setIncludeFile(textureQualityIncludeFile)
+        .setFunctionName('gdjs.textureQuality3d.clearRuntimeOverrides');
+
+      extension
+        .addCondition(
+          'IsTextureQualityEnabled',
+          _('Texture quality system enabled'),
+          _(
+            'Check if the advanced texture quality system is enabled for 3D textures.'
+          ),
+          _('The advanced texture quality system is enabled'),
+          _('Texture quality'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addCodeOnlyParameter('currentScene', '')
+        .getCodeExtraInformation()
+        .setIncludeFile(textureQualityIncludeFile)
+        .setFunctionName('gdjs.textureQuality3d.isEnabled');
+
+      extension
+        .addExpression(
+          'TextureMemoryUsedMB',
+          _('GPU memory used by 3D textures'),
+          _(
+            'Return the estimated GPU memory (in MB) used by the 3D textures currently loaded.'
+          ),
+          _('Texture quality'),
+          'res/actions/antialiasing.png'
+        )
+        .addCodeOnlyParameter('currentScene', '')
+        .setIncludeFile(textureQualityIncludeFile)
+        .setFunctionName('gdjs.textureQuality3d.getTextureMemoryMb');
+
+      extension
+        .addExpression(
+          'TrackedTextureCount',
+          _('Number of loaded 3D textures'),
+          _('Return the number of 3D textures currently loaded.'),
+          _('Texture quality'),
+          'res/actions/antialiasing.png'
+        )
+        .addCodeOnlyParameter('currentScene', '')
+        .setIncludeFile(textureQualityIncludeFile)
+        .setFunctionName('gdjs.textureQuality3d.getTrackedTextureCount');
+
+      extension
+        .addExpression(
+          'MaxSupportedAnisotropy',
+          _('Maximum anisotropy supported by the GPU'),
+          _(
+            'Return the maximum level of anisotropic filtering supported by the GPU (0 if not supported).' 
+          ),
+          _('Texture quality'),
+          'res/actions/antialiasing.png'
+        )
+        .addCodeOnlyParameter('currentScene', '')
+        .setIncludeFile(textureQualityIncludeFile)
+        .setFunctionName('gdjs.textureQuality3d.getMaxSupportedAnisotropy');
+
+      extension
+        .addExpression(
+          'MaxSupportedTextureSize',
+          _('Maximum texture size supported by the GPU'),
+          _(
+            'Return the maximum texture size (in pixels) supported by the GPU.'
+          ),
+          _('Texture quality'),
+          'res/actions/antialiasing.png'
+        )
+        .addCodeOnlyParameter('currentScene', '')
+        .setIncludeFile(textureQualityIncludeFile)
+        .setFunctionName('gdjs.textureQuality3d.getMaxSupportedTextureSize');
+
+      extension
+        .addExpression(
+          'MaxSupportedCubemapSize',
+          _('Maximum cube-map texture size supported by the GPU'),
+          _(
+            'Return the maximum size (in pixels) supported for each face of a cube-map texture.'
+          ),
+          _('Texture quality'),
+          'res/actions/antialiasing.png'
+        )
+        .addCodeOnlyParameter('currentScene', '')
+        .setIncludeFile(textureQualityIncludeFile)
+        .setFunctionName('gdjs.textureQuality3d.getMaxSupportedCubemapSize');
+    }
+    {
       const effect = extension
         .addEffect('LinearFog')
         .setFullName(_('Fog (linear)'))

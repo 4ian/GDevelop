@@ -1659,6 +1659,7 @@ export class InstructionMetadata extends AbstractFunctionMetadata {
   isRelevantForFunctionEvents(): boolean;
   isRelevantForAsynchronousFunctionEvents(): boolean;
   isRelevantForCustomObjectEvents(): boolean;
+  getRequiredBaseObjectCapability(): string;
   setCanHaveSubInstructions(): InstructionMetadata;
   setHelpPath(helpPath: string): InstructionMetadata;
   setHidden(): InstructionMetadata;
@@ -1792,6 +1793,7 @@ export class ParameterMetadata extends EmscriptenObject {
   setDescription(description_: string): ParameterMetadata;
   getLongDescription(): string;
   setLongDescription(longDescription_: string): ParameterMetadata;
+  getRequiredObjectCapability(): string;
   getHint(): string;
   setHint(hint_: string): ParameterMetadata;
   isCodeOnly(): boolean;

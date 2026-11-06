@@ -4,6 +4,10 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { mapFor } from '../../Utils/MapFor';
+import {
+  isParameterUsedByItsObject,
+  getSentencePartTexts,
+} from '../../InstructionOrExpression/ParameterRequiredObjectCapability';
 import classNames from 'classnames';
 import {
   selectedArea,
@@ -248,6 +252,19 @@ const Instruction = (props: Props): React.Node => {
       metadata
     );
     const parametersCount = metadata.getParametersCount();
+    // The parameters not used by the object (like the Z position of a 2D
+    // object) are hidden, with the texts only describing them.
+    const partTexts = getSentencePartTexts(
+      formattedTexts,
+      parametersCount,
+      parameterIndex =>
+        isParameterUsedByItsObject(
+          instruction,
+          metadata,
+          parameterIndex,
+          projectScopedContainers.getObjectsContainersList()
+        )
+    );
 
     return (
       <span
@@ -260,8 +277,9 @@ const Instruction = (props: Props): React.Node => {
         }
       >
         {mapFor(0, formattedTexts.size(), i => {
+          const value = partTexts[i];
+          if (value === null || value === undefined) return null;
           const formatting = formattedTexts.getTextFormatting(i);
-          const value = formattedTexts.getString(i);
           const parameterIndex = formatting.getUserData();
           const isParameter =
             parameterIndex >= 0 && parameterIndex < parametersCount;

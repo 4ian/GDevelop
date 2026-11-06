@@ -181,6 +181,28 @@ class GD_CORE_API ParameterMetadata {
   }
 
   /**
+   * \brief Get the capability (the type of a default behavior, like
+   * "Scene3D::Base3DBehavior") that the object of the instruction must have
+   * for this parameter to be used. Empty if the parameter is always used.
+   *
+   * The object is the last object parameter before this one.
+   */
+  const gd::String &GetRequiredObjectCapability() const {
+    return requiredObjectCapability;
+  }
+
+  /**
+   * \brief Set the capability that the object of the instruction must have for
+   * this parameter to be used (for instance, a Z position only used by 3D
+   * objects). The editor doesn't show the parameter for other objects.
+   */
+  ParameterMetadata &SetRequiredObjectCapability(
+      const gd::String &requiredObjectCapability_) {
+    requiredObjectCapability = requiredObjectCapability_;
+    return *this;
+  }
+
+  /**
    * \brief Get the hint attached to the parameter. Hints are short reminders
    * about how the parameter should be used (e.g. "object timers must be
    * started manually"). They can be surfaced by tooling, documentation or
@@ -265,6 +287,8 @@ class GD_CORE_API ParameterMetadata {
  private:
   gd::ValueTypeMetadata valueTypeMetadata; ///< Parameter type
   gd::String longDescription;  ///< Long description shown in the editor.
+  gd::String requiredObjectCapability;  ///< Capability that the object must
+                                        ///< have for the parameter to be used.
   gd::String hint;             ///< Reminder/hint about the parameter's usage,
                                ///< usable by tooling, docs and AI agents.
   gd::String name;             ///< The name of the parameter to be used in code

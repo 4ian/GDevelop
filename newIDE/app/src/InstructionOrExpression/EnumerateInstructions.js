@@ -455,6 +455,23 @@ const orderFirstInstructionsWithoutGroup = (
   return [...noGroupInstructions, ...instructionsWithGroups];
 };
 
+// For 3D objects, the rotations are only handled with the X, Y and Z rotations
+// and turns of the 3D capability, so that the 2D ones (angle, rotate at a speed
+// or toward something, around the Z axis only) are not mixed with them. They
+// still work in existing events.
+const baseObjectInstructionsReplacedByCapabilities: {
+  [capabilityType: string]: Array<string>,
+} = {
+  'Scene3D::Base3DBehavior': [
+    'SetAngle',
+    'Angle',
+    'Rotate',
+    'RotateTowardAngle',
+    'RotateTowardPosition',
+    'RotateTowardObject',
+  ],
+};
+
 /**
  * List all the instructions that can be used for the given object,
  * in the given context. This includes instructions for the behaviors
@@ -649,6 +666,28 @@ export const enumerateObjectAndBehaviorsInstructions = (
       instruction => instruction.type !== 'CreateByName'
     );
   }
+
+  // Base object instructions requiring a capability (like the 3D ones)
+  // only make sense for objects having it.
+  allInstructions = allInstructions.filter(instruction => {
+    const requiredCapability = instruction.metadata.getRequiredBaseObjectCapability();
+    return !requiredCapability || objectBehaviorTypes.has(requiredCapability);
+  });
+
+  // Base object instructions replaced by the ones of a capability, for objects
+  // having it.
+  const replacedInstructionTypes = new Set();
+  Object.keys(baseObjectInstructionsReplacedByCapabilities).forEach(
+    capabilityType => {
+      if (!objectBehaviorTypes.has(capabilityType)) return;
+      baseObjectInstructionsReplacedByCapabilities[capabilityType].forEach(
+        instructionType => replacedInstructionTypes.add(instructionType)
+      );
+    }
+  );
+  allInstructions = allInstructions.filter(
+    instruction => !replacedInstructionTypes.has(instruction.type)
+  );
 
   return orderFirstInstructionsWithoutGroup(allInstructions);
 };

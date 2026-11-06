@@ -504,6 +504,15 @@ namespace gdjs {
     return locationAwareKeyCode % 1000;
   };
 
+  const checkHasTouchScreen = (): boolean => {
+    // First check if the device is mobile, as all mobile devices have a touchscreen
+    // and some older browsers don't have support for `navigator.maxTouchPoints`
+    if (gdjs.evtTools.common.isMobile()) {
+      return true;
+    }
+    return !!navigator.maxTouchPoints && navigator.maxTouchPoints > 2;
+  };
+
   // See same factors in `newIDE/app/src/Utils/ZoomUtils.js`.
   const zoomInFactor = Math.pow(2, (2 * 1) / 16);
   const zoomOutFactor = Math.pow(2, (-2 * 1) / 16);
@@ -1529,8 +1538,6 @@ namespace gdjs {
         // prevent the user from modifying them manually in the inline fields.
         selectedInstance.setX(Math.round(newX));
         selectedInstance.setY(Math.round(newY));
-
-        // TODO Fix the resizing of text objects.
 
         // Also round the size.
         selectedInstance.setWidth(Math.round(newWidth));
@@ -6137,8 +6144,6 @@ namespace gdjs {
     }
   }
 
-  // TODO Implement a zoom-in/out at cursor for 2D editor.
-
   interface CameraControl {
     step(): void;
     updateCamera(currentScene: RuntimeScene, layer: RuntimeLayer): void;
@@ -8202,12 +8207,18 @@ namespace gdjs {
     }
   }
 
-  // TODO Handle mobile syle.
-  const selectionStyle = {
+  const selectionStyleForMouse = {
     bigButtonSize: 10,
     smallButtonSize: 8,
     buttonPadding: 5,
     hitAreaPadding: 5,
+  };
+
+  const selectionStyleForTouch = {
+    bigButtonSize: 14,
+    smallButtonSize: 12,
+    buttonPadding: 5,
+    hitAreaPadding: 12,
   };
 
   enum ButtonLocation {
@@ -8285,6 +8296,10 @@ namespace gdjs {
       threeCamera: THREE.PerspectiveCamera | THREE.OrthographicCamera,
       canvasHeight: float
     ) {
+      const selectionStyle = checkHasTouchScreen()
+        ? selectionStyleForTouch
+        : selectionStyleForMouse;
+
       let minX = aabb.min[0];
       let minY = aabb.min[1];
       let maxX = aabb.max[0];

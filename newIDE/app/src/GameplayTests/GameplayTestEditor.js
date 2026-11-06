@@ -139,9 +139,7 @@ const GameplayTestEditor: React.ComponentType<{
               // The test script is run inside an async function (see
               // `gdjs.gameplayTests.runGameplayTest`), so top-level `await`
               // is allowed in it.
-              suppressedDiagnosticsMessages={[
-                'only allowed within an async function',
-              ]}
+              allowTopLevelAwait
             />
           )}
         </FullSizeMeasurer>

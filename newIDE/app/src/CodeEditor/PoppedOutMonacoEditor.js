@@ -2,12 +2,8 @@
 import * as React from 'react';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import {
-  registerThemes,
-  initializeCompletions,
-  enableJsTypeDiagnostics,
-  applyElectronClipboardPatch,
-  suppressDiagnosticsMessagesForModel,
-  unsuppressDiagnosticsMessagesForModel,
+  initializeMonaco,
+  allowTopLevelAwaitForModel,
   baseEditorOptions,
 } from './MonacoSetup';
 
@@ -30,8 +26,7 @@ type Props = {|
   onEditorMounted?: () => void,
   onFocus: () => void,
   onBlur: () => void,
-  /** See `CodeEditor`. */
-  suppressedDiagnosticsMessages?: Array<string>,
+  allowTopLevelAwait?: boolean,
 |};
 
 type State = {|
@@ -95,7 +90,8 @@ const loadMonacoInWindow = (targetWindow: any, doc: Document): Promise<any> => {
       if (savedGlobals.process) targetWindow.process = savedGlobals.process;
 
       amdRequire.config({
-        paths: { vs: 'external/monaco-editor-min/vs' },
+        // The language worker has a blob URL and cannot resolve relative imports.
+        baseUrl: new URL('../', script.src).href,
       });
 
       amdRequire(['vs/editor/editor.main'], monaco => {
@@ -190,12 +186,6 @@ class PoppedOutMonacoEditor extends React.Component<Props, State> {
           cursorLine: cursorPosition.lineNumber,
         });
       }
-      if (this._monaco) {
-        unsuppressDiagnosticsMessagesForModel(
-          this._monaco,
-          this._editor.getModel()
-        );
-      }
       this._editor.dispose();
       this._editor = null;
     }
@@ -223,12 +213,7 @@ class PoppedOutMonacoEditor extends React.Component<Props, State> {
   _createEditor = (monaco: any, container: HTMLDivElement) => {
     this._monaco = monaco;
 
-    registerThemes(monaco);
-    initializeCompletions(monaco);
-
-    if (this.props.showJsTypeError) {
-      enableJsTypeDiagnostics(monaco);
-    }
+    initializeMonaco(monaco, this.props.showJsTypeError);
 
     this._editor = monaco.editor.create(container, {
       ...baseEditorOptions,
@@ -238,15 +223,8 @@ class PoppedOutMonacoEditor extends React.Component<Props, State> {
       fontSize: this.props.fontSize,
     });
 
-    applyElectronClipboardPatch(this._editor, monaco);
-
-    const { suppressedDiagnosticsMessages } = this.props;
-    if (suppressedDiagnosticsMessages) {
-      suppressDiagnosticsMessagesForModel(
-        monaco,
-        this._editor.getModel(),
-        suppressedDiagnosticsMessages
-      );
+    if (this.props.allowTopLevelAwait) {
+      allowTopLevelAwaitForModel(this._editor.getModel());
     }
 
     this._editor.onDidChangeModelContent(() => {

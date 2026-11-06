@@ -2219,6 +2219,7 @@ module.exports = {
           'res/actions/antialiasing24.png',
           'res/actions/antialiasing.png'
         )
+        .addCodeOnlyParameter('currentScene', '')
         .addParameter(
           'stringWithSelector',
           _('Preset'),
@@ -2248,6 +2249,7 @@ module.exports = {
           'res/actions/antialiasing24.png',
           'res/actions/antialiasing.png'
         )
+        .addCodeOnlyParameter('currentScene', '')
         .addParameter('yesorno', _('Enabled?'), '', false)
         .setDefaultValue('true')
         .getCodeExtraInformation()
@@ -2266,6 +2268,7 @@ module.exports = {
           'res/actions/antialiasing24.png',
           'res/actions/antialiasing.png'
         )
+        .addCodeOnlyParameter('currentScene', '')
         .addParameter('expression', _('Level (0 for automatic)'), '', false)
         .setDefaultValue('0')
         .getCodeExtraInformation()
@@ -2277,13 +2280,14 @@ module.exports = {
           'SetMaxTextureResolution',
           _('Set the maximum texture resolution'),
           _(
-            'Set the maximum resolution of 3D textures: bigger textures are downscaled before being uploaded to the GPU, which reduces the GPU memory usage (0 for no limit).' 
+            'Set the maximum resolution of 3D textures: bigger textures are downscaled before being uploaded to the GPU, which reduces the GPU memory usage (0 for no limit). Raising the resolution restores the original image of the textures that are already loaded.'
           ),
           _('Set the maximum resolution of 3D textures to _PARAM0_ pixels'),
           _('Texture quality'),
           'res/actions/antialiasing24.png',
           'res/actions/antialiasing.png'
         )
+        .addCodeOnlyParameter('currentScene', '')
         .addParameter('expression', _('Resolution (0 for unlimited)'), '', false)
         .setDefaultValue('0')
         .getCodeExtraInformation()
@@ -2302,6 +2306,7 @@ module.exports = {
           'res/conditions/3d_box.svg',
           'res/conditions/3d_box.svg'
         )
+        .addCodeOnlyParameter('currentScene', '')
         .getCodeExtraInformation()
         .setIncludeFile(textureQualityIncludeFile)
         .setFunctionName('gdjs.textureQuality3d.isEnabled');
@@ -2316,6 +2321,7 @@ module.exports = {
           _('Texture quality'),
           'res/actions/antialiasing.png'
         )
+        .addCodeOnlyParameter('currentScene', '')
         .setIncludeFile(textureQualityIncludeFile)
         .setFunctionName('gdjs.textureQuality3d.getTextureMemoryMb');
 
@@ -2327,6 +2333,7 @@ module.exports = {
           _('Texture quality'),
           'res/actions/antialiasing.png'
         )
+        .addCodeOnlyParameter('currentScene', '')
         .setIncludeFile(textureQualityIncludeFile)
         .setFunctionName('gdjs.textureQuality3d.getTrackedTextureCount');
 
@@ -2340,6 +2347,7 @@ module.exports = {
           _('Texture quality'),
           'res/actions/antialiasing.png'
         )
+        .addCodeOnlyParameter('currentScene', '')
         .setIncludeFile(textureQualityIncludeFile)
         .setFunctionName('gdjs.textureQuality3d.getMaxSupportedAnisotropy');
 
@@ -2353,6 +2361,7 @@ module.exports = {
           _('Texture quality'),
           'res/actions/antialiasing.png'
         )
+        .addCodeOnlyParameter('currentScene', '')
         .setIncludeFile(textureQualityIncludeFile)
         .setFunctionName('gdjs.textureQuality3d.getMaxSupportedTextureSize');
     }

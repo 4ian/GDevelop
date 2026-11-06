@@ -380,23 +380,95 @@ namespace gdjs {
     filter === THREE.LinearMipmapNearestFilter ||
     filter === THREE.LinearMipmapLinearFilter;
 
+  // `wrapR` only exists on some Three.js texture classes (3D/array textures).
+  type TextureWithWrapR = THREE.Texture & { wrapR?: THREE.Wrapping };
+
+  const getTextureWrapR = (
+    texture: THREE.Texture
+  ): THREE.Wrapping | undefined => {
+    const wrapR = (texture as TextureWithWrapR).wrapR;
+    return typeof wrapR === 'number' ? wrapR : undefined;
+  };
+
+  const setTextureWrapR = (
+    texture: THREE.Texture,
+    wrapR: THREE.Wrapping
+  ): void => {
+    (texture as TextureWithWrapR).wrapR = wrapR;
+  };
+
+  type TextureSamplerState = {
+    magFilter: THREE.MagnificationTextureFilter;
+    minFilter: THREE.MinificationTextureFilter;
+    generateMipmaps: boolean;
+    wrapS: THREE.Wrapping;
+    wrapT: THREE.Wrapping;
+    /** Only present on texture classes supporting `wrapR`. */
+    wrapR?: THREE.Wrapping;
+    anisotropy: float;
+  };
+
   type TrackedTextureEntry = {
     texture: THREE.Texture;
-    sourceId: string;
+    source: TrackedSourceEntry;
     label: string;
     kind: TextureQuality3DTextureKind;
     keepNearestFilter: boolean;
     respectSamplerSettings: boolean;
+    /**
+     * The sampler settings that existed before the manager modified the texture
+     * for the first time. They are kept so that disabling the system restores
+     * the texture exactly like it was loaded.
+     */
+    originalSampler?: TextureSamplerState;
+    /**
+     * `true` if `forceClampWrapping` clamped the wrapping of this texture. Used
+     * to restore the original wrapping when the setting is turned off, without
+     * overwriting wrapping changes made by other code while the setting was
+     * disabled.
+     */
+    wrappedByManager?: boolean;
     /** The per-texture memory estimate (see `TextureQuality3DTextureEntry`). */
     memoryBytes: integer;
   };
 
   type TrackedSourceEntry = {
-    /** The estimated GPU memory used by the (shared) source. */
+    /**
+     * The source as it existed before the manager managed any of its textures.
+     * It is never modified by the manager: external textures sharing it keep
+     * their own image data and GPU allocation.
+     */
+    originalSource: THREE.Source<unknown>;
+    /**
+     * The image data of the original source when it was first downscaled (an
+     * image, a canvas, or the 6 faces of a cube texture). Used as the baseline
+     * of every downscale, so that raising the maximum texture resolution (or
+     * disabling the system) restores the original image.
+     */
+    originalImage?: any;
+    /**
+     * A source created and owned by the manager, holding the downscaled image.
+     * The textures managed by the manager are switched to it instead of
+     * modifying the original source.
+     */
+    managedSource?: THREE.Source<unknown>;
+    /** The settings the managed source was computed for. */
+    managedKey?: string;
+    /** The estimated GPU memory used by the textures of this group. */
     memoryBytes: integer;
     /** The uuid of each tracked texture using this source. */
     textureIds: Set<string>;
   };
+
+  /**
+   * Associate a source created by the manager with the original source it was
+   * derived from. A WeakMap is used so that the sources can still be collected
+   * when nothing references them anymore.
+   */
+  const managedSourceOrigins = new WeakMap<
+    THREE.Source<unknown>,
+    THREE.Source<unknown>
+  >();
 
   /**
    * The manager handling the advanced texture quality of 3D textures:
@@ -442,16 +514,19 @@ namespace gdjs {
     // Tracking of the GPU memory used by the textures. A texture is registered
     // as soon as it is created (even when the system is disabled) so that the
     // diagnostics and the runtime actions always work. Textures sharing the
-    // same source (like the textures of cloned 3D models) are counted once.
+    // same original source (like the textures of cloned 3D models) are grouped
+    // and counted once.
     private _trackedTextures = new Map<string, TrackedTextureEntry>();
     private _trackedSources = new Map<string, TrackedSourceEntry>();
     private _totalMemoryBytes = 0;
     private _isMemoryBudgetWarningLogged = false;
     private _isDisposed = false;
 
-    // Cache of the images that were already downscaled, to avoid doing the
-    // work twice when a source is shared between several textures.
-    private _resizedImages = new WeakMap<object, any>();
+    // The groups whose textures are being disposed to move them to another
+    // source (or to force Three.js to reallocate their GPU texture). The
+    // "dispose" event listeners must keep these textures tracked during that
+    // internal operation.
+    private _sourcesBeingReallocated = new Set<TrackedSourceEntry>();
 
     constructor(runtimeGame: gdjs.RuntimeGame) {
       this._projectSettings =
@@ -788,6 +863,10 @@ namespace gdjs {
      * Apply the quality settings to a texture, resizing it if it is too big
      * for the settings or for the GPU, and track the GPU memory it uses.
      *
+     * When the system is disabled, the texture is restored to the sampler
+     * settings and image it had before the system modified it for the first
+     * time.
+     *
      * This is called by the image manager and the 3D model manager when a
      * texture is created.
      */
@@ -797,10 +876,18 @@ namespace gdjs {
     ): void {
       if (!texture) return;
       const applyOptions: TextureQuality3DApplyOptions = options || {};
+      const entry = this._getOrCreateTrackedTexture(texture, applyOptions);
 
       if (this._settings.enabled) {
+        // Record the sampler settings before modifying them for the first
+        // time, so that they can be restored when the system is disabled.
+        if (!entry.originalSampler) {
+          entry.originalSampler = this._captureSamplerState(texture);
+        }
+
         // The resolution cap is useful even for 3D models with respected
         // samplers: it reduces the GPU memory usage.
+        this._fitTextureResolution(texture, entry);
         this._fitTextureResolution(texture, applyOptions.kind);
 
         const canChangeSampler =
@@ -809,10 +896,17 @@ namespace gdjs {
         if (canChangeSampler) {
           this._applySamplerSettings(texture, !!applyOptions.keepNearestFilter);
         }
+        // `forceClampWrapping` is independent from the model sampler handling:
+        // it overrides only wrapping modes, for every managed texture.
+        this._applyWrappingSettings(texture, entry);
         this._applyAnisotropy(texture);
+      } else {
+        // Disabling the system (or selecting `classic`) puts the texture back
+        // to the state it had before the system modified it.
+        this._restoreTexture(texture, entry);
       }
 
-      this._trackTexture(texture, applyOptions);
+      this._updateTrackedMemory(entry);
     }
 
     /**
@@ -834,7 +928,8 @@ namespace gdjs {
     }
 
     /**
-     * Apply the filtering, mipmap and wrapping settings to a texture.
+     * Apply the filtering and mipmap settings to a texture. The wrapping
+     * settings are handled separately by `_applyWrappingSettings`.
      */
     private _applySamplerSettings(
       texture: THREE.Texture,
@@ -936,7 +1031,36 @@ namespace gdjs {
         }
       }
 
-      if (settings.forceClampWrapping) {
+      if (changed) {
+        texture.needsUpdate = true;
+      }
+    }
+
+    /**
+     * Apply the wrapping modes of the settings.
+     *
+     * `forceClampWrapping` deliberately takes precedence over the wrapping
+     * modes imported with a texture, including the samplers of glTF textures:
+     * it clamps `wrapS`, `wrapT` and, when the texture class supports it,
+     * `wrapR`, regardless of `respectSamplerSettings` and
+     * `overrideModelSamplers`. It only affects wrapping: filtering, mipmaps and
+     * anisotropy keep following their existing precedence.
+     *
+     * When the setting is turned off, the wrapping recorded before the manager
+     * first modified the texture is restored, but only if the manager did clamp
+     * it. This avoids leaving previously clamped textures clamped, while not
+     * overwriting wrapping changes made by other code when the manager never
+     * forced the wrapping.
+     */
+    private _applyWrappingSettings(
+      texture: THREE.Texture,
+      entry: TrackedTextureEntry
+    ): void {
+      const originalSampler = entry.originalSampler;
+      let changed = false;
+
+      if (this._settings.forceClampWrapping) {
+        entry.wrappedByManager = true;
         if (texture.wrapS !== THREE.ClampToEdgeWrapping) {
           texture.wrapS = THREE.ClampToEdgeWrapping;
           changed = true;
@@ -945,6 +1069,28 @@ namespace gdjs {
           texture.wrapT = THREE.ClampToEdgeWrapping;
           changed = true;
         }
+        const wrapR = getTextureWrapR(texture);
+        if (wrapR !== undefined && wrapR !== THREE.ClampToEdgeWrapping) {
+          setTextureWrapR(texture, THREE.ClampToEdgeWrapping);
+          changed = true;
+        }
+      } else if (entry.wrappedByManager && originalSampler) {
+        if (texture.wrapS !== originalSampler.wrapS) {
+          texture.wrapS = originalSampler.wrapS;
+          changed = true;
+        }
+        if (texture.wrapT !== originalSampler.wrapT) {
+          texture.wrapT = originalSampler.wrapT;
+          changed = true;
+        }
+        if (originalSampler.wrapR !== undefined) {
+          const wrapR = getTextureWrapR(texture);
+          if (wrapR !== undefined && wrapR !== originalSampler.wrapR) {
+            setTextureWrapR(texture, originalSampler.wrapR);
+            changed = true;
+          }
+        }
+        entry.wrappedByManager = false;
       }
 
       if (changed) {
@@ -978,9 +1124,39 @@ namespace gdjs {
     }
 
     /**
-     * Downscale the image (or the 6 images of a cube texture) if it is bigger
-     * than the maximum texture resolution, so that less GPU memory is used.
+     * Return the sampler settings currently used by a texture.
      */
+    private _captureSamplerState(texture: THREE.Texture): TextureSamplerState {
+      return {
+        magFilter: texture.magFilter,
+        minFilter: texture.minFilter,
+        generateMipmaps: texture.generateMipmaps,
+        wrapS: texture.wrapS,
+        wrapT: texture.wrapT,
+        wrapR: getTextureWrapR(texture),
+        anisotropy: texture.anisotropy,
+      };
+    }
+
+    /**
+     * Put a texture back to the state it had before the manager modified it:
+     * restore the sampler settings and move its source group back to the
+     * original source.
+     */
+    private _restoreTexture(
+      texture: THREE.Texture,
+      entry: TrackedTextureEntry
+    ): void {
+      let changed = false;
+      const originalSampler = entry.originalSampler;
+      if (originalSampler) {
+        if (texture.magFilter !== originalSampler.magFilter) {
+          texture.magFilter = originalSampler.magFilter;
+          changed = true;
+        }
+        if (texture.minFilter !== originalSampler.minFilter) {
+          texture.minFilter = originalSampler.minFilter;
+          changed = true;
     private _fitTextureResolution(
       texture: THREE.Texture,
       kind?: TextureQuality3DTextureKind
@@ -1008,22 +1184,247 @@ namespace gdjs {
           texture.image = resizedImages;
           texture.needsUpdate = true;
         }
-        return changed;
+        if (texture.generateMipmaps !== originalSampler.generateMipmaps) {
+          texture.generateMipmaps = originalSampler.generateMipmaps;
+          changed = true;
+        }
+        if (texture.wrapS !== originalSampler.wrapS) {
+          texture.wrapS = originalSampler.wrapS;
+          changed = true;
+        }
+        if (texture.wrapT !== originalSampler.wrapT) {
+          texture.wrapT = originalSampler.wrapT;
+          changed = true;
+        }
+        if (originalSampler.wrapR !== undefined) {
+          const currentWrapR = getTextureWrapR(texture);
+          if (
+            currentWrapR !== undefined &&
+            currentWrapR !== originalSampler.wrapR
+          ) {
+            setTextureWrapR(texture, originalSampler.wrapR);
+            changed = true;
+          }
+        }
+        if (texture.anisotropy !== originalSampler.anisotropy) {
+          texture.anisotropy = originalSampler.anisotropy;
+          changed = true;
+        }
       }
 
-      const resizedImage = this._fitImageResolution(image, maxResolution);
-      if (resizedImage !== image) {
-        texture.image = resizedImage;
-        texture.needsUpdate = true;
-        return true;
+      entry.wrappedByManager = false;
+
+      const group = entry.source;
+      if (texture.source !== group.originalSource || group.managedSource) {
+        this._useOriginalSource(group);
+        changed = true;
       }
-      return false;
+
+      if (changed) {
+        texture.needsUpdate = true;
+      }
+    }
+
+    /**
+     * Return the image data that the original source had before the manager
+     * downscaled it. If the original source was replaced by something else,
+     * the new data is adopted as the baseline so that an outdated copy is not
+     * restored.
+     */
+    private _getOriginalImage(group: TrackedSourceEntry): any {
+      const originalImage = group.originalSource.data;
+      if (
+        group.originalImage === undefined ||
+        (originalImage !== group.originalImage &&
+          originalImage !== group.managedSource?.data)
+      ) {
+        group.originalImage = originalImage;
+        group.managedSource = undefined;
+        group.managedKey = undefined;
+      }
+      return group.originalImage;
+    }
+
+    /**
+     * Return the original image downscaled to fit in `maxResolution` x
+     * `maxResolution`, using the cached downscale when it was computed for the
+     * same settings. Return the original image if it is small enough.
+     */
+    private _getResizedImage(
+      group: TrackedSourceEntry,
+      originalImage: any,
+      maxResolution: integer
+    ): any {
+      const cacheKey = maxResolution + '|' + this._settings.resamplingQuality;
+      if (group.managedSource && group.managedKey === cacheKey) {
+        return group.managedSource.data;
+      }
+
+      const resizedImage = Array.isArray(originalImage)
+        ? // Cube texture: fit each face.
+          originalImage.map((face: any) =>
+            this._fitImageResolution(face, maxResolution)
+          )
+        : this._fitImageResolution(originalImage, maxResolution);
+
+      const unchanged = Array.isArray(originalImage)
+        ? (resizedImage as Array<any>).every(
+            (face: any, index: number) => face === originalImage[index]
+          )
+        : resizedImage === originalImage;
+      return unchanged ? originalImage : resizedImage;
+    }
+
+    /**
+     * Return a key describing the dimensions of an image (or of the 6 faces of
+     * a cube texture), used to detect when a managed source can be reused.
+     */
+    private _getImageSizeKey(image: any): string {
+      const faces: Array<any> = Array.isArray(image) ? image : [image];
+      return faces
+        .map((face) =>
+          face
+            ? (face.naturalWidth || face.width || 0) +
+              'x' +
+              (face.naturalHeight || face.height || 0)
+            : '0x0'
+        )
+        .join('|');
+    }
+
+    /**
+     * Mark every tracked texture of a group for a re-upload. Used when the
+     * manager-owned source is updated in place (same dimensions).
+     */
+    private _markGroupTexturesNeedsUpdate(group: TrackedSourceEntry): void {
+      for (const otherEntry of this._trackedTextures.values()) {
+        if (otherEntry.source === group) {
+          otherEntry.texture.needsUpdate = true;
+        }
+      }
+    }
+
+    /**
+     * Move every tracked texture of a group to another source. The old GPU
+     * texture of each texture is disposed first, so that Three.js allocates a
+     * texture matching the new source. The textures are kept tracked during
+     * the operation.
+     */
+    private _switchTexturesToSource(
+      group: TrackedSourceEntry,
+      targetSource: THREE.Source<unknown>
+    ): boolean {
+      this._sourcesBeingReallocated.add(group);
+      let changed = false;
+      try {
+        for (const otherEntry of this._trackedTextures.values()) {
+          if (otherEntry.source !== group) continue;
+          const texture = otherEntry.texture;
+          if (texture.source === targetSource) continue;
+          texture.dispose();
+          texture.source = targetSource;
+          texture.needsUpdate = true;
+          changed = true;
+        }
+      } finally {
+        this._sourcesBeingReallocated.delete(group);
+      }
+      return changed;
+    }
+
+    /**
+     * Move a group back to its original source, and forget the manager-owned
+     * source (which can still be referenced by an external clone of a managed
+     * texture, so it must not be modified).
+     */
+    private _useOriginalSource(group: TrackedSourceEntry): boolean {
+      group.managedSource = undefined;
+      group.managedKey = undefined;
+      return this._switchTexturesToSource(group, group.originalSource);
+    }
+
+    /**
+     * Return the manager-owned source holding the downscaled image, creating it
+     * when needed. The original source is never modified.
+     *
+     * When the dimensions are unchanged (for example a resampling quality
+     * change), the existing owned source is reused and its data is replaced:
+     * this is a content-only update, which Three.js handles with
+     * `texSubImage2D` and therefore requires `needsUpdate` on every texture
+     * using it. When the dimensions change, a **new** source is created
+     * instead, so that an external clone of a managed texture still references
+     * a valid, unchanged source.
+     */
+    private _getManagedSource(
+      group: TrackedSourceEntry,
+      image: any,
+      maxResolution: integer
+    ): THREE.Source<unknown> {
+      const cacheKey = maxResolution + '|' + this._settings.resamplingQuality;
+      const managedSource = group.managedSource;
+      if (managedSource) {
+        if (managedSource.data === image) {
+          group.managedKey = cacheKey;
+          return managedSource;
+        }
+        if (
+          this._getImageSizeKey(managedSource.data) ===
+          this._getImageSizeKey(image)
+        ) {
+          managedSource.data = image;
+          group.managedKey = cacheKey;
+          this._markGroupTexturesNeedsUpdate(group);
+          return managedSource;
+        }
+      }
+
+      const newSource = new THREE.Source<unknown>(image);
+      group.managedSource = newSource;
+      group.managedKey = cacheKey;
+      managedSourceOrigins.set(newSource, group.originalSource);
+      return newSource;
+    }
+
+    /**
+     * Downscale the image (or the 6 images of a cube texture) if it is bigger
+     * than the maximum texture resolution, or restore the original image if it
+     * fits again. The downscale is always computed from the original image, so
+     * that increasing the maximum resolution restores the full resolution.
+     */
+    private _fitTextureResolution(
+      texture: THREE.Texture,
+      entry: TrackedTextureEntry
+    ): boolean {
+      const group = entry.source;
+      const originalImage = this._getOriginalImage(group);
+      if (!originalImage) return false;
+
+      const maxResolution = this.getMaxTextureResolution();
+      if (maxResolution <= 0) {
+        // No limit: put the original image back if it was downscaled before.
+        return this._useOriginalSource(group);
+      }
+
+      const resizedImage = this._getResizedImage(
+        group,
+        originalImage,
+        maxResolution
+      );
+      if (resizedImage === originalImage) {
+        return this._useOriginalSource(group);
+      }
+
+      const targetSource = this._getManagedSource(
+        group,
+        resizedImage,
+        maxResolution
+      );
+      return this._switchTexturesToSource(group, targetSource);
     }
 
     /**
      * Return an image downscaled to fit in `maxResolution` x `maxResolution`,
-     * or the given image if it is small enough. The result is cached to avoid
-     * doing the same work again for shared sources.
+     * or the given image if it is small enough.
      */
     private _fitImageResolution(image: any, maxResolution: integer): any {
       if (!image || typeof image !== 'object') return image;
@@ -1032,14 +1433,10 @@ namespace gdjs {
       if (width <= 0 || height <= 0) return image;
       if (width <= maxResolution && height <= maxResolution) return image;
 
-      const cachedImage = this._resizedImages.get(image);
-      if (cachedImage) return cachedImage;
-
       const scale = Math.min(maxResolution / width, maxResolution / height);
       const newWidth = Math.max(1, Math.round(width * scale));
       const newHeight = Math.max(1, Math.round(height * scale));
 
-      let resizedImage = image;
       try {
         const canvas = document.createElement('canvas');
         canvas.width = newWidth;
@@ -1049,7 +1446,7 @@ namespace gdjs {
         context.imageSmoothingEnabled = true;
         context.imageSmoothingQuality = this._settings.resamplingQuality;
         context.drawImage(image, 0, 0, newWidth, newHeight);
-        resizedImage = canvas;
+        return canvas;
       } catch (error) {
         logger.warn(
           'Unable to downscale a texture to ' +
@@ -1061,23 +1458,73 @@ namespace gdjs {
         );
         return image;
       }
-
-      this._resizedImages.set(image, resizedImage);
-      return resizedImage;
     }
 
     /**
      * Register a texture to track the GPU memory it uses, and keep the
-     * information needed for the diagnostics. The registration is dropped
-     * automatically when the texture is disposed.
+     * information needed for the diagnostics and the restoration of the
+     * original settings. The registration is dropped automatically when the
+     * texture is disposed.
      */
-    private _trackTexture(
+    private _getOrCreateTrackedTexture(
       texture: THREE.Texture,
       options: TextureQuality3DApplyOptions
-    ): void {
+    ): TrackedTextureEntry {
       const textureId = texture.uuid;
+      const group = this._getOrCreateSourceGroup(texture.source);
       let entry = this._trackedTextures.get(textureId);
+      if (!entry) {
+        entry = {
+          texture,
+          source: group,
+          label: options.label || 'texture',
+          kind: options.kind || 'image',
+          keepNearestFilter: !!options.keepNearestFilter,
+          respectSamplerSettings: !!options.respectSamplerSettings,
+        };
+        this._trackedTextures.set(textureId, entry);
+        group.textureIds.add(textureId);
+        texture.addEventListener('dispose', () => {
+          this._untrackTexture(textureId);
+        });
+      } else {
+        entry.label = options.label || entry.label;
+        entry.kind = options.kind || entry.kind;
+        entry.keepNearestFilter = !!options.keepNearestFilter;
+        entry.respectSamplerSettings = !!options.respectSamplerSettings;
+      }
+      return entry;
+    }
 
+    /**
+     * Return the group of the original source behind a texture source. A source
+     * created by the manager (holding a downscaled image) is mapped back to the
+     * original source it was derived from, so that late clones of a managed
+     * texture still use the original image as their baseline.
+     */
+    private _getOrCreateSourceGroup(
+      source: THREE.Source<unknown>
+    ): TrackedSourceEntry {
+      const originalSource = managedSourceOrigins.get(source) || source;
+      let group = this._trackedSources.get(originalSource.uuid);
+      if (!group) {
+        group = {
+          originalSource,
+          originalImage: originalSource.data,
+          memoryBytes: 0,
+          textureIds: new Set(),
+        };
+        this._trackedSources.set(originalSource.uuid, group);
+      }
+      return group;
+    }
+
+    /**
+     * Refresh the GPU memory estimation of a tracked texture and of the source
+     * group it belongs to, and warn if the memory budget is exceeded.
+     */
+    private _updateTrackedMemory(entry: TrackedTextureEntry): void {
+      const texture = entry.texture;
       const image: any = texture.image;
       const faces: Array<any> = Array.isArray(image) ? image : [image];
       let width = 0;
@@ -1096,6 +1543,12 @@ namespace gdjs {
           (texture.generateMipmaps ? 4 / 3 : 1)
       );
 
+      const sourceEntry = entry.source;
+      if (sourceEntry.memoryBytes !== memoryBytes) {
+        // The texture was resized or its mipmaps were changed.
+        this._totalMemoryBytes += memoryBytes - sourceEntry.memoryBytes;
+        sourceEntry.memoryBytes = memoryBytes;
+      }
       const sourceId = texture.source.uuid;
       let sourceEntry = this._trackedSources.get(sourceId);
       if (!sourceEntry) {
@@ -1172,16 +1625,27 @@ namespace gdjs {
 
     /**
      * Forget a texture that was disposed, and free its memory from the
-     * accounting (once no tracked texture shares its source anymore).
+     * accounting (once no tracked texture uses its original source anymore).
+     * The original source is never modified, so external consumers sharing it
+     * are unaffected.
      */
     private _untrackTexture(textureId: string): void {
       const entry = this._trackedTextures.get(textureId);
       if (!entry) return;
+      if (this._sourcesBeingReallocated.has(entry.source)) {
+        // The texture is disposed to move it to another source: it must stay
+        // tracked.
+        return;
+      }
       this._trackedTextures.delete(textureId);
 
-      const sourceEntry = this._trackedSources.get(entry.sourceId);
-      if (!sourceEntry) return;
+      const sourceEntry = entry.source;
       sourceEntry.textureIds.delete(textureId);
+      if (sourceEntry.textureIds.size > 0) return;
+
+      this._trackedSources.delete(sourceEntry.originalSource.uuid);
+      this._totalMemoryBytes -= sourceEntry.memoryBytes;
+      if (this._totalMemoryBytes < 0) this._totalMemoryBytes = 0;
       if (sourceEntry.textureIds.size === 0) {
         this._trackedSources.delete(entry.sourceId);
         this._totalMemoryBytes -= sourceEntry.memoryBytes;
@@ -1297,6 +1761,7 @@ namespace gdjs {
             width = Math.max(width, face.naturalWidth || face.width || 0);
             height = Math.max(height, face.naturalHeight || face.height || 0);
           }
+          const sourceEntry = entry.source;
           const sourceEntry = this._trackedSources.get(entry.sourceId);
           const sourceMemoryBytes = sourceEntry ? sourceEntry.memoryBytes : 0;
           const isNewSource = !sourcesWithAttributedMemory.has(entry.sourceId);
@@ -1308,6 +1773,7 @@ namespace gdjs {
             kind: entry.kind,
             width,
             height,
+            memoryBytes: sourceEntry.memoryBytes,
             memoryBytes: entry.memoryBytes,
             uniqueSourceMemoryBytes: isNewSource ? sourceMemoryBytes : 0,
             sourceMemoryBytes,
@@ -1344,11 +1810,21 @@ namespace gdjs {
     }
 
     /**
-     * To be called when the game is disposed: forget all the tracked textures.
-     * The textures themselves are disposed by the image manager and the 3D
-     * model manager.
+     * To be called when the game is disposed.
+     *
+     * Textures that are still alive are restored first (original source and
+     * sampler settings), so that dropping the tracking records never leaves
+     * them attached to a manager-owned downscaled source. The textures
+     * themselves are disposed by the image manager and the 3D model manager,
+     * which normally happens before this method.
      */
     dispose(): void {
+      // Snapshot the entries: restoring a group switches the source of every
+      // texture of the group, but does not change the tracked map.
+      const entries = Array.from(this._trackedTextures.values());
+      for (const entry of entries) {
+        this._restoreTexture(entry.texture, entry);
+      }
       this._isDisposed = true;
       this._trackedTextures.clear();
       this._trackedSources.clear();

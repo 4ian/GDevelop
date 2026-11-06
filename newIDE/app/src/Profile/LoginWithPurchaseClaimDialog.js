@@ -119,7 +119,7 @@ const LoginWithPurchaseClaimDialog = ({
               background: gdevelopTheme.paper.backgroundColor.light,
             }}
             src={claimedProduct.thumbnailUrls[0]}
-            alt={`Preview image of bundle ${claimedProduct.name}`}
+            alt={`Preview image of product ${claimedProduct.name}`}
           />
         )}
         <Text size="section-title" align="center" noMargin>

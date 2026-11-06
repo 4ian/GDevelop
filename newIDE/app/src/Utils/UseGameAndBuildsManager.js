@@ -39,7 +39,7 @@ export const getDefaultRegisterGameProperties = ({
 } => ({
   gameId: projectId,
   authorName: projectAuthor || 'Unspecified publisher',
-  gameName: projectName || 'Untitled game',
+  gameName: (projectName && projectName.trim()) || 'Untitled game',
   savedStatus,
 });
 

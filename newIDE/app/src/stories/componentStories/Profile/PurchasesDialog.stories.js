@@ -3,7 +3,7 @@ import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
 import paperDecorator from '../../PaperDecorator';
-import InvoicesDialog from '../../../Profile/InvoicesDialog';
+import PurchasesDialog from '../../../Profile/PurchasesDialog';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import { fakeSilverAuthenticatedUser } from '../../../fixtures/GDevelopServicesTestData';
 import {
@@ -14,14 +14,14 @@ import {
 } from './InvoicesApiMocks';
 
 export default {
-  title: 'Profile/InvoicesDialog',
-  component: InvoicesDialog,
+  title: 'Profile/PurchasesDialog',
+  component: PurchasesDialog,
   decorators: [paperDecorator],
 };
 
-const InvoicesDialogWithUser = () => (
+const PurchasesDialogWithUser = () => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
-    <InvoicesDialog onClose={() => action('close')()} />
+    <PurchasesDialog onClose={() => action('close')()} />
   </AuthenticatedUserContext.Provider>
 );
 
@@ -31,7 +31,7 @@ export const WithPaymentsAndPurchases = (): React.Node => {
     invoiceablePurchasesReply: [200, invoiceablePurchases],
     invoiceReply: [200, fakeInvoicePdf],
   });
-  return <InvoicesDialogWithUser />;
+  return <PurchasesDialogWithUser />;
 };
 
 export const OnlyPurchases = (): React.Node => {
@@ -40,7 +40,7 @@ export const OnlyPurchases = (): React.Node => {
     invoiceablePurchasesReply: [200, invoiceablePurchases],
     invoiceReply: [200, fakeInvoicePdf],
   });
-  return <InvoicesDialogWithUser />;
+  return <PurchasesDialogWithUser />;
 };
 
 export const NothingToInvoice = (): React.Node => {
@@ -49,7 +49,7 @@ export const NothingToInvoice = (): React.Node => {
     invoiceablePurchasesReply: [200, []],
     invoiceReply: [200, fakeInvoicePdf],
   });
-  return <InvoicesDialogWithUser />;
+  return <PurchasesDialogWithUser />;
 };
 
 export const LoadingError = (): React.Node => {
@@ -58,7 +58,7 @@ export const LoadingError = (): React.Node => {
     invoiceablePurchasesReply: [200, invoiceablePurchases],
     invoiceReply: [200, fakeInvoicePdf],
   });
-  return <InvoicesDialogWithUser />;
+  return <PurchasesDialogWithUser />;
 };
 
 export const InvoiceGenerationError = (): React.Node => {
@@ -67,5 +67,5 @@ export const InvoiceGenerationError = (): React.Node => {
     invoiceablePurchasesReply: [200, invoiceablePurchases],
     invoiceReply: [500, null],
   });
-  return <InvoicesDialogWithUser />;
+  return <PurchasesDialogWithUser />;
 };

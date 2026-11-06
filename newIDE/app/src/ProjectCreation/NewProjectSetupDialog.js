@@ -464,7 +464,7 @@ const NewProjectSetupDialog = ({
       if (!shouldAllowCreatingProject) return;
 
       setProjectNameError(null);
-      if (!projectName) {
+      if (!projectName.trim()) {
         setProjectNameError(
           <Trans>Please enter a name for your project.</Trans>
         );

@@ -30,6 +30,58 @@ orbs:
   node: circleci/node@7.1.0 # For a recent npm version (see below)
   win: circleci/windows@5.1.0
 commands:
+  # Write the checksum of the lock files of the dependencies, to be used in the
+  # key of their cache (`{{ checksum "ci-dependencies-checksum.txt" }}`).
+  # It must be computed before `npm install`: the install (and the postinstall
+  # running `npm install` in GDJS) rewrites the lock files, so a key computed
+  # from them would differ between `restore_cache` and `save_cache`, and the
+  # cache would never be found (only a stale fallback).
+  write-dependencies-checksum:
+    parameters:
+      lock-files:
+        type: string
+    steps:
+      - run:
+          name: Compute the checksum of the dependencies lock files
+          command: cat << parameters.lock-files >> | shasum -a 256 > ci-dependencies-checksum.txt
+
+  # Install the Emscripten SDK, from the cache when possible. The cache also
+  # holds the system libraries (libc, libc++...) that Emscripten builds the
+  # first time they are linked, which are long to build.
+  # Use `save-emscripten-sdk` after the build to save it.
+  install-emscripten-sdk:
+    parameters:
+      cache-key:
+        type: string
+    steps:
+      - restore_cache:
+          name: Restore the Emscripten SDK
+          keys:
+            - << parameters.cache-key >>
+      - run:
+          name: Install Emscripten (for GDevelop.js)
+          # The downloads of the SDK sometimes fail: retry them.
+          command: |
+            if [ ! -d emsdk ]; then git clone https://github.com/juj/emsdk.git; fi
+            cd emsdk
+            for i in 1 2 3; do
+              ./emsdk install 3.1.21 && break
+              if [ $i -eq 3 ]; then exit 1; fi
+              echo "Installing the Emscripten SDK failed, retrying in 10 seconds..."
+              sleep 10
+            done
+            ./emsdk activate 3.1.21
+  save-emscripten-sdk:
+    parameters:
+      cache-key:
+        type: string
+    steps:
+      - save_cache:
+          name: Save the Emscripten SDK (with the system libraries it built)
+          key: << parameters.cache-key >>
+          paths:
+            - emsdk
+
   # Used by the visual monkey tests jobs on a "changed" scope: stop the job
   # (before anything expensive) when no test of the suite is related to what
   # the branch changes. A change to the tests themselves relates every test.
@@ -79,16 +131,17 @@ jobs:
           name: Install dependencies for AWS S3 upload
           command: curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg" && sudo installer -pkg AWSCLIV2.pkg -target /
 
-      - run:
-          name: Install Emscripten (for GDevelop.js)
-          command: git clone https://github.com/juj/emsdk.git && cd emsdk && ./emsdk install 3.1.21 && ./emsdk activate 3.1.21 && cd ..
+      - install-emscripten-sdk:
+          cache-key: emsdk-3.1.21-macos-v1
 
       # GDevelop.js dependencies
+      - write-dependencies-checksum:
+          lock-files: newIDE/app/package-lock.json newIDE/electron-app/package-lock.json newIDE/electron-app/app/package-lock.json GDevelop.js/package-lock.json GDJS/package-lock.json
       - restore_cache:
           keys:
-            - gd-macos-nodejs-dependencies-v2-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}-{{ checksum "GDJS/package-lock.json" }}
+            - gd-macos-nodejs-dependencies-v3-{{ checksum "ci-dependencies-checksum.txt" }}
             # fallback to using the latest cache if no exact match is found
-            - gd-macos-nodejs-dependencies-v2-
+            - gd-macos-nodejs-dependencies-v3-
 
       - run:
           name: Install GDevelop.js dependencies
@@ -99,24 +152,34 @@ jobs:
           name: Build GDevelop.js
           command: cd GDevelop.js && source ../emsdk/emsdk_env.sh && npm run build && npm test && cd ..
 
+      - save-emscripten-sdk:
+          cache-key: emsdk-3.1.21-macos-v1
+
       # GDevelop IDE dependencies (after building GDevelop.js to avoid downloading a pre-built version)
       - run:
           name: Install GDevelop IDE dependencies
-          command: cd newIDE/app && npm install && cd ../electron-app && npm install
+          command: cd newIDE/app && npm install --no-audit --no-fund && cd ../electron-app && npm install --no-audit --no-fund
 
       - save_cache:
           paths:
             - newIDE/electron-app/node_modules
+            - newIDE/electron-app/app/node_modules
             - newIDE/app/node_modules
             - GDevelop.js/node_modules
             - GDJS/node_modules
-          key: gd-macos-nodejs-dependencies-v2-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}-{{ checksum "GDJS/package-lock.json" }}
+          key: gd-macos-nodejs-dependencies-v3-{{ checksum "ci-dependencies-checksum.txt" }}
 
       # Build GDevelop IDE (seems like we need to allow Node.js to use more space than usual)
       # Note: Code signing is done using CSC_LINK (see https://www.electron.build/code-signing).
       # To test signing the code in the CI, add "export CSC_FOR_PULL_REQUEST=true && " before the command.
       - run:
           name: Build GDevelop IDE
+          environment:
+            # No source maps: they doubled the size of the app (and of the installers)
+            # and the build time, while nothing uses them in the desktop app.
+            GENERATE_SOURCEMAP: 'false'
+            # The editor is already linted (`npm run lint`) by the Semaphore CI.
+            DISABLE_ESLINT_PLUGIN: 'true'
           command: export CSC_FOR_PULL_REQUEST=true && export NODE_OPTIONS="--max-old-space-size=7168" && cd newIDE/electron-app && CI=false npm run build -- --mac --publish=never
 
       - run:
@@ -156,7 +219,80 @@ jobs:
               exit 1
             fi
 
-  # Build the app for Linux (using a pre-built GDevelop.js library).
+  # Build the editor (newIDE/app, using the GDevelop.js library built by
+  # build-gdevelop_js-wasm-only) once, for the desktop apps of Linux and
+  # Windows: it's the same JavaScript on every platform, and building it on
+  # Linux is much faster than on Windows.
+  build-app-for-desktop:
+    # CircleCI docker workers are failing if they don't have enough memory (no swap)
+    resource_class: xlarge
+    docker:
+      - image: cimg/node:24.13.0
+
+    working_directory: ~/GDevelop
+
+    steps:
+      - checkout
+
+      - write-dependencies-checksum:
+          lock-files: newIDE/app/package-lock.json GDJS/package-lock.json
+      - restore_cache:
+          keys:
+            - gd-linux-newide-app-dependencies-v3-{{ checksum "ci-dependencies-checksum.txt" }}
+            # fallback to using the latest cache if no exact match is found
+            - gd-linux-newide-app-dependencies-v3-
+
+      # GDevelop IDE dependencies (using an exact version of GDevelop.js, built previously)
+      - run:
+          name: Install GDevelop IDE dependencies
+          command: export REQUIRES_EXACT_LIBGD_JS_VERSION=true && cd newIDE/app && npm install --no-audit --no-fund
+
+      - save_cache:
+          paths:
+            - newIDE/app/node_modules
+            - GDJS/node_modules
+          key: gd-linux-newide-app-dependencies-v3-{{ checksum "ci-dependencies-checksum.txt" }}
+
+      # The cache of Babel (transpiled source files), restored after saving the
+      # dependencies so that it's not part of them. A new one is started every
+      # week, so that it does not grow forever with outdated files.
+      - run:
+          name: Compute the period of the build cache
+          command: date +%G-%V > ci-build-cache-period.txt
+      - restore_cache:
+          name: Restore the build cache
+          keys:
+            - gd-newide-app-build-cache-v1-{{ checksum "ci-build-cache-period.txt" }}-{{ .Revision }}
+            - gd-newide-app-build-cache-v1-{{ checksum "ci-build-cache-period.txt" }}-
+
+      # Build GDevelop IDE (seems like we need to allow Node.js to use more space than usual)
+      - run:
+          name: Build GDevelop IDE
+          environment:
+            # No source maps: they doubled the size of the app (and of the installers)
+            # and the build time, while nothing uses them in the desktop app.
+            GENERATE_SOURCEMAP: 'false'
+            # The editor is already linted (`npm run lint`) by the Semaphore CI.
+            DISABLE_ESLINT_PLUGIN: 'true'
+          command: export NODE_OPTIONS="--max-old-space-size=7168" && cd newIDE/app && npm run build
+
+      - save_cache:
+          name: Save the build cache
+          key: gd-newide-app-build-cache-v1-{{ checksum "ci-build-cache-period.txt" }}-{{ .Revision }}
+          paths:
+            - newIDE/app/node_modules/.cache/babel-loader
+
+      # What the desktop app is made of (see newIDE/electron-app/scripts/app-build.js
+      # and electron-builder-config.js).
+      - persist_to_workspace:
+          root: newIDE/app
+          paths:
+            - build
+            - resources/GDJS
+            - public/libGD.js
+            - public/libGD.wasm
+
+  # Build the app for Linux (using the editor built by build-app-for-desktop).
   build-linux:
     # CircleCI docker workers are failing if they don't have enough memory (no swap)
     resource_class: xlarge
@@ -167,6 +303,8 @@ jobs:
 
     steps:
       - checkout
+      - attach_workspace:
+          at: newIDE/app
       - aws-cli/setup
 
       # System dependencies (for Electron Builder)
@@ -178,29 +316,27 @@ jobs:
           name: Install system dependencies for Electron builder
           command: sudo apt install icnsutils && sudo apt install graphicsmagick && sudo apt install rsync
 
+      - write-dependencies-checksum:
+          lock-files: newIDE/electron-app/package-lock.json newIDE/electron-app/app/package-lock.json
       - restore_cache:
           keys:
-            - gd-linux-nodejs-dependencies-v2-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}-{{ checksum "GDJS/package-lock.json" }}
+            - gd-linux-electron-app-dependencies-v3-{{ checksum "ci-dependencies-checksum.txt" }}
             # fallback to using the latest cache if no exact match is found
-            - gd-linux-nodejs-dependencies-v2-
+            - gd-linux-electron-app-dependencies-v3-
 
-      # GDevelop IDE dependencies (using an exact version of GDevelop.js, built previously)
       - run:
-          name: Install GDevelop IDE dependencies
-          command: export REQUIRES_EXACT_LIBGD_JS_VERSION=true && cd newIDE/app && npm install && cd ../electron-app && npm install
+          name: Install Electron app dependencies
+          command: cd newIDE/electron-app && npm install --no-audit --no-fund
 
       - save_cache:
           paths:
             - newIDE/electron-app/node_modules
-            - newIDE/app/node_modules
-            - GDevelop.js/node_modules
-            - GDJS/node_modules
-          key: gd-linux-nodejs-dependencies-v2-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}-{{ checksum "GDJS/package-lock.json" }}
+            - newIDE/electron-app/app/node_modules
+          key: gd-linux-electron-app-dependencies-v3-{{ checksum "ci-dependencies-checksum.txt" }}
 
-      # Build GDevelop IDE (seems like we need to allow Node.js to use more space than usual)
       - run:
           name: Build GDevelop IDE
-          command: export NODE_OPTIONS="--max-old-space-size=7168" && cd newIDE/electron-app && npm run build -- --linux --publish=never
+          command: cd newIDE/electron-app && node scripts/app-build.js --skip-app-build && node scripts/build.js --skip-app-build --linux --publish=never
 
       - run:
           name: Clean dist folder to keep only installers/binaries.
@@ -254,9 +390,8 @@ jobs:
           name: Install dependencies for Emscripten
           command: sudo apt-get update && sudo apt install cmake ccache
 
-      - run:
-          name: Install Emscripten (for GDevelop.js)
-          command: git clone https://github.com/juj/emsdk.git && cd emsdk && ./emsdk install 3.1.21 && ./emsdk activate 3.1.21 && cd ..
+      - install-emscripten-sdk:
+          cache-key: emsdk-3.1.21-linux-v1
 
       # GDevelop.js dependencies
       - restore_cache:
@@ -301,6 +436,9 @@ jobs:
           name: Run GDevelop.js tests
           command: cd GDevelop.js && source ../emsdk/emsdk_env.sh && npm test -- --runInBand && cd ..
 
+      - save-emscripten-sdk:
+          cache-key: emsdk-3.1.21-linux-v1
+
       - save_cache:
           paths:
             - GDevelop.js/node_modules
@@ -333,15 +471,15 @@ jobs:
       # System dependencies (for Emscripten)
       - run:
           name: Install dependencies for Emscripten
-          command: sudo apt-get update && sudo apt install cmake
+          command: sudo apt-get update && sudo apt install cmake ccache
 
       - run:
           name: Install dependencies for clang-tidy v19
           command: wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && sudo ./llvm.sh 19 && sudo apt install clang-tidy-19
 
-      - run:
-          name: Install Emscripten (for GDevelop.js)
-          command: git clone https://github.com/juj/emsdk.git && cd emsdk && ./emsdk install 3.1.21 && ./emsdk activate 3.1.21 && cd ..
+      # Its own cache: the system libraries are built with the sanitizers.
+      - install-emscripten-sdk:
+          cache-key: emsdk-3.1.21-linux-debug-sanitizers-v1
 
       # GDevelop.js dependencies
       - restore_cache:
@@ -354,10 +492,31 @@ jobs:
           name: Install GDevelop.js dependencies and build it
           command: cd GDevelop.js && npm install && cd ..
 
+      # Cache emcc/em++ output via ccache (see build-gdevelop_js-wasm-only).
+      - restore_cache:
+          name: Restore ccache (Emscripten, debug-sanitizers)
+          keys:
+            - gdevelop.js-emscripten-debug-sanitizers-ccache-v1-{{ .Branch }}-{{ .Revision }}
+            - gdevelop.js-emscripten-debug-sanitizers-ccache-v1-{{ .Branch }}-
+            - gdevelop.js-emscripten-debug-sanitizers-ccache-v1-
+
       # Build GDevelop.js
       - run:
           name: Build GDevelop.js ('debug-sanitizers' variant)
-          command: cd GDevelop.js && source ../emsdk/emsdk_env.sh && npm run build -- --variant=debug-sanitizers
+          command: |
+            export CMAKE_C_COMPILER_LAUNCHER=ccache
+            export CMAKE_CXX_COMPILER_LAUNCHER=ccache
+            cd GDevelop.js && source ../emsdk/emsdk_env.sh && npm run build -- --variant=debug-sanitizers
+            ccache --show-stats
+
+      - save_cache:
+          name: Save ccache (Emscripten, debug-sanitizers)
+          key: gdevelop.js-emscripten-debug-sanitizers-ccache-v1-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - ~/.cache/ccache
+
+      - save-emscripten-sdk:
+          cache-key: emsdk-3.1.21-linux-debug-sanitizers-v1
 
       - run:
           name: Run clang-tidy
@@ -519,11 +678,20 @@ jobs:
 
             echo Certificate: $CodeSigningCert
 
+      # The editor (newIDE/app) built by build-app-for-desktop.
+      - attach_workspace:
+          at: newIDE/app
+
+      # Computed before the install, which rewrites the lock files (see write-dependencies-checksum).
+      - run:
+          name: Compute the checksum of the dependencies lock files
+          command: Get-Content newIDE\electron-app\package-lock.json, newIDE\electron-app\app\package-lock.json | Set-Content ci-dependencies-checksum.txt
+
       - restore_cache:
           name: Restore node_modules cache
           keys:
-            - v2-win-node-{{ checksum "newIDE/app/package-lock.json" }}-{{ checksum "newIDE/electron-app/package-lock.json" }}-{{ checksum "GDJS/package-lock.json" }}
-            - v2-win-node-
+            - v3-win-electron-app-node-{{ checksum "ci-dependencies-checksum.txt" }}
+            - v3-win-electron-app-node-
 
       - run:
           name: Install dependencies
@@ -535,34 +703,24 @@ jobs:
             pip install setuptools
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-            cd newIDE\app
+            cd newIDE\electron-app
 
             npm -v
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
             Remove-Item package-lock.json
 
-            $Env:REQUIRES_EXACT_LIBGD_JS_VERSION = "true"
-
-            npm install
-            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-
-            cd ..\electron-app
-
-            Remove-Item package-lock.json
-
-            npm install
+            npm install --no-audit --no-fund
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
             cd ..\..
 
       - save_cache:
           name: Save node_modules cache
-          key: v2-win-node-{{ checksum "newIDE/app/package-lock.json" }}-{{ checksum "newIDE/electron-app/package-lock.json" }}-{{ checksum "GDJS/package-lock.json" }}
+          key: v3-win-electron-app-node-{{ checksum "ci-dependencies-checksum.txt" }}
           paths:
-            - newIDE/app/node_modules
             - newIDE/electron-app/node_modules
-            - GDJS/node_modules
+            - newIDE/electron-app/app/node_modules
 
       - run:
           name: Build NSIS executable (with code signing)
@@ -585,9 +743,15 @@ jobs:
 
             $Env:GD_SIGNTOOL_SUBJECT_NAME = ($CodeSigningCert.Subject -replace ", ?", "`n" | ConvertFrom-StringData).CN
 
+            # Copy the editor built by build-app-for-desktop in the app.
+
+            node scripts/app-build.js --skip-app-build
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
             # Build the nsis installer (signed: electron-builder will use SignTool.exe with the certificate)
 
-            node scripts/build.js --win nsis --publish=never
+            node scripts/build.js --skip-app-build --win nsis --publish=never
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
             cd ..\..
       - run:
@@ -781,15 +945,26 @@ jobs:
           scope: << parameters.scope >>
           suite: 'storybook'
 
+      # Same dependencies as build-app-for-desktop.
+      - write-dependencies-checksum:
+          lock-files: newIDE/app/package-lock.json GDJS/package-lock.json
       - restore_cache:
           keys:
-            - gd-linux-nodejs-dependencies-v2-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}-{{ checksum "GDJS/package-lock.json" }}
+            - gd-linux-newide-app-dependencies-v3-{{ checksum "ci-dependencies-checksum.txt" }}
             # fallback to using the latest cache if no exact match is found
-            - gd-linux-nodejs-dependencies-v2-
+            - gd-linux-newide-app-dependencies-v3-
 
       - run:
           name: Install GDevelop IDE dependencies
-          command: cd newIDE/app && npm install
+          command: cd newIDE/app && npm install --no-audit --no-fund
+
+      # Saved here too: this job runs on every branch, so the cache is ready
+      # when the branch lands on master.
+      - save_cache:
+          paths:
+            - newIDE/app/node_modules
+            - GDJS/node_modules
+          key: gd-linux-newide-app-dependencies-v3-{{ checksum "ci-dependencies-checksum.txt" }}
 
       - run:
           name: Build Storybook
@@ -1045,9 +1220,18 @@ workflows:
                 - master
                 - stable
                 - /experimental-build.*/
-      - build-linux:
+      - build-app-for-desktop:
           requires:
             - build-gdevelop_js-wasm-only
+          filters:
+            branches:
+              only:
+                - master
+                - stable
+                - /experimental-build.*/
+      - build-linux:
+          requires:
+            - build-app-for-desktop
           filters:
             branches:
               only:
@@ -1082,7 +1266,7 @@ workflows:
                 - /experimental-build.*/
       - build-windows:
           requires:
-            - build-gdevelop_js-wasm-only
+            - build-app-for-desktop
           filters:
             branches:
               only:

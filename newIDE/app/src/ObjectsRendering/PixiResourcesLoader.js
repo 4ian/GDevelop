@@ -11,6 +11,7 @@ import { loadFontFace } from '../Utils/FontFaceLoader';
 import { checkIfCredentialsRequired } from '../Utils/CrossOrigin';
 import { dracoDecoderPath } from '../Utils/DracoDecoder';
 import { type ResourceKind } from '../ResourcesList/ResourceSource';
+import EditorTextureQuality3DManager from './EditorTextureQuality3DManager';
 const gd: libGDevelop = global.gd;
 
 type SpineTextureAtlasOrLoadingError = {|
@@ -150,6 +151,7 @@ let loadedOrLoadingThreeTextures: ResourcePromise<THREE.Texture> = {};
 let loadedOrLoadingThreeMaterials: ResourcePromise<THREE.Material> = {};
 // $FlowFixMe[value-as-type]
 let loadedOrLoading3DModelPromises: ResourcePromise<THREE.THREE_ADDONS.GLTF> = {};
+const editorTextureQuality3DManager = new EditorTextureQuality3DManager();
 let spineAtlasPromises: ResourcePromise<SpineTextureAtlasOrLoadingError> = {};
 let spineDataPromises: ResourcePromise<SpineDataOrLoadingError> = {};
 
@@ -374,6 +376,19 @@ const getEmbedderResources = (
  */
 export default class PixiResourcesLoader {
   /**
+   * Called by the scene editor before drawing. The editor uses a different
+   * Three.js renderer from games, so this is deliberately separate from the
+   * runtime TextureQuality3DManager.
+   */
+  static updateEditorTextureQualitySettings(
+    project: gdProject,
+    // $FlowFixMe[value-as-type]
+    renderer: THREE.WebGLRenderer | null
+  ) {
+    editorTextureQuality3DManager.setRenderer(project, renderer);
+  }
+
+  /**
    * Forget and unload everything that was loaded (typically, when a project is closed).
    *
    * Just dropping the references is not enough: PIXI.Assets (and PIXI.utils caches)
@@ -381,6 +396,7 @@ export default class PixiResourcesLoader {
    * the textures of every project opened during the session.
    */
   static async burstCache(): Promise<void> {
+    editorTextureQuality3DManager.dispose();
     const pixiTextureEntries = loadedOrLoadingPixiTextures.getAllEntries();
     const threeTexturePromises = Object.keys(loadedOrLoadingThreeTextures).map(
       key => loadedOrLoadingThreeTextures[key]
@@ -978,6 +994,11 @@ export default class PixiResourcesLoader {
 
     const resource = project.getResourcesManager().getResource(resourceName);
     applyThreeTextureSettings(resource, threeTexture);
+    editorTextureQuality3DManager.track(threeTexture, {
+      keepNearestFilter:
+        resource.getKind() === 'image' &&
+        !gd.asImageResource(resource).isSmooth(),
+    });
 
     return (loadedOrLoadingThreeTextures[resourceName] = Promise.resolve(
       threeTexture
@@ -1047,7 +1068,27 @@ export default class PixiResourcesLoader {
     // $FlowFixMe[constant-condition]
     if (promise) return promise;
 
-    const loadingPromise = load3DModel(project, resourceName);
+    const loadingPromise = load3DModel(project, resourceName).then(model => {
+      if (model !== invalidModel) {
+        model.scene.traverse(node => {
+          const materials = node.material
+            ? Array.isArray(node.material)
+              ? node.material
+              : [node.material]
+            : [];
+          materials.forEach(material => {
+            for (const key in material) {
+              const texture = material[key];
+              if (texture && texture.isTexture)
+                editorTextureQuality3DManager.track(texture, {
+                  respectSamplerSettings: true,
+                });
+            }
+          });
+        });
+      }
+      return model;
+    });
     loadedOrLoading3DModelPromises[resourceName] = loadingPromise;
     return loadingPromise;
   }

@@ -391,6 +391,7 @@ namespace gdjs {
     private _trackedSources = new Map<string, TrackedSourceEntry>();
     private _totalMemoryBytes = 0;
     private _isMemoryBudgetWarningLogged = false;
+    private _isDisposed = false;
 
     // Cache of the images that were already downscaled, to avoid doing the
     // work twice when a source is shared between several textures.
@@ -477,6 +478,24 @@ namespace gdjs {
      */
     getSettings(): TextureQuality3DSettings {
       return { ...this._settings };
+    }
+
+    /**
+     * Re-read the settings saved in the project and apply them again to the
+     * textures that are already loaded.
+     *
+     * This is called when the project data is replaced while the game is
+     * running (see `gdjs.RuntimeGame.setProjectData`), which is what the
+     * hot-reload of the editor does. The settings saved in the new project
+     * data then take precedence over the changes previously made at runtime
+     * by the actions of the 3D extension.
+     */
+    reloadSettingsFromProject(runtimeGame: gdjs.RuntimeGame): void {
+      if (this._isDisposed) return;
+      this._settings =
+        gdjs.TextureQuality3DManager.loadSettingsFromProject(runtimeGame);
+      this._isMemoryBudgetWarningLogged = false;
+      this._reapplyToTrackedTextures();
     }
 
     /**
@@ -589,10 +608,17 @@ namespace gdjs {
      * Return the maximum texture resolution that textures must respect,
      * taking both the settings and the hard limit of the GPU into account.
      * 0 means "no limit".
+     *
+     * Cube map faces are limited by `GL.MAX_CUBE_MAP_TEXTURE_SIZE`, which can
+     * be smaller than `GL.MAX_TEXTURE_SIZE`: pass 'cubemap' as the kind for
+     * them. Every other texture uses `GL.MAX_TEXTURE_SIZE`.
      */
-    getMaxTextureResolution(): integer {
-      const deviceMax = this._capabilities
-        ? this._capabilities.maxTextureSize
+    getMaxTextureResolution(kind?: TextureQuality3DTextureKind): integer {
+      const capabilities = this._capabilities;
+      const deviceMax = capabilities
+        ? kind === 'cubemap'
+          ? capabilities.maxCubemapSize
+          : capabilities.maxTextureSize
         : 0;
       let maxResolution = this._settings.maxTextureResolution;
       if (deviceMax > 0 && (maxResolution === 0 || maxResolution > deviceMax)) {
@@ -618,7 +644,7 @@ namespace gdjs {
       if (this._settings.enabled) {
         // The resolution cap is useful even for 3D models with respected
         // samplers: it reduces the GPU memory usage.
-        this._fitTextureResolution(texture);
+        this._fitTextureResolution(texture, applyOptions.kind);
 
         const canChangeSampler =
           !applyOptions.respectSamplerSettings ||
@@ -798,12 +824,20 @@ namespace gdjs {
      * Downscale the image (or the 6 images of a cube texture) if it is bigger
      * than the maximum texture resolution, so that less GPU memory is used.
      */
-    private _fitTextureResolution(texture: THREE.Texture): boolean {
-      const maxResolution = this.getMaxTextureResolution();
-      if (maxResolution <= 0) return false;
-
+    private _fitTextureResolution(
+      texture: THREE.Texture,
+      kind?: TextureQuality3DTextureKind
+    ): boolean {
       const image: any = texture.image;
       if (!image) return false;
+
+      // Cube map faces are limited by `GL.MAX_CUBE_MAP_TEXTURE_SIZE`, which
+      // can be smaller than `GL.MAX_TEXTURE_SIZE`.
+      const isCubeMap = kind === 'cubemap' || (!kind && Array.isArray(image));
+      const maxResolution = this.getMaxTextureResolution(
+        isCubeMap ? 'cubemap' : 'image'
+      );
+      if (maxResolution <= 0) return false;
 
       if (Array.isArray(image)) {
         // Cube texture: fit each face.
@@ -1117,6 +1151,7 @@ namespace gdjs {
      * model manager.
      */
     dispose(): void {
+      this._isDisposed = true;
       this._trackedTextures.clear();
       this._trackedSources.clear();
       this._totalMemoryBytes = 0;

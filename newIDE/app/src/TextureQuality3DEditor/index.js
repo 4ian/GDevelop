@@ -121,6 +121,10 @@ const TextureQuality3DEditor = (props: Props) => {
                 preset: (newPreset: any),
               };
               saveSettings(project, newSettings);
+              // Preset selection has its own save path (separate from the
+              // individual controls below), so explicitly refresh the live
+              // editor textures here as well.
+              PixiResourcesLoader.refreshEditorTextureQualitySettings(project);
               props.onSettingsUpdated();
               setSettings(newSettings);
             }}

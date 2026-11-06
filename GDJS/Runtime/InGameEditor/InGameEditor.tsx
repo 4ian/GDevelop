@@ -6838,8 +6838,33 @@ namespace gdjs {
         } else if (!areSameTouchesSet(this._gestureActiveTouchIds, touchIds)) {
           // Start or reinitialize gesture tracking
           this._gestureActiveTouchIds = touchIds.slice();
+          if (touchCount === 2) {
+            const centroid = getTouchesCentroid(inputManager);
+            this._gestureLastCentroidX = centroid.x;
+            this._gestureLastCentroidY = centroid.y;
+            this._gestureLastDistance = getTouchesDistance(inputManager);
+          }
         } else {
           // Process ongoing gesture
+          if (touchCount === 2) {
+            // Pan: move on the camera plane by centroid delta
+            const centroid = getTouchesCentroid(inputManager);
+
+            this.cameraCenterX -=
+              (centroid.x - this._gestureLastCentroidX) / this.cameraZoom;
+            this.cameraCenterY -=
+              (centroid.y - this._gestureLastCentroidY) / this.cameraZoom;
+
+            this._gestureLastCentroidX = centroid.x;
+            this._gestureLastCentroidY = centroid.y;
+
+            // Pinch: zoom forward/backward based on distance delta
+            const dist = getTouchesDistance(inputManager);
+            if (dist !== 0 && this._gestureLastDistance !== 0) {
+              this.cameraZoom *= dist / this._gestureLastDistance;
+              this._gestureLastDistance = dist;
+            }
+          }
         }
       } else {
         // Reset gesture tracking when camera control is disabled.

@@ -209,7 +209,7 @@ describe('gdjs.TextureQuality3DManager settings reload', () => {
     expect(manager.getSettings().maxTextureResolution).to.be(4);
   });
 
-  it('makes the reloaded project settings take precedence over previous runtime changes', () => {
+  it('makes runtime changes survive the reload and take precedence over the project settings', () => {
     const runtimeGame = makeGame({
       enabled: true,
       filtering: 'bilinear',
@@ -223,13 +223,19 @@ describe('gdjs.TextureQuality3DManager settings reload', () => {
     manager.updateSettings({ filtering: 'nearest' });
     expect(texture.minFilter).to.be(THREE.NearestFilter);
 
-    // The project data wins when it is reloaded: the editor sends the whole
-    // project again, so its settings are the new source of truth.
+    // The runtime change survives the hot-reload and wins over the new
+    // project value (runtime overrides have priority over project settings).
     hotReloadProjectData(runtimeGame, {
       enabled: true,
       filtering: 'bilinear',
       mipmapMode: 'forceOff',
     });
+    expect(manager.getSettings().filtering).to.be('nearest');
+    expect(manager.getProjectSettings().filtering).to.be('bilinear');
+    expect(texture.minFilter).to.be(THREE.NearestFilter);
+
+    // Removing the override returns to the latest project setting.
+    manager.removeRuntimeOverride('filtering');
     expect(manager.getSettings().filtering).to.be('bilinear');
     expect(texture.minFilter).to.be(THREE.LinearFilter);
     expect(texture.magFilter).to.be(THREE.LinearFilter);

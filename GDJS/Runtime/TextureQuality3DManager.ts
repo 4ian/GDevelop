@@ -687,7 +687,7 @@ namespace gdjs {
      * be detected automatically: use `clearRuntimeOverrides` explicitly).
      */
     private static _getProjectKey(runtimeGame: gdjs.RuntimeGame): string {
-      return runtimeGame._data.properties.projectUuid || '';
+      return runtimeGame._data?.properties?.projectUuid || '';
     }
 
     /**
@@ -888,7 +888,6 @@ namespace gdjs {
         // The resolution cap is useful even for 3D models with respected
         // samplers: it reduces the GPU memory usage.
         this._fitTextureResolution(texture, entry);
-        this._fitTextureResolution(texture, applyOptions.kind);
 
         const canChangeSampler =
           !applyOptions.respectSamplerSettings ||
@@ -1157,32 +1156,6 @@ namespace gdjs {
         if (texture.minFilter !== originalSampler.minFilter) {
           texture.minFilter = originalSampler.minFilter;
           changed = true;
-    private _fitTextureResolution(
-      texture: THREE.Texture,
-      kind?: TextureQuality3DTextureKind
-    ): boolean {
-      const image: any = texture.image;
-      if (!image) return false;
-
-      // Cube map faces are limited by `GL.MAX_CUBE_MAP_TEXTURE_SIZE`, which
-      // can be smaller than `GL.MAX_TEXTURE_SIZE`.
-      const isCubeMap = kind === 'cubemap' || (!kind && Array.isArray(image));
-      const maxResolution = this.getMaxTextureResolution(
-        isCubeMap ? 'cubemap' : 'image'
-      );
-      if (maxResolution <= 0) return false;
-
-      if (Array.isArray(image)) {
-        // Cube texture: fit each face.
-        let changed = false;
-        const resizedImages = image.map((face: any) => {
-          const resizedFace = this._fitImageResolution(face, maxResolution);
-          if (resizedFace !== face) changed = true;
-          return resizedFace;
-        });
-        if (changed) {
-          texture.image = resizedImages;
-          texture.needsUpdate = true;
         }
         if (texture.generateMipmaps !== originalSampler.generateMipmaps) {
           texture.generateMipmaps = originalSampler.generateMipmaps;
@@ -1399,7 +1372,7 @@ namespace gdjs {
       const originalImage = this._getOriginalImage(group);
       if (!originalImage) return false;
 
-      const maxResolution = this.getMaxTextureResolution();
+      const maxResolution = this.getMaxTextureResolution(entry.kind);
       if (maxResolution <= 0) {
         // No limit: put the original image back if it was downscaled before.
         return this._useOriginalSource(group);
@@ -1481,6 +1454,7 @@ namespace gdjs {
           kind: options.kind || 'image',
           keepNearestFilter: !!options.keepNearestFilter,
           respectSamplerSettings: !!options.respectSamplerSettings,
+          memoryBytes: 0,
         };
         this._trackedTextures.set(textureId, entry);
         group.textureIds.add(textureId);
@@ -1543,44 +1517,10 @@ namespace gdjs {
           (texture.generateMipmaps ? 4 / 3 : 1)
       );
 
-      const sourceEntry = entry.source;
-      if (sourceEntry.memoryBytes !== memoryBytes) {
-        // The texture was resized or its mipmaps were changed.
-        this._totalMemoryBytes += memoryBytes - sourceEntry.memoryBytes;
-        sourceEntry.memoryBytes = memoryBytes;
-      }
-      const sourceId = texture.source.uuid;
-      let sourceEntry = this._trackedSources.get(sourceId);
-      if (!sourceEntry) {
-        sourceEntry = { memoryBytes: 0, textureIds: new Set() };
-        this._trackedSources.set(sourceId, sourceEntry);
-      }
-      sourceEntry.textureIds.add(textureId);
-
-      if (!entry) {
-        entry = {
-          texture,
-          sourceId,
-          label: options.label || 'texture',
-          kind: options.kind || 'image',
-          keepNearestFilter: !!options.keepNearestFilter,
-          respectSamplerSettings: !!options.respectSamplerSettings,
-          memoryBytes,
-        };
-        this._trackedTextures.set(textureId, entry);
-        texture.addEventListener('dispose', () => {
-          this._untrackTexture(textureId);
-        });
-      } else {
-        entry.label = options.label || entry.label;
-        entry.kind = options.kind || entry.kind;
-        entry.keepNearestFilter = !!options.keepNearestFilter;
-        entry.respectSamplerSettings = !!options.respectSamplerSettings;
-        // The texture may have been resized (or restored) since it was
-        // first tracked.
-        entry.memoryBytes = memoryBytes;
-      }
-      this._updateSourceMemory(sourceId);
+      // The source group may be shared by cloned textures. Keep a per-texture
+      // estimate and account the group only once, using its largest member.
+      entry.memoryBytes = memoryBytes;
+      this._updateSourceMemory(entry.source);
 
       const settings = this._settings;
       if (
@@ -1606,9 +1546,7 @@ namespace gdjs {
      * the number of textures sharing it, and repeated calls never accumulate
      * errors (the total always converges to the sum of the source estimates).
      */
-    private _updateSourceMemory(sourceId: string): void {
-      const sourceEntry = this._trackedSources.get(sourceId);
-      if (!sourceEntry) return;
+    private _updateSourceMemory(sourceEntry: TrackedSourceEntry): void {
       let memoryBytes = 0;
       for (const textureId of sourceEntry.textureIds) {
         const entry = this._trackedTextures.get(textureId);
@@ -1641,20 +1579,15 @@ namespace gdjs {
 
       const sourceEntry = entry.source;
       sourceEntry.textureIds.delete(textureId);
-      if (sourceEntry.textureIds.size > 0) return;
-
-      this._trackedSources.delete(sourceEntry.originalSource.uuid);
-      this._totalMemoryBytes -= sourceEntry.memoryBytes;
-      if (this._totalMemoryBytes < 0) this._totalMemoryBytes = 0;
       if (sourceEntry.textureIds.size === 0) {
-        this._trackedSources.delete(entry.sourceId);
+        this._trackedSources.delete(sourceEntry.originalSource.uuid);
         this._totalMemoryBytes -= sourceEntry.memoryBytes;
         if (this._totalMemoryBytes < 0) this._totalMemoryBytes = 0;
       } else {
         // The source is still used by other textures, but its estimate can
         // shrink (for example when the disposed texture was the only one
         // generating mipmaps).
-        this._updateSourceMemory(entry.sourceId);
+        this._updateSourceMemory(sourceEntry);
       }
     }
 
@@ -1762,18 +1695,17 @@ namespace gdjs {
             height = Math.max(height, face.naturalHeight || face.height || 0);
           }
           const sourceEntry = entry.source;
-          const sourceEntry = this._trackedSources.get(entry.sourceId);
-          const sourceMemoryBytes = sourceEntry ? sourceEntry.memoryBytes : 0;
-          const isNewSource = !sourcesWithAttributedMemory.has(entry.sourceId);
-          if (isNewSource) sourcesWithAttributedMemory.add(entry.sourceId);
+          const sourceId = sourceEntry.originalSource.uuid;
+          const sourceMemoryBytes = sourceEntry.memoryBytes;
+          const isNewSource = !sourcesWithAttributedMemory.has(sourceId);
+          if (isNewSource) sourcesWithAttributedMemory.add(sourceId);
           textures.push({
             id: entry.texture.uuid,
-            sourceId: entry.sourceId,
+            sourceId,
             label: entry.label,
             kind: entry.kind,
             width,
             height,
-            memoryBytes: sourceEntry.memoryBytes,
             memoryBytes: entry.memoryBytes,
             uniqueSourceMemoryBytes: isNewSource ? sourceMemoryBytes : 0,
             sourceMemoryBytes,

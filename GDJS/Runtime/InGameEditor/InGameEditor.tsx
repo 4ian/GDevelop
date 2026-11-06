@@ -541,6 +541,7 @@ namespace gdjs {
      * is not listed keeps its default shortcut, an empty string removes it.
      */
     shortcuts?: { [commandName: string]: string };
+    isRealTime2DEditorEnabled: boolean;
   };
 
   const defaultInGameEditorSettings: InGameEditorSettings = {
@@ -552,6 +553,7 @@ namespace gdjs {
       textColorPrimary: 'black',
     },
     shortcuts: {},
+    isRealTime2DEditorEnabled: false,
   };
 
   let hasWindowFocus = true;
@@ -1358,6 +1360,9 @@ namespace gdjs {
       translationY: float
     ) {
       for (const selectedInstance of selectedObjects) {
+        if (this.editor.isInstanceLocked(selectedInstance)) {
+          return;
+        }
         const initialInstanceOriginPosition =
           this._getOrCreateInstanceOriginPosition(selectedInstance);
         const initialInstanceOriginX = initialInstanceOriginPosition[0];
@@ -1379,6 +1384,9 @@ namespace gdjs {
       fixedPointY: float
     ) {
       for (const selectedInstance of selectedObjects) {
+        if (this.editor.isInstanceLocked(selectedInstance)) {
+          return;
+        }
         const initialAABB = this._getOrCreateInstanceAABB(selectedInstance);
         const initialCenterX = (initialAABB.min[0] + initialAABB.max[0]) / 2;
         const initialCenterY = (initialAABB.min[1] + initialAABB.max[1]) / 2;
@@ -1435,6 +1443,9 @@ namespace gdjs {
       const hasRotatedInstance = areAnyInstancesNotStraight(selectedObjects);
 
       for (const selectedInstance of selectedObjects) {
+        if (this.editor.isInstanceLocked(selectedInstance)) {
+          return;
+        }
         const initialUnrotatedInstanceAABB =
           this._getOrCreateUnrotatedInstanceAABB(selectedInstance);
         const initialUnrotatedInstanceWidth =
@@ -2374,10 +2385,12 @@ namespace gdjs {
       }
       // Compatibility with GD <= 5.6.286
       if (!this._instancesEditorSettings.editorMode) {
-        this._instancesEditorSettings.editorMode =
-          this._instancesEditorSettings.gameEditorMode === 'embedded-game'
+        this._instancesEditorSettings.editorMode = this._inGameEditorSettings
+          .isRealTime2DEditorEnabled
+          ? this._instancesEditorSettings.gameEditorMode === 'embedded-game'
             ? '3d-editor'
-            : '2d-editor';
+            : '2d-editor'
+          : '3d-editor';
       }
       // end of compatibility code
       if (this._instancesEditorSettings.editorMode === '3d-editor') {
@@ -9002,11 +9015,13 @@ namespace gdjs {
         const positions = new Float32Array(segmentCount * 3);
 
         indices[0] = 0;
-        indices[indices.length - 1] = 0;
-        for (let index = 0; index < segmentCount; index++) {
-          indices[index * 2 + 1] = index;
-          indices[index * 2 + 2] = index;
+        for (let index = 1; index < segmentCount; index++) {
+          // Previous segment end
+          indices[index * 2 - 1] = index;
+          // Current segment start
+          indices[index * 2] = index;
         }
+        indices[indices.length - 1] = 0;
 
         for (let index = 0; index < segmentCount; index++) {
           const angle = (2 * Math.PI * index) / segmentCount;

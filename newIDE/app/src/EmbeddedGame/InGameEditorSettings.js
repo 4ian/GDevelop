@@ -6,6 +6,7 @@ import {
   getCommandNamesHandledByInGameEditor,
   type CommandName,
 } from '../CommandPalette/CommandsList';
+import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 
 export type InGameEditorSettings = {
   theme: {
@@ -21,6 +22,7 @@ export type InGameEditorSettings = {
    * means that the command has no shortcut.
    */
   shortcuts: { [CommandName]: string },
+  isRealTime2DEditorEnabled: boolean,
 };
 
 const commandNamesHandledByInGameEditor = getCommandNamesHandledByInGameEditor();
@@ -51,6 +53,10 @@ export const useInGameEditorSettings = (): InGameEditorSettings => {
     [shortcutMap]
   );
 
+  const {
+    values: { useRealTime2DEditor },
+  } = React.useContext(PreferencesContext);
+
   const inGameEditorSettings = React.useMemo<InGameEditorSettings>(
     () => ({
       theme: {
@@ -61,6 +67,7 @@ export const useInGameEditorSettings = (): InGameEditorSettings => {
         textColorPrimary,
       },
       shortcuts,
+      isRealTime2DEditorEnabled: useRealTime2DEditor,
     }),
     [
       iconButtonSelectedBackgroundColor,
@@ -69,6 +76,7 @@ export const useInGameEditorSettings = (): InGameEditorSettings => {
       toolbarSeparatorColor,
       textColorPrimary,
       shortcuts,
+      useRealTime2DEditor,
     ]
   );
 

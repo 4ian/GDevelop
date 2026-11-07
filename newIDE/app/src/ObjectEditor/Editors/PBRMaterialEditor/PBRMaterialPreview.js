@@ -27,16 +27,60 @@ const textureSlots = [
 ];
 
 /**
+ * Return a clone of the texture with the UV transform applied (or the texture
+ * itself when the transform is the identity).
+ */
+const applyUvTransform = (texture, transform) => {
+  if (!texture || !transform) return texture;
+  const repeatX = transform.repeatX === undefined ? 1 : transform.repeatX;
+  const repeatY = transform.repeatY === undefined ? 1 : transform.repeatY;
+  const offsetX = transform.offsetX === undefined ? 0 : transform.offsetX;
+  const offsetY = transform.offsetY === undefined ? 0 : transform.offsetY;
+  const rotation = transform.rotation === undefined ? 0 : transform.rotation;
+  if (
+    repeatX === 1 &&
+    repeatY === 1 &&
+    offsetX === 0 &&
+    offsetY === 0 &&
+    rotation === 0
+  ) {
+    return texture;
+  }
+  const clone = texture.clone();
+  clone.wrapS = THREE.RepeatWrapping;
+  clone.wrapT = THREE.RepeatWrapping;
+  clone.center.set(0.5, 0.5);
+  clone.repeat.set(repeatX, repeatY);
+  clone.offset.set(offsetX, offsetY);
+  clone.rotation = (rotation * Math.PI) / 180;
+  clone.needsUpdate = true;
+  return clone;
+};
+
+/**
+ * Merge the global UV transform of the settings with the one of a slot.
+ */
+const getSlotUvTransform = (settings, slotName) => {
+  const globalTransform = settings.uvTransform;
+  const slotTransform =
+    settings.slotUvTransforms && settings.slotUvTransforms[slotName];
+  if (!globalTransform && !slotTransform) return undefined;
+  return { ...globalTransform, ...slotTransform };
+};
+
+/**
  * Build the Three.js material shown by the preview, from PBR settings.
  */
 const createMaterial = async (
   project: gdProject,
   settings: PBRMaterialSettings
 ): Promise<THREE.Material> => {
+  // Neutral values do not need the (slower) physical material, like in the
+  // game engine (`settingsNeedPhysicalMaterial`).
   const needsPhysical =
-    settings.transmission !== undefined ||
-    settings.ior !== undefined ||
-    settings.clearcoat !== undefined;
+    (settings.transmission !== undefined && settings.transmission > 0) ||
+    (settings.clearcoat !== undefined && settings.clearcoat > 0) ||
+    (settings.ior !== undefined && settings.ior !== 1.5);
   const material = needsPhysical
     ? new THREE.MeshPhysicalMaterial()
     : new THREE.MeshStandardMaterial();
@@ -72,8 +116,19 @@ const createMaterial = async (
     material.opacity = settings.opacity;
     material.transparent = settings.opacity < 1;
   }
-  if (settings.normalScale !== undefined) {
-    material.normalScale.setScalar(settings.normalScale);
+  if (
+    settings.normalScale !== undefined ||
+    settings.normalFlipY !== undefined
+  ) {
+    // The strength is always positive: `normalFlipY` only inverts the green
+    // channel of the normal map (DirectX / Unreal convention).
+    const strength = Math.abs(
+      settings.normalScale !== undefined
+        ? settings.normalScale
+        : material.normalScale.x
+    );
+    const flip = settings.normalFlipY === true;
+    material.normalScale.set(strength, flip ? -strength : strength);
   }
   if (settings.aoIntensity !== undefined) {
     material.aoMapIntensity = settings.aoIntensity;
@@ -100,6 +155,8 @@ const createMaterial = async (
     }
     if (settings.clearcoat !== undefined)
       physicalMaterial.clearcoat = settings.clearcoat;
+    if (settings.clearcoatRoughness !== undefined)
+      physicalMaterial.clearcoatRoughness = settings.clearcoatRoughness;
   }
   if (settings.doubleSided) {
     material.side = THREE.DoubleSide;
@@ -110,13 +167,17 @@ const createMaterial = async (
     textureSlots.map(async slotName => {
       const resourceName = textures[slotName];
       if (resourceName === undefined) return;
-      const texture = resourceName
+      const loadedTexture = resourceName
         ? await getPBRThreeTexture(
             project,
             resourceName,
             isColorTextureSlot(slotName)
           )
         : null;
+      const texture = applyUvTransform(
+        loadedTexture,
+        getSlotUvTransform(settings, slotName)
+      );
       switch (slotName) {
         case 'baseColor':
           material.map = texture;

@@ -37,11 +37,14 @@ import {
   writeBooleanValue,
   readTextureValue,
   writeTextureValue,
+  readUvTransformValue,
+  writeUvTransformValue,
   resetProperty,
   applyPreset,
   getMergedSettingsWithDefaults,
   floatProperties,
   textureSlots,
+  uvTransformProperties,
   presetNames,
   type PBRConfig,
 } from './pbrConfig';
@@ -277,6 +280,12 @@ const PBRMaterialEditor = ({
     updateConfig(newConfig);
   };
 
+  const onChangeUvTransform = (key: string, value: number) => {
+    const newConfig = parsePBRConfig(pbrConfigJson);
+    writeUvTransformValue(newConfig, targetName, key, value);
+    updateConfig(newConfig);
+  };
+
   const onChangeTexture = (slot: string, resourceName: string) => {
     const newConfig = parsePBRConfig(pbrConfigJson);
     writeTextureValue(newConfig, targetName, slot, resourceName);
@@ -382,6 +391,37 @@ const PBRMaterialEditor = ({
     'doubleSided',
     false
   );
+  const normalFlipY = readBooleanValue(
+    config,
+    targetName,
+    'normalFlipY',
+    false
+  );
+
+  const renderUvTransformSlider = (key: string) => {
+    const property = uvTransformProperties.find(item => item.key === key);
+    if (!property) return null;
+    const { value, isOverridden } = readUvTransformValue(
+      config,
+      targetName,
+      property.key,
+      property.defaultValue
+    );
+    return (
+      <FloatSlider
+        key={property.key}
+        label={property.label}
+        value={value}
+        isOverridden={isOverridden}
+        min={property.min}
+        max={property.max}
+        step={property.step}
+        visibleResetButton={isTarget}
+        onChange={newValue => onChangeUvTransform(property.key, newValue)}
+        onReset={() => onResetProperty('uvTransform:' + property.key)}
+      />
+    );
+  };
 
   return (
     <ColumnStackLayout noMargin>
@@ -480,6 +520,26 @@ const PBRMaterialEditor = ({
               ['emissiveIntensity', 'normalScale'],
               ['aoIntensity', 'envMapIntensity'],
             ])}
+            <Line noMargin alignItems="center">
+              <Column expand noMargin>
+                <Checkbox
+                  checked={normalFlipY.value}
+                  label={
+                    <Trans>
+                      Flip the normal map green channel (DirectX / Unreal)
+                    </Trans>
+                  }
+                  onCheck={(_, checked) =>
+                    onChangeBoolean('normalFlipY', checked)
+                  }
+                />
+              </Column>
+              <ResetButton
+                isOverridden={normalFlipY.isOverridden}
+                visible={isTarget}
+                onClick={() => onResetProperty('normalFlipY')}
+              />
+            </Line>
 
             <Text size="block-title" style={styles.sectionTitle} noMargin>
               <Trans>Transparency</Trans>
@@ -487,8 +547,39 @@ const PBRMaterialEditor = ({
             {renderSliderRows([
               ['opacity', 'alphaCutoff'],
               ['transmission', 'ior'],
-              ['clearcoat'],
+              ['clearcoat', 'clearcoatRoughness'],
             ])}
+
+            <Text size="block-title" style={styles.sectionTitle} noMargin>
+              <Trans>Texture tiling</Trans>
+            </Text>
+            <Text size="body" noMargin>
+              <Trans>
+                Tiling, offset and rotation applied to the textures set above (a
+                texture left untouched keeps its original mapping).
+              </Trans>
+            </Text>
+            <ResponsiveLineStackLayout
+              expand
+              noColumnMargin
+              noResponsiveLandscape
+            >
+              {['repeatX', 'repeatY'].map(key => renderUvTransformSlider(key))}
+            </ResponsiveLineStackLayout>
+            <ResponsiveLineStackLayout
+              expand
+              noColumnMargin
+              noResponsiveLandscape
+            >
+              {['offsetX', 'offsetY'].map(key => renderUvTransformSlider(key))}
+            </ResponsiveLineStackLayout>
+            <ResponsiveLineStackLayout
+              expand
+              noColumnMargin
+              noResponsiveLandscape
+            >
+              {renderUvTransformSlider('rotation')}
+            </ResponsiveLineStackLayout>
 
             <Text size="block-title" style={styles.sectionTitle} noMargin>
               <Trans>Textures</Trans>

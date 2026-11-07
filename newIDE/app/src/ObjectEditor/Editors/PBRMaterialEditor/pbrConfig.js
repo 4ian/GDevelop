@@ -33,6 +33,14 @@ export type PBRMaterialTextures = {|
   opacity?: string,
 |};
 
+export type PBRUvTransform = {|
+  repeatX?: number,
+  repeatY?: number,
+  offsetX?: number,
+  offsetY?: number,
+  rotation?: number,
+|};
+
 export type PBRMaterialSettings = {|
   preset?: string,
   baseColor?: string,
@@ -49,8 +57,12 @@ export type PBRMaterialSettings = {|
   ior?: number,
   transmission?: number,
   clearcoat?: number,
+  clearcoatRoughness?: number,
+  normalFlipY?: boolean,
   doubleSided?: boolean,
   alphaCutoff?: number,
+  uvTransform?: PBRUvTransform,
+  slotUvTransforms?: { [slot: string]: PBRUvTransform },
   textures?: PBRMaterialTextures,
 |};
 
@@ -206,6 +218,99 @@ export const writeBooleanValue = (
   if (settings) settings[key] = value;
 };
 
+/**
+ * The description of a numeric property of a UV transform (tiling, offset or
+ * rotation).
+ */
+export type PBRUvTransformProperty = {|
+  key: string,
+  label: string,
+  min: number,
+  max: number,
+  step: number,
+  defaultValue: number,
+|};
+
+export const uvTransformProperties: Array<PBRUvTransformProperty> = [
+  {
+    key: 'repeatX',
+    label: 'Tiling X',
+    min: 0.01,
+    max: 32,
+    step: 0.01,
+    defaultValue: 1,
+  },
+  {
+    key: 'repeatY',
+    label: 'Tiling Y',
+    min: 0.01,
+    max: 32,
+    step: 0.01,
+    defaultValue: 1,
+  },
+  {
+    key: 'offsetX',
+    label: 'Offset X',
+    min: -1,
+    max: 1,
+    step: 0.01,
+    defaultValue: 0,
+  },
+  {
+    key: 'offsetY',
+    label: 'Offset Y',
+    min: -1,
+    max: 1,
+    step: 0.01,
+    defaultValue: 0,
+  },
+  {
+    key: 'rotation',
+    label: 'Rotation (degrees)',
+    min: -180,
+    max: 180,
+    step: 1,
+    defaultValue: 0,
+  },
+];
+
+/**
+ * The value of a UV transform property for a target (the target overrides the
+ * object).
+ */
+export const readUvTransformValue = (
+  config: PBRConfig,
+  targetName: string,
+  property: string,
+  defaultValue: number
+): {| value: number, isOverridden: boolean |} => {
+  const targetSettings = targetName
+    ? getTargetSettings(config, targetName, false)
+    : null;
+  const targetTransform = targetSettings && targetSettings.uvTransform;
+  if (targetTransform && (targetTransform: any)[property] !== undefined) {
+    return { value: (targetTransform: any)[property], isOverridden: true };
+  }
+  const settings = getTargetSettings(config, '', false);
+  const transform = settings && settings.uvTransform;
+  if (transform && (transform: any)[property] !== undefined) {
+    return { value: (transform: any)[property], isOverridden: false };
+  }
+  return { value: defaultValue, isOverridden: false };
+};
+
+export const writeUvTransformValue = (
+  config: PBRConfig,
+  targetName: string,
+  property: string,
+  value: number
+) => {
+  const settings = getTargetSettings(config, targetName, true);
+  if (!settings) return;
+  if (!settings.uvTransform) settings.uvTransform = {};
+  (settings.uvTransform: any)[property] = value;
+};
+
 export const readTextureValue = (
   config: PBRConfig,
   targetName: string,
@@ -251,6 +356,10 @@ export const resetProperty = (
   if (!settings) return;
   if (key.startsWith('texture:') && settings.textures) {
     delete settings.textures[key.substring('texture:'.length)];
+    return;
+  }
+  if (key.startsWith('uvTransform:') && settings.uvTransform) {
+    delete settings.uvTransform[key.substring('uvTransform:'.length)];
     return;
   }
   delete settings[key];
@@ -365,6 +474,16 @@ export const floatProperties: Array<PBRFloatProperty> = [
     isPhysicalOnly: true,
   },
   {
+    key: 'clearcoatRoughness',
+    label: 'Clear coat roughness',
+    min: 0,
+    max: 1,
+    step: 0.01,
+    defaultValue: 0,
+    group: 'transparency',
+    isPhysicalOnly: true,
+  },
+  {
     key: 'alphaCutoff',
     label: 'Alpha cutoff',
     min: 0,
@@ -448,6 +567,7 @@ export const pbrPresets: { [name: string]: PBRMaterialSettings } = {
     metallic: 0,
     roughness: 0.4,
     clearcoat: 0.3,
+    clearcoatRoughness: 0.15,
   },
   stone: {
     preset: 'stone',

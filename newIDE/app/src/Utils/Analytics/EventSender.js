@@ -34,6 +34,11 @@ let posthogLoaded = false;
 // to a random uuid (like program_opening), which may not be merged to the main user's account.
 let userIdentified = false;
 let currentlyRunningInAppTutorial = null;
+// User properties that changed, sent with the next event rather than in a `$set` event.
+let pendingUserIdAndProperties: {|
+  userIdAndProperties: string,
+  userProperties: { [string]: any },
+|} | null = null;
 let currentProjectUuid: string | null = null;
 
 const lastUserIdAndPropertiesSentLocalStorageKey =
@@ -122,23 +127,6 @@ export const setCurrentProjectUuid = (projectUuid: string | null) => {
   currentProjectUuid = projectUuid;
 };
 
-const makeCanSendEvent = (options: {| minimumTimeBetweenEvents: number |}) => {
-  const lastSentEventTimestamps = {};
-  return (eventName: string) => {
-    const now = Date.now();
-    // $FlowFixMe[invalid-computed-prop]
-    if (lastSentEventTimestamps[eventName]) {
-      const timeSinceLastEvent = now - lastSentEventTimestamps[eventName];
-      if (timeSinceLastEvent < options.minimumTimeBetweenEvents) {
-        return false;
-      }
-    }
-    // $FlowFixMe[prop-missing]
-    lastSentEventTimestamps[eventName] = now;
-    return true;
-  };
-};
-
 /**
  * Metadata about the app, added to every event. Note that `appKind` is `mobile-app` for both
  * iOS and Android: use `appPlatform` to tell them apart.
@@ -196,10 +184,21 @@ const recordEvent = (
       return;
     }
 
-    posthog.capture(name, {
-      ...metadata,
-      ...appMetadata,
-    });
+    const userIdAndPropertiesToSend = pendingUserIdAndProperties;
+    pendingUserIdAndProperties = null;
+    const properties: { [string]: any } = { ...metadata, ...appMetadata };
+    if (userIdAndPropertiesToSend) {
+      properties.$set = {
+        ...userIdAndPropertiesToSend.userProperties,
+        ...properties.$set,
+      };
+    }
+    posthog.capture(name, properties);
+    if (userIdAndPropertiesToSend) {
+      saveLastUserIdAndPropertiesSent(
+        userIdAndPropertiesToSend.userIdAndProperties
+      );
+    }
   })();
 
   (async () => {
@@ -260,6 +259,9 @@ export const installAnalyticsEvents = () => {
     // as the PostHog anonymous id: identifying the anonymous user with it then
     // does not require an `$identify` event.
     get_device_id: () => getUserUUID(),
+    // Anonymous users have a person profile too (their user properties are sent with
+    // an event rather than with `identify`, which would otherwise be required for this).
+    person_profiles: 'always',
     session_recording: {
       // Iframes (in-game editor, gameplay tests) are not recorded: the recording would
       // keep a reference to every document loaded in them (including game WebAssembly memories).
@@ -324,18 +326,18 @@ export const identifyUserForAnalytics = (
       return;
     }
 
-    // Identify which user is using the app, only if the user or its properties
-    // changed since they were last sent (even in a previous launch of the app):
-    // each call sends an `$identify` or `$set` event otherwise.
-    // This is so we can build stats on the used version, languages and usage
-    // of GDevelop features.
+    // Identify which user is using the app, so we can build stats on the used version,
+    // languages and usage of GDevelop features. User properties are only sent if they
+    // changed since they were last sent (even in a previous launch of the app), and
+    // with the next event unless the user changed: `identify` sends an `$identify`
+    // or a `$set` event.
     const userIdAndProperties = JSON.stringify({ userId, userProperties });
-    if (
-      posthog.get_distinct_id() !== userId ||
-      userIdAndProperties !== loadLastUserIdAndPropertiesSent()
-    ) {
+    if (posthog.get_distinct_id() !== userId) {
       posthog.identify(userId, userProperties);
       saveLastUserIdAndPropertiesSent(userIdAndProperties);
+      pendingUserIdAndProperties = null;
+    } else if (userIdAndProperties !== loadLastUserIdAndPropertiesSent()) {
+      pendingUserIdAndProperties = { userIdAndProperties, userProperties };
     }
     userIdentified = true;
   })();
@@ -965,16 +967,8 @@ export const sendAssetSwapFinished = ({
   );
 };
 
-const canSendPlaySectionOpened = makeCanSendEvent({
-  minimumTimeBetweenEvents: 1000 * 60 * 60 * 2, // Only once every 2 hours.
-});
-
 export const sendPlaySectionOpened = () => {
-  if (!canSendPlaySectionOpened('play-section-opened')) {
-    return;
-  }
-
-  recordEvent('play-section-opened');
+  recordDailyAggregatedEvent('play-section-opened');
 };
 
 export const sendAiRequestStarted = (metadata: {|
@@ -996,7 +990,16 @@ export const sendAiRequestMessageSent = (metadata: {|
   aiRequestId: string,
   outputLength: number,
 |}) => {
-  recordEvent('ai-request-message-sent', metadata);
+  // Sent once a day per mode and payment kind: the number of AI requests and
+  // messages is stored by the backend.
+  recordDailyAggregatedEvent(
+    'ai-request-message-sent',
+    metadata,
+    `ai-request-message-sent-${JSON.stringify({
+      mode: metadata.mode,
+      payWithCredits: metadata.payWithCredits,
+    })}`
+  );
 };
 
 export const sendMcpToolCalled = (metadata: {|

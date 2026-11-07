@@ -24,6 +24,8 @@ export interface ProjectItemFolderOrItem {
   getFolderName(): string;
   setFolderName(name: string): void;
   hasItemNamed(name: string): boolean;
+  // Searched recursively.
+  getItemNamed(name: string): ProjectItemFolderOrItem;
   getItemChild(name: string): ProjectItemFolderOrItem;
   getChildrenCount(): number;
   getChildAt(position: number): ProjectItemFolderOrItem;

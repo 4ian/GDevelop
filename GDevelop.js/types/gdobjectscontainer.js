@@ -21,6 +21,10 @@ declare class gdObjectsContainer {
   getRootFolder(): gdObjectFolderOrObject;
   getAllObjectFolderOrObjects(): gdVectorObjectFolderOrObject;
   getObjectGroups(): gdObjectGroupsContainer;
+  serializeObjectsTo(element: gdSerializerElement): void;
+  unserializeObjectsFrom(project: gdProject, element: gdSerializerElement): void;
+  serializeFoldersTo(element: gdSerializerElement): void;
+  unserializeFoldersFrom(project: gdProject, element: gdSerializerElement): void;
   getTypeOfBehavior(layout: gdObjectsContainer, name: string, searchInGroups: boolean): string;
   getTypeOfObject(layout: gdObjectsContainer, name: string, searchInGroups: boolean): string;
   getBehaviorsOfObject(layout: gdObjectsContainer, name: string, searchInGroups: boolean): gdVectorString;

@@ -674,6 +674,17 @@ class GD_CORE_API Project {
     return *layoutsRootFolder;
   }
 
+  /**
+   * \brief Serialize the folder structure of the layouts (scenes).
+   */
+  void SerializeLayoutsFoldersTo(SerializerElement& element) const;
+
+  /**
+   * \brief Replace the folder structure of the layouts (scenes) by the
+   * serialized one. The layouts it does not hold are added at its end.
+   */
+  void UnserializeLayoutsFoldersFrom(const SerializerElement& element);
+
   ///@}
 
   /**
@@ -792,6 +803,18 @@ class GD_CORE_API Project {
   gd::ExternalEventsFolderOrExternalEvents& GetExternalEventsRootFolder() {
     return *externalEventsRootFolder;
   }
+
+  /**
+   * \brief Serialize the folder structure of the external events.
+   */
+  void SerializeExternalEventsFoldersTo(SerializerElement& element) const;
+
+  /**
+   * \brief Replace the folder structure of the external events by the
+   * serialized one. The external events it does not hold are added at its
+   * end.
+   */
+  void UnserializeExternalEventsFoldersFrom(const SerializerElement& element);
   ///@}
 
   /** \name Tests management
@@ -908,6 +931,18 @@ class GD_CORE_API Project {
   gd::ExternalLayoutFolderOrExternalLayout& GetExternalLayoutsRootFolder() {
     return *externalLayoutsRootFolder;
   }
+
+  /**
+   * \brief Serialize the folder structure of the external layouts.
+   */
+  void SerializeExternalLayoutsFoldersTo(SerializerElement& element) const;
+
+  /**
+   * \brief Replace the folder structure of the external layouts by the
+   * serialized one. The external layouts it does not hold are added at its
+   * end.
+   */
+  void UnserializeExternalLayoutsFoldersFrom(const SerializerElement& element);
 
   /**
    * Set the first layout of the project.

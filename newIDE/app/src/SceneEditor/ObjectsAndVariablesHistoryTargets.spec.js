@@ -1,0 +1,1004 @@
+// @flow
+import {
+  getVariablesContainerHistoryTarget as _getVariablesContainerHistoryTarget,
+  getObjectsContainerHistoryTarget as _getObjectsContainerHistoryTarget,
+  getObjectGroupsContainerHistoryTarget as _getObjectGroupsContainerHistoryTarget,
+} from './ObjectsAndVariablesHistoryTargets';
+import { type CompositeTarget } from '../Utils/History';
+import { serializeToJSObject } from '../Utils/Serializer';
+
+const gd: libGDevelop = global.gd;
+
+const noopEnsurePersistentUuids = (object: gdObject) => {};
+
+// getValue/setValue are optional in the general CompositeTarget type (some
+// targets use `serializableObject` instead) - these three always provide
+// them, so narrow the type once here for the whole test file.
+type ValueTarget = {|
+  getValue: () => Object,
+  setValue: (value: Object) => void,
+|};
+const asValueTarget = (target: CompositeTarget): ValueTarget => {
+  const { getValue, setValue } = target;
+  if (!getValue || !setValue) throw new Error('Expected a value-based target.');
+  return { getValue, setValue };
+};
+const getVariablesContainerHistoryTarget = (
+  variablesContainer: gdVariablesContainer
+): ValueTarget =>
+  asValueTarget(_getVariablesContainerHistoryTarget(variablesContainer));
+const getObjectsContainerHistoryTarget = (
+  objectsContainer: gdObjectsContainer,
+  project: gdProject,
+  ensurePersistentUuidsOfObject: (object: gdObject) => void
+): ValueTarget =>
+  asValueTarget(
+    _getObjectsContainerHistoryTarget(
+      objectsContainer,
+      project,
+      ensurePersistentUuidsOfObject
+    )
+  );
+const getObjectGroupsContainerHistoryTarget = (
+  objectGroupsContainer: gdObjectGroupsContainer
+): ValueTarget =>
+  asValueTarget(_getObjectGroupsContainerHistoryTarget(objectGroupsContainer));
+
+describe('getObjectsContainerHistoryTarget', () => {
+  const makeProject = () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Scene', 0);
+    return { project, layout, objectsContainer: layout.getObjects() };
+  };
+
+  it('undoes and redoes the creation of an object, restoring its exact content', () => {
+    const { project, objectsContainer } = makeProject();
+    const target = getObjectsContainerHistoryTarget(
+      objectsContainer,
+      project,
+      noopEnsurePersistentUuids
+    );
+
+    const before = target.getValue();
+    const newObject = objectsContainer.insertNewObject(
+      project,
+      'Sprite',
+      'Enemy',
+      0
+    );
+    newObject
+      .getVariables()
+      .insertNew('Health', 0)
+      .setValue(5);
+    const after = target.getValue();
+
+    target.setValue(before);
+    expect(objectsContainer.hasObjectNamed('Enemy')).toBe(false);
+
+    target.setValue(after);
+    expect(objectsContainer.hasObjectNamed('Enemy')).toBe(true);
+    expect(
+      objectsContainer
+        .getObject('Enemy')
+        .getVariables()
+        .get('Health')
+        .getValue()
+    ).toBe(5);
+
+    project.delete();
+  });
+
+  it('never destroys and recreates an object unrelated to the step being undone/redone', () => {
+    const { project, objectsContainer } = makeProject();
+    const player = objectsContainer.insertNewObject(
+      project,
+      'Sprite',
+      'Player',
+      0
+    );
+    player
+      .getVariables()
+      .insertNew('Life', 0)
+      .setValue(3);
+
+    const target = getObjectsContainerHistoryTarget(
+      objectsContainer,
+      project,
+      noopEnsurePersistentUuids
+    );
+    const before = target.getValue();
+
+    const removedNames = [];
+    const originalRemoveObject = objectsContainer.removeObject.bind(
+      objectsContainer
+    );
+    objectsContainer.removeObject = (name: string) => {
+      removedNames.push(name);
+      originalRemoveObject(name);
+    };
+
+    objectsContainer.insertNewObject(project, 'Sprite', 'Enemy', 1);
+    const after = target.getValue();
+    target.setValue(before);
+    target.setValue(after);
+
+    expect(removedNames).not.toContain('Player');
+    // Player's own identity, and its variable's, must be untouched -
+    // otherwise any other open scene tab using this (global) object would
+    // be left with dangling references.
+    expect(objectsContainer.getObject('Player').ptr).toBe(player.ptr);
+    expect(
+      objectsContainer
+        .getObject('Player')
+        .getVariables()
+        .get('Life').ptr
+    ).toBe(player.getVariables().get('Life').ptr);
+
+    project.delete();
+  });
+
+  it('updates an existing object in place (same underlying object) when its content changed', () => {
+    const { project, objectsContainer } = makeProject();
+    const player = objectsContainer.insertNewObject(
+      project,
+      'Sprite',
+      'Player',
+      0
+    );
+    const target = getObjectsContainerHistoryTarget(
+      objectsContainer,
+      project,
+      noopEnsurePersistentUuids
+    );
+    const before = target.getValue();
+
+    player
+      .getVariables()
+      .insertNew('Life', 0)
+      .setValue(3);
+    const after = target.getValue();
+
+    target.setValue(before);
+    expect(
+      objectsContainer
+        .getObject('Player')
+        .getVariables()
+        .has('Life')
+    ).toBe(false);
+    expect(objectsContainer.getObject('Player').ptr).toBe(player.ptr);
+
+    target.setValue(after);
+    expect(
+      objectsContainer
+        .getObject('Player')
+        .getVariables()
+        .get('Life')
+        .getValue()
+    ).toBe(3);
+    expect(objectsContainer.getObject('Player').ptr).toBe(player.ptr);
+
+    project.delete();
+  });
+
+  it('undoes and redoes the addition and the removal of a behavior', () => {
+    const { project, objectsContainer } = makeProject();
+    const player = objectsContainer.insertNewObject(
+      project,
+      'Sprite',
+      'Player',
+      0
+    );
+    const target = getObjectsContainerHistoryTarget(
+      objectsContainer,
+      project,
+      noopEnsurePersistentUuids
+    );
+    const withoutBehavior = target.getValue();
+
+    player.addNewBehavior(
+      project,
+      'DestroyOutsideBehavior::DestroyOutside',
+      'DestroyOutside'
+    );
+    const withBehavior = target.getValue();
+
+    const hasBehavior = () =>
+      objectsContainer.getObject('Player').hasBehaviorNamed('DestroyOutside');
+    for (let i = 0; i < 2; i++) {
+      // Undo of the addition, or redo of a removal.
+      target.setValue(withoutBehavior);
+      expect(hasBehavior()).toBe(false);
+      // Redo of the addition, or undo of a removal.
+      target.setValue(withBehavior);
+      expect(hasBehavior()).toBe(true);
+    }
+    expect(objectsContainer.getObject('Player').ptr).toBe(player.ptr);
+
+    project.delete();
+  });
+
+  it('keeps the default (capability) behaviors of an object across undo/redo', () => {
+    const { project, objectsContainer } = makeProject();
+    const player = objectsContainer.insertNewObject(
+      project,
+      'Sprite',
+      'Player',
+      0
+    );
+    const defaultBehaviorNames = player
+      .getAllBehaviorNames()
+      .toJSArray()
+      .filter(name => player.getBehavior(name).isDefaultBehavior());
+    // A sprite has capability behaviors like "Scale", "Opacity", "Effect".
+    expect(defaultBehaviorNames).toContain('Scale');
+
+    const target = getObjectsContainerHistoryTarget(
+      objectsContainer,
+      project,
+      noopEnsurePersistentUuids
+    );
+    const before = target.getValue();
+    player
+      .getVariables()
+      .insertNew('Life', 0)
+      .setValue(10);
+    const after = target.getValue();
+
+    for (let i = 0; i < 2; i++) {
+      target.setValue(before);
+      target.setValue(after);
+    }
+    const object = objectsContainer.getObject('Player');
+    defaultBehaviorNames.forEach(name => {
+      expect(object.hasBehaviorNamed(name)).toBe(true);
+      expect(object.getBehavior(name).isDefaultBehavior()).toBe(true);
+    });
+
+    project.delete();
+  });
+
+  it('keeps the same behavior objects across undo/redo, updating their content', () => {
+    const { project, objectsContainer } = makeProject();
+    const player = objectsContainer.insertNewObject(
+      project,
+      'Sprite',
+      'Player',
+      0
+    );
+    const behavior = player.addNewBehavior(
+      project,
+      'DestroyOutsideBehavior::DestroyOutside',
+      'DestroyOutside'
+    );
+    const target = getObjectsContainerHistoryTarget(
+      objectsContainer,
+      project,
+      noopEnsurePersistentUuids
+    );
+    const getBehavior = () =>
+      objectsContainer.getObject('Player').getBehavior('DestroyOutside');
+    const getExtraBorder = () =>
+      getBehavior()
+        .getProperties()
+        .get('extraBorder')
+        .getValue();
+    const initialExtraBorder = getExtraBorder();
+    const before = target.getValue();
+    behavior.updateProperty('extraBorder', '50');
+    const after = target.getValue();
+
+    for (let i = 0; i < 2; i++) {
+      target.setValue(before);
+      expect(getBehavior().ptr).toBe(behavior.ptr);
+      expect(getExtraBorder()).toBe(initialExtraBorder);
+      target.setValue(after);
+      expect(getBehavior().ptr).toBe(behavior.ptr);
+      expect(getExtraBorder()).toBe('50');
+    }
+
+    project.delete();
+  });
+
+  it('replaces a behavior whose type changed between two steps', () => {
+    const { project, objectsContainer } = makeProject();
+    const player = objectsContainer.insertNewObject(
+      project,
+      'Sprite',
+      'Player',
+      0
+    );
+    player.addNewBehavior(
+      project,
+      'DestroyOutsideBehavior::DestroyOutside',
+      'MyBehavior'
+    );
+    const target = getObjectsContainerHistoryTarget(
+      objectsContainer,
+      project,
+      noopEnsurePersistentUuids
+    );
+    const before = target.getValue();
+    player.removeBehavior('MyBehavior');
+    player.addNewBehavior(
+      project,
+      'DraggableBehavior::Draggable',
+      'MyBehavior'
+    );
+    const after = target.getValue();
+
+    const getType = () =>
+      objectsContainer
+        .getObject('Player')
+        .getBehavior('MyBehavior')
+        .getTypeName();
+    target.setValue(before);
+    expect(getType()).toBe('DestroyOutsideBehavior::DestroyOutside');
+    target.setValue(after);
+    expect(getType()).toBe('DraggableBehavior::Draggable');
+
+    project.delete();
+  });
+
+  it('restores the folder structure', () => {
+    const { project, objectsContainer } = makeProject();
+    const target = getObjectsContainerHistoryTarget(
+      objectsContainer,
+      project,
+      noopEnsurePersistentUuids
+    );
+    const before = target.getValue();
+
+    const folder = objectsContainer
+      .getRootFolder()
+      .insertNewFolder('Enemies', 0);
+    objectsContainer.insertNewObjectInFolder(
+      project,
+      'Sprite',
+      'Enemy',
+      folder,
+      0
+    );
+    const after = target.getValue();
+
+    target.setValue(before);
+    expect(objectsContainer.getRootFolder().getChildrenCount()).toBe(0);
+
+    target.setValue(after);
+    expect(objectsContainer.getRootFolder().getChildrenCount()).toBe(1);
+    expect(
+      objectsContainer
+        .getRootFolder()
+        .getChildAt(0)
+        .getChildAt(0)
+        .getObject()
+        .getName()
+    ).toBe('Enemy');
+
+    project.delete();
+  });
+});
+
+describe('getObjectsContainerHistoryTarget - type changed outside the history', () => {
+  it('recreates an object whose type is not the one of the snapshot', () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Scene', 0);
+    const objectsContainer = layout.getObjects();
+    objectsContainer.insertNewObject(project, 'Sprite', 'Hero', 0);
+    const target = asValueTarget(
+      _getObjectsContainerHistoryTarget(
+        objectsContainer,
+        project,
+        noopEnsurePersistentUuids
+      )
+    );
+    const before = target.getValue();
+
+    // Something not tracked by the history replaces the object.
+    objectsContainer.removeObject('Hero');
+    const textObject = objectsContainer.insertNewObject(
+      project,
+      'TextObject::Text',
+      'Hero',
+      0
+    );
+    gd.asTextObjectConfiguration(textObject.getConfiguration()).setText(
+      'Hello'
+    );
+
+    target.setValue(before);
+    const hero = objectsContainer.getObject('Hero');
+    expect(hero.getType()).toBe('Sprite');
+    // A real Sprite configuration, not a Text one with a "Sprite" label.
+    const serializedHero = serializeToJSObject(hero);
+    expect(Array.isArray(serializedHero.animations)).toBe(true);
+    expect(serializedHero.string).toBeUndefined();
+
+    project.delete();
+  });
+});
+
+describe('getObjectGroupsContainerHistoryTarget', () => {
+  const makeContainer = () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Scene', 0);
+    const objectsContainer = layout.getObjects();
+    objectsContainer.insertNewObject(project, 'Sprite', 'Player', 0);
+    objectsContainer.insertNewObject(project, 'Sprite', 'Enemy', 1);
+    return {
+      project,
+      objectGroupsContainer: objectsContainer.getObjectGroups(),
+    };
+  };
+
+  it('undoes and redoes the creation of a group', () => {
+    const { project, objectGroupsContainer } = makeContainer();
+    const target = getObjectGroupsContainerHistoryTarget(objectGroupsContainer);
+    const before = target.getValue();
+
+    const group = objectGroupsContainer.insertNew('Everyone', 0);
+    group.addObject('Player');
+    const after = target.getValue();
+
+    target.setValue(before);
+    expect(objectGroupsContainer.has('Everyone')).toBe(false);
+
+    target.setValue(after);
+    expect(objectGroupsContainer.has('Everyone')).toBe(true);
+    expect(objectGroupsContainer.get('Everyone').find('Player')).toBe(true);
+
+    project.delete();
+  });
+
+  it('never destroys and recreates a group unrelated to the step being undone/redone', () => {
+    const { project, objectGroupsContainer } = makeContainer();
+    const untouchedGroup = objectGroupsContainer.insertNew('Untouched', 0);
+    untouchedGroup.addObject('Player');
+    const target = getObjectGroupsContainerHistoryTarget(objectGroupsContainer);
+    const before = target.getValue();
+
+    objectGroupsContainer.insertNew('Everyone', 1);
+    const after = target.getValue();
+    target.setValue(before);
+    target.setValue(after);
+
+    expect(objectGroupsContainer.get('Untouched').ptr).toBe(untouchedGroup.ptr);
+    expect(objectGroupsContainer.get('Untouched').find('Player')).toBe(true);
+
+    project.delete();
+  });
+
+  it('updates a group in place (same underlying object) when its content changed', () => {
+    const { project, objectGroupsContainer } = makeContainer();
+    const group = objectGroupsContainer.insertNew('Everyone', 0);
+    const target = getObjectGroupsContainerHistoryTarget(objectGroupsContainer);
+    const before = target.getValue();
+
+    group.addObject('Player');
+    const after = target.getValue();
+
+    target.setValue(before);
+    expect(objectGroupsContainer.get('Everyone').find('Player')).toBe(false);
+    expect(objectGroupsContainer.get('Everyone').ptr).toBe(group.ptr);
+
+    target.setValue(after);
+    expect(objectGroupsContainer.get('Everyone').find('Player')).toBe(true);
+    expect(objectGroupsContainer.get('Everyone').ptr).toBe(group.ptr);
+
+    project.delete();
+  });
+});
+
+describe('getObjectGroupsContainerHistoryTarget - order', () => {
+  it('restores the order of the groups', () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Scene', 0);
+    const groups = layout.getObjects().getObjectGroups();
+    groups.insertNew('A', 0);
+    groups.insertNew('B', 1);
+    groups.insertNew('C', 2);
+    const target = getObjectGroupsContainerHistoryTarget(groups);
+    const getNames = () =>
+      [0, 1, 2].map(index => groups.getAt(index).getName());
+
+    const before = target.getValue();
+    groups.move(2, 0);
+    expect(getNames()).toEqual(['C', 'A', 'B']);
+    const after = target.getValue();
+
+    target.setValue(before);
+    expect(getNames()).toEqual(['A', 'B', 'C']);
+    target.setValue(after);
+    expect(getNames()).toEqual(['C', 'A', 'B']);
+
+    project.delete();
+  });
+});
+
+describe('getVariablesContainerHistoryTarget', () => {
+  const makeContainer = () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Scene', 0);
+    return { project, variablesContainer: layout.getVariables() };
+  };
+
+  it('undoes and redoes the creation of a variable', () => {
+    const { project, variablesContainer } = makeContainer();
+    const target = getVariablesContainerHistoryTarget(variablesContainer);
+    const before = target.getValue();
+
+    variablesContainer.insertNew('Score', 0).setValue(0);
+    const after = target.getValue();
+
+    target.setValue(before);
+    expect(variablesContainer.has('Score')).toBe(false);
+
+    target.setValue(after);
+    expect(variablesContainer.has('Score')).toBe(true);
+    expect(variablesContainer.get('Score').getValue()).toBe(0);
+
+    project.delete();
+  });
+
+  it('never destroys and recreates a variable unrelated to the step being undone/redone', () => {
+    const { project, variablesContainer } = makeContainer();
+    const untouched = variablesContainer.insertNew('Untouched', 0);
+    untouched.setValue(42);
+    const target = getVariablesContainerHistoryTarget(variablesContainer);
+    const before = target.getValue();
+
+    variablesContainer.insertNew('Score', 1).setValue(0);
+    const after = target.getValue();
+    target.setValue(before);
+    target.setValue(after);
+
+    expect(variablesContainer.get('Untouched').ptr).toBe(untouched.ptr);
+    expect(variablesContainer.get('Untouched').getValue()).toBe(42);
+
+    project.delete();
+  });
+
+  it('updates a variable in place (same underlying object) when its value changed', () => {
+    const { project, variablesContainer } = makeContainer();
+    const score = variablesContainer.insertNew('Score', 0);
+    score.setValue(0);
+    const target = getVariablesContainerHistoryTarget(variablesContainer);
+    const before = target.getValue();
+
+    score.setValue(10);
+    const after = target.getValue();
+
+    target.setValue(before);
+    expect(variablesContainer.get('Score').getValue()).toBe(0);
+    expect(variablesContainer.get('Score').ptr).toBe(score.ptr);
+
+    target.setValue(after);
+    expect(variablesContainer.get('Score').getValue()).toBe(10);
+    expect(variablesContainer.get('Score').ptr).toBe(score.ptr);
+
+    project.delete();
+  });
+
+  it('restores the exact children of an array (no duplicated or leftover child)', () => {
+    const { project, variablesContainer } = makeContainer();
+    const array = variablesContainer.insertNew('MyArray', 0);
+    array.castTo('Array');
+    array.pushNew().setValue(1);
+    array.pushNew().setValue(2);
+    const target = getVariablesContainerHistoryTarget(variablesContainer);
+    const before = target.getValue();
+
+    array.getAtIndex(0).setValue(100);
+    array.pushNew().setValue(3);
+    const after = target.getValue();
+
+    const getValues = () => {
+      const values = [];
+      const restoredArray = variablesContainer.get('MyArray');
+      for (let i = 0; i < restoredArray.getChildrenCount(); i++)
+        values.push(restoredArray.getAtIndex(i).getValue());
+      return values;
+    };
+    target.setValue(before);
+    expect(getValues()).toEqual([1, 2]);
+    target.setValue(after);
+    expect(getValues()).toEqual([100, 2, 3]);
+    target.setValue(before);
+    expect(getValues()).toEqual([1, 2]);
+
+    project.delete();
+  });
+
+  it('leaves an array untouched when undoing/redoing a change to another variable', () => {
+    const { project, variablesContainer } = makeContainer();
+    const array = variablesContainer.insertNew('MyArray', 0);
+    array.castTo('Array');
+    array.pushNew().setValue(1);
+    array.pushNew().setValue(2);
+    const target = getVariablesContainerHistoryTarget(variablesContainer);
+    const before = target.getValue();
+
+    variablesContainer.insertNew('Score', 1).setValue(10);
+    const after = target.getValue();
+
+    for (let i = 0; i < 3; i++) {
+      target.setValue(before);
+      expect(variablesContainer.get('MyArray').getChildrenCount()).toBe(2);
+      target.setValue(after);
+      expect(variablesContainer.get('MyArray').getChildrenCount()).toBe(2);
+    }
+
+    project.delete();
+  });
+
+  it('restores the exact children of a structure (no leftover child)', () => {
+    const { project, variablesContainer } = makeContainer();
+    const structure = variablesContainer.insertNew('MyStructure', 0);
+    structure.castTo('Structure');
+    structure.getChild('A').setValue(1);
+    const target = getVariablesContainerHistoryTarget(variablesContainer);
+    const before = target.getValue();
+
+    structure.getChild('B').setValue(2);
+    const after = target.getValue();
+
+    const getNames = () =>
+      variablesContainer
+        .get('MyStructure')
+        .getAllChildrenNames()
+        .toJSArray()
+        .sort();
+    target.setValue(before);
+    expect(getNames()).toEqual(['A']);
+    target.setValue(after);
+    expect(getNames()).toEqual(['A', 'B']);
+
+    project.delete();
+  });
+
+  it('undoes and redoes the renaming of a child of a structure', () => {
+    const { project, variablesContainer } = makeContainer();
+    const structure = variablesContainer.insertNew('MyStructure', 0);
+    structure.castTo('Structure');
+    structure.getChild('Child').setValue(5);
+    const target = getVariablesContainerHistoryTarget(variablesContainer);
+    const before = target.getValue();
+
+    structure.renameChild('Child', 'Renamed');
+    const after = target.getValue();
+
+    const getNames = () =>
+      variablesContainer
+        .get('MyStructure')
+        .getAllChildrenNames()
+        .toJSArray();
+    for (let i = 0; i < 2; i++) {
+      target.setValue(before);
+      expect(getNames()).toEqual(['Child']);
+      expect(structure.getChild('Child').getValue()).toBe(5);
+      target.setValue(after);
+      expect(getNames()).toEqual(['Renamed']);
+    }
+
+    project.delete();
+  });
+
+  it('restores the order of the variables', () => {
+    const { project, variablesContainer } = makeContainer();
+    variablesContainer.insertNew('First', 0);
+    variablesContainer.insertNew('Second', 1);
+    const target = getVariablesContainerHistoryTarget(variablesContainer);
+    const before = target.getValue();
+
+    variablesContainer.move(0, 1);
+    const after = target.getValue();
+
+    const getNames = () => [
+      variablesContainer.getNameAt(0),
+      variablesContainer.getNameAt(1),
+    ];
+    expect(getNames()).toEqual(['Second', 'First']);
+    target.setValue(before);
+    expect(getNames()).toEqual(['First', 'Second']);
+    target.setValue(after);
+    expect(getNames()).toEqual(['Second', 'First']);
+
+    project.delete();
+  });
+});
+
+describe('global objects/groups/variables shared across scene tabs', () => {
+  // Every open SceneEditor tab tracks the same *global* containers in its
+  // own, independent history - two tabs are simulated here as two separate
+  // calls to the target-generator functions, both wrapping the same
+  // container, exactly as two mounted SceneEditor instances would. The
+  // regression this guards: tab A undoing/redoing its own step must never
+  // destroy a global object/group/variable that tab B still holds a
+  // reference to (its instances, effects, behaviors, or just a cached
+  // pointer), or tab B crashes with "memory access out of bounds" the next
+  // time it touches that reference - this is exactly the real crash
+  // reported after undoing/redoing scene and external layout renames.
+  const makeProjectWithGlobals = () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    project.insertNewLayout('SceneA', 0);
+    project.insertNewLayout('SceneB', 1);
+    return { project, globalObjectsContainer: project.getObjects() };
+  };
+
+  it('undoing/redoing a global object from tab A never invalidates a global object tab B still references', () => {
+    const { project, globalObjectsContainer } = makeProjectWithGlobals();
+    const sharedEnemy = globalObjectsContainer.insertNewObject(
+      project,
+      'Sprite',
+      'SharedEnemy',
+      0
+    );
+    sharedEnemy
+      .getVariables()
+      .insertNew('Health', 0)
+      .setValue(10);
+    // Tab B opens and keeps its own reference to the global object (as its
+    // objects list, or an effect/behavior editor, would).
+    const tabBReferenceToSharedEnemy = globalObjectsContainer.getObject(
+      'SharedEnemy'
+    );
+
+    // Tab A gets its own view of the same global container.
+    const tabATarget = getObjectsContainerHistoryTarget(
+      globalObjectsContainer,
+      project,
+      noopEnsurePersistentUuids
+    );
+    const before = tabATarget.getValue();
+
+    // Tab A creates, then undoes/redoes, an unrelated global object.
+    globalObjectsContainer.insertNewObject(project, 'Sprite', 'NewFromA', 1);
+    const after = tabATarget.getValue();
+    tabATarget.setValue(before);
+    tabATarget.setValue(after);
+
+    // Tab B's reference to the unrelated, untouched global object must
+    // still be the exact same underlying object, with its own content
+    // intact.
+    expect(globalObjectsContainer.getObject('SharedEnemy').ptr).toBe(
+      tabBReferenceToSharedEnemy.ptr
+    );
+    expect(
+      tabBReferenceToSharedEnemy
+        .getVariables()
+        .get('Health')
+        .getValue()
+    ).toBe(10);
+
+    project.delete();
+  });
+
+  it('undoing/redoing a global object group from tab A never invalidates one tab B still references', () => {
+    const { project, globalObjectsContainer } = makeProjectWithGlobals();
+    globalObjectsContainer.insertNewObject(project, 'Sprite', 'Player', 0);
+    const globalObjectGroupsContainer = globalObjectsContainer.getObjectGroups();
+    const sharedGroup = globalObjectGroupsContainer.insertNew('Shared', 0);
+    sharedGroup.addObject('Player');
+    const tabBReferenceToSharedGroup = globalObjectGroupsContainer.get(
+      'Shared'
+    );
+
+    const tabATarget = getObjectGroupsContainerHistoryTarget(
+      globalObjectGroupsContainer
+    );
+    const before = tabATarget.getValue();
+
+    globalObjectGroupsContainer.insertNew('NewFromA', 1);
+    const after = tabATarget.getValue();
+    tabATarget.setValue(before);
+    tabATarget.setValue(after);
+
+    expect(globalObjectGroupsContainer.get('Shared').ptr).toBe(
+      tabBReferenceToSharedGroup.ptr
+    );
+    expect(tabBReferenceToSharedGroup.find('Player')).toBe(true);
+
+    project.delete();
+  });
+
+  it('undoing/redoing a global variable from tab A never invalidates one tab B still references', () => {
+    const { project } = makeProjectWithGlobals();
+    const globalVariablesContainer = project.getVariables();
+    const sharedVariable = globalVariablesContainer.insertNew('Shared', 0);
+    sharedVariable.setValue(99);
+    const tabBReferenceToSharedVariable = globalVariablesContainer.get(
+      'Shared'
+    );
+
+    const tabATarget = getVariablesContainerHistoryTarget(
+      globalVariablesContainer
+    );
+    const before = tabATarget.getValue();
+
+    globalVariablesContainer.insertNew('NewFromA', 1).setValue(0);
+    const after = tabATarget.getValue();
+    tabATarget.setValue(before);
+    tabATarget.setValue(after);
+
+    expect(globalVariablesContainer.get('Shared').ptr).toBe(
+      tabBReferenceToSharedVariable.ptr
+    );
+    expect(tabBReferenceToSharedVariable.getValue()).toBe(99);
+
+    project.delete();
+  });
+});
+
+describe('variables refactoring when a rename is undone/redone', () => {
+  const makeProjectWithEvent = (
+    actionType: string,
+    parameters: Array<string>
+  ) => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Scene', 0);
+    const event = layout
+      .getEvents()
+      .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+    const action = new gd.Instruction();
+    action.setType(actionType);
+    action.setParametersCount(parameters.length);
+    parameters.forEach((parameter, index) =>
+      action.setParameter(index, parameter)
+    );
+    gd.asStandardEvent(event)
+      .getActions()
+      .insert(action, 0);
+    action.delete();
+    const getActionParameter = (index: number): string =>
+      gd
+        .asStandardEvent(layout.getEvents().getEventAt(0))
+        .getActions()
+        .get(0)
+        .getParameter(index)
+        .getPlainString();
+    return { project, layout, getActionParameter };
+  };
+
+  // What the editors do when the user edits variables: rename, then apply
+  // the refactoring computed from a snapshot taken before.
+  const renameWithRefactoring = (
+    project: gdProject,
+    variablesContainer: gdVariablesContainer,
+    oldName: string,
+    newName: string
+  ) => {
+    variablesContainer.ensurePersistentUuids();
+    const snapshot = new gd.SerializerElement();
+    variablesContainer.serializeTo(snapshot);
+    variablesContainer.rename(oldName, newName);
+    const changeset = gd.WholeProjectRefactorer.computeChangesetForVariablesContainer(
+      snapshot,
+      variablesContainer
+    );
+    gd.WholeProjectRefactorer.applyRefactoringForVariablesContainer(
+      project,
+      variablesContainer,
+      changeset,
+      snapshot
+    );
+    snapshot.delete();
+  };
+
+  it('renames a scene variable back in the events when its rename is undone, and again when redone', () => {
+    const { project, layout, getActionParameter } = makeProjectWithEvent(
+      'SetNumberVariable',
+      ['VarA', '=', '1']
+    );
+    const variablesContainer = layout.getVariables();
+    variablesContainer.insertNew('VarA', 0).setValue(0);
+    const target = asValueTarget(
+      _getVariablesContainerHistoryTarget(
+        variablesContainer,
+        (changeset, originalSerializedVariables) =>
+          gd.WholeProjectRefactorer.applyRefactoringForVariablesContainer(
+            project,
+            variablesContainer,
+            changeset,
+            originalSerializedVariables
+          )
+      )
+    );
+    const before = target.getValue();
+    renameWithRefactoring(project, variablesContainer, 'VarA', 'Score');
+    const after = target.getValue();
+    expect(getActionParameter(0)).toBe('Score');
+
+    target.setValue(before);
+    expect(variablesContainer.has('VarA')).toBe(true);
+    expect(getActionParameter(0)).toBe('VarA');
+
+    target.setValue(after);
+    expect(variablesContainer.has('Score')).toBe(true);
+    expect(getActionParameter(0)).toBe('Score');
+
+    project.delete();
+  });
+
+  it('does not refactor (and keeps the variables in place) when only a value changed', () => {
+    const { project, layout } = makeProjectWithEvent('SetNumberVariable', [
+      'VarA',
+      '=',
+      '1',
+    ]);
+    const variablesContainer = layout.getVariables();
+    const variable = variablesContainer.insertNew('VarA', 0);
+    variable.setValue(0);
+    const applyRefactoring = jest.fn<
+      [gdVariablesChangeset, gdSerializerElement],
+      void
+    >();
+    const target = asValueTarget(
+      _getVariablesContainerHistoryTarget(variablesContainer, applyRefactoring)
+    );
+    const before = target.getValue();
+    variable.setValue(42);
+    const after = target.getValue();
+
+    target.setValue(before);
+    target.setValue(after);
+    expect(applyRefactoring).not.toHaveBeenCalled();
+    expect(variablesContainer.get('VarA').ptr).toBe(variable.ptr);
+
+    project.delete();
+  });
+
+  it('renames an object variable back in the events when its rename is undone', () => {
+    const { project, layout, getActionParameter } = makeProjectWithEvent(
+      'SetNumberObjectVariable',
+      ['Enemy', 'VarA', '=', '1']
+    );
+    const objectsContainer = layout.getObjects();
+    const enemy = objectsContainer.insertNewObject(
+      project,
+      'Sprite',
+      'Enemy',
+      0
+    );
+    enemy
+      .getVariables()
+      .insertNew('VarA', 0)
+      .setValue(0);
+    const target = asValueTarget(
+      _getObjectsContainerHistoryTarget(
+        objectsContainer,
+        project,
+        object => {
+          object.getVariables().ensurePersistentUuids();
+        },
+        (object, changeset, originalSerializedVariables) =>
+          gd.WholeProjectRefactorer.applyRefactoringForObjectVariablesContainer(
+            project,
+            object.getVariables(),
+            layout.getInitialInstances(),
+            object.getName(),
+            changeset,
+            originalSerializedVariables
+          )
+      )
+    );
+    const before = target.getValue();
+    renameWithRefactoring(project, enemy.getVariables(), 'VarA', 'Score');
+    const after = target.getValue();
+    expect(getActionParameter(1)).toBe('Score');
+
+    target.setValue(before);
+    expect(enemy.getVariables().has('VarA')).toBe(true);
+    expect(getActionParameter(1)).toBe('VarA');
+
+    target.setValue(after);
+    expect(getActionParameter(1)).toBe('Score');
+
+    project.delete();
+  });
+});

@@ -1154,8 +1154,27 @@ namespace gdjs {
     hotReloadRuntimeSceneObjects(
       updatedObjects: Array<ObjectData>,
       // runtimeInstanceContainer gives an access as a map.
-      runtimeInstanceContainer: gdjs.RuntimeInstanceContainer
+      runtimeInstanceContainer: gdjs.RuntimeInstanceContainer,
+      behaviorsSharedData?: Array<BehaviorSharedData>
     ): void {
+      // The behaviors (re-)created below need their shared data, which can
+      // have been added (back) at the same time: update it first.
+      if (
+        behaviorsSharedData &&
+        runtimeInstanceContainer instanceof gdjs.RuntimeScene
+      ) {
+        const currentBehaviorsSharedData: Array<BehaviorSharedData | null> = [];
+        runtimeInstanceContainer._initialBehaviorSharedData.values(
+          currentBehaviorsSharedData
+        );
+        this._hotReloadRuntimeSceneBehaviorsSharedData(
+          currentBehaviorsSharedData.filter(
+            (sharedData): sharedData is BehaviorSharedData => !!sharedData
+          ),
+          behaviorsSharedData,
+          runtimeInstanceContainer
+        );
+      }
       // The registered object data are the ones from the ProjectData:
       // they are registered when the scene is loaded and they are the ones
       // updated below.

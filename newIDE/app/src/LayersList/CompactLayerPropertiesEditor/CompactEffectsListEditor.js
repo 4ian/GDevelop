@@ -141,6 +141,12 @@ export const CompactEffectsListEditor = ({
   return (
     <>
       <TopLevelCollapsibleSection
+        // A layer has two of these sections: their ids must be different.
+        id={
+          target === 'layer'
+            ? `layer-${layerRenderingType}-effects-section`
+            : `${target}-effects-section`
+        }
         title={
           target === 'object' ? (
             <Trans>Effects</Trans>
@@ -205,6 +211,7 @@ export const CompactEffectsListEditor = ({
             {effects.map(({ effect, effectMetadata }) => (
               <CollapsibleSubPanel
                 key={effect.ptr}
+                id={`effect-panel-${effect.getName()}`}
                 renderContent={() => (
                   <ColumnStackLayout noMargin expand noOverflowParent>
                     <Text

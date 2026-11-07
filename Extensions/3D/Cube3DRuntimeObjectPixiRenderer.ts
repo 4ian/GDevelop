@@ -336,6 +336,29 @@ namespace gdjs {
       );
     }
 
+    getPBRBooleanValue(
+      targetName: string,
+      property: gdjs.PBRBooleanPropertyName
+    ): boolean {
+      return this._getPBRMaterialManager().getBooleanProperty(
+        this._getTargetMaterial(targetName),
+        property
+      );
+    }
+
+    getPBRUvTransformValue(
+      targetName: string,
+      slot: gdjs.PBRTextureSlotName,
+      property: gdjs.PBRUvTransformPropertyName
+    ): float {
+      return (
+        this._getPBRMaterialManager().getUvTransform(
+          this._getTargetMaterial(targetName),
+          slot
+        )[property] || 0
+      );
+    }
+
     private _getPBRMaterialManager(): gdjs.PBRMaterialManager {
       return this._cube3DRuntimeObject
         .getInstanceContainer()

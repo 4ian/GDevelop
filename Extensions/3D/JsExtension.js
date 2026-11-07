@@ -49,9 +49,18 @@ module.exports = {
       'ior',
       'transmission',
       'clearcoat',
+      'clearcoatRoughness',
       'alphaCutoff',
     ]);
     const pbrColorProperties = JSON.stringify(['baseColor', 'emissiveColor']);
+    const pbrBooleanProperties = JSON.stringify(['normalFlipY']);
+    const pbrUvTransformProperties = JSON.stringify([
+      'repeatX',
+      'repeatY',
+      'offsetX',
+      'offsetY',
+      'rotation',
+    ]);
     const pbrTextureSlots = JSON.stringify([
       'baseColor',
       'metallicRoughness',
@@ -269,6 +278,59 @@ module.exports = {
         .addParameter('stringWithSelector', _('Preset'), pbrPresets, false)
         .setDefaultValue('"metal"')
         .setFunctionName('applyPBRPreset');
+
+      // Boolean properties (normal map flip Y).
+      addTargetParameter(
+        object.addExpressionAndConditionAndAction(
+          'boolean',
+          'PBRBoolean',
+          _('PBR material option'),
+          _('the value of a PBR material option'),
+          _('the _PARAM2_ PBR option of _PARAM0_ (_PARAM1_)'),
+          _('PBR materials'),
+          pbrIcon
+        )
+      )
+        .addParameter(
+          'stringWithSelector',
+          _('Option'),
+          pbrBooleanProperties,
+          false
+        )
+        .setDefaultValue('"normalFlipY"')
+        .useStandardParameters('boolean', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setPBRBoolean')
+        .setGetter('getPBRBoolean');
+
+      // UV transform of a texture slot (tiling, offset, rotation).
+      addTargetParameter(
+        object.addExpressionAndConditionAndAction(
+          'number',
+          'PBRTextureUvTransform',
+          _('PBR material texture tiling'),
+          _('the tiling, offset or rotation of a PBR material texture'),
+          _('the _PARAM3_ of the _PARAM2_ PBR texture of _PARAM0_ (_PARAM1_)'),
+          _('PBR materials'),
+          pbrIcon
+        )
+      )
+        .addParameter(
+          'stringWithSelector',
+          _('Texture slot'),
+          pbrTextureSlots,
+          false
+        )
+        .setDefaultValue('"baseColor"')
+        .addParameter(
+          'stringWithSelector',
+          _('Property'),
+          pbrUvTransformProperties,
+          false
+        )
+        .setDefaultValue('"repeatX"')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setPBRTextureUvTransform')
+        .setGetter('getPBRTextureUvTransform');
     };
 
     {
@@ -2559,6 +2621,21 @@ module.exports = {
         .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
         .setFunctionName('gdjs.pbr.setEnvironmentIntensity')
         .setGetter('gdjs.pbr.getEnvironmentIntensity')
+        .setIncludeFile(pbrIncludeFile);
+      extension
+        .addExpressionAndConditionAndAction(
+          'number',
+          'MaxAnisotropy',
+          _('Maximum texture anisotropy'),
+          _('the maximum anisotropic filtering of the 3D textures'),
+          _('the maximum anisotropic filtering of the 3D textures'),
+          _('PBR materials'),
+          'res/conditions/3d_box.svg'
+        )
+        .addCodeOnlyParameter('currentScene', '')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('gdjs.pbr.setMaxAnisotropy')
+        .setGetter('gdjs.pbr.getMaxAnisotropy')
         .setIncludeFile(pbrIncludeFile);
     }
     {

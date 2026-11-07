@@ -559,6 +559,30 @@ namespace gdjs {
         : '';
     }
 
+    getPBRBooleanValue(
+      targetName: string,
+      property: gdjs.PBRBooleanPropertyName
+    ): boolean {
+      const material = this._getTargetMaterial(targetName);
+      return material
+        ? this._getPBRMaterialManager().getBooleanProperty(material, property)
+        : false;
+    }
+
+    getPBRUvTransformValue(
+      targetName: string,
+      slot: gdjs.PBRTextureSlotName,
+      property: gdjs.PBRUvTransformPropertyName
+    ): float {
+      const material = this._getTargetMaterial(targetName);
+      if (!material) return 0;
+      return (
+        this._getPBRMaterialManager().getUvTransform(material, slot)[
+          property
+        ] || 0
+      );
+    }
+
     getAnimationCount() {
       return this._originalModel.animations.length;
     }

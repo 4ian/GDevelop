@@ -379,6 +379,88 @@ namespace gdjs {
     }
 
     /**
+     * Change a boolean PBR property (for the events). `faceTarget` is the
+     * name of a face or 'all' for every face.
+     */
+    setPBRBoolean(faceTarget: string, property: string, value: boolean): void {
+      const config = this._pbrConfig;
+      if (
+        !config ||
+        config.enabled === false ||
+        !gdjs.isPBRBooleanProperty(property)
+      )
+        return;
+      const targetName = this._getPBRTargetName(faceTarget);
+      if (!targetName) this._clearPBRBooleanOverrides(property);
+      gdjs.pbrconfig.setBooleanValue(config, targetName, property, value);
+      this._renderer.onPBRConfigChanged(
+        targetName ? faceNameToBitmaskIndex[targetName] : undefined
+      );
+    }
+
+    /**
+     * Get a boolean PBR property (for the events).
+     */
+    getPBRBoolean(faceTarget: string, property: string): boolean {
+      if (!gdjs.isPBRBooleanProperty(property)) return false;
+      return this._renderer.getPBRBooleanValue(
+        this._getPBRTargetName(faceTarget),
+        property
+      );
+    }
+
+    /**
+     * Change a property of the UV transform (tiling, offset, rotation) of a
+     * PBR texture slot (for the events).
+     */
+    setPBRTextureUvTransform(
+      faceTarget: string,
+      slot: string,
+      property: string,
+      value: float
+    ): void {
+      const config = this._pbrConfig;
+      if (
+        !config ||
+        config.enabled === false ||
+        !gdjs.isPBRTextureSlot(slot) ||
+        !gdjs.isPBRUvTransformProperty(property)
+      )
+        return;
+      const targetName = this._getPBRTargetName(faceTarget);
+      const currentTransform =
+        gdjs.pbrconfig.getUvTransform(config, targetName, slot) || {};
+      gdjs.pbrconfig.setUvTransform(config, targetName, slot, {
+        ...currentTransform,
+        [property]: value,
+      });
+      this._renderer.onPBRConfigChanged(
+        targetName ? faceNameToBitmaskIndex[targetName] : undefined
+      );
+    }
+
+    /**
+     * Get a property of the UV transform of a PBR texture slot (for the
+     * events).
+     */
+    getPBRTextureUvTransform(
+      faceTarget: string,
+      slot: string,
+      property: string
+    ): float {
+      if (
+        !gdjs.isPBRTextureSlot(slot) ||
+        !gdjs.isPBRUvTransformProperty(property)
+      )
+        return 0;
+      return this._renderer.getPBRUvTransformValue(
+        this._getPBRTargetName(faceTarget),
+        slot,
+        property
+      );
+    }
+
+    /**
      * Apply a PBR material preset (for the events).
      */
     applyPBRPreset(faceTarget: string, presetName: string): void {
@@ -422,6 +504,14 @@ namespace gdjs {
       for (const targetName of Object.keys(targets)) {
         const textures = targets[targetName].textures;
         if (textures) delete textures[slot];
+      }
+    }
+
+    private _clearPBRBooleanOverrides(property: gdjs.PBRBooleanPropertyName) {
+      const targets = this._pbrConfig && this._pbrConfig.targets;
+      if (!targets) return;
+      for (const targetName of Object.keys(targets)) {
+        delete targets[targetName][property];
       }
     }
 

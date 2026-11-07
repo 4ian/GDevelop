@@ -4,6 +4,8 @@ describe('Multiplayer lobby joining', () => {
   let clock;
   let loaderStates;
   let showConnectionError;
+  let originalProjectData;
+  let originalPeerJsHelper;
   // Quick-join throttling stores its timestamp across tests.
   let nextClockTime = Date.now() + 100000;
 
@@ -68,13 +70,11 @@ describe('Multiplayer lobby joining', () => {
     loaderStates = [];
     showConnectionError = sinon.fake();
 
-    sinon.replace(
-      gdjs,
-      'projectData',
-      /** @type {any} */ ({
-        properties: { projectUuid: 'test-game-id' },
-      })
-    );
+    // projectData is absent in the standalone runtime, so sinon.replace cannot use it.
+    originalProjectData = gdjs.projectData;
+    /** @type {any} */ (gdjs).projectData = {
+      properties: { projectUuid: 'test-game-id' },
+    };
     sinon.replace(
       gdjs.playerAuthentication,
       'getUserId',
@@ -117,16 +117,13 @@ describe('Multiplayer lobby joining', () => {
       'displayConnectionErrorNotification',
       showConnectionError
     );
-    sinon.replace(
-      gdjs,
-      'multiplayerPeerJsHelper',
-      /** @type {any} */ ({
-        useDefaultBrokerServer: () => {},
-        setCompressionMethod: () => {},
-        getCurrentId: () => 'test-client-peer-id',
-        connect: () => {},
-      })
-    );
+    originalPeerJsHelper = gdjs.multiplayerPeerJsHelper;
+    /** @type {any} */ (gdjs).multiplayerPeerJsHelper = {
+      useDefaultBrokerServer: () => {},
+      setCompressionMethod: () => {},
+      getCurrentId: () => 'test-client-peer-id',
+      connect: () => {},
+    };
     sinon.replace(gdjs.multiplayer, '_isLobbyGameRunning', false);
     sinon.replace(window, 'WebSocket', /** @type {any} */ (FakeWebSocket));
     sinon.replace(
@@ -160,6 +157,12 @@ describe('Multiplayer lobby joining', () => {
     gdjs.multiplayer.leaveGameLobby();
     clock.restore();
     sinon.restore();
+    if (originalProjectData === undefined)
+      delete (/** @type {any} */ (gdjs).projectData);
+    else gdjs.projectData = originalProjectData;
+    if (originalPeerJsHelper === undefined)
+      delete (/** @type {any} */ (gdjs).multiplayerPeerJsHelper);
+    else gdjs.multiplayerPeerJsHelper = originalPeerJsHelper;
   });
 
   it('leaves and shows an error when a lobbies-page join times out', async () => {

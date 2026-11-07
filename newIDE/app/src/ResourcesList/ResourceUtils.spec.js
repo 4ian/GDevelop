@@ -7,8 +7,13 @@ import {
   getResourceCustomProperties,
   getResourceCustomPropertyValue,
   setResourceCustomPropertyValue,
+  copyAllToProjectFolder,
 } from './ResourceUtils';
+import optionalRequire from '../Utils/OptionalRequire';
 const gd: libGDevelop = global.gd;
+const fs = optionalRequire('fs');
+const os = optionalRequire('os');
+const path = optionalRequire('path');
 
 const addNewAnimationWithImageToSpriteObject = (
   object: gdObject,
@@ -298,6 +303,66 @@ describe('ResourceUtils', () => {
         localFilePath: 'test',
       });
       expect(getResourceCustomProperties(r)).toEqual({ 'no-atlas': true });
+    });
+  });
+
+  describe('copyAllToProjectFolder', () => {
+    let tmpDir = '';
+    beforeEach(() => {
+      tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gdevelop-copy-test-'));
+    });
+    afterEach(() => {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    });
+
+    it('gives a different file to each resource when re-importing files with names already in the project', async () => {
+      const projectFolder = path.join(tmpDir, 'My Project');
+      const outsideFolder = path.join(tmpDir, 'Downloads');
+      fs.mkdirSync(projectFolder);
+      fs.mkdirSync(outsideFolder);
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      project.setProjectFile(path.join(projectFolder, 'game.json'));
+
+      // Frames of an animation, already imported once in the project folder...
+      const fileNames = Array.from(
+        { length: 8 },
+        (_, index) => `hero_run_0${index}.png`
+      );
+      fileNames.forEach(fileName =>
+        fs.writeFileSync(path.join(projectFolder, fileName), 'old ' + fileName)
+      );
+      // ...and a new version of them, imported from outside the project.
+      const importedFilePaths = fileNames.map(fileName => {
+        const filePath = path.join(outsideFolder, fileName);
+        fs.writeFileSync(filePath, 'new ' + fileName);
+        return filePath;
+      });
+
+      const newToOldFilePaths = new Map<string, string>();
+      const copiedFilePaths = await copyAllToProjectFolder(
+        project,
+        importedFilePaths,
+        newToOldFilePaths
+      );
+
+      expect(new Set(copiedFilePaths).size).toBe(fileNames.length);
+      copiedFilePaths.forEach((copiedFilePath, index) => {
+        expect(path.dirname(copiedFilePath)).toBe(projectFolder);
+        expect(fs.readFileSync(copiedFilePath, 'utf8')).toBe(
+          'new ' + fileNames[index]
+        );
+        expect(newToOldFilePaths.get(copiedFilePath)).toBe(
+          importedFilePaths[index]
+        );
+      });
+      // Files already in the project are left untouched.
+      fileNames.forEach(fileName =>
+        expect(
+          fs.readFileSync(path.join(projectFolder, fileName), 'utf8')
+        ).toBe('old ' + fileName)
+      );
+
+      project.delete();
     });
   });
 });

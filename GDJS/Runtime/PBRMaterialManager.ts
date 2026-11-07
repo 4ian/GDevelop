@@ -63,7 +63,15 @@ namespace gdjs {
     | 'ior'
     | 'transmission'
     | 'clearcoat'
+    | 'clearcoatRoughness'
     | 'alphaCutoff';
+
+  /**
+   * The names of the boolean properties of a PBR material.
+   *
+   * @category 3D > Materials
+   */
+  export type PBRBooleanPropertyName = 'normalFlipY';
 
   /**
    * The names of the color properties of a PBR material. Colors are stored
@@ -93,6 +101,28 @@ namespace gdjs {
     emissive?: string;
     height?: string;
     opacity?: string;
+  }
+
+  /**
+   * A UV transform applied to a texture: tiling (repeat), offset and rotation.
+   * A field that is not set keeps its default (repeat 1, offset 0, rotation 0).
+   *
+   * @category 3D > Materials
+   */
+  export interface PBRUvTransform {
+    /** Tiling on the U axis (1 by default). */
+    repeatX?: number;
+    /** Tiling on the V axis (1 by default). */
+    repeatY?: number;
+    /** Offset on the U axis (0 by default). */
+    offsetX?: number;
+    /** Offset on the V axis (0 by default). */
+    offsetY?: number;
+    /**
+     * Rotation in degrees, around the center (0.5; 0.5) of the texture (0 by
+     * default).
+     */
+    rotation?: number;
   }
 
   /**
@@ -133,10 +163,28 @@ namespace gdjs {
     transmission?: number;
     /** Strength of the clear coat layer (0 to 1). */
     clearcoat?: number;
+    /** Roughness of the clear coat layer (0 by default). */
+    clearcoatRoughness?: number;
+    /**
+     * When true, the green channel of the normal map is flipped (DirectX /
+     * Unreal convention). `false` by default: glTF and OpenGL-style normal
+     * maps need no flip.
+     */
+    normalFlipY?: boolean;
     /** When true, the material is rendered on both faces. */
     doubleSided?: boolean;
     /** When above 0, the alpha cutoff used to discard transparent pixels. */
     alphaCutoff?: number;
+    /**
+     * UV transform applied to every texture slot. It is only applied to the
+     * slots the settings actually set (a slot left untouched keeps the texture
+     * of the original material, which is never cloned).
+     */
+    uvTransform?: PBRUvTransform;
+    /** UV transforms overriding `uvTransform` for specific slots. */
+    slotUvTransforms?: {
+      [slot in PBRTextureSlotName]?: PBRUvTransform;
+    };
     /** The texture slots. */
     textures?: PBRMaterialTextures;
   }
@@ -207,6 +255,9 @@ namespace gdjs {
       metallic: 0,
       roughness: 0.4,
       clearcoat: 0.3,
+      // A starting value for the clear coat roughness: it is tunable, just
+      // like the other preset values.
+      clearcoatRoughness: 0.15,
     },
     stone: {
       preset: 'stone',
@@ -303,7 +354,43 @@ namespace gdjs {
     property === 'ior' ||
     property === 'transmission' ||
     property === 'clearcoat' ||
+    property === 'clearcoatRoughness' ||
     property === 'alphaCutoff';
+
+  /**
+   * Check that a string is the name of a boolean property.
+   *
+   * @category 3D > Materials
+   */
+  export const isPBRBooleanProperty = (
+    property: string
+  ): property is PBRBooleanPropertyName => property === 'normalFlipY';
+
+  /**
+   * The names of the numeric properties of a UV transform (`PBRUvTransform`).
+   *
+   * @category 3D > Materials
+   */
+  export type PBRUvTransformPropertyName =
+    | 'repeatX'
+    | 'repeatY'
+    | 'offsetX'
+    | 'offsetY'
+    | 'rotation';
+
+  /**
+   * Check that a string is the name of a UV transform property.
+   *
+   * @category 3D > Materials
+   */
+  export const isPBRUvTransformProperty = (
+    property: string
+  ): property is PBRUvTransformPropertyName =>
+    property === 'repeatX' ||
+    property === 'repeatY' ||
+    property === 'offsetX' ||
+    property === 'offsetY' ||
+    property === 'rotation';
 
   /**
    * Convert a GDevelop color string ("R;G;B") to a THREE.js color.
@@ -353,8 +440,71 @@ namespace gdjs {
     if (base && base.textures && settings && settings.textures) {
       merged.textures = { ...base.textures, ...settings.textures };
     }
+    if (base && base.uvTransform && settings && settings.uvTransform) {
+      merged.uvTransform = { ...base.uvTransform, ...settings.uvTransform };
+    }
+    if (
+      base &&
+      base.slotUvTransforms &&
+      settings &&
+      settings.slotUvTransforms
+    ) {
+      merged.slotUvTransforms = {
+        ...base.slotUvTransforms,
+        ...settings.slotUvTransforms,
+      };
+    }
     return merged;
   };
+
+  /**
+   * `true` when a UV transform is the identity: the shared texture of the
+   * image manager can then be used directly (no clone).
+   */
+  const isDefaultUvTransform = (
+    transform: PBRUvTransform | undefined
+  ): boolean =>
+    !transform ||
+    ((transform.repeatX === undefined || transform.repeatX === 1) &&
+      (transform.repeatY === undefined || transform.repeatY === 1) &&
+      (transform.offsetX === undefined || transform.offsetX === 0) &&
+      (transform.offsetY === undefined || transform.offsetY === 0) &&
+      (transform.rotation === undefined || transform.rotation === 0));
+
+  /**
+   * Merge the global UV transform of the settings with the one of a slot (the
+   * per-slot transform wins).
+   */
+  const getSlotUvTransform = (
+    settings: PBRMaterialSettings,
+    slot: PBRTextureSlotName
+  ): PBRUvTransform | undefined => {
+    const globalTransform = settings.uvTransform;
+    const slotTransform = settings.slotUvTransforms
+      ? settings.slotUvTransforms[slot]
+      : undefined;
+    if (!globalTransform && !slotTransform) return undefined;
+    return { ...globalTransform, ...slotTransform };
+  };
+
+  /**
+   * Build the cache key of a transformed texture (resource, color space and
+   * normalized transform values).
+   */
+  const getUvTransformCacheKey = (
+    resourceName: string,
+    isColorData: boolean,
+    transform: PBRUvTransform
+  ): string =>
+    [
+      resourceName,
+      isColorData ? 'color' : 'linear',
+      transform.repeatX === undefined ? 1 : transform.repeatX,
+      transform.repeatY === undefined ? 1 : transform.repeatY,
+      transform.offsetX === undefined ? 0 : transform.offsetX,
+      transform.offsetY === undefined ? 0 : transform.offsetY,
+      transform.rotation === undefined ? 0 : transform.rotation,
+    ].join('|');
 
   /**
    * The value of a numeric property in merged settings (or `null` when the
@@ -378,6 +528,7 @@ namespace gdjs {
       case 'ior':
       case 'transmission':
       case 'clearcoat':
+      case 'clearcoatRoughness':
       case 'alphaCutoff': {
         const value = settings[property];
         return value === undefined ? null : value;
@@ -514,6 +665,82 @@ namespace gdjs {
       const value = textures && textures[slot];
       return value === undefined ? null : value;
     };
+
+    /** Change a boolean property in the configuration. */
+    export const setBooleanValue = (
+      config: PBRConfig,
+      targetName: string,
+      property: PBRBooleanPropertyName,
+      value: boolean
+    ) => {
+      getOrCreateTargetSettings(config, targetName)[property] = value;
+    };
+
+    /**
+     * Read a boolean property in the configuration (or `null` when the
+     * property is not set).
+     */
+    export const getBooleanValue = (
+      config: PBRConfig | null,
+      targetName: string,
+      property: PBRBooleanPropertyName
+    ): boolean | null => {
+      const value = getSettingsForTarget(config, targetName)[property];
+      return value === undefined ? null : value;
+    };
+
+    /**
+     * Change the UV transform of a texture slot. `slot` is `null` for the
+     * transform applied to every slot. A `null` transform removes it.
+     */
+    export const setUvTransform = (
+      config: PBRConfig,
+      targetName: string,
+      slot: PBRTextureSlotName | null,
+      transform: PBRUvTransform | null
+    ) => {
+      const settings = getOrCreateTargetSettings(config, targetName);
+      if (!slot) {
+        if (transform === null) {
+          delete settings.uvTransform;
+        } else {
+          settings.uvTransform = transform;
+        }
+        return;
+      }
+      if (!settings.slotUvTransforms) settings.slotUvTransforms = {};
+      if (transform === null) {
+        delete settings.slotUvTransforms[slot];
+      } else {
+        settings.slotUvTransforms[slot] = transform;
+      }
+    };
+
+    /**
+     * Read the UV transform of a texture slot (or `null` when it is not set).
+     * `slot` is `null` for the transform applied to every slot.
+     */
+    export const getUvTransform = (
+      config: PBRConfig | null,
+      targetName: string,
+      slot: PBRTextureSlotName | null
+    ): PBRUvTransform | null => {
+      const settings = getSettingsForTarget(config, targetName);
+      if (!slot) return settings.uvTransform || null;
+      const transforms = settings.slotUvTransforms;
+      return (transforms && transforms[slot]) || null;
+    };
+  }
+
+  /**
+   * A texture cloned to apply a non-default UV transform. It is shared by every
+   * material using the same resource and transform, and reference counted so
+   * that it is disposed only when its last user is gone.
+   */
+  interface UvTransformedTextureEntry {
+    texture: THREE.Texture;
+    resourceName: string;
+    users: Set<THREE.Material>;
   }
 
   /**
@@ -614,8 +841,36 @@ namespace gdjs {
     private _environmentIntensity: float = 1;
     private _pmremGenerator: THREE.PMREMGenerator | null = null;
 
+    /**
+     * The textures cloned to apply a non-default UV transform (tiling, offset
+     * or rotation). They are cached by resource/color-space/transform and
+     * reference counted by material. The textures of the image manager are
+     * never modified: a clone is only made when a non-default transform is
+     * needed.
+     */
+    private _uvTransformedTextures = new Map<
+      string,
+      UvTransformedTextureEntry
+    >();
+
     constructor(runtimeGame: gdjs.RuntimeGame) {
       this._runtimeGame = runtimeGame;
+    }
+
+    /**
+     * Set the maximum anisotropic filtering applied to the 3D textures of the
+     * materials (16 by default). Lower it on weak devices. It is applied
+     * immediately to the textures already created.
+     */
+    setMaxAnisotropy(value: number): void {
+      this._runtimeGame.getImageManager().setMaxAnisotropy(value);
+    }
+
+    /**
+     * @returns the maximum anisotropic filtering asked for the 3D textures.
+     */
+    getMaxAnisotropy(): number {
+      return this._runtimeGame.getImageManager().getMaxAnisotropy();
     }
 
     /**
@@ -688,6 +943,10 @@ namespace gdjs {
           entry[1].add(materialCopy);
         }
       }
+      // The copy shares the textures of the original: register it as a user
+      // of the UV transform clones so that they are not disposed under its
+      // feet.
+      this._registerMaterialUvTransformTextures(materialCopy);
       return materialCopy;
     }
 
@@ -747,6 +1006,9 @@ namespace gdjs {
           entry[1].add(newMaterial);
         }
       }
+      // The new material shares the textures copied from the old one: register
+      // it as a user of their UV transform clones.
+      this._registerMaterialUvTransformTextures(newMaterial);
       this._applySettings(newMaterial, settings);
       return newMaterial;
     }
@@ -789,7 +1051,14 @@ namespace gdjs {
           break;
         case 'normalScale':
           if (standardMaterial.normalScale) {
-            standardMaterial.normalScale.setScalar(value);
+            // The strength is always positive: the sign of Y is driven by
+            // `normalFlipY` and kept when the strength changes.
+            const strength = Math.abs(value);
+            const flip = this._getNormalFlipY(material);
+            standardMaterial.normalScale.set(
+              strength,
+              flip ? -strength : strength
+            );
           }
           break;
         case 'aoIntensity':
@@ -809,16 +1078,113 @@ namespace gdjs {
           if (value > 0) material.transparent = true;
           break;
         case 'ior':
-          (material as THREE.MeshPhysicalMaterial).ior = value;
+          // Physical-only fields are not assigned to a standard material (it
+          // would only pollute it with unused properties).
+          if (this._isPhysicalMaterial(material)) {
+            (material as THREE.MeshPhysicalMaterial).ior = value;
+          }
           break;
         case 'transmission':
-          (material as THREE.MeshPhysicalMaterial).transmission = value;
-          if (value > 0) material.transparent = true;
+          if (this._isPhysicalMaterial(material)) {
+            (material as THREE.MeshPhysicalMaterial).transmission = value;
+            if (value > 0) material.transparent = true;
+          }
           break;
         case 'clearcoat':
-          (material as THREE.MeshPhysicalMaterial).clearcoat = value;
+          if (this._isPhysicalMaterial(material)) {
+            (material as THREE.MeshPhysicalMaterial).clearcoat = value;
+          }
+          break;
+        case 'clearcoatRoughness':
+          if (this._isPhysicalMaterial(material)) {
+            (material as THREE.MeshPhysicalMaterial).clearcoatRoughness = value;
+          }
           break;
       }
+    }
+
+    /**
+     * Change a boolean property of an existing material (used by events to
+     * change materials while the game is running).
+     */
+    setBooleanProperty(
+      material: THREE.Material,
+      property: PBRBooleanPropertyName,
+      value: boolean
+    ): void {
+      if (property === 'normalFlipY') {
+        this._setNormalFlipY(material, value);
+      }
+    }
+
+    /**
+     * Read a boolean property of a material (for events).
+     */
+    getBooleanProperty(
+      material: THREE.Material,
+      property: PBRBooleanPropertyName
+    ): boolean {
+      if (property === 'normalFlipY') {
+        return this._getNormalFlipY(material);
+      }
+      return false;
+    }
+
+    /**
+     * Change the UV transform (tiling, offset, rotation) of a texture slot of
+     * an existing material. Use `'all'` to change every slot at once.
+     *
+     * The material must be unique (`makeUniqueMaterialCopy`): a shared
+     * material must never be changed.
+     */
+    setUvTransform(
+      material: THREE.Material,
+      slotName: PBRTextureSlotName | 'all',
+      transform: PBRUvTransform
+    ): void {
+      const slots: Array<PBRTextureSlotName> =
+        slotName === 'all'
+          ? [
+              'baseColor',
+              'metallic',
+              'roughness',
+              'normal',
+              'ao',
+              'emissive',
+              'height',
+              'opacity',
+            ]
+          : [slotName];
+      for (const slot of slots) {
+        const resourceName = this.getTextureSlotName(material, slot);
+        if (!resourceName) continue;
+        const isColorData = slot === 'baseColor' || slot === 'emissive';
+        const texture = this._getUvTransformedTexture(
+          material,
+          resourceName,
+          isColorData,
+          transform
+        );
+        this._setMaterialTextureSlot(material, slot, texture);
+      }
+    }
+
+    /**
+     * Read the UV transform of a texture slot of a material (for events).
+     * `'all'` returns the transform of the base color slot. Defaults are
+     * returned when the slot has no transform.
+     */
+    getUvTransform(
+      material: THREE.Material,
+      slotName: PBRTextureSlotName | 'all'
+    ): PBRUvTransform {
+      const slot: PBRTextureSlotName =
+        slotName === 'all' ? 'baseColor' : slotName;
+      const texture = this._getMaterialTextureSlot(material, slot);
+      const transform = texture ? (texture as any)._gdjsUvTransform : undefined;
+      return transform
+        ? { ...transform }
+        : { repeatX: 1, repeatY: 1, offsetX: 0, offsetY: 0, rotation: 0 };
     }
 
     /**
@@ -875,8 +1241,9 @@ namespace gdjs {
         case 'emissiveIntensity':
           return standardMaterial.emissiveIntensity;
         case 'normalScale':
+          // The strength is always the positive value (see `normalFlipY`).
           return standardMaterial.normalScale
-            ? standardMaterial.normalScale.x
+            ? Math.abs(standardMaterial.normalScale.x)
             : 1;
         case 'aoIntensity':
           return standardMaterial.aoMapIntensity;
@@ -894,6 +1261,10 @@ namespace gdjs {
           return (material as THREE.MeshPhysicalMaterial).transmission || 0;
         case 'clearcoat':
           return (material as THREE.MeshPhysicalMaterial).clearcoat || 0;
+        case 'clearcoatRoughness':
+          return (
+            (material as THREE.MeshPhysicalMaterial).clearcoatRoughness || 0
+          );
       }
     }
 
@@ -923,35 +1294,7 @@ namespace gdjs {
       material: THREE.Material,
       slotName: PBRTextureSlotName
     ): string {
-      const standardMaterial = material as THREE.MeshStandardMaterial;
-      let texture: THREE.Texture | null = null;
-      switch (slotName) {
-        case 'baseColor':
-          texture = standardMaterial.map;
-          break;
-        case 'metallicRoughness':
-        case 'metallic':
-          texture = standardMaterial.metalnessMap;
-          break;
-        case 'roughness':
-          texture = standardMaterial.roughnessMap;
-          break;
-        case 'normal':
-          texture = standardMaterial.normalMap;
-          break;
-        case 'ao':
-          texture = standardMaterial.aoMap;
-          break;
-        case 'emissive':
-          texture = standardMaterial.emissiveMap;
-          break;
-        case 'height':
-          texture = standardMaterial.displacementMap;
-          break;
-        case 'opacity':
-          texture = standardMaterial.alphaMap;
-          break;
-      }
+      const texture = this._getMaterialTextureSlot(material, slotName);
       return texture ? (texture as any)._gdjsResourceName || '' : '';
     }
 
@@ -987,6 +1330,13 @@ namespace gdjs {
      * disposed textures on materials (and leaking GPU memory).
      */
     onImageResourceUnloaded(resourceName: string): void {
+      // Dispose the UV transform clones made for this resource.
+      for (const [key, entry] of this._uvTransformedTextures) {
+        if (entry.resourceName === resourceName) {
+          entry.texture.dispose();
+          this._uvTransformedTextures.delete(key);
+        }
+      }
       const materials = this._materialsByResource.get(resourceName);
       if (!materials) return;
       this._materialsByResource.delete(resourceName);
@@ -1093,6 +1443,10 @@ namespace gdjs {
       }
       this._uniqueMaterials.clear();
       this._materialsByResource.clear();
+      for (const entry of this._uvTransformedTextures.values()) {
+        entry.texture.dispose();
+      }
+      this._uvTransformedTextures.clear();
       if (this._environmentTexture) {
         this._environmentTexture.dispose();
         this._environmentTexture = null;
@@ -1156,7 +1510,6 @@ namespace gdjs {
       settings: PBRMaterialSettings | undefined
     ): void {
       if (!settings) return;
-      const imageManager = this._runtimeGame.getImageManager();
       const standardMaterial = material as THREE.MeshStandardMaterial;
 
       if (settings.baseColor !== undefined) {
@@ -1181,8 +1534,16 @@ namespace gdjs {
       if (settings.emissiveIntensity !== undefined) {
         standardMaterial.emissiveIntensity = settings.emissiveIntensity;
       }
+      if (settings.normalFlipY !== undefined) {
+        this._setNormalFlipY(material, settings.normalFlipY);
+      }
       if (settings.normalScale !== undefined && standardMaterial.normalScale) {
-        standardMaterial.normalScale.setScalar(settings.normalScale);
+        // The strength is always positive: the sign of Y is driven by
+        // `normalFlipY`. It is applied after the flip so that both settings
+        // can be changed at once.
+        const strength = Math.abs(settings.normalScale);
+        const flip = this._getNormalFlipY(material);
+        standardMaterial.normalScale.set(strength, flip ? -strength : strength);
       }
       if (settings.aoIntensity !== undefined) {
         standardMaterial.aoMapIntensity = settings.aoIntensity;
@@ -1205,92 +1566,119 @@ namespace gdjs {
         material.alphaTest = settings.alphaCutoff;
         material.transparent = true;
       }
-      const physicalMaterial = material as THREE.MeshPhysicalMaterial;
-      if (settings.ior !== undefined) {
-        physicalMaterial.ior = settings.ior;
-      }
-      if (settings.transmission !== undefined) {
-        physicalMaterial.transmission = settings.transmission;
-        if (settings.transmission > 0) {
-          material.transparent = true;
+      // Physical-only fields are only assigned to a physical material: a
+      // standard material must not be polluted with unused properties.
+      if (this._isPhysicalMaterial(material)) {
+        const physicalMaterial = material as THREE.MeshPhysicalMaterial;
+        if (settings.ior !== undefined) {
+          physicalMaterial.ior = settings.ior;
         }
-      }
-      if (settings.clearcoat !== undefined) {
-        physicalMaterial.clearcoat = settings.clearcoat;
+        if (settings.transmission !== undefined) {
+          physicalMaterial.transmission = settings.transmission;
+          if (settings.transmission > 0) {
+            material.transparent = true;
+          }
+        }
+        if (settings.clearcoat !== undefined) {
+          physicalMaterial.clearcoat = settings.clearcoat;
+        }
+        if (settings.clearcoatRoughness !== undefined) {
+          physicalMaterial.clearcoatRoughness = settings.clearcoatRoughness;
+        }
       }
 
       const textures = settings.textures;
       if (textures) {
-        this._applyTextureSlot(material, 'baseColor', textures.baseColor);
+        this._applyTextureSlot(
+          material,
+          'baseColor',
+          textures.baseColor,
+          getSlotUvTransform(settings, 'baseColor')
+        );
         if (textures.metallicRoughness !== undefined) {
           // glTF packs the roughness in the green channel and the metallic
           // factor in the blue channel: one texture fills the 2 slots.
-          const texture = this._getTexture(
-            imageManager,
-            textures.metallicRoughness,
-            false
-          );
-          standardMaterial.metalnessMap = texture;
-          standardMaterial.roughnessMap = texture;
-          this._trackMaterialForResource(textures.metallicRoughness, material);
+          const texture = textures.metallicRoughness
+            ? this._getUvTransformedTexture(
+                material,
+                textures.metallicRoughness,
+                false,
+                getSlotUvTransform(settings, 'metallicRoughness')
+              )
+            : null;
+          this._setMaterialTextureSlot(material, 'metallicRoughness', texture);
+          if (texture && textures.metallicRoughness) {
+            this._trackMaterialForResource(
+              textures.metallicRoughness,
+              material
+            );
+          }
         } else {
-          this._applyTextureSlot(material, 'metallic', textures.metallic);
-          this._applyTextureSlot(material, 'roughness', textures.roughness);
+          this._applyTextureSlot(
+            material,
+            'metallic',
+            textures.metallic,
+            getSlotUvTransform(settings, 'metallic')
+          );
+          this._applyTextureSlot(
+            material,
+            'roughness',
+            textures.roughness,
+            getSlotUvTransform(settings, 'roughness')
+          );
         }
-        this._applyTextureSlot(material, 'normal', textures.normal);
-        this._applyTextureSlot(material, 'ao', textures.ao);
-        this._applyTextureSlot(material, 'emissive', textures.emissive);
-        this._applyTextureSlot(material, 'height', textures.height);
-        this._applyTextureSlot(material, 'opacity', textures.opacity);
+        this._applyTextureSlot(
+          material,
+          'normal',
+          textures.normal,
+          getSlotUvTransform(settings, 'normal')
+        );
+        this._applyTextureSlot(
+          material,
+          'ao',
+          textures.ao,
+          getSlotUvTransform(settings, 'ao')
+        );
+        this._applyTextureSlot(
+          material,
+          'emissive',
+          textures.emissive,
+          getSlotUvTransform(settings, 'emissive')
+        );
+        this._applyTextureSlot(
+          material,
+          'height',
+          textures.height,
+          getSlotUvTransform(settings, 'height')
+        );
+        this._applyTextureSlot(
+          material,
+          'opacity',
+          textures.opacity,
+          getSlotUvTransform(settings, 'opacity')
+        );
       }
     }
 
     private _applyTextureSlot(
       material: THREE.Material,
       slotName: PBRTextureSlotName,
-      resourceName: string | null | undefined
+      resourceName: string | null | undefined,
+      uvTransform?: PBRUvTransform
     ): void {
       if (resourceName === undefined) {
         // Keep the texture of the original material.
         return;
       }
       const texture = resourceName
-        ? this._getTexture(
-            this._runtimeGame.getImageManager(),
+        ? this._getUvTransformedTexture(
+            material,
             resourceName,
-            slotName === 'baseColor' || slotName === 'emissive'
+            slotName === 'baseColor' || slotName === 'emissive',
+            uvTransform
           )
         : null;
-      const standardMaterial = material as THREE.MeshStandardMaterial;
-      switch (slotName) {
-        case 'baseColor':
-          standardMaterial.map = texture;
-          break;
-        case 'metallic':
-          standardMaterial.metalnessMap = texture;
-          break;
-        case 'roughness':
-          standardMaterial.roughnessMap = texture;
-          break;
-        case 'normal':
-          standardMaterial.normalMap = texture;
-          break;
-        case 'ao':
-          standardMaterial.aoMap = texture;
-          break;
-        case 'emissive':
-          standardMaterial.emissiveMap = texture;
-          break;
-        case 'height':
-          standardMaterial.displacementMap = texture;
-          break;
-        case 'opacity':
-          standardMaterial.alphaMap = texture;
-          if (texture) {
-            material.transparent = true;
-          }
-          break;
-      }
+      this._setMaterialTextureSlot(material, slotName, texture);
       if (texture && resourceName) {
         this._trackMaterialForResource(resourceName, material);
       }
@@ -1311,6 +1699,268 @@ namespace gdjs {
       return texture;
     }
 
+    private _isPhysicalMaterial(material: THREE.Material): boolean {
+      return (
+        (material as THREE.MeshPhysicalMaterial).isMeshPhysicalMaterial === true
+      );
+    }
+
+    private _getNormalFlipY(material: THREE.Material): boolean {
+      return material.userData.gdjsNormalFlipY === true;
+    }
+
+    /**
+     * Set whether the green channel of the normal map is flipped, keeping the
+     * strength (`normalScale.x` always stays the positive strength).
+     */
+    private _setNormalFlipY(material: THREE.Material, value: boolean): void {
+      material.userData.gdjsNormalFlipY = value;
+      const standardMaterial = material as THREE.MeshStandardMaterial;
+      if (!standardMaterial.normalScale) return;
+      const strength = Math.abs(standardMaterial.normalScale.x);
+      standardMaterial.normalScale.set(strength, value ? -strength : strength);
+    }
+
+    /**
+     * Read the texture of a slot (the mapping of the slot names to the
+     * Three.js material properties).
+     */
+    private _getMaterialTextureSlot(
+      material: THREE.Material,
+      slotName: PBRTextureSlotName
+    ): THREE.Texture | null {
+      const standardMaterial = material as THREE.MeshStandardMaterial;
+      switch (slotName) {
+        case 'baseColor':
+          return standardMaterial.map;
+        case 'metallicRoughness':
+        case 'metallic':
+          return standardMaterial.metalnessMap;
+        case 'roughness':
+          return standardMaterial.roughnessMap;
+        case 'normal':
+          return standardMaterial.normalMap;
+        case 'ao':
+          return standardMaterial.aoMap;
+        case 'emissive':
+          return standardMaterial.emissiveMap;
+        case 'height':
+          return standardMaterial.displacementMap;
+        case 'opacity':
+          return standardMaterial.alphaMap;
+        default:
+          return null;
+      }
+    }
+
+    /**
+     * Set the texture of a slot, releasing the UV transform clone previously
+     * used by the material (a clone is never released when it is kept).
+     */
+    private _setMaterialTextureSlot(
+      material: THREE.Material,
+      slotName: PBRTextureSlotName,
+      texture: THREE.Texture | null
+    ): void {
+      const standardMaterial = material as THREE.MeshStandardMaterial;
+      switch (slotName) {
+        case 'baseColor':
+          if (standardMaterial.map !== texture) {
+            this._releaseUvTransformTexture(material, standardMaterial.map);
+          }
+          standardMaterial.map = texture;
+          break;
+        case 'metallicRoughness':
+          if (standardMaterial.metalnessMap !== texture) {
+            this._releaseUvTransformTexture(
+              material,
+              standardMaterial.metalnessMap
+            );
+          }
+          if (standardMaterial.roughnessMap !== texture) {
+            this._releaseUvTransformTexture(
+              material,
+              standardMaterial.roughnessMap
+            );
+          }
+          standardMaterial.metalnessMap = texture;
+          standardMaterial.roughnessMap = texture;
+          break;
+        case 'metallic':
+          if (standardMaterial.metalnessMap !== texture) {
+            this._releaseUvTransformTexture(
+              material,
+              standardMaterial.metalnessMap
+            );
+          }
+          standardMaterial.metalnessMap = texture;
+          break;
+        case 'roughness':
+          if (standardMaterial.roughnessMap !== texture) {
+            this._releaseUvTransformTexture(
+              material,
+              standardMaterial.roughnessMap
+            );
+          }
+          standardMaterial.roughnessMap = texture;
+          break;
+        case 'normal':
+          if (standardMaterial.normalMap !== texture) {
+            this._releaseUvTransformTexture(
+              material,
+              standardMaterial.normalMap
+            );
+          }
+          standardMaterial.normalMap = texture;
+          break;
+        case 'ao':
+          if (standardMaterial.aoMap !== texture) {
+            this._releaseUvTransformTexture(material, standardMaterial.aoMap);
+          }
+          standardMaterial.aoMap = texture;
+          break;
+        case 'emissive':
+          if (standardMaterial.emissiveMap !== texture) {
+            this._releaseUvTransformTexture(
+              material,
+              standardMaterial.emissiveMap
+            );
+          }
+          standardMaterial.emissiveMap = texture;
+          break;
+        case 'height':
+          if (standardMaterial.displacementMap !== texture) {
+            this._releaseUvTransformTexture(
+              material,
+              standardMaterial.displacementMap
+            );
+          }
+          standardMaterial.displacementMap = texture;
+          break;
+        case 'opacity':
+          if (standardMaterial.alphaMap !== texture) {
+            this._releaseUvTransformTexture(
+              material,
+              standardMaterial.alphaMap
+            );
+          }
+          standardMaterial.alphaMap = texture;
+          if (texture) {
+            material.transparent = true;
+          }
+          break;
+      }
+    }
+
+    /**
+     * Return the texture to use for a slot: the shared texture of the image
+     * manager when the transform is the identity, or a cached clone with the
+     * UV transform applied (the shared texture is never modified).
+     */
+    private _getUvTransformedTexture(
+      material: THREE.Material,
+      resourceName: string,
+      isColorData: boolean,
+      transform: PBRUvTransform | undefined
+    ): THREE.Texture | null {
+      const originalTexture = this._getTexture(
+        this._runtimeGame.getImageManager(),
+        resourceName,
+        isColorData
+      );
+      if (!originalTexture) return null;
+      if (isDefaultUvTransform(transform) || !transform) {
+        return originalTexture;
+      }
+      const key = getUvTransformCacheKey(resourceName, isColorData, transform);
+      let entry = this._uvTransformedTextures.get(key);
+      if (!entry) {
+        const clone = originalTexture.clone();
+        clone.wrapS = THREE.RepeatWrapping;
+        clone.wrapT = THREE.RepeatWrapping;
+        clone.center.set(0.5, 0.5);
+        clone.repeat.set(
+          transform.repeatX === undefined ? 1 : transform.repeatX,
+          transform.repeatY === undefined ? 1 : transform.repeatY
+        );
+        clone.offset.set(
+          transform.offsetX === undefined ? 0 : transform.offsetX,
+          transform.offsetY === undefined ? 0 : transform.offsetY
+        );
+        clone.rotation = gdjs.toRad(
+          transform.rotation === undefined ? 0 : transform.rotation
+        );
+        // Keep the color space and the anisotropic filtering of the original.
+        clone.colorSpace = originalTexture.colorSpace;
+        clone.anisotropy = originalTexture.anisotropy;
+        (clone as any)._gdjsResourceName = resourceName;
+        (clone as any)._gdjsUvTransformKey = key;
+        (clone as any)._gdjsUvTransform = {
+          repeatX: transform.repeatX === undefined ? 1 : transform.repeatX,
+          repeatY: transform.repeatY === undefined ? 1 : transform.repeatY,
+          offsetX: transform.offsetX === undefined ? 0 : transform.offsetX,
+          offsetY: transform.offsetY === undefined ? 0 : transform.offsetY,
+          rotation: transform.rotation === undefined ? 0 : transform.rotation,
+        };
+        // `Texture.clone()` already sets `needsUpdate` (see `Texture.copy` in
+        // three r185), it is kept explicit for clarity.
+        clone.needsUpdate = true;
+        entry = { texture: clone, resourceName, users: new Set() };
+        this._uvTransformedTextures.set(key, entry);
+      }
+      entry.users.add(material);
+      return entry.texture;
+    }
+
+    /**
+     * Release a material from a UV transform clone (disposing the clone when
+     * its last user is gone). Textures that are not manager clones are left
+     * untouched.
+     */
+    private _releaseUvTransformTexture(
+      material: THREE.Material,
+      texture: THREE.Texture | null | undefined
+    ): void {
+      if (!texture) return;
+      const key = (texture as any)._gdjsUvTransformKey as string | undefined;
+      if (!key) return;
+      const entry = this._uvTransformedTextures.get(key);
+      if (!entry) return;
+      entry.users.delete(material);
+      if (entry.users.size === 0) {
+        entry.texture.dispose();
+        this._uvTransformedTextures.delete(key);
+      }
+    }
+
+    /**
+     * Register a material as a user of every UV transform clone it references
+     * (used when a material is copied: the copy shares the textures of the
+     * original).
+     */
+    private _registerMaterialUvTransformTextures(
+      material: THREE.Material
+    ): void {
+      const slots: Array<PBRTextureSlotName> = [
+        'baseColor',
+        'metallic',
+        'roughness',
+        'normal',
+        'ao',
+        'emissive',
+        'height',
+        'opacity',
+      ];
+      for (const slot of slots) {
+        const texture = this._getMaterialTextureSlot(material, slot);
+        if (!texture) continue;
+        const key = (texture as any)._gdjsUvTransformKey as string | undefined;
+        if (!key) continue;
+        const entry = this._uvTransformedTextures.get(key);
+        if (entry) entry.users.add(material);
+      }
+    }
+
     private _trackMaterialForResource(
       resourceName: string,
       material: THREE.Material
@@ -1326,6 +1976,14 @@ namespace gdjs {
     private _forgetMaterial(material: THREE.Material): void {
       for (const entry of this._materialsByResource) {
         entry[1].delete(material);
+      }
+      // Release the UV transform clones used by this material (disposing the
+      // ones that have no user anymore).
+      for (const [key, entry] of this._uvTransformedTextures) {
+        if (entry.users.delete(material) && entry.users.size === 0) {
+          entry.texture.dispose();
+          this._uvTransformedTextures.delete(key);
+        }
       }
     }
   }
@@ -1518,5 +2176,23 @@ namespace gdjs {
       runtimeScene: gdjs.RuntimeScene
     ): boolean =>
       getPBRMaterialManager(runtimeScene).getEnvironmentTexture() !== null;
+
+    /**
+     * Set the maximum anisotropic filtering applied to the 3D textures of the
+     * materials (16 by default). Lower it on weak devices.
+     */
+    export const setMaxAnisotropy = (
+      runtimeScene: gdjs.RuntimeScene,
+      value: float
+    ) => {
+      getPBRMaterialManager(runtimeScene).setMaxAnisotropy(value);
+    };
+
+    /**
+     * Get the maximum anisotropic filtering applied to the 3D textures of the
+     * materials.
+     */
+    export const getMaxAnisotropy = (runtimeScene: gdjs.RuntimeScene): float =>
+      getPBRMaterialManager(runtimeScene).getMaxAnisotropy();
   }
 }

@@ -2,18 +2,9 @@
 
 describe('Multiplayer lobby joining', () => {
   let clock;
-  let originalFetch;
-  let originalWebSocket;
-  let originalProjectData;
-  let originalGetUserId;
-  let originalGetUserToken;
-  let originalDisplayLoader;
-  let originalDisplayConnectionErrorNotification;
-  let originalGetLobbiesIframe;
-  let originalPeerJsHelper;
-  let onPeerUnavailableForTest;
-  let originalLobbyGameRunning;
   let loaderStates;
+  let showConnectionError;
+  // Quick-join throttling stores its timestamp across tests.
   let nextClockTime = Date.now() + 100000;
 
   class FakeWebSocket {
@@ -56,6 +47,11 @@ describe('Multiplayer lobby joining', () => {
       isInGameEdition: () => false,
       isPreview: () => true,
       getGameData: () => ({ properties: { version: 'test-version' } }),
+      getAdditionalOptions: () => ({}),
+      getRenderer: () => ({
+        getDomElementContainer: () => ({}),
+        getElectron: () => null,
+      }),
       getPlatformInfo: () => ({
         isCordova: false,
         devicePlatform: 'desktop',
@@ -69,90 +65,127 @@ describe('Multiplayer lobby joining', () => {
   beforeEach(() => {
     clock = sinon.useFakeTimers({ now: nextClockTime });
     nextClockTime += 1000;
-    originalFetch = window.fetch;
-    originalWebSocket = window.WebSocket;
-    originalProjectData = gdjs.projectData;
-    originalGetUserId = gdjs.playerAuthentication.getUserId;
-    originalGetUserToken = gdjs.playerAuthentication.getUserToken;
-    originalDisplayLoader = gdjs.multiplayerComponents.displayLoader;
-    originalDisplayConnectionErrorNotification =
-      gdjs.multiplayerComponents.displayConnectionErrorNotification;
-    originalGetLobbiesIframe = gdjs.multiplayerComponents.getLobbiesIframe;
-    originalPeerJsHelper = gdjs.multiplayerPeerJsHelper;
-    onPeerUnavailableForTest = null;
-    originalLobbyGameRunning = gdjs.multiplayer._isLobbyGameRunning;
     loaderStates = [];
+    showConnectionError = sinon.fake();
 
-    /** @type {any} */ (gdjs).projectData = {
-      properties: { projectUuid: 'test-game-id' },
-    };
-    /** @type {any} */ (gdjs.playerAuthentication).getUserId = () =>
-      'test-player-id';
-    /** @type {any} */ (gdjs.playerAuthentication).getUserToken = () =>
-      'test-player-token';
-    /** @type {any} */ (gdjs.multiplayerComponents).displayLoader = (
-      _runtimeScene,
-      visible
-    ) => {
-      loaderStates.push(visible);
-    };
-    /** @type {any} */ (gdjs.multiplayerComponents).getLobbiesIframe = () =>
-      null;
-    /** @type {any} */ (
-      gdjs.multiplayerComponents
-    ).displayConnectionErrorNotification = () => {};
-    /** @type {any} */ (gdjs).multiplayerPeerJsHelper = {
-      useDefaultBrokerServer: ({ onPeerUnavailable }) => {
-        onPeerUnavailableForTest = onPeerUnavailable;
-      },
-      setCompressionMethod: () => {},
-      getCurrentId: () => 'test-client-peer-id',
-      connect: () => {},
-    };
-    gdjs.multiplayer._isLobbyGameRunning = false;
-    /** @type {any} */ (window).WebSocket = FakeWebSocket;
-    /** @type {any} */ (window).fetch = async () => ({
-      ok: true,
-      text: async () =>
-        JSON.stringify({
-          id: 'test-lobby-id',
-          minPlayers: 1,
-          maxPlayers: 4,
-          canJoinAfterStart: true,
-          players: [
-            { playerId: 'host-player-id', status: 'playing', playerNumber: 1 },
-          ],
-          status: 'playing',
-        }),
-    });
+    sinon.replace(
+      gdjs,
+      'projectData',
+      /** @type {any} */ ({
+        properties: { projectUuid: 'test-game-id' },
+      })
+    );
+    sinon.replace(
+      gdjs.playerAuthentication,
+      'getUserId',
+      () => 'test-player-id'
+    );
+    sinon.replace(
+      gdjs.playerAuthentication,
+      'getUserToken',
+      () => 'test-player-token'
+    );
+    sinon.replace(
+      gdjs.playerAuthentication,
+      'isAuthenticationWindowOpen',
+      () => false
+    );
+    sinon.replace(
+      gdjs.multiplayerComponents,
+      'displayLoader',
+      (_scene, visible) => loaderStates.push(visible)
+    );
+    sinon.replace(gdjs.multiplayerComponents, 'getLobbiesIframe', () => null);
+    sinon.replace(
+      gdjs.multiplayerComponents,
+      'getLobbiesRootContainer',
+      () => null
+    );
+    sinon.replace(gdjs.multiplayerComponents, 'displayLobbies', () => {});
+    sinon.replace(
+      gdjs.multiplayerComponents,
+      'displayIframeInsideLobbiesContainer',
+      () => {}
+    );
+    sinon.replace(
+      gdjs.multiplayerComponents,
+      'addTextsToLoadingContainer',
+      () => {}
+    );
+    sinon.replace(
+      gdjs.multiplayerComponents,
+      'displayConnectionErrorNotification',
+      showConnectionError
+    );
+    sinon.replace(
+      gdjs,
+      'multiplayerPeerJsHelper',
+      /** @type {any} */ ({
+        useDefaultBrokerServer: () => {},
+        setCompressionMethod: () => {},
+        getCurrentId: () => 'test-client-peer-id',
+        connect: () => {},
+      })
+    );
+    sinon.replace(gdjs.multiplayer, '_isLobbyGameRunning', false);
+    sinon.replace(window, 'WebSocket', /** @type {any} */ (FakeWebSocket));
+    sinon.replace(
+      window,
+      'fetch',
+      /** @type {any} */ (
+        async () => ({
+          ok: true,
+          status: 200,
+          text: async () =>
+            JSON.stringify({
+              id: 'test-lobby-id',
+              minPlayers: 1,
+              maxPlayers: 4,
+              canJoinAfterStart: true,
+              players: [
+                {
+                  playerId: 'host-player-id',
+                  status: 'playing',
+                  playerNumber: 1,
+                },
+              ],
+              status: 'playing',
+            }),
+        })
+      )
+    );
   });
 
   afterEach(() => {
-    if (
-      onPeerUnavailableForTest &&
-      FakeWebSocket.latest &&
-      !FakeWebSocket.latest.isClosed
-    ) {
-      onPeerUnavailableForTest();
-    }
+    gdjs.multiplayer.leaveGameLobby();
     clock.restore();
-    window.fetch = originalFetch;
-    window.WebSocket = originalWebSocket;
-    /** @type {any} */ (gdjs).projectData = originalProjectData;
-    /** @type {any} */ (gdjs.playerAuthentication).getUserId =
-      originalGetUserId;
-    /** @type {any} */ (gdjs.playerAuthentication).getUserToken =
-      originalGetUserToken;
-    /** @type {any} */ (gdjs.multiplayerComponents).displayLoader =
-      originalDisplayLoader;
-    /** @type {any} */ (
-      gdjs.multiplayerComponents
-    ).displayConnectionErrorNotification =
-      originalDisplayConnectionErrorNotification;
-    /** @type {any} */ (gdjs.multiplayerComponents).getLobbiesIframe =
-      originalGetLobbiesIframe;
-    /** @type {any} */ (gdjs).multiplayerPeerJsHelper = originalPeerJsHelper;
-    gdjs.multiplayer._isLobbyGameRunning = originalLobbyGameRunning;
+    sinon.restore();
+  });
+
+  it('leaves and shows an error when a lobbies-page join times out', async () => {
+    await gdjs.multiplayer.openLobbiesWindow(runtimeScene);
+    window.dispatchEvent(
+      new MessageEvent('message', {
+        origin: 'https://gd.games',
+        data: { id: 'joinLobby', lobbyId: 'test-lobby-id' },
+      })
+    );
+    const websocket = FakeWebSocket.latest;
+    websocket.open();
+    websocket.receive({
+      type: 'connectionId',
+      data: { connectionId: 'test-connection-id', positionInLobby: 2 },
+    });
+    window.dispatchEvent(
+      new MessageEvent('message', {
+        origin: 'https://gd.games',
+        data: { id: 'joinGame' },
+      })
+    );
+    clock.tick(10000);
+    expect(showConnectionError.calledOnce).to.be(true);
+    expect(websocket.isClosed).to.be(true);
+    expect(gdjs.multiplayer.hasQuickJoinJustFailed(runtimeScene)).to.be(false);
   });
 
   it('fails a quick join when the lobby never sends a peer ID', async () => {

@@ -1115,31 +1115,24 @@ namespace gdjs {
         })
       );
 
-      const peerIdTimeout = setTimeout(() => {
-        if (_joinGamePeerIdTimeout !== peerIdTimeout) return;
+      _joinGamePeerIdTimeout = setTimeout(() => {
         _joinGamePeerIdTimeout = null;
         logger.error(
           'Timed out while waiting for the lobby to send a peer ID.'
         );
 
-        const wasQuickJoining = _isQuickJoiningOrStartingAGame;
-        if (wasQuickJoining) {
+        handleLeaveLobbyEvent();
+        _actionAfterJoiningLobby = null;
+        if (_isQuickJoiningOrStartingAGame) {
           _quickJoinLobbyJustFailed = true;
           _quickJoinLobbyFailureReason = 'TIMEOUT';
+          onLobbyQuickJoinFinished(runtimeScene);
         } else {
           gdjs.multiplayerComponents.displayConnectionErrorNotification(
             runtimeScene
           );
         }
-
-        handleLeaveLobbyEvent();
-        if (wasQuickJoining) {
-          onLobbyQuickJoinFinished(runtimeScene);
-        } else {
-          _actionAfterJoiningLobby = null;
-        }
       }, DEFAULT_LOBBY_JOIN_GAME_PEER_ID_TIMEOUT);
-      _joinGamePeerIdTimeout = peerIdTimeout;
     };
 
     /**

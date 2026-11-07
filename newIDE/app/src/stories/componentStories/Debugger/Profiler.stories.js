@@ -13,6 +13,7 @@ export default {
 };
 
 const profilerProps = {
+  canStartProfiler: true,
   onStart: action('start profiler'),
   onStop: action('stop profiler'),
 };

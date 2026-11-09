@@ -171,6 +171,50 @@ describe('put_3d_instances (modifications of existing instances)', () => {
     expect(instances[0].z).toBe(60);
   });
 
+  it('tells when a moved and resized instance keeps its tilt', async () => {
+    await putInstances({
+      brush_kind: 'point',
+      brush_position: '10,20,30',
+      new_instances_count: 1,
+      instances_rotation: '0,75,72',
+    });
+    const [created] = getInstances(testScene);
+
+    const result = await putInstances({
+      brush_kind: 'point',
+      brush_position: '40,50,60',
+      existing_instance_ids: created.id,
+      instances_size: '200,8192,4',
+    });
+
+    expect(result.message).toEqual(
+      expect.stringContaining(
+        `Kept the tilt of 1 instance of "Cube" (${
+          created.id
+        } at (0°, 75°, 72°)): the space they occupy is not the one given above. Give a new rotation to lay them flat.`
+      )
+    );
+  });
+
+  it('does not mention a tilt when the move also gives a rotation', async () => {
+    await putInstances({
+      brush_kind: 'point',
+      brush_position: '10,20,30',
+      new_instances_count: 1,
+      instances_rotation: '0,75,72',
+    });
+    const [created] = getInstances(testScene);
+
+    const result = await putInstances({
+      brush_kind: 'point',
+      brush_position: '40,50,60',
+      existing_instance_ids: created.id,
+      instances_rotation: '0,0,90',
+    });
+
+    expect(result.message).not.toEqual(expect.stringContaining('tilt'));
+  });
+
   it('moves an existing instance to a different layer with the none brush', async () => {
     testScene.insertNewLayer('Foreground', testScene.getLayersCount());
     await putInstances({

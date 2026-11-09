@@ -242,6 +242,135 @@ describe('libGD.js - GDJS Free Function Code Generation integration tests', func
         .getAsNumber()
     ).toBe(456);
   });
+
+  it.each([
+    'new',
+    'class',
+    'this',
+    'gdjs',
+    'runtimeScene',
+    'eventsFunctionContext',
+    'parentEventsFunctionContext',
+  ])(
+    'Can use a parameter named like a JavaScript keyword or a generated identifier (%s)',
+    (parameterName) => {
+      const project = new gd.ProjectHelper.createNewGDJSProject();
+      const eventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
+        'MyExtension',
+        0
+      );
+      eventsFunctionsExtension
+        .getSceneVariables()
+        .insertNew('MyVariable', 0)
+        .setValue(0);
+
+      const eventsSerializerElement = gd.Serializer.fromJSObject([
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [
+            {
+              type: { value: 'NumberVariable' },
+              parameters: [parameterName, '=', '123'],
+            },
+          ],
+          actions: [
+            {
+              type: { value: 'SetNumberVariable' },
+              parameters: ['MyVariable', '=', '456'],
+            },
+          ],
+        },
+      ]);
+      const eventsFunction = eventsFunctionsExtension
+        .getEventsFunctions()
+        .insertNewEventsFunction('MyFunction', 0);
+      eventsFunction
+        .getEvents()
+        .unserializeFrom(project, eventsSerializerElement);
+      eventsFunction
+        .getParameters()
+        .insertNewParameter(parameterName, 0)
+        .setType('number');
+
+      const { gdjs, runtimeScene, runCompiledEvents } = generatedFreeFunction(
+        gd,
+        project,
+        eventsFunctionsExtension,
+        eventsFunction,
+        { logCode: false }
+      );
+
+      runCompiledEvents(gdjs, runtimeScene, [123]);
+      expect(
+        runtimeScene
+          .getVariablesForExtension('MyExtension')
+          .get('MyVariable')
+          .getAsNumber()
+      ).toBe(456);
+    }
+  );
+
+  it('Can use parameters whose names would be mangled the same way without escaping underscores', () => {
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const eventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    eventsFunctionsExtension
+      .getSceneVariables()
+      .insertNew('MyVariable', 0)
+      .setValue(0);
+
+    // "é" is mangled as "_233" when underscores are not escaped.
+    const eventsSerializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [
+          {
+            type: { value: 'NumberVariable' },
+            parameters: ['é', '=', '1'],
+          },
+          {
+            type: { value: 'NumberVariable' },
+            parameters: ['_233', '=', '2'],
+          },
+        ],
+        actions: [
+          {
+            type: { value: 'SetNumberVariable' },
+            parameters: ['MyVariable', '=', '456'],
+          },
+        ],
+      },
+    ]);
+    const eventsFunction = eventsFunctionsExtension
+      .getEventsFunctions()
+      .insertNewEventsFunction('MyFunction', 0);
+    eventsFunction
+      .getEvents()
+      .unserializeFrom(project, eventsSerializerElement);
+    eventsFunction.getParameters().insertNewParameter('é', 0).setType('number');
+    eventsFunction
+      .getParameters()
+      .insertNewParameter('_233', 1)
+      .setType('number');
+
+    const { gdjs, runtimeScene, runCompiledEvents } = generatedFreeFunction(
+      gd,
+      project,
+      eventsFunctionsExtension,
+      eventsFunction,
+      { logCode: false }
+    );
+
+    runCompiledEvents(gdjs, runtimeScene, [1, 2]);
+    expect(
+      runtimeScene
+        .getVariablesForExtension('MyExtension')
+        .get('MyVariable')
+        .getAsNumber()
+    ).toBe(456);
+  });
 });
 
 function generatedFreeFunction(

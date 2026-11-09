@@ -632,16 +632,16 @@ describe('libGD.js - GDJS related tests', function () {
       // Check that the parameters, with the (optional) context of the parent function,
       // are all here
       expect(code).toMatch(
-        'function(runtimeScene, MyObject, MyNumber, MySprite, MyString, parentEventsFunctionContext)'
+        'function(runtimeScene, parameter_MyObject, parameter_MyNumber, parameter_MySprite, parameter_MyString, parentEventsFunctionContext)'
       );
 
       // ...and objects should be able to get queried...
-      expect(code).toMatch('"MyObject": MyObject');
-      expect(code).toMatch('"MySprite": MySprite');
+      expect(code).toMatch('"MyObject": parameter_MyObject');
+      expect(code).toMatch('"MySprite": parameter_MySprite');
 
       // ...and arguments should be able to get queried too:
-      expect(code).toMatch('if (argName === "MyNumber") return MyNumber;');
-      expect(code).toMatch('if (argName === "MyString") return MyString;');
+      expect(code).toMatch('if (argName === "MyNumber") return parameter_MyNumber;');
+      expect(code).toMatch('if (argName === "MyString") return parameter_MyString;');
 
       // GetArgumentAsString("MyString") should be generated code to query and cast as a string
       // the argument
@@ -736,12 +736,12 @@ describe('libGD.js - GDJS related tests', function () {
       // Check that the parameters, with the (optional) context of the parent function,
       // are all here
       expect(code).toMatch(
-        'function(runtimeScene, MyObject, MySprite, parentEventsFunctionContext)'
+        'function(runtimeScene, parameter_MyObject, parameter_MySprite, parentEventsFunctionContext)'
       );
 
       // ...and objects should be able to get queried...
-      expect(code).toMatch('"MyObject": MyObject');
-      expect(code).toMatch('"MySprite": MySprite');
+      expect(code).toMatch('"MyObject": parameter_MyObject');
+      expect(code).toMatch('"MySprite": parameter_MySprite');
 
       // Variables of both MyObject and MySprite should have 42 added:
       expect(code).toMatch(

@@ -1053,31 +1053,42 @@ namespace gdjs {
     return false;
   };
 
-  const getObjectWidth = (instance: gdjs.RuntimeObject) =>
-    isTextObject(instance) && instance.isWrapping()
-      ? instance.getWrappingWidth() || instance.getWidth()
-      : instance.getWidth();
+  /**
+   * Workarounds for text objects.
+   */
+  class RuntimeObjectHelper {
+    getObjectWidth(instance: gdjs.RuntimeObject): number {
+      return isTextObject(instance) && instance.isWrapping()
+        ? instance.getWrappingWidth() || instance.getWidth()
+        : instance.getWidth();
+    }
 
-  const getObjectHeight = (instance: gdjs.RuntimeObject) =>
-    isTextObject(instance) && instance.isWrapping()
-      ? instance.getRequestedHeight() || instance.getHeight()
-      : instance.getHeight();
+    getObjectHeight(instance: gdjs.RuntimeObject): number {
+      return isTextObject(instance) && instance.isWrapping()
+        ? instance.getRequestedHeight() || instance.getHeight()
+        : instance.getHeight();
+    }
 
-  const getObjectDrawableY = (instance: gdjs.RuntimeObject) =>
-    isTextObject(instance) && instance.isWrapping() && instance.getHeight()
-      ? ((instance.getDrawableY() - instance.getY()) / instance.getHeight()) *
-          getObjectHeight(instance) +
-        instance.getY()
-      : instance.getDrawableY();
+    getObjectDrawableY(instance: gdjs.RuntimeObject): number {
+      return isTextObject(instance) &&
+        instance.isWrapping() &&
+        instance.getHeight()
+        ? ((instance.getDrawableY() - instance.getY()) / instance.getHeight()) *
+            this.getObjectHeight(instance) +
+            instance.getY()
+        : instance.getDrawableY();
+    }
+  }
+  const runtimeObjectHelper = new RuntimeObjectHelper();
 
   const getUnrotatedInstanceAABB = (
     instance: gdjs.RuntimeObject,
     unrotatedAABB: AABB3D
   ): AABB3D => {
     const minX = instance.getDrawableX();
-    const minY = getObjectDrawableY(instance);
-    const maxX = minX + getObjectWidth(instance);
-    const maxY = minY + getObjectHeight(instance);
+    const minY = runtimeObjectHelper.getObjectDrawableY(instance);
+    const maxX = minX + runtimeObjectHelper.getObjectWidth(instance);
+    const maxY = minY + runtimeObjectHelper.getObjectHeight(instance);
     let minZ = 0;
     let maxZ = 0;
     if (is3D(instance)) {
@@ -3365,8 +3376,8 @@ namespace gdjs {
     ): InstanceData | null {
       if (!runtimeObject.persistentUuid) return null;
 
-      const width = getObjectWidth(runtimeObject);
-      const height = getObjectHeight(runtimeObject);
+      const width = runtimeObjectHelper.getObjectWidth(runtimeObject);
+      const height = runtimeObjectHelper.getObjectHeight(runtimeObject);
       const depth = !is3D(runtimeObject) ? undefined : runtimeObject.getDepth();
       const defaultWidth = runtimeObject.getOriginalWidth();
       const defaultHeight = runtimeObject.getOriginalHeight();

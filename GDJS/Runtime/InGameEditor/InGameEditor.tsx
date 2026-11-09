@@ -2144,12 +2144,15 @@ namespace gdjs {
       } else {
         // A guess of the visible area, not stored: the editor sends the real
         // one while the scene is loading.
-        this._zoomToInnerArea({
-          minX: 0.15,
-          minY: 0.15,
-          maxX: 0.85,
-          maxY: 0.85,
-        });
+        this._zoomToInnerArea(
+          {
+            minX: 0.15,
+            minY: 0.15,
+            maxX: 0.85,
+            maxY: 0.85,
+          },
+          true
+        );
       }
 
       // Update initialRuntimeGameStatus so that a hard reload
@@ -2431,7 +2434,10 @@ namespace gdjs {
       this._zoomToInnerArea(visibleScreenArea);
     }
 
-    private _zoomToInnerArea(visibleScreenArea: ScreenArea) {
+    private _zoomToInnerArea(
+      visibleScreenArea: ScreenArea,
+      shouldApplyToAllEditorMode = false
+    ) {
       if (this._innerArea) {
         this.zoomToFitArea(
           {
@@ -2443,7 +2449,8 @@ namespace gdjs {
             maxZ: this._innerArea.max[2],
           },
           visibleScreenArea,
-          0.1
+          0.1,
+          shouldApplyToAllEditorMode
         );
       } else {
         this.zoomToFitArea(
@@ -2456,7 +2463,8 @@ namespace gdjs {
             maxZ: 0,
           },
           visibleScreenArea,
-          0.1
+          0.1,
+          shouldApplyToAllEditorMode
         );
       }
     }
@@ -2524,13 +2532,15 @@ namespace gdjs {
         maxX: number;
         maxY: number;
       },
-      margin: float
+      margin: float,
+      shouldApplyToAllEditorMode = false
     ) {
       if (!this._currentScene) return;
       this._getEditorCamera().zoomToFitArea(
         sceneArea,
         visibleScreenArea,
-        margin
+        margin,
+        shouldApplyToAllEditorMode
       );
       this._getEditorCamera().switchToFreeCamera();
     }
@@ -5935,8 +5945,11 @@ namespace gdjs {
       this.onHasCameraChanged();
     }
 
-    setTopDownAndZoom(zoom: float): void {
-      if (this.editor.getEditorMode() === '3d-editor') {
+    setTopDownAndZoom(zoom: float, shouldApplyToAllEditorMode = false): void {
+      if (
+        this.editor.getEditorMode() === '3d-editor' ||
+        shouldApplyToAllEditorMode
+      ) {
         const distance = this._getCameraZFromZoom(zoom);
         this.switchToOrbitAroundPosition(
           this.getAnchorX(),
@@ -5945,17 +5958,33 @@ namespace gdjs {
         );
         this.resetRotationToTopDown();
         this.orbitCameraControl.distance = distance;
-      } else {
+      }
+      if (
+        this.editor.getEditorMode() === '2d-editor' ||
+        shouldApplyToAllEditorMode
+      ) {
         this.cameraControl2D.cameraZoom = zoom;
       }
       this.onHasCameraChanged();
     }
 
-    setTopDownAndCenter(x: float, y: float, z: float): void {
-      if (this.editor.getEditorMode() === '3d-editor') {
+    setTopDownAndCenter(
+      x: float,
+      y: float,
+      z: float,
+      shouldApplyToAllEditorMode = false
+    ): void {
+      if (
+        this.editor.getEditorMode() === '3d-editor' ||
+        shouldApplyToAllEditorMode
+      ) {
         this.switchToOrbitAroundPosition(x, y, z);
         this.resetRotationToTopDown();
-      } else {
+      }
+      if (
+        this.editor.getEditorMode() === '2d-editor' ||
+        shouldApplyToAllEditorMode
+      ) {
         this.cameraControl2D.cameraCenterX = x;
         this.cameraControl2D.cameraCenterY = y;
       }
@@ -6061,7 +6090,8 @@ namespace gdjs {
         maxX: number;
         maxY: number;
       },
-      margin: float
+      margin: float,
+      shouldApplyToAllEditorMode = false
     ) {
       const sceneAreaWidth = sceneArea.maxX - sceneArea.minX;
       const sceneAreaHeight = sceneArea.maxY - sceneArea.minY;
@@ -6087,9 +6117,10 @@ namespace gdjs {
       this.setTopDownAndCenter(
         sceneAreaCenterX,
         sceneAreaCenterY,
-        sceneArea.minZ
+        sceneArea.minZ,
+        shouldApplyToAllEditorMode
       );
-      this.setTopDownAndZoom(zoom);
+      this.setTopDownAndZoom(zoom, shouldApplyToAllEditorMode);
       this.onHasCameraChanged();
     }
 

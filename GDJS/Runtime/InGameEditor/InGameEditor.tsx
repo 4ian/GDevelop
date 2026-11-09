@@ -598,6 +598,7 @@ namespace gdjs {
     getWrappingWidth(): float;
     getRequestedHeight(): float;
     setWrapping(enable: boolean): void;
+    isWrapping(): boolean;
   }
 
   const isTextObject = (
@@ -1053,19 +1054,19 @@ namespace gdjs {
   };
 
   const getObjectWidth = (instance: gdjs.RuntimeObject) =>
-    isTextObject(instance)
+    isTextObject(instance) && instance.isWrapping()
       ? instance.getWrappingWidth() || instance.getWidth()
       : instance.getWidth();
 
   const getObjectHeight = (instance: gdjs.RuntimeObject) =>
-    isTextObject(instance)
+    isTextObject(instance) && instance.isWrapping()
       ? instance.getRequestedHeight() || instance.getHeight()
       : instance.getHeight();
 
   const getObjectDrawableY = (instance: gdjs.RuntimeObject) =>
-    isTextObject(instance) && instance.getHeight()
+    isTextObject(instance) && instance.isWrapping() && instance.getHeight()
       ? ((instance.getDrawableY() - instance.getY()) / instance.getHeight()) *
-          instance.getRequestedHeight() +
+          getObjectHeight(instance) +
         instance.getY()
       : instance.getDrawableY();
 
@@ -1540,6 +1541,9 @@ namespace gdjs {
         selectedInstance.setY(Math.round(newY));
 
         // Also round the size.
+        if (isTextObject(selectedInstance)) {
+          selectedInstance.setWrapping(true);
+        }
         selectedInstance.setWidth(Math.round(newWidth));
         selectedInstance.setHeight(Math.round(newHeight));
         if (is3D(selectedInstance)) {
@@ -3968,13 +3972,13 @@ namespace gdjs {
           if (instance) {
             runtimeObject.setX(instance.x);
             runtimeObject.setY(instance.y);
+            if (isTextObject(runtimeObject)) {
+              runtimeObject.setWrapping(instance.customSize);
+            }
             if (instance.customSize) {
               runtimeObject.setWidth(instance.width);
               runtimeObject.setHeight(instance.height);
             } else {
-              if (isTextObject(runtimeObject)) {
-                runtimeObject.setWrapping(false);
-              }
               runtimeObject.setWidth(runtimeObject.getOriginalWidth());
               runtimeObject.setHeight(runtimeObject.getOriginalHeight());
             }

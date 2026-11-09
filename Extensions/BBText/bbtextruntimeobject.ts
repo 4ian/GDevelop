@@ -71,7 +71,7 @@ namespace gdjs {
 
     _wrapping: boolean = false;
     _wrappingWidth: float = 250;
-    _requestedHeight: float = 100;
+    _requestedHeight: float = 0;
 
     _textAlign: string;
     _verticalTextAlignment: string;

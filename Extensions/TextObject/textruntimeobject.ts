@@ -106,7 +106,7 @@ namespace gdjs {
     _wrapping: boolean = false;
     // A wrapping of 1 makes games crash on Firefox
     _wrappingWidth: float = 100;
-    _requestedHeight: float = 100;
+    _requestedHeight: float = 0;
 
     _isOutlineEnabled: boolean;
     _outlineThickness: float;

@@ -279,6 +279,9 @@ import { useAuthenticatedPlayer } from './UseAuthenticatedPlayer';
 import ListIcon from '../UI/ListIcon';
 import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import useGamesList from '../GameDashboard/UseGamesList';
+import PreviewVideoRecordingContext, {
+  type PreviewVideoRecording,
+} from './PreviewVideoRecordingContext';
 import useCapturesManager from './UseCapturesManager';
 import {
   readProjectSettings,
@@ -3316,6 +3319,28 @@ const MainFrame = (props: Props): React.MixedElement => {
       });
     },
     [currentProject, launchPreview, getHotReloadPreviewLaunchCaptureOptions]
+  );
+
+  const recordPreviewVideo = React.useCallback(
+    () =>
+      launchPreview({
+        networkPreview: false,
+        launchCaptureOptions: {
+          screenshots: [],
+          previewVideo: 'recorded-by-user',
+        },
+      }),
+    [launchPreview]
+  );
+
+  const previewVideoRecording = React.useMemo(
+    (): PreviewVideoRecording => ({
+      currentProjectGameId: currentProject
+        ? currentProject.getProjectUuid()
+        : null,
+      onRecordPreviewVideo: recordPreviewVideo,
+    }),
+    [currentProject, recordPreviewVideo]
   );
 
   const launchNetworkPreview = React.useCallback(
@@ -6401,486 +6426,496 @@ const MainFrame = (props: Props): React.MixedElement => {
   const hasEditorsInRightPane = hasEditorsInPane(state.editorTabs, 'right');
 
   return (
-    <div
-      className={
-        'main-frame' /* The root styling, done in CSS to read some CSS variables. */
-      }
-    >
-      <CliCommandRunner
-        useCliCommandRunner={useCliCommandRunner}
-        options={cliCommandRunnerOptions}
-      />
-      {!!renderPreviewLauncher &&
-        renderPreviewLauncher(
-          {
-            crashReportUploadLevel:
-              preferences.values.previewCrashReportUploadLevel ||
-              'exclude-javascript-code-events',
-            getIncludeFileHashs:
-              eventsFunctionsExtensionsContext.getIncludeFileHashs,
-            onExport: () => {
-              openShareDialog('publish');
-            },
-            onCaptureFinished,
-          },
-          (previewLauncher: ?PreviewLauncherInterface) => {
-            _previewLauncher.current = previewLauncher;
-          }
-        )}
-      <EmbeddedGameFrame
-        key={currentProject ? currentProject.ptr : 0}
-        // The in-game editor requires WebGL2 (a message is shown instead).
-        enabled={gameEditorMode === 'embedded-game' && isWebGL2Supported()}
-        onEnable={onEnableInGameEditor}
-        previewDebuggerServer={previewDebuggerServer || null}
-        onLaunchPreviewForInGameEdition={onLaunchPreviewForInGameEdition}
-      >
-        <LineStackLayout noMargin>
-          <SlowGraphicsRenderingIndicator />
-          <InGameEditorExtensionErrorsIndicator
-            errors={inGameEditorExtensionErrors}
-            isFromStore={error =>
-              isInGameEditorExtensionErrorFromStore(currentProject, error)
-            }
-            onAskAiToFix={() =>
-              openAskAi({
-                prefilledUserRequest: getAskAiToFixInGameEditorExtensionErrorsText(
-                  inGameEditorExtensionErrors
-                ),
-                prefillInCurrentChat: true,
-              })
-            }
-            onDismiss={clearInGameEditorExtensionErrors}
-          />
-        </LineStackLayout>
-      </EmbeddedGameFrame>
-      <GameplayTestFrame
-        previewDebuggerServer={previewDebuggerServer || null}
-        onStopRequested={stopRunningProjectGameplayTest}
-      />
-      {!!renderMainMenu &&
-        renderMainMenu(
-          { ...buildMainMenuProps, isApplicationTopLevelMenu: true },
-          mainMenuCallbacks,
-          {
-            onClosePreview:
-              _previewLauncher.current && _previewLauncher.current.closePreview
-                ? _previewLauncher.current.closePreview
-                : null,
-          }
-        )}
-      <ProjectTitlebar
-        projectName={currentProject ? currentProject.getName() : null}
-        fileMetadata={currentFileMetadata}
-        storageProvider={getStorageProvider()}
-        i18n={i18n}
-      />
-      <ProjectManagerDrawer
-        projectManagerOpen={projectManagerOpen}
-        toggleProjectManager={toggleProjectManager}
-        title={
-          state.currentProject
-            ? state.currentProject.getName()
-            : i18n._(t`Menu`)
+    <PreviewVideoRecordingContext.Provider value={previewVideoRecording}>
+      <div
+        className={
+          'main-frame' /* The root styling, done in CSS to read some CSS variables. */
         }
       >
-        <ProjectManager
-          project={currentProject}
-          onChangeProjectName={onChangeProjectName}
-          onSaveProjectProperties={onSaveProjectProperties}
-          onOpenExternalEvents={openExternalEvents}
-          onOpenLayout={(name, options) => openLayout(name, options)}
-          onOpenExternalLayout={openExternalLayout}
-          onOpenEventsFunctionsExtension={openEventsFunctionsExtension}
-          onDeleteLayouts={deleteLayouts}
-          onDeleteExternalLayouts={deleteExternalLayouts}
-          onDeleteEventsFunctionsExtension={deleteEventsFunctionsExtension}
-          onDeleteExternalEventsList={deleteExternalEventsList}
-          onDeleteGameplayTests={(tests: Array<gdTest>, options) =>
-            deleteGameplayTests({ type: 'project' }, tests, options)
-          }
-          onRenameLayout={renameLayout}
-          onRenameExternalLayout={renameExternalLayout}
-          onRenameEventsFunctionsExtension={renameEventsFunctionsExtension}
-          onRenameExternalEvents={renameExternalEvents}
-          onRenameGameplayTest={(oldName: string, newName: string) =>
-            renameGameplayTest({ type: 'project' }, oldName, newName)
-          }
-          onOpenGameplayTest={(testName: string) =>
-            openGameplayTest({ type: 'project' }, testName)
-          }
-          onRunGameplayTest={(testName: string) =>
-            runGameplayTestFromUi({ type: 'project' }, testName)
-          }
-          onOpenResources={openResources}
-          onReloadEventsFunctionsExtensions={onReloadEventsFunctionsExtensions}
-          onWillInstallExtension={onWillInstallExtension}
-          onExtensionInstalled={onExtensionInstalled}
-          onSceneAdded={onSceneAdded}
-          onExternalLayoutAdded={onExternalLayoutAdded}
-          onShareProject={() => {
-            openShareDialog();
-          }}
-          isOpen={projectManagerOpen}
-          hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-          resourceManagementProps={resourceManagementProps}
-          projectScopedContainersAccessor={projectScopedContainersAccessor}
-          gamesList={gamesList}
-          onOpenHomePage={openHomePage}
-          toggleProjectManager={toggleProjectManager}
-          mainMenuCallbacks={mainMenuCallbacks}
-          // $FlowFixMe[incompatible-type]
-          buildMainMenuProps={buildMainMenuProps}
+        <CliCommandRunner
+          useCliCommandRunner={useCliCommandRunner}
+          options={cliCommandRunnerOptions}
         />
-      </ProjectManagerDrawer>
-      {// Render games platform frame before the editors, so the editor have priority
-      // in what to display (ex: Loader of play section)
-      gamesPlatformFrameTools.renderGamesPlatformFrame()}
-      <PoppedOutWindows
-        {...editorTabsPaneProps}
-        onClose={onExternalWindowClose}
-        onPopIn={onPopInTab}
-      />
-      {/* Editors of the main window register their commands in their own
+        {!!renderPreviewLauncher &&
+          renderPreviewLauncher(
+            {
+              crashReportUploadLevel:
+                preferences.values.previewCrashReportUploadLevel ||
+                'exclude-javascript-code-events',
+              getIncludeFileHashs:
+                eventsFunctionsExtensionsContext.getIncludeFileHashs,
+              onExport: () => {
+                openShareDialog('publish');
+              },
+              onCaptureFinished,
+            },
+            (previewLauncher: ?PreviewLauncherInterface) => {
+              _previewLauncher.current = previewLauncher;
+            }
+          )}
+        <EmbeddedGameFrame
+          key={currentProject ? currentProject.ptr : 0}
+          // The in-game editor requires WebGL2 (a message is shown instead).
+          enabled={gameEditorMode === 'embedded-game' && isWebGL2Supported()}
+          onEnable={onEnableInGameEditor}
+          previewDebuggerServer={previewDebuggerServer || null}
+          onLaunchPreviewForInGameEdition={onLaunchPreviewForInGameEdition}
+        >
+          <LineStackLayout noMargin>
+            <SlowGraphicsRenderingIndicator />
+            <InGameEditorExtensionErrorsIndicator
+              errors={inGameEditorExtensionErrors}
+              isFromStore={error =>
+                isInGameEditorExtensionErrorFromStore(currentProject, error)
+              }
+              onAskAiToFix={() =>
+                openAskAi({
+                  prefilledUserRequest: getAskAiToFixInGameEditorExtensionErrorsText(
+                    inGameEditorExtensionErrors
+                  ),
+                  prefillInCurrentChat: true,
+                })
+              }
+              onDismiss={clearInGameEditorExtensionErrors}
+            />
+          </LineStackLayout>
+        </EmbeddedGameFrame>
+        <GameplayTestFrame
+          previewDebuggerServer={previewDebuggerServer || null}
+          onStopRequested={stopRunningProjectGameplayTest}
+        />
+        {!!renderMainMenu &&
+          renderMainMenu(
+            { ...buildMainMenuProps, isApplicationTopLevelMenu: true },
+            mainMenuCallbacks,
+            {
+              onClosePreview:
+                _previewLauncher.current &&
+                _previewLauncher.current.closePreview
+                  ? _previewLauncher.current.closePreview
+                  : null,
+            }
+          )}
+        <ProjectTitlebar
+          projectName={currentProject ? currentProject.getName() : null}
+          fileMetadata={currentFileMetadata}
+          storageProvider={getStorageProvider()}
+          i18n={i18n}
+        />
+        <ProjectManagerDrawer
+          projectManagerOpen={projectManagerOpen}
+          toggleProjectManager={toggleProjectManager}
+          title={
+            state.currentProject
+              ? state.currentProject.getName()
+              : i18n._(t`Menu`)
+          }
+        >
+          <ProjectManager
+            project={currentProject}
+            onChangeProjectName={onChangeProjectName}
+            onSaveProjectProperties={onSaveProjectProperties}
+            onOpenExternalEvents={openExternalEvents}
+            onOpenLayout={(name, options) => openLayout(name, options)}
+            onOpenExternalLayout={openExternalLayout}
+            onOpenEventsFunctionsExtension={openEventsFunctionsExtension}
+            onDeleteLayouts={deleteLayouts}
+            onDeleteExternalLayouts={deleteExternalLayouts}
+            onDeleteEventsFunctionsExtension={deleteEventsFunctionsExtension}
+            onDeleteExternalEventsList={deleteExternalEventsList}
+            onDeleteGameplayTests={(tests: Array<gdTest>, options) =>
+              deleteGameplayTests({ type: 'project' }, tests, options)
+            }
+            onRenameLayout={renameLayout}
+            onRenameExternalLayout={renameExternalLayout}
+            onRenameEventsFunctionsExtension={renameEventsFunctionsExtension}
+            onRenameExternalEvents={renameExternalEvents}
+            onRenameGameplayTest={(oldName: string, newName: string) =>
+              renameGameplayTest({ type: 'project' }, oldName, newName)
+            }
+            onOpenGameplayTest={(testName: string) =>
+              openGameplayTest({ type: 'project' }, testName)
+            }
+            onRunGameplayTest={(testName: string) =>
+              runGameplayTestFromUi({ type: 'project' }, testName)
+            }
+            onOpenResources={openResources}
+            onReloadEventsFunctionsExtensions={
+              onReloadEventsFunctionsExtensions
+            }
+            onWillInstallExtension={onWillInstallExtension}
+            onExtensionInstalled={onExtensionInstalled}
+            onSceneAdded={onSceneAdded}
+            onExternalLayoutAdded={onExternalLayoutAdded}
+            onShareProject={() => {
+              openShareDialog();
+            }}
+            isOpen={projectManagerOpen}
+            hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+            resourceManagementProps={resourceManagementProps}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
+            gamesList={gamesList}
+            onOpenHomePage={openHomePage}
+            toggleProjectManager={toggleProjectManager}
+            mainMenuCallbacks={mainMenuCallbacks}
+            // $FlowFixMe[incompatible-type]
+            buildMainMenuProps={buildMainMenuProps}
+          />
+        </ProjectManagerDrawer>
+        {// Render games platform frame before the editors, so the editor have priority
+        // in what to display (ex: Loader of play section)
+        gamesPlatformFrameTools.renderGamesPlatformFrame()}
+        <PoppedOutWindows
+          {...editorTabsPaneProps}
+          onClose={onExternalWindowClose}
+          onPopIn={onPopInTab}
+        />
+        {/* Editors of the main window register their commands in their own
       command manager, so that they stay separated from the ones of the popped
       out windows (rendered above, outside of this provider): a keyboard
       shortcut must always run the command of the window where it was pressed. */}
-      <WindowCommandsProvider>
-        <LeaderboardProvider
-          gameId={currentProject ? currentProject.getProjectUuid() : ''}
-        >
-          {renderNpmScriptConfirmDialog()}
-          <PanesContainer
-            hasEditorsInLeftPane={hasEditorsInLeftPane}
-            hasEditorsInRightPane={hasEditorsInRightPane}
-            onRequestDrawerClose={requestCloseAskAiDrawerInPane}
-            renderPane={({
-              paneIdentifier,
-              isLeftMostPane,
-              isRightMostPane,
-              isDrawer,
-              areSidePanesDrawers,
-              onSetPointerEventsNone,
-              onSetPaneDrawerState,
-              onRequestPaneClose,
-              drawerState,
-              rightPaneDrawerOpen,
-            }) => (
-              <EditorTabsPane
-                {...editorTabsPaneProps}
-                paneIdentifier={paneIdentifier}
-                isLeftMostPane={isLeftMostPane}
-                isRightMostPane={isRightMostPane}
-                isDrawer={isDrawer}
-                areSidePanesDrawers={areSidePanesDrawers}
-                onSetPointerEventsNone={onSetPointerEventsNone}
-                onSetPaneDrawerState={onSetPaneDrawerState}
-                onPopOutTab={onPopOutTab}
-                onRequestPaneClose={onRequestPaneClose}
-                drawerState={drawerState}
-                rightPaneDrawerOpen={rightPaneDrawerOpen}
-              />
-            )}
-          />
-        </LeaderboardProvider>
-        <CommandPalette ref={commandPaletteRef} />
-      </WindowCommandsProvider>
-      <LoaderModal
-        showImmediately={showLoaderImmediately}
-        showAfterDelay={showLoaderAfterDelay}
-        progress={fileMetadataOpeningProgress}
-        message={
-          loaderModalOpeningMessage ||
-          fileMetadataOpeningMessage ||
-          (previewLoading ? t`Loading preview...` : null)
-        }
-      />
-      <Snackbar
-        open={state.snackMessageOpen}
-        autoHideDuration={state.snackDuration}
-        onClose={_closeSnackMessage}
-        ContentProps={{
-          'aria-describedby': 'snackbar-message',
-        }}
-        message={<span id="snackbar-message">{state.snackMessage}</span>}
-      />
-      {shareDialogOpen &&
-        renderShareDialog({
-          onClose: closeShareDialog,
-          onChangeSubscription: closeShareDialog,
-          project: state.currentProject,
-          onSaveProject: saveProject,
-          isSavingProject: isSavingProject,
+        <WindowCommandsProvider>
+          <LeaderboardProvider
+            gameId={currentProject ? currentProject.getProjectUuid() : ''}
+          >
+            {renderNpmScriptConfirmDialog()}
+            <PanesContainer
+              hasEditorsInLeftPane={hasEditorsInLeftPane}
+              hasEditorsInRightPane={hasEditorsInRightPane}
+              onRequestDrawerClose={requestCloseAskAiDrawerInPane}
+              renderPane={({
+                paneIdentifier,
+                isLeftMostPane,
+                isRightMostPane,
+                isDrawer,
+                areSidePanesDrawers,
+                onSetPointerEventsNone,
+                onSetPaneDrawerState,
+                onRequestPaneClose,
+                drawerState,
+                rightPaneDrawerOpen,
+              }) => (
+                <EditorTabsPane
+                  {...editorTabsPaneProps}
+                  paneIdentifier={paneIdentifier}
+                  isLeftMostPane={isLeftMostPane}
+                  isRightMostPane={isRightMostPane}
+                  isDrawer={isDrawer}
+                  areSidePanesDrawers={areSidePanesDrawers}
+                  onSetPointerEventsNone={onSetPointerEventsNone}
+                  onSetPaneDrawerState={onSetPaneDrawerState}
+                  onPopOutTab={onPopOutTab}
+                  onRequestPaneClose={onRequestPaneClose}
+                  drawerState={drawerState}
+                  rightPaneDrawerOpen={rightPaneDrawerOpen}
+                />
+              )}
+            />
+          </LeaderboardProvider>
+          <CommandPalette ref={commandPaletteRef} />
+        </WindowCommandsProvider>
+        <LoaderModal
+          showImmediately={showLoaderImmediately}
+          showAfterDelay={showLoaderAfterDelay}
+          progress={fileMetadataOpeningProgress}
+          message={
+            loaderModalOpeningMessage ||
+            fileMetadataOpeningMessage ||
+            (previewLoading ? t`Loading preview...` : null)
+          }
+        />
+        <Snackbar
+          open={state.snackMessageOpen}
+          autoHideDuration={state.snackDuration}
+          onClose={_closeSnackMessage}
+          ContentProps={{
+            'aria-describedby': 'snackbar-message',
+          }}
+          message={<span id="snackbar-message">{state.snackMessage}</span>}
+        />
+        {shareDialogOpen &&
+          renderShareDialog({
+            onClose: closeShareDialog,
+            onChangeSubscription: closeShareDialog,
+            project: state.currentProject,
+            onSaveProject: saveProject,
+            isSavingProject: isSavingProject,
+            fileMetadata: currentFileMetadata,
+            storageProvider: getStorageProvider(),
+            initialTab: shareDialogInitialTab,
+            gamesList,
+          })}
+        {renderNewResourceDialog({
+          project: currentProject,
           fileMetadata: currentFileMetadata,
-          storageProvider: getStorageProvider(),
-          initialTab: shareDialogInitialTab,
-          gamesList,
+          getStorageProvider,
+          i18n,
+          resourceSources,
         })}
-      {renderNewResourceDialog({
-        project: currentProject,
-        fileMetadata: currentFileMetadata,
-        getStorageProvider,
-        i18n,
-        resourceSources,
-      })}
-      {profileDialogOpen && (
-        // ProfileDialog is dependent on multiple contexts,
-        // which are dependent of AuthenticatedUserContext.
-        // So it cannot be moved inside the AuthenticatedUserProvider,
-        // otherwise, those contexts would not be correctly mounted,
-        // as they are defined after the AuthenticatedUserProvider in Providers.js.
-        <ProfileDialog
-          onClose={() => {
-            openProfileDialog(false);
-          }}
-        />
-      )}
-      {authenticatedUser.claimedProductOptions && (
-        // PurchaseClaimDialog is dependent on SubscriptionContext,
-        // which is defined after the AuthenticatedUserProvider in Providers.js.
-        // So it cannot be rendered inside the AuthenticatedUserProvider.
-        <PurchaseClaimDialog
-          claimedProductOptions={authenticatedUser.claimedProductOptions}
-          onClose={authenticatedUser.onClosePurchaseClaimDialog}
-        />
-      )}
-      {renderNewProjectDialog()}
-      {cloudProjectFileMetadataToRecover && (
-        <CloudProjectRecoveryDialog
-          cloudProjectId={cloudProjectFileMetadataToRecover.fileIdentifier}
-          onClose={() => setCloudProjectFileMetadataToRecover(null)}
-          onOpenPreviousVersion={onOpenCloudProjectOnSpecificVersionForRecovery}
-        />
-      )}
-      {cloudProjectSaveChoiceOpen && (
-        <CloudProjectSaveChoiceDialog
-          isLoading={isSavingProject}
-          onClose={() => setCloudProjectSaveChoiceOpen(false)}
-          onSaveAsMainVersion={saveProject}
-          onSaveAsDuplicate={saveProjectAs}
-        />
-      )}
-      {preferencesDialogOpen && (
-        <PreferencesDialog
-          i18n={props.i18n}
-          onClose={options => {
-            openPreferencesDialog(false);
-            if (options.languageDidChange) _languageDidChange();
-          }}
-        />
-      )}
-      {languageDialogOpen && (
-        <LanguageDialog
-          open
-          onClose={options => {
-            openLanguageDialog(false);
-            if (options.languageDidChange) _languageDidChange();
-          }}
-        />
-      )}
-      {aboutDialogOpen && (
-        <AboutDialog
-          open
-          onClose={() => openAboutDialog(false)}
-          updateStatus={updateStatus}
-        />
-      )}
-      {state.openFromStorageProviderDialogOpen && (
-        <OpenFromStorageProviderDialog
-          onClose={() => openOpenFromStorageProviderDialog(false)}
-          storageProviders={props.storageProviders}
-          onChooseProvider={storageProvider => {
-            openOpenFromStorageProviderDialog(false);
-            getStorageProviderOperations(storageProvider);
-            chooseProjectWithStorageProviderPicker();
-          }}
-        />
-      )}
-      {state.saveToStorageProviderDialogOpen && (
-        <SaveToStorageProviderDialog
-          onClose={() => openSaveToStorageProviderDialog(false)}
-          storageProviders={props.storageProviders}
-          onChooseProvider={storageProvider => {
-            openSaveToStorageProviderDialog(false);
-            saveProjectAsWithStorageProvider({
-              requestedStorageProvider: storageProvider,
-            });
-          }}
-        />
-      )}
-      {renderOpenConfirmDialog()}
-      {renderLeaderboardReplacerDialog()}
-      {renderResourceMoverDialog()}
-      {renderResourceFetcherDialog()}
-      {renderVersionHistoryPanel()}
-      {renderSaveReminder()}
-      {renderExtensionLoadErrorDialog()}
-      <CloseConfirmDialog
-        shouldPrompt={!!state.currentProject}
-        i18n={props.i18n}
-        language={props.i18n.language}
-        hasUnsavedChanges={hasUnsavedChanges}
-      />
-      {!Window.isRunningCommandFromCli() && <ChangelogDialogContainer />}
-      {selectedInAppTutorialInfo && (
-        <StartInAppTutorialDialog
-          open
-          tutorialCompletionStatus={
-            !selectedInAppTutorialInfo.userProgress
-              ? 'notStarted'
-              : selectedInAppTutorialInfo.userProgress.progress.every(
-                  item => item === 100
-                )
-              ? 'complete'
-              : 'started'
-          }
-          tutorialId={selectedInAppTutorialInfo.tutorialId}
-          startTutorial={startSelectedTutorial}
-          onClose={() => {
-            setSelectedInAppTutorialInfo(null);
-          }}
-          isProjectOpening={isProjectOpening}
-        />
-      )}
-      {state.gdjsDevelopmentWatcherEnabled &&
-        renderGDJSDevelopmentWatcher &&
-        renderGDJSDevelopmentWatcher({
-          onGDJSUpdated: relaunchAndThenHardReloadAllPreviews,
-        })}
-      {gameHotReloadLogs.length > 0 && (
-        <HotReloadLogsDialog
-          logs={gameHotReloadLogs}
-          onClose={clearGameHotReloadLogs}
-          onLaunchNewPreview={() => {
-            clearGameHotReloadLogs();
-            launchNewPreview();
-          }}
-        />
-      )}
-      {(editorHotReloadLogs.length > 0 || editorUncaughtError !== null) && (
-        <HotReloadLogsDialog
-          isForEditor
-          logs={
-            editorUncaughtError
-              ? [
-                  ...editorHotReloadLogs,
-                  { kind: 'error', message: editorUncaughtError.message },
-                ]
-              : editorHotReloadLogs
-          }
-          onClose={() => {
-            clearEditorHotReloadLogs();
-            clearEditorUncaughtError();
-            setShowRestartInGameEditorAfterErrorButton(true);
-          }}
-          onLaunchNewPreview={() => {
-            clearEditorHotReloadLogs();
-            clearEditorUncaughtError();
-            onRestartInGameEditor(
-              'relaunched-after-uncaught-error-or-hot-reload-error'
-            );
-          }}
-        />
-      )}
-      {currentlyRunningInAppTutorial && (
-        <InAppTutorialOrchestrator
-          ref={inAppTutorialOrchestratorRef}
-          tutorial={currentlyRunningInAppTutorial}
-          startStepIndex={startStepIndex}
-          startProjectData={startProjectData}
-          project={currentProject}
-          quitInAppTutorialDialogOpen={quitInAppTutorialDialogOpen}
-          i18n={props.i18n}
-          endTutorial={({
-            shouldCloseProject,
-            shouldWarnAboutUnsavedChanges,
-          }: {|
-            shouldCloseProject: boolean,
-            shouldWarnAboutUnsavedChanges: boolean,
-          |}) => {
-            if (
-              shouldWarnAboutUnsavedChanges &&
-              currentProject &&
-              (!currentFileMetadata || hasUnsavedChanges)
-            ) {
-              setQuitInAppTutorialDialogOpen(true);
-            } else {
-              endTutorial(shouldCloseProject);
+        {profileDialogOpen && (
+          // ProfileDialog is dependent on multiple contexts,
+          // which are dependent of AuthenticatedUserContext.
+          // So it cannot be moved inside the AuthenticatedUserProvider,
+          // otherwise, those contexts would not be correctly mounted,
+          // as they are defined after the AuthenticatedUserProvider in Providers.js.
+          <ProfileDialog
+            onClose={() => {
+              openProfileDialog(false);
+            }}
+          />
+        )}
+        {authenticatedUser.claimedProductOptions && (
+          // PurchaseClaimDialog is dependent on SubscriptionContext,
+          // which is defined after the AuthenticatedUserProvider in Providers.js.
+          // So it cannot be rendered inside the AuthenticatedUserProvider.
+          <PurchaseClaimDialog
+            claimedProductOptions={authenticatedUser.claimedProductOptions}
+            onClose={authenticatedUser.onClosePurchaseClaimDialog}
+          />
+        )}
+        {renderNewProjectDialog()}
+        {cloudProjectFileMetadataToRecover && (
+          <CloudProjectRecoveryDialog
+            cloudProjectId={cloudProjectFileMetadataToRecover.fileIdentifier}
+            onClose={() => setCloudProjectFileMetadataToRecover(null)}
+            onOpenPreviousVersion={
+              onOpenCloudProjectOnSpecificVersionForRecovery
             }
-          }}
-          {...orchestratorProps}
+          />
+        )}
+        {cloudProjectSaveChoiceOpen && (
+          <CloudProjectSaveChoiceDialog
+            isLoading={isSavingProject}
+            onClose={() => setCloudProjectSaveChoiceOpen(false)}
+            onSaveAsMainVersion={saveProject}
+            onSaveAsDuplicate={saveProjectAs}
+          />
+        )}
+        {preferencesDialogOpen && (
+          <PreferencesDialog
+            i18n={props.i18n}
+            onClose={options => {
+              openPreferencesDialog(false);
+              if (options.languageDidChange) _languageDidChange();
+            }}
+          />
+        )}
+        {languageDialogOpen && (
+          <LanguageDialog
+            open
+            onClose={options => {
+              openLanguageDialog(false);
+              if (options.languageDidChange) _languageDidChange();
+            }}
+          />
+        )}
+        {aboutDialogOpen && (
+          <AboutDialog
+            open
+            onClose={() => openAboutDialog(false)}
+            updateStatus={updateStatus}
+          />
+        )}
+        {state.openFromStorageProviderDialogOpen && (
+          <OpenFromStorageProviderDialog
+            onClose={() => openOpenFromStorageProviderDialog(false)}
+            storageProviders={props.storageProviders}
+            onChooseProvider={storageProvider => {
+              openOpenFromStorageProviderDialog(false);
+              getStorageProviderOperations(storageProvider);
+              chooseProjectWithStorageProviderPicker();
+            }}
+          />
+        )}
+        {state.saveToStorageProviderDialogOpen && (
+          <SaveToStorageProviderDialog
+            onClose={() => openSaveToStorageProviderDialog(false)}
+            storageProviders={props.storageProviders}
+            onChooseProvider={storageProvider => {
+              openSaveToStorageProviderDialog(false);
+              saveProjectAsWithStorageProvider({
+                requestedStorageProvider: storageProvider,
+              });
+            }}
+          />
+        )}
+        {renderOpenConfirmDialog()}
+        {renderLeaderboardReplacerDialog()}
+        {renderResourceMoverDialog()}
+        {renderResourceFetcherDialog()}
+        {renderVersionHistoryPanel()}
+        {renderSaveReminder()}
+        {renderExtensionLoadErrorDialog()}
+        <CloseConfirmDialog
+          shouldPrompt={!!state.currentProject}
+          i18n={props.i18n}
+          language={props.i18n.language}
+          hasUnsavedChanges={hasUnsavedChanges}
         />
-      )}
-      {quitInAppTutorialDialogOpen && (
-        <QuitInAppTutorialDialog
-          onSaveProject={saveProject}
-          onClose={() => setQuitInAppTutorialDialogOpen(false)}
-          isSavingProject={isSavingProject}
-          canEndTutorial={!!currentFileMetadata && !hasUnsavedChanges}
-          endTutorial={() => {
-            endTutorial(true);
-          }}
-        />
-      )}
-      {diagnosticReportDialogOpen && currentProject && (
-        <DiagnosticReportDialog
-          project={currentProject}
-          wholeProjectDiagnosticReport={currentProject.getWholeProjectDiagnosticReport()}
-          onClose={() => setDiagnosticReportDialogOpen(false)}
-          onNavigateToLayoutEvent={(layoutName, eventPath) => {
-            setPendingEventNavigation({
-              name: layoutName,
-              locationType: 'layout',
-              eventPath,
-            });
-            openLayout(layoutName, {
-              openEventsEditor: true,
-              openSceneEditor: false,
-              focusWhenOpened: 'events',
-            });
-          }}
-          onNavigateToExternalEventsEvent={(externalEventsName, eventPath) => {
-            setPendingEventNavigation({
-              name: externalEventsName,
-              locationType: 'external-events',
-              eventPath,
-            });
-            openExternalEvents(externalEventsName);
-          }}
-          onNavigateToExtensionEvent={({
-            extensionName,
-            functionName,
-            behaviorName,
-            objectName,
-            eventPath,
-          }) => {
-            setPendingEventNavigation({
-              name: extensionName,
-              locationType: 'extension',
-              eventPath,
-              functionName,
-              behaviorName,
-              objectName,
-            });
-            openEventsFunctionsExtension(
+        {!Window.isRunningCommandFromCli() && <ChangelogDialogContainer />}
+        {selectedInAppTutorialInfo && (
+          <StartInAppTutorialDialog
+            open
+            tutorialCompletionStatus={
+              !selectedInAppTutorialInfo.userProgress
+                ? 'notStarted'
+                : selectedInAppTutorialInfo.userProgress.progress.every(
+                    item => item === 100
+                  )
+                ? 'complete'
+                : 'started'
+            }
+            tutorialId={selectedInAppTutorialInfo.tutorialId}
+            startTutorial={startSelectedTutorial}
+            onClose={() => {
+              setSelectedInAppTutorialInfo(null);
+            }}
+            isProjectOpening={isProjectOpening}
+          />
+        )}
+        {state.gdjsDevelopmentWatcherEnabled &&
+          renderGDJSDevelopmentWatcher &&
+          renderGDJSDevelopmentWatcher({
+            onGDJSUpdated: relaunchAndThenHardReloadAllPreviews,
+          })}
+        {gameHotReloadLogs.length > 0 && (
+          <HotReloadLogsDialog
+            logs={gameHotReloadLogs}
+            onClose={clearGameHotReloadLogs}
+            onLaunchNewPreview={() => {
+              clearGameHotReloadLogs();
+              launchNewPreview();
+            }}
+          />
+        )}
+        {(editorHotReloadLogs.length > 0 || editorUncaughtError !== null) && (
+          <HotReloadLogsDialog
+            isForEditor
+            logs={
+              editorUncaughtError
+                ? [
+                    ...editorHotReloadLogs,
+                    { kind: 'error', message: editorUncaughtError.message },
+                  ]
+                : editorHotReloadLogs
+            }
+            onClose={() => {
+              clearEditorHotReloadLogs();
+              clearEditorUncaughtError();
+              setShowRestartInGameEditorAfterErrorButton(true);
+            }}
+            onLaunchNewPreview={() => {
+              clearEditorHotReloadLogs();
+              clearEditorUncaughtError();
+              onRestartInGameEditor(
+                'relaunched-after-uncaught-error-or-hot-reload-error'
+              );
+            }}
+          />
+        )}
+        {currentlyRunningInAppTutorial && (
+          <InAppTutorialOrchestrator
+            ref={inAppTutorialOrchestratorRef}
+            tutorial={currentlyRunningInAppTutorial}
+            startStepIndex={startStepIndex}
+            startProjectData={startProjectData}
+            project={currentProject}
+            quitInAppTutorialDialogOpen={quitInAppTutorialDialogOpen}
+            i18n={props.i18n}
+            endTutorial={({
+              shouldCloseProject,
+              shouldWarnAboutUnsavedChanges,
+            }: {|
+              shouldCloseProject: boolean,
+              shouldWarnAboutUnsavedChanges: boolean,
+            |}) => {
+              if (
+                shouldWarnAboutUnsavedChanges &&
+                currentProject &&
+                (!currentFileMetadata || hasUnsavedChanges)
+              ) {
+                setQuitInAppTutorialDialogOpen(true);
+              } else {
+                endTutorial(shouldCloseProject);
+              }
+            }}
+            {...orchestratorProps}
+          />
+        )}
+        {quitInAppTutorialDialogOpen && (
+          <QuitInAppTutorialDialog
+            onSaveProject={saveProject}
+            onClose={() => setQuitInAppTutorialDialogOpen(false)}
+            isSavingProject={isSavingProject}
+            canEndTutorial={!!currentFileMetadata && !hasUnsavedChanges}
+            endTutorial={() => {
+              endTutorial(true);
+            }}
+          />
+        )}
+        {diagnosticReportDialogOpen && currentProject && (
+          <DiagnosticReportDialog
+            project={currentProject}
+            wholeProjectDiagnosticReport={currentProject.getWholeProjectDiagnosticReport()}
+            onClose={() => setDiagnosticReportDialogOpen(false)}
+            onNavigateToLayoutEvent={(layoutName, eventPath) => {
+              setPendingEventNavigation({
+                name: layoutName,
+                locationType: 'layout',
+                eventPath,
+              });
+              openLayout(layoutName, {
+                openEventsEditor: true,
+                openSceneEditor: false,
+                focusWhenOpened: 'events',
+              });
+            }}
+            onNavigateToExternalEventsEvent={(
+              externalEventsName,
+              eventPath
+            ) => {
+              setPendingEventNavigation({
+                name: externalEventsName,
+                locationType: 'external-events',
+                eventPath,
+              });
+              openExternalEvents(externalEventsName);
+            }}
+            onNavigateToExtensionEvent={({
               extensionName,
               functionName,
               behaviorName,
-              objectName
-            );
-          }}
-        />
-      )}
-      {standaloneDialogOpen && (
-        <StandaloneDialog onClose={() => setStandaloneDialogOpen(false)} />
-      )}
-      {memoryTrackerRegistryDialogOpen && (
-        <MemoryTrackedRegistryDialog
-          onClose={() => setMemoryTrackedRegistryDialogOpen(false)}
-        />
-      )}
-      <CustomDragLayer />
-    </div>
+              objectName,
+              eventPath,
+            }) => {
+              setPendingEventNavigation({
+                name: extensionName,
+                locationType: 'extension',
+                eventPath,
+                functionName,
+                behaviorName,
+                objectName,
+              });
+              openEventsFunctionsExtension(
+                extensionName,
+                functionName,
+                behaviorName,
+                objectName
+              );
+            }}
+          />
+        )}
+        {standaloneDialogOpen && (
+          <StandaloneDialog onClose={() => setStandaloneDialogOpen(false)} />
+        )}
+        {memoryTrackerRegistryDialogOpen && (
+          <MemoryTrackedRegistryDialog
+            onClose={() => setMemoryTrackedRegistryDialogOpen(false)}
+          />
+        )}
+        <CustomDragLayer />
+      </div>
+    </PreviewVideoRecordingContext.Provider>
   );
 };
 

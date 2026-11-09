@@ -33,7 +33,9 @@ class GD_CORE_API CaptureOptions {
   CaptureOptions();
   virtual ~CaptureOptions() {};
 
-  bool IsEmpty() const { return screenshots.empty(); }
+  bool IsEmpty() const {
+    return screenshots.empty() && previewVideoSignedUrl.empty();
+  }
 
   void AddScreenshot(const Screenshot& screenshot) {
     screenshots.push_back(screenshot);
@@ -43,8 +45,39 @@ class GD_CORE_API CaptureOptions {
 
   void ClearScreenshots() { screenshots.clear(); }
 
+  /**
+   * \brief Set where to upload the short gameplay video recorded during the
+   * preview.
+   */
+  void SetPreviewVideo(const gd::String& signedUrl,
+                       const gd::String& publicUrl,
+                       bool isRecordedByUser) {
+    previewVideoSignedUrl = signedUrl;
+    previewVideoPublicUrl = publicUrl;
+    isPreviewVideoRecordedByUser = isRecordedByUser;
+  }
+
+  const gd::String& GetPreviewVideoSignedUrl() const {
+    return previewVideoSignedUrl;
+  }
+
+  const gd::String& GetPreviewVideoPublicUrl() const {
+    return previewVideoPublicUrl;
+  }
+
+  /**
+   * \brief True if the user records the video with a toolbar shown in the
+   * preview, false if the video is recorded automatically.
+   */
+  bool IsPreviewVideoRecordedByUser() const {
+    return isPreviewVideoRecordedByUser;
+  }
+
  private:
   std::vector<Screenshot> screenshots;
+  gd::String previewVideoSignedUrl;
+  gd::String previewVideoPublicUrl;
+  bool isPreviewVideoRecordedByUser = false;
 };
 
 }  // namespace gd

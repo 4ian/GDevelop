@@ -4641,6 +4641,7 @@ interface PreviewExportOptions {
     [Ref] PreviewExportOptions SetGDevelopVersionWithHash([Const] DOMString gdevelopVersionWithHash);
     [Ref] PreviewExportOptions SetProjectTemplateSlug([Const] DOMString projectTemplateSlug);
     [Ref] PreviewExportOptions AddScreenshotCapture(long delayTimeInSeconds, [Const] DOMString signedUrl, [Const] DOMString publicUrl);
+    [Ref] PreviewExportOptions SetPreviewVideoCapture([Const] DOMString signedUrl, [Const] DOMString publicUrl, boolean isRecordedByUser);
 };
 
 [Prefix="gdjs::"]

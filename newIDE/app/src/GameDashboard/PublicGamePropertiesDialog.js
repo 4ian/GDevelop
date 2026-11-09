@@ -240,6 +240,7 @@ export const PublicGamePropertiesDialog = ({
         discoverable={discoverable}
         displayThumbnail
         thumbnailUrl={publicGameThumbnailUrl}
+        publicGame={publicGame}
         onGameUpdated={onGameUpdated}
         onUpdatingGame={onUpdatingGame}
         disabled={isLoading}

@@ -364,6 +364,18 @@ struct PreviewExportOptions {
     return *this;
   }
 
+  /**
+   * \brief Set where to upload the short gameplay video recorded during the
+   * preview, either automatically or by the user with a toolbar shown in the
+   * preview.
+   */
+  PreviewExportOptions &SetPreviewVideoCapture(const gd::String &signedUrl,
+                                               const gd::String &publicUrl,
+                                               bool isRecordedByUser) {
+    captureOptions.SetPreviewVideo(signedUrl, publicUrl, isRecordedByUser);
+    return *this;
+  }
+
   gd::Project &project;
   gd::String exportPath;
   gd::String websocketDebuggerServerAddress;

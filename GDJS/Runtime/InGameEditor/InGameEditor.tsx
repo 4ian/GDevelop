@@ -6,7 +6,7 @@ namespace gdjs {
   /**
    * A minimal utility to define DOM elements.
    * Children can be arrays, and empty children (null, false) are skipped.
-   * Also copied in InGameDebugger.tsx.
+   * Also copied in InGameDebugger.tsx and PreviewVideoRecordingToolbar.tsx.
    */
   function h<K extends keyof HTMLElementTagNameMap>(
     tag: K,

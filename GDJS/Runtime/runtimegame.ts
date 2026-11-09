@@ -367,10 +367,7 @@ namespace gdjs {
       this._sceneStack = new gdjs.SceneStack(this);
       this._inputManager = new gdjs.InputManager();
       this._captureManager = gdjs.CaptureManager
-        ? new gdjs.CaptureManager(
-            this._renderer,
-            this._options.captureOptions || {}
-          )
+        ? new gdjs.CaptureManager(this, this._options.captureOptions || {})
         : null;
       this._sessionId = null;
       this._playerId = null;

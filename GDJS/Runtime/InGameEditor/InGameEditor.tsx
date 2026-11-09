@@ -6158,7 +6158,6 @@ namespace gdjs {
     }
 
     restoreCameraState(cameraState: EditorCameraState) {
-      console.log("cameraState", cameraState);
       this.cameraControl2D._restoreCameraState(cameraState.camera2D);
       if (cameraState.camera3D.cameraMode === 'free') {
         this.orbitCameraControl.setEnabled(false);

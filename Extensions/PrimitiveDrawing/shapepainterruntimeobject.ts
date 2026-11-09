@@ -865,6 +865,14 @@ namespace gdjs {
       return this._renderer.getHeight();
     }
 
+    override getOriginalWidth(): float {
+      return this.getWidth() / this._scaleX;
+    }
+
+    override getOriginalHeight(): float {
+      return this.getHeight() / this._scaleY;
+    }
+
     updatePreRender(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       this._renderer.updatePreRender();
     }

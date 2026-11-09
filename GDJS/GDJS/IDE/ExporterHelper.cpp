@@ -403,8 +403,10 @@ void ExporterHelper::SerializeRuntimeGameOptions(
     initialRuntimeGameStatus.AddChild("isInGameEdition").SetBoolValue(true);
     initialRuntimeGameStatus.AddChild("editorId").SetValue(options.editorId);
     if (!options.editorCamera3DCameraMode.empty()) {
+      auto &editorCamera =
+          initialRuntimeGameStatus.AddChild("editorCamera");
       auto &editorCamera3D =
-          initialRuntimeGameStatus.AddChild("editorCamera3D");
+          editorCamera.AddChild("camera3D");
       editorCamera3D.AddChild("cameraMode").SetStringValue(
           options.editorCamera3DCameraMode);
       editorCamera3D.AddChild("positionX")
@@ -419,6 +421,14 @@ void ExporterHelper::SerializeRuntimeGameOptions(
           .SetDoubleValue(options.editorCamera3DElevationAngle);
       editorCamera3D.AddChild("distance")
           .SetDoubleValue(options.editorCamera3DDistance);
+      auto &editorCamera2D =
+          editorCamera.AddChild("camera2D");
+      editorCamera2D.AddChild("centerX")
+          .SetDoubleValue(options.editorCamera2DCenterX);
+      editorCamera2D.AddChild("centerY")
+          .SetDoubleValue(options.editorCamera2DCenterY);
+      editorCamera2D.AddChild("zoom")
+          .SetDoubleValue(options.editorCamera2DZoom);
     }
   }
   if (!options.externalLayoutName.empty()) {

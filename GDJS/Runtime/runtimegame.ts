@@ -59,7 +59,7 @@ namespace gdjs {
     eventsBasedObjectType: string | null;
     eventsBasedObjectVariantName: string | null;
     editorId: string | null;
-    editorCamera3D?: EditorCameraState;
+    editorCamera?: EditorCameraState;
   };
 
   /**

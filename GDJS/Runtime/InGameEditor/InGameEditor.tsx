@@ -2019,7 +2019,7 @@ namespace gdjs {
       externalLayoutName: string | null,
       eventsBasedObjectType: string | null,
       eventsBasedObjectVariantName: string | null,
-      editorCamera3D: EditorCameraState | null
+      editorCameraState: EditorCameraState | null
     ) {
       if (this._currentScene) {
         this._currentScene.unloadScene();
@@ -2143,8 +2143,8 @@ namespace gdjs {
           : null,
       };
       this._editorId = editorId || '';
-      if (editorCamera3D) {
-        this.restoreCameraState(editorCamera3D);
+      if (editorCameraState) {
+        this.restoreCameraState(editorCameraState);
       } else {
         // A guess of the visible area, not stored: the editor sends the real
         // one while the scene is loading.
@@ -6158,6 +6158,7 @@ namespace gdjs {
     }
 
     restoreCameraState(cameraState: EditorCameraState) {
+      console.log("cameraState", cameraState);
       this.cameraControl2D._restoreCameraState(cameraState.camera2D);
       if (cameraState.camera3D.cameraMode === 'free') {
         this.orbitCameraControl.setEnabled(false);

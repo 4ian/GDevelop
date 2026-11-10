@@ -2052,6 +2052,7 @@ namespace gdjs {
       // The 3D scene is rebuilt and the inner area marker is lost in the process.
       this._threeInnerArea = null;
       this._innerArea = null;
+      this._threeWindowMask = null;
       const previousEditorId = this._editorId;
       const previousSelectedLayerName = this._selectedLayerName;
       this._selectedLayerName = '';
@@ -4252,6 +4253,11 @@ namespace gdjs {
           child.layers.set(1);
         }
       }
+      if (this._threeWindowMask) {
+        for (const child of this._threeWindowMask.children) {
+          child.layers.set(1);
+        }
+      }
       if (excludedObjects) {
         for (const excludedObject of excludedObjects) {
           if (is3D(excludedObject)) {
@@ -4315,6 +4321,11 @@ namespace gdjs {
       this._selectionBoxes.forEach((box) => box.setLayer(0));
       if (this._threeInnerArea) {
         for (const child of this._threeInnerArea.children) {
+          child.layers.set(0);
+        }
+      }
+      if (this._threeWindowMask) {
+        for (const child of this._threeWindowMask.children) {
           child.layers.set(0);
         }
       }

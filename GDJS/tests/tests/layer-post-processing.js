@@ -45,6 +45,7 @@ describe('gdjs.LayerPixiRenderer (3D post-processing)', () => {
       gridColor: 0,
       gridAlpha: 1,
       snap: false,
+        windowMask: false,
     },
   });
 

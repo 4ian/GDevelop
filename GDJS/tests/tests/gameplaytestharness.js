@@ -1894,6 +1894,7 @@ describe('gdjs.gameplayTests', () => {
         gridColor: 0,
         gridAlpha: 1,
         snap: false,
+        windowMask: false,
       },
     });
 

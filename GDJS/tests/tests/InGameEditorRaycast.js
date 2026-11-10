@@ -107,6 +107,7 @@ describe('gdjs.InGameEditor.raycast', function () {
       gridColor: 0,
       gridAlpha: 1,
       snap: false,
+        windowMask: false,
     },
   };
 

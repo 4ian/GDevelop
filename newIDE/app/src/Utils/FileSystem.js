@@ -4,6 +4,30 @@ const fs = optionalRequire('fs');
 const fsPromises = fs ? fs.promises : null;
 const remote = optionalRequire('@electron/remote');
 const dialog = remote ? remote.dialog : null;
+const path = optionalRequire('path');
+
+const lastUsedDialogDirectoryKey = 'gd-last-used-file-dialog-directory';
+
+/**
+ * The folder of the last file or folder picked in a dialog, to be used as
+ * the default path of dialogs: Electron opens them in the Downloads folder otherwise.
+ */
+export const getLastUsedDialogDirectory = (): string | void => {
+  try {
+    return localStorage.getItem(lastUsedDialogDirectoryKey) || undefined;
+  } catch (error) {
+    return undefined;
+  }
+};
+
+export const rememberLastUsedDialogDirectory = (pickedPath: string) => {
+  if (!path) return;
+  try {
+    localStorage.setItem(lastUsedDialogDirectoryKey, path.dirname(pickedPath));
+  } catch (error) {
+    console.warn('Unable to remember the last used dialog directory:', error);
+  }
+};
 
 export const readJSONFile = async (filepath: string): Promise<Object> => {
   if (!fsPromises) throw new Error('Filesystem is not supported.');
@@ -37,9 +61,11 @@ export const openFilePicker = ({
       properties,
       message,
       filters,
+      defaultPath: getLastUsedDialogDirectory(),
     })
     .then(({ filePaths }) => {
       if (!filePaths || !filePaths.length) return null;
+      rememberLastUsedDialogDirectory(filePaths[0]);
       return filePaths[0];
     });
 };
@@ -64,8 +90,11 @@ export const openFilesPicker = ({
       properties,
       message,
       filters,
+      defaultPath: getLastUsedDialogDirectory(),
     })
     .then(({ filePaths }) => {
+      if (filePaths && filePaths.length)
+        rememberLastUsedDialogDirectory(filePaths[0]);
       return filePaths;
     });
 };

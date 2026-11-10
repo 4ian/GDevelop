@@ -15,6 +15,10 @@ import {
 } from '../index';
 import optionalRequire from '../../Utils/OptionalRequire';
 import {
+  getLastUsedDialogDirectory,
+  rememberLastUsedDialogDirectory,
+} from '../../Utils/FileSystem';
+import {
   split,
   splitPaths,
   getSlugifiedUniqueNameFromProperty,
@@ -301,7 +305,7 @@ export const generateOnChooseSaveProjectAsLocation = ({
 
   const browserWindow = remote.getCurrentWindow();
   const saveDialogOptions = {
-    defaultPath,
+    defaultPath: defaultPath || getLastUsedDialogDirectory(),
     filters: [{ name: 'GDevelop 5 project', extensions: ['json'] }],
   };
 
@@ -312,6 +316,7 @@ export const generateOnChooseSaveProjectAsLocation = ({
   if (!filePath) {
     return { saveAsLocation: null, saveAsOptions: null };
   }
+  rememberLastUsedDialogDirectory(filePath);
 
   return {
     saveAsLocation: {

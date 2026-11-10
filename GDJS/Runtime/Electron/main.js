@@ -23,8 +23,18 @@ if (process.platform === 'win32') {
 // slower than they could. Must be set before the app is ready.
 app.commandLine.appendSwitch('force_high_performance_gpu');
 
+// Chromium no longer falls back to software rendering for WebGL by itself:
+// without this, 3D games show nothing on computers without a usable GPU.
+app.commandLine.appendSwitch('enable-unsafe-swiftshader');
+
 // Initialize `@electron/remote` module
 require('@electron/remote/main').initialize();
+
+// `@electron/remote` would otherwise look for the modules required by the game
+// (like Steamworks) from Electron itself, and not find them.
+app.on('remote-require', (event, _webContents, moduleName) => {
+  event.returnValue = require(moduleName);
+});
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.

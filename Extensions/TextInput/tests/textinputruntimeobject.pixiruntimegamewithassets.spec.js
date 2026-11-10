@@ -75,6 +75,7 @@ describe('gdjs.TextInputRuntimeObject (using a PixiJS RuntimeGame with DOM eleme
           gridColor: 0,
           gridAlpha: 1,
           snap: false,
+          windowMask: false,
         },
       },
       usedExtensionsWithVariablesData: [],

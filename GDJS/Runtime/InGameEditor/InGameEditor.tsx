@@ -1705,6 +1705,7 @@ namespace gdjs {
       maxY: 1,
     };
     private _threeInnerArea: THREE.Object3D | null = null;
+    private _threeWindowMask: THREE.Object3D | null = null;
     private _unregisterContextLostListener: (() => void) | null = null;
     private _tempVector2d: THREE.Vector2 = new THREE.Vector2();
     private _raycaster: THREE.Raycaster = new THREE.Raycaster();
@@ -3519,7 +3520,12 @@ namespace gdjs {
     private _updateInnerAreaOutline(): void {
       if (!this._currentScene) return;
 
-      const layer = this._getCameraLayer('');
+      // In 3D, we want to avoid the outline to be too much visible because its
+      // only use is to show something for empty scenes.
+      const layer =
+        this.getEditorMode() === '2d-editor'
+          ? this.getTopVisibleLayer()
+          : this._getCameraLayer('');
       if (!layer) {
         return;
       }
@@ -3541,7 +3547,14 @@ namespace gdjs {
         boxMesh.position.z = 0.5;
         const box = new THREE.BoxHelper(boxMesh, '#444444');
         box.rotation.order = 'ZYX';
-        //box.material.depthTest = false;
+        box.material.depthTest = false;
+        if (this.getEditorMode() === '2d-editor') {
+          box.material.depthTest = false;
+          box.renderOrder = Number.MAX_SAFE_INTEGER;
+        } else {
+          box.material.depthTest = true;
+          box.renderOrder = 0;
+        }
         box.material.fog = false;
         const container = new THREE.Group();
         container.rotation.order = 'ZYX';
@@ -3550,6 +3563,13 @@ namespace gdjs {
         this._threeInnerArea = container;
       }
       const threeInnerArea = this._threeInnerArea;
+      // Make sure it moves to the current top layer.
+      if (this._hasTopVisibleLayerChanged) {
+        threeInnerArea.removeFromParent();
+      }
+      if (!threeInnerArea.parent) {
+        threeGroup.add(threeInnerArea);
+      }
       if (this._innerArea) {
         const innerArea = this._innerArea;
         threeInnerArea.scale.x = innerArea.max[0] - innerArea.min[0];
@@ -3566,6 +3586,65 @@ namespace gdjs {
         threeInnerArea.position.y = 0;
         threeInnerArea.position.z = 0;
       }
+    }
+
+    private _updateWindowMaskOutline(): void {
+      if (!this._currentScene) return;
+
+      if (this._threeWindowMask && this.getEditorMode() === '3d-editor') {
+        this._threeWindowMask.removeFromParent();
+        return;
+      }
+
+      const layer = this.getTopVisibleLayer();
+      if (!layer) {
+        return;
+      }
+      const threeGroup = layer.getRenderer().getThreeGroup();
+      if (!threeGroup) {
+        return;
+      }
+      if (!this._threeWindowMask) {
+        const boxMesh = new THREE.Mesh(
+          new THREE.BoxGeometry(1, 1, 1),
+          new THREE.MeshBasicMaterial({
+            transparent: true,
+            opacity: 0,
+            alphaTest: 1,
+          })
+        );
+        const box = new THREE.BoxHelper(boxMesh, '#000000');
+        box.rotation.order = 'ZYX';
+        box.material.depthTest = false;
+        box.material.depthTest = false;
+        box.renderOrder = Number.MAX_SAFE_INTEGER;
+        box.material.fog = false;
+        const container = new THREE.Group();
+        container.rotation.order = 'ZYX';
+        container.add(box);
+        this._threeWindowMask = container;
+      }
+      const threeWindowMask = this._threeWindowMask;
+      if (
+        this._instancesEditorSettings &&
+        !this._instancesEditorSettings.windowMask
+      ) {
+        threeWindowMask.removeFromParent();
+        return;
+      }
+      // Make sure it moves to the current top layer.
+      if (this._hasTopVisibleLayerChanged) {
+        threeWindowMask.removeFromParent();
+      }
+      if (!threeWindowMask.parent) {
+        threeGroup.add(threeWindowMask);
+      }
+      threeWindowMask.scale.x = this._runtimeGame.getOriginalWidth();
+      threeWindowMask.scale.y = this._runtimeGame.getOriginalHeight();
+      threeWindowMask.scale.z = 0.01;
+      threeWindowMask.position.x = layer.getCameraX();
+      threeWindowMask.position.y = layer.getCameraY();
+      threeWindowMask.position.z = 0;
     }
 
     private _handleContextMenu() {
@@ -4699,6 +4778,7 @@ namespace gdjs {
         this._selectionControls.update();
       }
       this._updateInnerAreaOutline();
+      this._updateWindowMaskOutline();
       this._handleContextMenu();
       this._handleShortcuts();
 

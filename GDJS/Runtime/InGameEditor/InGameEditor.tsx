@@ -1692,6 +1692,8 @@ namespace gdjs {
     private _editedLocation: InGameEditorEditedLocation | null = null;
     private _selectedLayerName: string = '';
     private _innerArea: AABB3D | null = null;
+    private _hasTopVisibleLayerChanged = false;
+    private _lastTopVisibleLayer: gdjs.RuntimeLayer | null = null;
     /**
      * The part of the game frame that is not covered by the editor panels,
      * in ratios of the game frame size.
@@ -2002,14 +2004,23 @@ namespace gdjs {
         : null;
     }
 
-    getTopLayer(): gdjs.RuntimeLayer | null {
+    getTopVisibleLayer(): gdjs.RuntimeLayer | null {
       const currentScene = this._currentScene;
       if (!currentScene) {
         return null;
       }
-      return currentScene._orderedLayers[
-        currentScene._orderedLayers.length - 1
-      ];
+      for (
+        let index = currentScene._orderedLayers.length - 1;
+        index >= 0;
+        index--
+      ) {
+        const layer = currentScene._orderedLayers[index];
+        if (layer.isVisible()) {
+          return layer;
+        }
+      }
+      // This won't happen because the editor always keeps 1 layer visible.
+      return null;
     }
 
     /**
@@ -3260,8 +3271,15 @@ namespace gdjs {
     }
 
     private _createBoundingBoxIfNeeded(object: RuntimeObject): void {
-      if (this._selectionBoxes.has(object)) {
-        return;
+      {
+        const objectBoxHelper = this._selectionBoxes.get(object);
+        if (objectBoxHelper) {
+          if (this._hasTopVisibleLayerChanged) {
+            objectBoxHelper.setVisible(false);
+            objectBoxHelper.setVisible(true);
+          }
+          return;
+        }
       }
 
       const objectBoxHelper =
@@ -4078,11 +4096,11 @@ namespace gdjs {
     _raycastFromCursorOnTopLayer(
       objects: Array<THREE.Object3D>
     ): Array<THREE.Intersection> {
-      const topLayer = this.getTopLayer();
-      if (!topLayer) {
+      const topVisibleLayer = this.getTopVisibleLayer();
+      if (!topVisibleLayer) {
         return [];
       }
-      const runtimeLayerRender = topLayer.getRenderer();
+      const runtimeLayerRender = topVisibleLayer.getRenderer();
       const threeCamera = runtimeLayerRender.getThreeCamera();
       if (!threeCamera) {
         return [];
@@ -4478,7 +4496,7 @@ namespace gdjs {
           return null;
         }
         let topObject2D: gdjs.RuntimeObject | null = null;
-        let topLayer: gdjs.RuntimeLayer | null = null;
+        let topVisibleLayer: gdjs.RuntimeLayer | null = null;
         let topLayerIndex = 0;
         for (const object of editedInstanceContainer.getAdhocListOfAllInstances()) {
           if (is3D(object) || !cursorOnObject(object)) {
@@ -4491,10 +4509,11 @@ namespace gdjs {
           if (
             !topObject2D ||
             layerIndex > topLayerIndex ||
-            (layer === topLayer && object.getZOrder() > topObject2D.getZOrder())
+            (layer === topVisibleLayer &&
+              object.getZOrder() > topObject2D.getZOrder())
           ) {
             topObject2D = object;
-            topLayer = layer;
+            topVisibleLayer = layer;
             topLayerIndex = layerIndex;
           }
         }
@@ -4612,6 +4631,11 @@ namespace gdjs {
         this._setupWebGLContextLostListener();
       }
       this.setCursorIcon('');
+
+      const topVisibleLayer = this.getTopVisibleLayer();
+      this._hasTopVisibleLayerChanged =
+        this._lastTopVisibleLayer !== topVisibleLayer;
+      this._lastTopVisibleLayer = topVisibleLayer;
 
       const objectUnderCursor: gdjs.RuntimeObject | null =
         this.getObjectUnderCursor();
@@ -7280,10 +7304,10 @@ namespace gdjs {
         const currentScene = this.editor.getCurrentScene();
         if (!currentScene) return;
 
-        const objectLayer = this.editor.getTopLayer();
-        if (!objectLayer) return;
+        const topVisibleLayer = this.editor.getTopVisibleLayer();
+        if (!topVisibleLayer) return;
 
-        const threeGroup = objectLayer.getRenderer().getThreeGroup();
+        const threeGroup = topVisibleLayer.getRenderer().getThreeGroup();
         if (!threeGroup) return;
         threeGroup.add(this.area);
       } else {
@@ -8202,11 +8226,13 @@ namespace gdjs {
       if (!currentScene) {
         return;
       }
-      const topLayer = this.editor.getTopLayer();
-      if (!topLayer) {
+      const topVisibleLayer = this.editor.getTopVisibleLayer();
+      if (!topVisibleLayer) {
         return;
       }
-      const runtimeLayerRender = topLayer ? topLayer.getRenderer() : null;
+      const runtimeLayerRender = topVisibleLayer
+        ? topVisibleLayer.getRenderer()
+        : null;
       const threeCamera = runtimeLayerRender
         ? runtimeLayerRender.getThreeCamera()
         : null;
@@ -8235,16 +8261,18 @@ namespace gdjs {
       const cameraZ = gdjs.scene3d.camera.getCameraZ(currentScene, '', 0);
       const cameraDistance = cameraCenter
         ? Math.hypot(
-            topLayer.getCameraX() - cameraCenter[0],
-            topLayer.getCameraY() - cameraCenter[1],
+            topVisibleLayer.getCameraX() - cameraCenter[0],
+            topVisibleLayer.getCameraY() - cameraCenter[1],
             cameraZ
           )
         : Math.abs(cameraZ);
       const zoomFactor = Math.min(
         Number.MAX_SAFE_INTEGER,
-        (0.5 * topLayer.getHeight()) /
+        (0.5 * topVisibleLayer.getHeight()) /
           (cameraDistance *
-            Math.tan(0.5 * gdjs.toRad(topLayer.getCamera3DFieldOfView())))
+            Math.tan(
+              0.5 * gdjs.toRad(topVisibleLayer.getCamera3DFieldOfView())
+            ))
       );
       editorGrid.setDivisionsCount(
         Math.floor(
@@ -8485,11 +8513,11 @@ namespace gdjs {
       if (!currentScene) {
         return;
       }
-      const topLayer = editor.getTopLayer();
-      if (!topLayer) {
+      const topVisibleLayer = editor.getTopVisibleLayer();
+      if (!topVisibleLayer) {
         return;
       }
-      const runtimeLayerRender = topLayer.getRenderer();
+      const runtimeLayerRender = topVisibleLayer.getRenderer();
       const threeCamera = runtimeLayerRender.getThreeCamera();
       const threeScene = runtimeLayerRender.getThreeScene();
       if (!threeCamera || !threeScene) {

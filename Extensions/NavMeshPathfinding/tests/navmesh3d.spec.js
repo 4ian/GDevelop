@@ -103,7 +103,7 @@ describe('gdjs.NavMeshObstacleRuntimeBehavior (3D)', function () {
       },
     ]);
 
-  const addCharacter = (runtimeScene) =>
+  const addCharacter = (runtimeScene, { radius = 0 } = {}) =>
     addCube(runtimeScene, 'Character', [
       {
         type: 'NavMeshPathfinding::NavMeshCharacterBehavior',
@@ -114,7 +114,7 @@ describe('gdjs.NavMeshObstacleRuntimeBehavior (3D)', function () {
         angularMaxSpeed: 180,
         rotateObject: false,
         angleOffset: 0,
-        radius: 0,
+        radius,
         avoidanceSightRange: 120,
       },
     ]);
@@ -639,6 +639,213 @@ describe('gdjs.NavMeshObstacleRuntimeBehavior (3D)', function () {
       );
       expect(builtTiles.size).to.be(buildTileSpy.callCount);
       expect(builtTiles.size).to.be.above(tilesCount - 1);
+    });
+
+    it('finds shorter paths when an obstacle is deleted', function () {
+      const runtimeScene = createScene();
+      addGround(runtimeScene);
+      const wall = addWall(runtimeScene);
+      const character = addCharacter(runtimeScene);
+      character.setPosition(100, 300);
+      stepOneSecond(runtimeScene);
+      expect(walkAcross(runtimeScene, character)).to.be.above(700);
+
+      wall.deleteFromScene();
+      for (let stepIndex = 0; stepIndex < 10; stepIndex++) {
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+      expect(walkAcross(runtimeScene, character)).to.be.below(320);
+    });
+
+    it('lets a character move again after an obstacle that covered it moved away', function () {
+      const runtimeScene = createScene();
+      addGround(runtimeScene);
+      const character = addCharacter(runtimeScene, { radius: 20 });
+      character.setPosition(500, 500);
+      stepOneSecond(runtimeScene);
+      getCharacterBehavior(character).moveTo(520, 500, 0);
+      stepUntilDestinationIsReached(runtimeScene, character);
+      expect(getCharacterBehavior(character).destinationReached()).to.be(true);
+
+      // No floor is left near the character.
+      const building = addObstacle(runtimeScene, { obstacleOnly: true });
+      building.setPosition(250, 250);
+      building.setWidth(500);
+      building.setHeight(500);
+      building.setZ(0);
+      building.setDepth(100);
+      stepOneSecond(runtimeScene);
+      getCharacterBehavior(character).moveTo(900, 500, 0);
+      expect(getCharacterBehavior(character).pathFound()).to.be(false);
+
+      building.setPosition(5000, 5000);
+      stepOneSecond(runtimeScene);
+      stepOneSecond(runtimeScene);
+      getCharacterBehavior(character).moveTo(900, 500, 0);
+      expect(getCharacterBehavior(character).pathFound()).to.be(true);
+      stepUntilDestinationIsReached(runtimeScene, character);
+      expect(getCharacterBehavior(character).destinationReached()).to.be(true);
+    });
+
+    it('keeps bigger characters created later away from obstacles, building the navigation mesh again once', function () {
+      const createNavMeshSpy = sinon.spy(
+        gdjs.NavMeshTileBuilder.prototype,
+        'createNavMesh'
+      );
+      try {
+        const runtimeScene = createScene();
+        addGround(runtimeScene);
+        // The passage at the bottom is 60 pixels wide.
+        const wall = addWall(runtimeScene);
+        wall.setHeight(940);
+        const character = addCharacter(runtimeScene);
+        character.setPosition(100, 300);
+        stepOneSecond(runtimeScene);
+        expect(walkAcross(runtimeScene, character)).to.be.above(940);
+        expect(createNavMeshSpy.callCount).to.be(1);
+
+        const bigCharacter = addCharacter(runtimeScene, { radius: 40 });
+        bigCharacter.setPosition(100, 300);
+        // The navigation mesh is built again when an obstacle changes.
+        wall.setX(500);
+        stepOneSecond(runtimeScene);
+        stepOneSecond(runtimeScene);
+        stepOneSecond(runtimeScene);
+        expect(createNavMeshSpy.callCount).to.be(2);
+
+        // The passage is too narrow for the big character: no one crosses.
+        character.setPosition(100, 300);
+        getCharacterBehavior(character).moveTo(900, 300, 0);
+        stepUntilDestinationIsReached(runtimeScene, character);
+        expect(character.getX()).to.be.below(500);
+      } finally {
+        createNavMeshSpy.restore();
+      }
+    });
+
+    it('builds the navigation mesh again when obstacles are created far beyond where it was built', function () {
+      const createNavMeshSpy = sinon.spy(
+        gdjs.NavMeshTileBuilder.prototype,
+        'createNavMesh'
+      );
+      try {
+        const runtimeScene = createScene();
+        const smallGround = addObstacle(runtimeScene);
+        smallGround.setWidth(300);
+        smallGround.setHeight(300);
+        smallGround.setDepth(100);
+        smallGround.setZ(-100);
+        const character = addCharacter(runtimeScene);
+        character.setPosition(100, 100);
+        stepOneSecond(runtimeScene);
+        expect(createNavMeshSpy.callCount).to.be(1);
+
+        // Many more tiles than the navigation mesh was created for.
+        const largeGround = addObstacle(runtimeScene);
+        largeGround.setWidth(3000);
+        largeGround.setHeight(3000);
+        largeGround.setDepth(100);
+        largeGround.setZ(-100);
+        stepOneSecond(runtimeScene);
+        stepOneSecond(runtimeScene);
+        expect(createNavMeshSpy.callCount).to.be(2);
+
+        getCharacterBehavior(character).moveTo(300, 2800, 0);
+        expect(getCharacterBehavior(character).pathFound()).to.be(true);
+        for (
+          let stepIndex = 0;
+          stepIndex < 1200 &&
+          !getCharacterBehavior(character).destinationReached();
+          stepIndex++
+        ) {
+          runtimeScene.renderAndStep(1000 / 60);
+        }
+        expect(getCharacterBehavior(character).destinationReached()).to.be(
+          true
+        );
+      } finally {
+        createNavMeshSpy.restore();
+      }
+    });
+
+    describe('(WebAssembly memory)', function () {
+      /**
+       * Where the WebAssembly module of Recast allocates a big block:
+       * it moves when memory allocated before was not freed.
+       */
+      const getFreeMemoryStart = () => {
+        const array = new RecastNav.UnsignedCharArray();
+        array.resize(4 * 1024 * 1024);
+        const freeMemoryStart = array.raw.getDataPointer();
+        array.destroy();
+        return freeMemoryStart;
+      };
+
+      /**
+       * @param {(index: number) => void} action
+       * @param {number} count
+       * @returns the bytes left allocated by each call of the action.
+       */
+      const getLeakedBytes = (action, count) => {
+        // Let the allocator reuse the blocks freed before.
+        for (let index = 0; index < 100; index++) {
+          action(index);
+        }
+        const freeMemoryStart = getFreeMemoryStart();
+        for (let index = 0; index < count; index++) {
+          action(index);
+        }
+        return (getFreeMemoryStart() - freeMemoryStart) / count;
+      };
+
+      const createSceneWithWall = () => {
+        const runtimeScene = createScene();
+        addGround(runtimeScene);
+        const wall = addWall(runtimeScene);
+        const character = addCharacter(runtimeScene);
+        character.setPosition(100, 300);
+        stepOneSecond(runtimeScene);
+        return { runtimeScene, wall, character };
+      };
+
+      it('frees the memory used to search paths', function () {
+        const { runtimeScene, character } = createSceneWithWall();
+        const leakedBytes = getLeakedBytes((index) => {
+          getCharacterBehavior(character).moveTo(index % 2 ? 900 : 100, 300, 0);
+          expect(getCharacterBehavior(character).pathFound()).to.be(true);
+        }, 2000);
+        expect(leakedBytes).to.be(0);
+        runtimeScene.unloadScene();
+      });
+
+      it('frees the memory of the tiles built again when obstacles move', function () {
+        this.timeout(20000);
+        // The character stays away from the wall: its agent is kept.
+        const { runtimeScene, wall } = createSceneWithWall();
+        buildTileSpy.resetHistory();
+        const leakedBytes = getLeakedBytes((index) => {
+          wall.setX(index % 20 < 10 ? 480 : 520);
+          runtimeScene.renderAndStep(1000 / 60);
+        }, 3000);
+        expect(buildTileSpy.callCount).to.be.above(500);
+        expect(leakedBytes).to.be(0);
+        runtimeScene.unloadScene();
+      });
+
+      it('frees the memory of navigation meshes built again and of unloaded scenes', function () {
+        this.timeout(20000);
+        const leakedBytes = getLeakedBytes(() => {
+          const { runtimeScene, character } = createSceneWithWall();
+          getCharacterBehavior(character).moveTo(900, 300, 0);
+          runtimeScene.navMeshObstaclesManager.invalidateNavMesh();
+          stepOneSecond(runtimeScene);
+          runtimeScene.unloadScene();
+        }, 50);
+        // A navigation mesh or a crowd not freed would be thousands of bytes.
+        // The classes of `RecastNav` leave 16 bytes for each build context
+        // and each crowd, and 40 bytes for each agent.
+        expect(leakedBytes).to.be.below(1024);
+      });
     });
   });
 

@@ -272,7 +272,7 @@ namespace gdjs {
 
       this.createCrowd();
       if (oldCrowd) {
-        oldCrowd.destroy();
+        this.destroyCrowd(oldCrowd);
       }
       if (oldNavMesh) {
         oldNavMesh.destroy();
@@ -631,6 +631,10 @@ namespace gdjs {
       this.haveTilesChangedSincePathsRefresh = false;
       this.timeSincePathsRefresh = 0;
       for (const character of this.characters) {
+        if (!character._agent) {
+          // There may now be a floor near the character.
+          this.buildCharacterAgent(character);
+        }
         character.refreshPath();
       }
     }
@@ -1099,30 +1103,56 @@ namespace gdjs {
       });
     }
 
+    /**
+     * The closest point of the navigation mesh around a position of the
+     * scene, or null if there is none.
+     */
+    findClosestPoint(
+      sceneX: float,
+      sceneY: float,
+      sceneZ: float
+    ): RecastNav.Vector3 | null {
+      if (!this.crowd) {
+        return null;
+      }
+      // The query of the crowd is used: creating one for each search is
+      // slow, and `RecastNav.NavMeshQuery` doesn't free all its memory.
+      const { success, point } = this.crowd.navMeshQuery.findClosestPoint(
+        { x: sceneX, y: sceneZ, z: this.toNavMeshZ(sceneY) },
+        {
+          halfExtents: {
+            x: searchHalfExtent,
+            y: this.is3D ? searchHalfExtent : this.cellSize / 2 - 0.5,
+            z: searchHalfExtent,
+          },
+        }
+      );
+      return success ? point : null;
+    }
+
+    /**
+     * `RecastNav.Crowd` doesn't free the default filter of its query.
+     */
+    private destroyCrowd(crowd: RecastNav.Crowd): void {
+      const recastModule = gdjs.NavMeshTileBuilder.recastModule;
+      if (recastModule) {
+        recastModule.destroy(crowd.navMeshQuery.defaultFilter.raw);
+      }
+      crowd.destroy();
+    }
+
     buildCharacterAgent(character: NavMeshCharacterRuntimeBehavior): void {
       if (!this.navMesh || !this.crowd) {
         return;
       }
       const owner = character.owner;
       this.buildTilesAround(owner.getX(), owner.getY());
-      const navMeshQuery = new RecastNav.NavMeshQuery(this.navMesh);
-      const { success: hasFoundOrigin, point: origin } =
-        navMeshQuery.findClosestPoint(
-          {
-            x: owner.getX(),
-            y: gdjs.Base3DHandler.is3D(owner) ? owner.getZ() : 0,
-            z: this.toNavMeshZ(owner.getY()),
-          },
-          {
-            halfExtents: {
-              x: searchHalfExtent,
-              y: this.is3D ? searchHalfExtent : this.cellSize / 2 - 0.5,
-              z: searchHalfExtent,
-            },
-          }
-        );
-      navMeshQuery.destroy();
-      if (!hasFoundOrigin) {
+      const origin = this.findClosestPoint(
+        owner.getX(),
+        owner.getY(),
+        gdjs.Base3DHandler.is3D(owner) ? owner.getZ() : 0
+      );
+      if (!origin) {
         character._agent = null;
         return;
       }
@@ -1372,7 +1402,7 @@ namespace gdjs {
       ) {
         const oldCrowd = this.crowd;
         this.createCrowd();
-        oldCrowd.destroy();
+        this.destroyCrowd(oldCrowd);
         return;
       }
       this.buildCharacterAgent(character);
@@ -1404,7 +1434,7 @@ namespace gdjs {
       this.tilesToBuild.clear();
       this.tileBuildTimes.clear();
       if (this.crowd) {
-        this.crowd.destroy();
+        this.destroyCrowd(this.crowd);
         this.crowd = null;
       }
       if (this.navMesh) {

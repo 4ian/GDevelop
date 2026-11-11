@@ -216,26 +216,12 @@ namespace gdjs {
         return;
       }
 
-      const navMeshQuery = new RecastNav.NavMeshQuery(this._manager.navMesh);
-      const { success: hasFoundOrigin, point: origin } =
-        navMeshQuery.findClosestPoint(
-          {
-            x: this.owner.getX(),
-            y: gdjs.Base3DHandler.is3D(this.owner) ? this.owner.getZ() : 0,
-            z: this._manager.is3D
-              ? this.owner.getY()
-              : this.owner.getY() * this._manager.inverseSpeedScaleY,
-          },
-          {
-            halfExtents: {
-              x: 100,
-              y: this._manager.is3D ? 100 : this._manager.cellSize / 2 - 0.5,
-              z: 100,
-            },
-          }
-        );
-      if (!hasFoundOrigin) {
-        navMeshQuery.destroy();
+      const origin = this._manager.findClosestPoint(
+        this.owner.getX(),
+        this.owner.getY(),
+        gdjs.Base3DHandler.is3D(this.owner) ? this.owner.getZ() : 0
+      );
+      if (!origin) {
         this._pathFound = false;
         return;
       }
@@ -252,23 +238,8 @@ namespace gdjs {
         hasTeleported = true;
       }
 
-      const { success: hasFoundDestination, point: destination } =
-        navMeshQuery.findClosestPoint(
-          {
-            x,
-            y: z,
-            z: this._manager.is3D ? y : y * this._manager.inverseSpeedScaleY,
-          },
-          {
-            halfExtents: {
-              x: 100,
-              y: this._manager.is3D ? 100 : this._manager.cellSize / 2 - 0.5,
-              z: 100,
-            },
-          }
-        );
-      navMeshQuery.destroy();
-      if (!hasFoundDestination) {
+      const destination = this._manager.findClosestPoint(x, y, z);
+      if (!destination) {
         this._pathFound = false;
         if (hasTeleported) {
           this._agent.teleport(agentInitialPosition);

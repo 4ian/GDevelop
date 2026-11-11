@@ -500,8 +500,25 @@ export default class PixiResourcesLoader {
     }
     if (spineAtlasPromises[resourceName]) {
       // TODO: only unload if no other resources pointing to the same Spine Atlas?
-      await PIXI.Assets.unload(resourceName).catch(() => {});
-      delete spineAtlasPromises[resourceName];
+      const { textureAtlas } = await spineAtlasPromises[resourceName];
+      if (textureAtlas) {
+        // These textures belong to the image cache, not the atlas.
+        for (const page of textureAtlas.pages) {
+          page.texture = null;
+        }
+      }
+      try {
+        await PIXI.Assets.unload(resourceName);
+      } catch (error) {
+        console.error(
+          `Error while unloading Spine atlas "${resourceName}":`,
+          error
+        );
+        throw error;
+      } finally {
+        delete spineAtlasPromises[resourceName];
+        PIXI.Assets.resolver.prefer();
+      }
 
       // Also reload any resource embedding this resource:
       await this._reloadEmbedderResources(project, resourceName, 'spine');
@@ -1028,6 +1045,7 @@ export default class PixiResourcesLoader {
         src: atlasUrl,
         data: { images },
       });
+      PIXI.Assets.resolver.prefer();
       PIXI.Assets.load(spineTextureAtlasName).then(
         textureAtlas => {
           resolve({
@@ -1127,6 +1145,7 @@ export default class PixiResourcesLoader {
             alias: spineName,
             src: spineUrl,
           });
+          PIXI.Assets.resolver.prefer();
           PIXI.Assets.load(spineName).then(
             () => {
               resolve({

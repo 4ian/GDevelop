@@ -31,6 +31,10 @@ namespace gdjs {
      * The atlas page textures are tracked separately by the SpineAtlasManager.
      */
     private _loadedSpines = new gdjs.ResourceCache<SpineAssetAliases>();
+    private _loadingSpines = new gdjs.ResourceCache<
+      Promise<SpineAssetAliases | null>
+    >();
+    private _unloadingSpines = new Map<string, Promise<void>>();
 
     /**
      * @param resourceLoader The resources loader of the game.
@@ -61,6 +65,38 @@ namespace gdjs {
         );
       }
 
+      if (this._loadedSpines.get(resource)) {
+        return;
+      }
+      const inflight = this._loadingSpines.get(resource);
+      if (inflight) {
+        await inflight;
+        return;
+      }
+
+      const skeletonAlias = this._resourceLoader.getFullUrl(resource.file);
+      const loadingPromise = Promise.resolve(
+        this._unloadingSpines.get(skeletonAlias)
+      )
+        .then(() => this._load(resource))
+        .then((aliases) => {
+          if (aliases && this._loadingSpines.get(resource) === loadingPromise) {
+            this._loadedSpines.set(resource, aliases);
+          }
+          return aliases;
+        })
+        .finally(() => {
+          if (this._loadingSpines.get(resource) === loadingPromise) {
+            this._loadingSpines.delete(resource);
+          }
+        });
+      this._loadingSpines.set(resource, loadingPromise);
+      await loadingPromise;
+    }
+
+    private async _load(
+      resource: ResourceData
+    ): Promise<SpineAssetAliases | null> {
       const skeletonUrl = this._resourceLoader.getFullUrl(resource.file);
       const skeletonAlias = skeletonUrl;
 
@@ -72,9 +108,10 @@ namespace gdjs {
 
         // there should be exactly one embedded resource (the atlas)
         if (embeddedResourcesNames.length !== 1) {
-          return logger.error(
-            `Unable to find atlas metadata for resource spine skeleton ${resourceName}.`
+          logger.error(
+            `Unable to find atlas metadata for resource spine skeleton ${resource.name}.`
           );
+          return null;
         }
 
         const atlasResourceName = game.resolveEmbeddedResource(
@@ -86,9 +123,10 @@ namespace gdjs {
           this._spineAtlasManager.getAtlasAlias(atlasResourceName);
 
         if (!atlasAlias) {
-          return logger.error(
+          logger.error(
             `Atlas '${atlasResourceName}' was loaded but no alias is registered.`
           );
+          return null;
         }
 
         PIXI.Assets.setPreferences({
@@ -100,14 +138,20 @@ namespace gdjs {
             : 'anonymous',
         });
         PIXI.Assets.add({ alias: skeletonAlias, src: skeletonUrl });
+        PIXI.Assets.resolver.prefer();
         await PIXI.Assets.load(skeletonAlias);
 
-        this._loadedSpines.set(resource, { skeletonAlias, atlasAlias });
+        return { skeletonAlias, atlasAlias };
       } catch (error) {
         logger.error(
           `Error while preloading spine resource ${resource.name}: ${error}`
         );
-        await PIXI.Assets.unload(skeletonAlias).catch(() => {});
+        await PIXI.Assets.unload(skeletonAlias).catch((unloadError) => {
+          logger.error(
+            `Error while unloading spine resource ${resource.name}: ${unloadError}`
+          );
+        });
+        PIXI.Assets.resolver.prefer();
         throw error;
       }
     }
@@ -139,22 +183,48 @@ namespace gdjs {
      */
     dispose(): void {
       this._loadedSpines.clear();
+      this._loadingSpines.clear();
+      this._unloadingSpines.clear();
     }
 
-    unloadResource(resourceData: ResourceData): void {
+    unloadResource(resourceData: ResourceData): Promise<void> {
       const aliases = this._loadedSpines.get(resourceData);
-      if (aliases) {
-        // Drop cached SkeletonData entries created by Spine.from for this skeleton.
-        const skeletonCache = spine.Spine.skeletonCache;
-        const cachePrefix = `${aliases.skeletonAlias}-${aliases.atlasAlias}-`;
-        for (const cacheKey of Object.keys(skeletonCache)) {
-          if (cacheKey.startsWith(cachePrefix)) {
-            delete skeletonCache[cacheKey];
-          }
-        }
-        PIXI.Assets.unload(aliases.skeletonAlias).catch(() => {});
-        this._loadedSpines.delete(resourceData);
+      const loading = this._loadingSpines.get(resourceData);
+      const skeletonAlias = this._resourceLoader.getFullUrl(resourceData.file);
+      if (!aliases && !loading) {
+        return this._unloadingSpines.get(skeletonAlias) || Promise.resolve();
       }
+
+      this._loadedSpines.delete(resourceData);
+      this._loadingSpines.delete(resourceData);
+
+      const unloadPromise = Promise.resolve(loading || aliases)
+        .then(async (loadedAliases) => {
+          if (!loadedAliases) return;
+
+          // Drop cached SkeletonData entries created by Spine.from for this skeleton.
+          const skeletonCache = spine.Spine.skeletonCache;
+          const cachePrefix = `${loadedAliases.skeletonAlias}-${loadedAliases.atlasAlias}-`;
+          for (const cacheKey of Object.keys(skeletonCache)) {
+            if (cacheKey.startsWith(cachePrefix)) {
+              delete skeletonCache[cacheKey];
+            }
+          }
+          await PIXI.Assets.unload(skeletonAlias);
+        })
+        .catch((error) => {
+          logger.error(
+            `Error while unloading spine resource ${resourceData.name}: ${error}`
+          );
+        })
+        .finally(() => {
+          PIXI.Assets.resolver.prefer();
+          if (this._unloadingSpines.get(skeletonAlias) === unloadPromise) {
+            this._unloadingSpines.delete(skeletonAlias);
+          }
+        });
+      this._unloadingSpines.set(skeletonAlias, unloadPromise);
+      return unloadPromise;
     }
   }
 }

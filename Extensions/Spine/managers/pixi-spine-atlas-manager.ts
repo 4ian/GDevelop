@@ -23,6 +23,7 @@ namespace gdjs {
     private _loadingSpineAtlases = new gdjs.ResourceCache<
       Promise<spine.TextureAtlas>
     >();
+    private _unloadingSpineAtlases = new Map<string, Promise<void>>();
 
     /**
      * @param resourceLoader The resources loader of the game.
@@ -69,10 +70,16 @@ namespace gdjs {
         return inflight;
       }
 
-      const loadingPromise = this._load(resource).then((atlas) => {
-        this._loadedSpineAtlases.set(resource, atlas);
-        return atlas;
-      });
+      const loadingPromise = this._load(resource)
+        .then((atlas) => {
+          this._loadedSpineAtlases.set(resource, atlas);
+          return atlas;
+        })
+        .finally(() => {
+          if (this._loadingSpineAtlases.get(resource) === loadingPromise) {
+            this._loadingSpineAtlases.delete(resource);
+          }
+        });
       this._loadingSpineAtlases.set(resource, loadingPromise);
       return loadingPromise;
     }
@@ -87,24 +94,33 @@ namespace gdjs {
         throw new Error(`${resource.name} does not have image metadata!`);
       }
 
-      const images = embeddedResourcesNames.reduce<{
-        [key: string]: PIXI.BaseTexture;
-      }>((imagesMap, embeddedResourceName) => {
-        const mappedResourceName = game.resolveEmbeddedResource(
-          resource.name,
-          embeddedResourceName
-        );
-        // The v7 atlas loader expects BaseTexture instances when sharing pages
-        // with already-loaded textures.
-        imagesMap[embeddedResourceName] =
-          this._imageManager.getOrLoadPIXITexture(
-            mappedResourceName
-          ).baseTexture;
-        return imagesMap;
-      }, {});
-
       const url = this._resourceLoader.getFullUrl(resource.file);
       const alias = url;
+
+      const pendingUnload = this._unloadingSpineAtlases.get(alias);
+      if (pendingUnload) {
+        await pendingUnload;
+      }
+
+      const images: { [key: string]: PIXI.BaseTexture } = {};
+      await Promise.all(
+        embeddedResourcesNames.map(async (embeddedResourceName) => {
+          const mappedResourceName = game.resolveEmbeddedResource(
+            resource.name,
+            embeddedResourceName
+          );
+          await this._imageManager.loadResource(mappedResourceName);
+          // The v7 atlas loader expects BaseTexture instances when sharing pages
+          // with already-loaded textures.
+          images[embeddedResourceName] =
+            this._imageManager.getPIXITexture(mappedResourceName).baseTexture;
+        })
+      );
+
+      const pendingUnloadAfterImages = this._unloadingSpineAtlases.get(alias);
+      if (pendingUnloadAfterImages) {
+        await pendingUnloadAfterImages;
+      }
 
       PIXI.Assets.setPreferences({
         preferWorkers: false,
@@ -113,6 +129,9 @@ namespace gdjs {
           : 'anonymous',
       });
       PIXI.Assets.add({ alias, src: url, data: { images } });
+      // Clear PIXI.Assets.resolver._resolverHash (https://github.com/pixijs/pixijs/issues/10069)
+      // so resolve() picks up the newly registered data.images BaseTextures.
+      PIXI.Assets.resolver.prefer();
       return PIXI.Assets.load<spine.TextureAtlas>(alias);
     }
 
@@ -156,15 +175,30 @@ namespace gdjs {
     dispose(): void {
       this._loadedSpineAtlases.clear();
       this._loadingSpineAtlases.clear();
+      this._unloadingSpineAtlases.clear();
     }
 
     unloadResource(resourceData: ResourceData): void {
+      const atlas = this._loadedSpineAtlases.get(resourceData);
+      if (atlas) {
+        for (const page of atlas.pages) {
+          page.texture = null;
+        }
+      }
       const resource = this._getAtlasResource(resourceData.name);
       // PIXI.Assets.unload disposes the TextureAtlas and clears the cache entry,
       // preventing a stale atlas from being reused on the next load.
       if (resource) {
         const alias = this._resourceLoader.getFullUrl(resource.file);
-        PIXI.Assets.unload(alias).catch(() => {});
+        const unloadPromise = PIXI.Assets.unload(alias)
+          .catch(() => {})
+          .then(() => {
+            PIXI.Assets.resolver.prefer();
+            if (this._unloadingSpineAtlases.get(alias) === unloadPromise) {
+              this._unloadingSpineAtlases.delete(alias);
+            }
+          });
+        this._unloadingSpineAtlases.set(alias, unloadPromise);
       }
 
       this._loadedSpineAtlases.delete(resourceData);

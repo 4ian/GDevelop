@@ -42,20 +42,6 @@ describe('gdjs.SpineManager & gdjs.SpineAtlasManager', () => {
     },
   ];
 
-  /** @param {gdjs.ResourceLoader} resourceLoader */
-  const unloadSpineResources = async (resourceLoader) => {
-    const atlasManager = resourceLoader.getSpineAtlasManager();
-    const spineManager = resourceLoader.getSpineManager();
-    if (!atlasManager || !spineManager) {
-      throw new Error('Spine managers should be registered.');
-    }
-    const [atlasResource, spineResource] = createSpineResources();
-    await Promise.all([
-      spineManager.unloadResource(spineResource),
-      atlasManager.unloadResource(atlasResource),
-    ]);
-  };
-
   /**
    * @param {{ name: string, usedResources: Array<{ name: string }> }} params
    * @returns {LayoutData}
@@ -103,27 +89,59 @@ describe('gdjs.SpineManager & gdjs.SpineAtlasManager', () => {
     },
   });
 
-  it('awaits imageManager.loadResource instead of calling getOrLoadPIXITexture when loading an atlas', async () => {
+  /**
+   * @param {{ resources?: ResourceData[], nextSceneResources?: Array<{ name: string }> }} [settings]
+   */
+  const createTestContext = ({
+    resources = createSpineResources(),
+    nextSceneResources = [],
+  } = {}) => {
     const runtimeGame = gdjs.getPixiRuntimeGame({
-      resources: { resources: createSpineResources() },
+      resources: { resources },
       layouts: [
         createSceneData({
           name: 'Scene1',
-          // Alphabetical order as produced by SceneResourcesFinder:
-          usedResources: [
-            { name: 'spineboy.atlas' },
-            { name: 'spineboy.json' },
-            { name: 'spineboy.png' },
-          ],
+          usedResources: resources.map(({ name }) => ({ name })),
+        }),
+        createSceneData({
+          name: 'Scene2',
+          usedResources: nextSceneResources,
         }),
       ],
     });
     const resourceLoader = runtimeGame.getResourceLoader();
-    const imageManager = runtimeGame.getImageManager();
-    const spineAtlasManager = resourceLoader.getSpineAtlasManager();
-    if (!spineAtlasManager) {
-      throw new Error('SpineAtlasManager should be registered.');
+    const spineManager = resourceLoader.getSpineManager();
+    const atlasManager = resourceLoader.getSpineAtlasManager();
+    if (!spineManager || !atlasManager) {
+      throw new Error('Spine managers should be registered.');
     }
+    const unloadSpineResources = () =>
+      Promise.all(
+        resources.map((resource) =>
+          resource.kind === 'spine'
+            ? spineManager.unloadResource(resource)
+            : resource.kind === 'atlas'
+              ? atlasManager.unloadResource(resource)
+              : Promise.resolve()
+        )
+      );
+    return {
+      resources,
+      runtimeGame,
+      resourceLoader,
+      imageManager: runtimeGame.getImageManager(),
+      spineManager,
+      atlasManager,
+      unloadSpineResources,
+      cleanup: async () => {
+        await unloadSpineResources();
+        resourceLoader.unloadAllResources();
+      },
+    };
+  };
+
+  it('awaits imageManager.loadResource instead of calling getOrLoadPIXITexture when loading an atlas', async () => {
+    const { imageManager, atlasManager, cleanup } = createTestContext();
 
     let getOrLoadCalled = false;
     const originalGetOrLoad =
@@ -134,48 +152,31 @@ describe('gdjs.SpineManager & gdjs.SpineAtlasManager', () => {
     };
 
     try {
-      await spineAtlasManager.loadResource('spineboy.atlas');
+      await atlasManager.loadResource('spineboy.atlas');
       expect(getOrLoadCalled).to.be(false);
-      expect(spineAtlasManager.isLoaded('spineboy.atlas')).to.be(true);
+      expect(atlasManager.isLoaded('spineboy.atlas')).to.be(true);
       const texture = imageManager.getPIXITexture('spineboy.png');
       expect(texture).not.to.be(imageManager.getInvalidPIXITexture());
       expect(texture.valid).to.be(true);
     } finally {
       imageManager.getOrLoadPIXITexture = originalGetOrLoad;
-      await unloadSpineResources(resourceLoader);
-      resourceLoader.unloadAllResources();
+      await cleanup();
     }
   });
 
   it('reloads Spine resources after scene unload without throwing on destroyed BaseTexture', async () => {
-    const runtimeGame = gdjs.getPixiRuntimeGame({
-      resources: { resources: createSpineResources() },
-      layouts: [
-        createSceneData({
-          name: 'Scene1',
-          usedResources: [
-            { name: 'spineboy.atlas' },
-            { name: 'spineboy.json' },
-            { name: 'spineboy.png' },
-          ],
-        }),
-        createSceneData({
-          name: 'Scene2',
-          usedResources: [],
-        }),
-      ],
-    });
-    const resourceLoader = runtimeGame.getResourceLoader();
-    const spineManager = resourceLoader.getSpineManager();
-    const spineAtlasManager = resourceLoader.getSpineAtlasManager();
-    if (!spineManager || !spineAtlasManager) {
-      throw new Error('Spine managers should be registered.');
-    }
+    const {
+      resourceLoader,
+      spineManager,
+      atlasManager,
+      unloadSpineResources,
+      cleanup,
+    } = createTestContext();
 
     try {
       // First load of Scene1
       await resourceLoader.loadAndProcessSceneResources('Scene1');
-      expect(spineAtlasManager.isLoaded('spineboy.atlas')).to.be(true);
+      expect(atlasManager.isLoaded('spineboy.atlas')).to.be(true);
       expect(spineManager.isSpineLoaded('spineboy.json')).to.be(true);
       const initialAliases = spineManager.getSpineAliases('spineboy.json');
       if (!initialAliases) {
@@ -194,13 +195,13 @@ describe('gdjs.SpineManager & gdjs.SpineAtlasManager', () => {
         unloadedSceneName: 'Scene1',
         newSceneName: 'Scene2',
       });
-      expect(spineAtlasManager.isLoaded('spineboy.atlas')).to.be(false);
+      expect(atlasManager.isLoaded('spineboy.atlas')).to.be(false);
       expect(spineManager.isSpineLoaded('spineboy.json')).to.be(false);
 
-      await unloadSpineResources(resourceLoader);
+      await unloadSpineResources();
 
       await resourceLoader.loadAndProcessSceneResources('Scene1');
-      expect(spineAtlasManager.isLoaded('spineboy.atlas')).to.be(true);
+      expect(atlasManager.isLoaded('spineboy.atlas')).to.be(true);
       expect(spineManager.isSpineLoaded('spineboy.json')).to.be(true);
 
       const aliases = spineManager.getSpineAliases('spineboy.json');
@@ -216,35 +217,20 @@ describe('gdjs.SpineManager & gdjs.SpineAtlasManager', () => {
       expect(spineObject.skeleton.data).not.to.be(initialSkeletonData);
       spineObject.destroy();
     } finally {
-      await unloadSpineResources(resourceLoader);
-      resourceLoader.unloadAllResources();
+      await cleanup();
     }
   });
 
   it('does not destroy PixiImageManager texture when unloading an atlas whose image is shared with another scene', async () => {
-    const runtimeGame = gdjs.getPixiRuntimeGame({
-      resources: { resources: createSpineResources() },
-      layouts: [
-        createSceneData({
-          name: 'Scene1',
-          usedResources: [
-            { name: 'spineboy.atlas' },
-            { name: 'spineboy.json' },
-            { name: 'spineboy.png' },
-          ],
-        }),
-        createSceneData({
-          name: 'Scene2',
-          usedResources: [{ name: 'spineboy.png' }],
-        }),
-      ],
+    const {
+      resourceLoader,
+      imageManager,
+      spineManager,
+      unloadSpineResources,
+      cleanup,
+    } = createTestContext({
+      nextSceneResources: [{ name: 'spineboy.png' }],
     });
-    const resourceLoader = runtimeGame.getResourceLoader();
-    const imageManager = runtimeGame.getImageManager();
-    const spineManager = resourceLoader.getSpineManager();
-    if (!spineManager) {
-      throw new Error('SpineManager should be registered.');
-    }
 
     try {
       await resourceLoader.loadAndProcessSceneResources('Scene1');
@@ -263,7 +249,7 @@ describe('gdjs.SpineManager & gdjs.SpineAtlasManager', () => {
         newSceneName: 'Scene2',
       });
 
-      await unloadSpineResources(resourceLoader);
+      await unloadSpineResources();
 
       const sharedTextureAfterUnload =
         imageManager.getPIXITexture('spineboy.png');
@@ -274,30 +260,12 @@ describe('gdjs.SpineManager & gdjs.SpineAtlasManager', () => {
       await resourceLoader.loadAndProcessSceneResources('Scene1');
       expect(spineManager.isSpineLoaded('spineboy.json')).to.be(true);
     } finally {
-      await unloadSpineResources(resourceLoader);
-      resourceLoader.unloadAllResources();
+      await cleanup();
     }
   });
 
   it('clears _loadingSpineAtlases when loading fails so subsequent retries succeed', async () => {
-    const runtimeGame = gdjs.getPixiRuntimeGame({
-      resources: { resources: createSpineResources() },
-      layouts: [
-        createSceneData({
-          name: 'Scene1',
-          usedResources: [
-            { name: 'spineboy.atlas' },
-            { name: 'spineboy.json' },
-            { name: 'spineboy.png' },
-          ],
-        }),
-      ],
-    });
-    const resourceLoader = runtimeGame.getResourceLoader();
-    const spineAtlasManager = resourceLoader.getSpineAtlasManager();
-    if (!spineAtlasManager) {
-      throw new Error('SpineAtlasManager should be registered.');
-    }
+    const { atlasManager, cleanup } = createTestContext();
 
     const originalAssetsLoad = PIXI.Assets.load.bind(PIXI.Assets);
     let shouldFailNextLoad = true;
@@ -314,47 +282,25 @@ describe('gdjs.SpineManager & gdjs.SpineAtlasManager', () => {
     try {
       let firstError = null;
       try {
-        await spineAtlasManager.getOrLoad('spineboy.atlas');
+        await atlasManager.getOrLoad('spineboy.atlas');
       } catch (err) {
         firstError = err;
       }
       expect(firstError).not.to.be(null);
-      expect(spineAtlasManager.isLoaded('spineboy.atlas')).to.be(false);
+      expect(atlasManager.isLoaded('spineboy.atlas')).to.be(false);
 
       // Retry should not return the cached rejected promise
-      const atlas = await spineAtlasManager.getOrLoad('spineboy.atlas');
+      const atlas = await atlasManager.getOrLoad('spineboy.atlas');
       expect(atlas).to.be.ok();
-      expect(spineAtlasManager.isLoaded('spineboy.atlas')).to.be(true);
+      expect(atlasManager.isLoaded('spineboy.atlas')).to.be(true);
     } finally {
       PIXI.Assets.load = originalAssetsLoad;
-      await unloadSpineResources(resourceLoader);
-      resourceLoader.unloadAllResources();
+      await cleanup();
     }
   });
 
   it('handles immediate synchronous reload right after unload without async unload race', async () => {
-    const runtimeGame = gdjs.getPixiRuntimeGame({
-      resources: { resources: createSpineResources() },
-      layouts: [
-        createSceneData({
-          name: 'Scene1',
-          usedResources: [
-            { name: 'spineboy.atlas' },
-            { name: 'spineboy.json' },
-            { name: 'spineboy.png' },
-          ],
-        }),
-        createSceneData({
-          name: 'Scene2',
-          usedResources: [],
-        }),
-      ],
-    });
-    const resourceLoader = runtimeGame.getResourceLoader();
-    const spineManager = resourceLoader.getSpineManager();
-    if (!spineManager) {
-      throw new Error('SpineManager should be registered.');
-    }
+    const { resourceLoader, spineManager, cleanup } = createTestContext();
 
     try {
       await resourceLoader.loadAndProcessSceneResources('Scene1');
@@ -378,25 +324,15 @@ describe('gdjs.SpineManager & gdjs.SpineAtlasManager', () => {
       expect(spineObject).to.be.a(spine.Spine);
       spineObject.destroy();
     } finally {
-      await unloadSpineResources(resourceLoader);
-      resourceLoader.unloadAllResources();
+      await cleanup();
     }
   });
 
   for (const loadingStage of ['image', 'atlas']) {
     for (const reloadCount of [0, 1, 2]) {
       it(`unloads an atlas during ${loadingStage} loading with ${reloadCount} queued reloads without destroying its shared image`, async () => {
-        const resources = createSpineResources();
-        const runtimeGame = gdjs.getPixiRuntimeGame({
-          resources: { resources },
-        });
-        const imageManager = runtimeGame.getImageManager();
-        const atlasManager = runtimeGame
-          .getResourceLoader()
-          .getSpineAtlasManager();
-        if (!atlasManager) {
-          throw new Error('SpineAtlasManager should be registered.');
-        }
+        const { resources, imageManager, atlasManager, cleanup } =
+          createTestContext();
         await imageManager.loadResource('spineboy.png');
         const sharedTexture = imageManager.getPIXITexture('spineboy.png');
         const started = createDeferred();
@@ -461,8 +397,7 @@ describe('gdjs.SpineManager & gdjs.SpineAtlasManager', () => {
         } finally {
           gate.resolve();
           stub.restore();
-          await atlasManager.unloadResource(resources[0]);
-          runtimeGame.getResourceLoader().unloadAllResources();
+          await cleanup();
         }
       });
     }
@@ -470,16 +405,7 @@ describe('gdjs.SpineManager & gdjs.SpineAtlasManager', () => {
 
   for (const loadingStage of ['atlas', 'json']) {
     it(`unloads a skeleton during ${loadingStage} fetching without repopulating its cache`, async () => {
-      const resources = createSpineResources();
-      const runtimeGame = gdjs.getPixiRuntimeGame({
-        resources: { resources },
-      });
-      const resourceLoader = runtimeGame.getResourceLoader();
-      const spineManager = resourceLoader.getSpineManager();
-      const atlasManager = resourceLoader.getSpineAtlasManager();
-      if (!spineManager || !atlasManager) {
-        throw new Error('Spine managers should be registered.');
-      }
+      const { resources, spineManager, cleanup } = createTestContext();
       const started = createDeferred();
       const gate = createDeferred();
       const originalFetch = PIXI.settings.ADAPTER.fetch.bind(
@@ -510,23 +436,13 @@ describe('gdjs.SpineManager & gdjs.SpineAtlasManager', () => {
       } finally {
         gate.resolve();
         fetchStub.restore();
-        await spineManager.unloadResource(resources[1]);
-        await atlasManager.unloadResource(resources[0]);
-        resourceLoader.unloadAllResources();
+        await cleanup();
       }
     });
   }
 
   it('cleans up a failed in-flight atlas load during unload and allows a retry', async () => {
-    const resources = createSpineResources();
-    const runtimeGame = gdjs.getPixiRuntimeGame({
-      resources: { resources },
-    });
-    const resourceLoader = runtimeGame.getResourceLoader();
-    const atlasManager = resourceLoader.getSpineAtlasManager();
-    if (!atlasManager) {
-      throw new Error('SpineAtlasManager should be registered.');
-    }
+    const { resources, atlasManager, cleanup } = createTestContext();
     const started = createDeferred();
     const gate = createDeferred();
     const originalFetch = PIXI.settings.ADAPTER.fetch.bind(
@@ -571,8 +487,142 @@ describe('gdjs.SpineManager & gdjs.SpineAtlasManager', () => {
       gate.resolve();
       fetchStub.restore();
       errorSpy.restore();
-      await unloadSpineResources(resourceLoader);
-      resourceLoader.unloadAllResources();
+      await cleanup();
     }
   });
+
+  for (const kind of ['spine', 'atlas']) {
+    it(`loads a shared ${kind} file concurrently under both resource names`, async () => {
+      const resources = createSpineResources();
+      const resource = resources[kind === 'spine' ? 1 : 0];
+      const duplicate = { ...resource, name: `duplicate-${resource.name}` };
+      resources.push(duplicate);
+      const { spineManager, atlasManager, cleanup } = createTestContext({
+        resources,
+      });
+      const manager = kind === 'spine' ? spineManager : atlasManager;
+      const fetchSpy = sinon.spy(PIXI.settings.ADAPTER, 'fetch');
+
+      try {
+        await Promise.all([
+          manager.loadResource(resource.name),
+          manager.loadResource(duplicate.name),
+        ]);
+        if (kind === 'spine') {
+          expect(spineManager.isSpineLoaded(duplicate.name)).to.be(true);
+          expect(spineManager.getSpineAliases(duplicate.name)).to.be(
+            spineManager.getSpineAliases(resource.name)
+          );
+        } else {
+          expect(atlasManager.isLoaded(duplicate.name)).to.be(true);
+          expect(atlasManager.getAtlasTexture(duplicate.name)).to.be(
+            atlasManager.getAtlasTexture(resource.name)
+          );
+          expect(atlasManager.getAtlasAlias(duplicate.name)).to.be(
+            atlasManager.getAtlasAlias(resource.name)
+          );
+        }
+        expect(
+          fetchSpy
+            .getCalls()
+            .filter((call) => String(call.args[0]).includes(resource.file))
+            .length
+        ).to.be(1);
+      } finally {
+        fetchSpy.restore();
+        await cleanup();
+      }
+    });
+
+    it(`retries a failed shared ${kind} load through the other resource name`, async () => {
+      const resources = createSpineResources();
+      const resource = resources[kind === 'spine' ? 1 : 0];
+      const duplicate = { ...resource, name: `duplicate-${resource.name}` };
+      resources.push(duplicate);
+      const { spineManager, atlasManager, cleanup } = createTestContext({
+        resources,
+      });
+      const manager = kind === 'spine' ? spineManager : atlasManager;
+      const originalFetch = PIXI.settings.ADAPTER.fetch.bind(
+        PIXI.settings.ADAPTER
+      );
+      const fetchStub = sinon
+        .stub(PIXI.settings.ADAPTER, 'fetch')
+        .callsFake(async (...args) => {
+          if (String(args[0]).includes(resource.file)) {
+            throw new Error('Transient fetch failure');
+          }
+          return originalFetch(...args);
+        });
+
+      try {
+        await Promise.all(
+          [resource, duplicate].map(({ name }) =>
+            manager.loadResource(name).then(
+              () => {
+                throw new Error('Expected the shared load to fail.');
+              },
+              (error) => {
+                expect(String(error)).to.contain('Transient fetch failure');
+              }
+            )
+          )
+        );
+        fetchStub.callsFake(originalFetch);
+        await manager.loadResource(duplicate.name);
+        expect(
+          kind === 'spine'
+            ? spineManager.isSpineLoaded(duplicate.name)
+            : atlasManager.isLoaded(duplicate.name)
+        ).to.be(true);
+      } finally {
+        fetchStub.restore();
+        await cleanup();
+      }
+    });
+
+    it(`unloads the registered ${kind} URL when the in-game editor cache token changes`, async () => {
+      const { resources, runtimeGame, spineManager, atlasManager, cleanup } =
+        createTestContext();
+      const resource = resources[kind === 'spine' ? 1 : 0];
+      const manager = kind === 'spine' ? spineManager : atlasManager;
+      const editorStub = sinon
+        .stub(runtimeGame, 'isInGameEdition')
+        .returns(true);
+      const dateStub = sinon.stub(Date, 'now').returns(100);
+      let initialAlias = '';
+
+      try {
+        await manager.loadResource(resource.name);
+        initialAlias = runtimeGame
+          .getResourceLoader()
+          .getFullUrl(resource.file);
+        expect(PIXI.Assets.cache.has(initialAlias)).to.be(true);
+        dateStub.returns(200);
+        await manager.unloadResource(resource);
+        expect(PIXI.Assets.cache.has(initialAlias)).to.be(false);
+
+        await spineManager.loadResource('spineboy.json');
+        dateStub.returns(300);
+        const aliases = spineManager.getSpineAliases('spineboy.json');
+        if (!aliases) throw new Error('Expected the reloaded Spine aliases.');
+        expect(atlasManager.getAtlasAlias('spineboy.atlas')).to.be(
+          aliases.atlasAlias
+        );
+        const spineObject = spine.Spine.from({
+          skeleton: aliases.skeletonAlias,
+          atlas: aliases.atlasAlias,
+          autoUpdate: false,
+        });
+        expect(spineObject).to.be.a(spine.Spine);
+        spineObject.destroy();
+      } finally {
+        dateStub.returns(100);
+        await cleanup();
+        if (initialAlias) await PIXI.Assets.unload(initialAlias);
+        dateStub.restore();
+        editorStub.restore();
+      }
+    });
+  }
 });

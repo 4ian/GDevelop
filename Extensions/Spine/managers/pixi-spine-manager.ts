@@ -19,7 +19,7 @@ namespace gdjs {
   /**
    * SpineManager loads Spine skeleton (`.json` / `.skel`) resources via the
    * official `@esotericsoftware/spine-pixi-v7` asset loader. The skeleton is
-   * stored in the global `PIXI.Assets` cache under a stable alias, ready to be
+   * stored in the global `PIXI.Assets` cache under its loading URL, ready to be
    * consumed by `spine.Spine.from(...)`.
    * @category Resources > Spine
    */
@@ -31,7 +31,8 @@ namespace gdjs {
      * The atlas page textures are tracked separately by the SpineAtlasManager.
      */
     private _loadedSpines = new gdjs.ResourceCache<SpineAssetAliases>();
-    private _loadingSpines = new gdjs.ResourceCache<
+    private _loadingSpines = new Map<
+      string,
       Promise<SpineAssetAliases | null>
     >();
     private _unloadingSpines = new Map<string, Promise<void>>();
@@ -68,29 +69,31 @@ namespace gdjs {
       if (this._loadedSpines.get(resource)) {
         return;
       }
-      const inflight = this._loadingSpines.get(resource);
+      const inflight = this._loadingSpines.get(resource.file);
       if (inflight) {
         await inflight;
         return;
       }
 
-      const skeletonAlias = this._resourceLoader.getFullUrl(resource.file);
       const loadingPromise = Promise.resolve(
-        this._unloadingSpines.get(skeletonAlias)
+        this._unloadingSpines.get(resource.file)
       )
         .then(() => this._load(resource))
         .then((aliases) => {
-          if (aliases && this._loadingSpines.get(resource) === loadingPromise) {
+          if (
+            aliases &&
+            this._loadingSpines.get(resource.file) === loadingPromise
+          ) {
             this._loadedSpines.set(resource, aliases);
           }
           return aliases;
         })
         .finally(() => {
-          if (this._loadingSpines.get(resource) === loadingPromise) {
-            this._loadingSpines.delete(resource);
+          if (this._loadingSpines.get(resource.file) === loadingPromise) {
+            this._loadingSpines.delete(resource.file);
           }
         });
-      this._loadingSpines.set(resource, loadingPromise);
+      this._loadingSpines.set(resource.file, loadingPromise);
       await loadingPromise;
     }
 
@@ -161,14 +164,15 @@ namespace gdjs {
      * or `null` if the resource is not loaded yet.
      */
     getSpineAliases(resourceName: string): SpineAssetAliases | null {
-      return this._loadedSpines.getFromName(resourceName);
+      const resource = this._getSpineResource(resourceName);
+      return resource ? this._loadedSpines.get(resource) : null;
     }
 
     /**
      * Check if the given spine skeleton was loaded.
      */
     isSpineLoaded(resourceName: string): boolean {
-      return !!this._loadedSpines.getFromName(resourceName);
+      return !!this.getSpineAliases(resourceName);
     }
 
     private _getSpineResource(resourceName: string): ResourceData | null {
@@ -189,14 +193,15 @@ namespace gdjs {
 
     unloadResource(resourceData: ResourceData): Promise<void> {
       const aliases = this._loadedSpines.get(resourceData);
-      const loading = this._loadingSpines.get(resourceData);
-      const skeletonAlias = this._resourceLoader.getFullUrl(resourceData.file);
+      const loading = this._loadingSpines.get(resourceData.file);
       if (!aliases && !loading) {
-        return this._unloadingSpines.get(skeletonAlias) || Promise.resolve();
+        return (
+          this._unloadingSpines.get(resourceData.file) || Promise.resolve()
+        );
       }
 
       this._loadedSpines.delete(resourceData);
-      this._loadingSpines.delete(resourceData);
+      this._loadingSpines.delete(resourceData.file);
 
       const unloadPromise = Promise.resolve(loading || aliases)
         .then(async (loadedAliases) => {
@@ -210,7 +215,7 @@ namespace gdjs {
               delete skeletonCache[cacheKey];
             }
           }
-          await PIXI.Assets.unload(skeletonAlias);
+          await PIXI.Assets.unload(loadedAliases.skeletonAlias);
         })
         .catch((error) => {
           logger.error(
@@ -219,11 +224,11 @@ namespace gdjs {
         })
         .finally(() => {
           PIXI.Assets.resolver.prefer();
-          if (this._unloadingSpines.get(skeletonAlias) === unloadPromise) {
-            this._unloadingSpines.delete(skeletonAlias);
+          if (this._unloadingSpines.get(resourceData.file) === unloadPromise) {
+            this._unloadingSpines.delete(resourceData.file);
           }
         });
-      this._unloadingSpines.set(skeletonAlias, unloadPromise);
+      this._unloadingSpines.set(resourceData.file, unloadPromise);
       return unloadPromise;
     }
   }

@@ -18,6 +18,7 @@ import {
   sendMcpToolCalled,
 } from '../../Utils/Analytics/EventSender';
 import { getIDEVersion } from '../../Version';
+import { type OpenAskAiOptions } from '../../AiGeneration/Utils';
 import Window from '../../Utils/Window';
 import optionalRequire from '../../Utils/OptionalRequire';
 
@@ -52,6 +53,7 @@ export const useMcpServers = ({
   projectCreationCallbacks,
   runEditorFunctionCalls,
   saveProject,
+  openAskAi,
 }: {|
   i18n: I18nType,
   project: ?gdProject,
@@ -61,15 +63,25 @@ export const useMcpServers = ({
   // Stable: they must call the latest callbacks of the editor.
   runEditorFunctionCalls: RunEditorFunctionCalls,
   saveProject: SaveProject,
+  openAskAi: (?OpenAskAiOptions) => void,
 |}): {|
   // Called by the `--mcp` command once the project is loaded.
   onMcpProjectReady: () => void,
 |} => {
-  const { lookupTools, projectCreationTools } = useMcpServerTools({
+  const {
+    lookupTools,
+    projectCreationTools,
+    aiRequestTools,
+  } = useMcpServerTools({
     i18n,
     project,
     projectCreationCallbacks,
+    openAskAi,
   });
+  const liveServerTools = React.useMemo(
+    () => [...lookupTools, ...projectCreationTools, ...aiRequestTools],
+    [lookupTools, projectCreationTools, aiRequestTools]
+  );
   const makeHandlers = React.useCallback(
     (transport: 'stdio' | 'http'): CliMcpServerHandlers => ({
       getServerVersion: getIDEVersion,
@@ -150,7 +162,7 @@ export const useMcpServers = ({
             handlers: {
               ...makeHandlers('http'),
               getOpenedProject: () => openedProjectRef.current,
-              serverTools: [...lookupTools, ...projectCreationTools],
+              serverTools: liveServerTools,
             },
             send: text => {
               if (ipcRenderer)
@@ -178,7 +190,7 @@ export const useMcpServers = ({
         );
       };
     },
-    [makeHandlers, lookupTools, projectCreationTools]
+    [makeHandlers, liveServerTools]
   );
 
   return { onMcpProjectReady };

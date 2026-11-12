@@ -23,6 +23,10 @@ import { AiRequestChat, type AiRequestChatInterface } from './AiRequestChat';
 import { canPayForAiRequest } from './AiRequestChat/Utils';
 import { registerAskAiPrefillListener } from './AskAiPrefill';
 import {
+  registerAskAiAutomationDriver,
+  getAiToolsVersionOverride,
+} from './AskAiAutomation';
+import {
   getLatestInGameEditorExtensionErrors,
   addInGameEditorExtensionErrorsToFunctionCallOutputs,
 } from '../InGameEditorExtensionErrors';
@@ -56,6 +60,7 @@ import {
   aiRequestHasWorkInProgress,
   getFunctionCallOutputsFromEditorFunctionCallResults,
   getFunctionCallsToProcess,
+  getLatestActivePlan,
 } from './AiRequestUtils';
 import { type EditorFunctionCallResult } from '../EditorFunctions';
 import { useStableUpToDateRef } from '../Utils/UseStableUpToDateCallback';
@@ -717,7 +722,8 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                 fileMetadata,
                 storageProviderName,
                 mode,
-                toolsVersion: AI_ORCHESTRATOR_TOOLS_VERSION,
+                toolsVersion:
+                  getAiToolsVersionOverride() || AI_ORCHESTRATOR_TOOLS_VERSION,
                 aiConfiguration: {
                   presetId: aiConfigurationPresetId,
                 },
@@ -965,7 +971,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                 // sent to a sub-agent request (explorer or edit agent).
                 mode: hasUserMessage ? 'orchestrator' : undefined,
                 toolsVersion: hasUserMessage
-                  ? AI_ORCHESTRATOR_TOOLS_VERSION
+                  ? getAiToolsVersionOverride() || AI_ORCHESTRATOR_TOOLS_VERSION
                   : undefined,
               })
             );
@@ -1328,6 +1334,67 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           );
         },
         [selectedAiRequest, getEditorFunctionCallResults]
+      );
+
+      // Let a request be run from start to end without a user (see
+      // `AskAiAutomation`), with what a user would do in the chat.
+      const automationRef = useStableUpToDateRef({
+        selectedAiRequest,
+        getHasWorkInProgress,
+        isSending:
+          isSendingUserMessage || isSendingAiRequest(selectedAiRequestId),
+        isSavingProject: !!savingProjectForMessageId,
+        lastSendError: getLastSendError(selectedAiRequestId),
+        hasProject: !!project,
+        onSendMessage,
+        getEditorFunctionCallResults,
+      });
+      React.useEffect(
+        () =>
+          registerAskAiAutomationDriver({
+            startNewChat: () => setSelectedAiRequestId(null),
+            startNewRequest: ({ userRequest, aiConfigurationPresetId }) =>
+              startNewAiRequest({
+                mode: 'orchestrator',
+                userRequest,
+                attachmentIds: [],
+                aiConfigurationPresetId,
+              }),
+            sendUserMessage: async userMessage => {
+              const { selectedAiRequest } = automationRef.current;
+              if (!selectedAiRequest) return;
+              await automationRef.current.onSendMessage({
+                aiRequestId: selectedAiRequest.id,
+                userMessage,
+                editorFunctionCallResults:
+                  automationRef.current.getEditorFunctionCallResults(
+                    selectedAiRequest.id
+                  ) || [],
+              });
+            },
+            getState: () => {
+              const {
+                selectedAiRequest,
+                getHasWorkInProgress,
+                isSending,
+                isSavingProject,
+                lastSendError,
+                hasProject,
+              } = automationRef.current;
+              return {
+                aiRequest: selectedAiRequest,
+                hasWorkInProgress: getHasWorkInProgress(),
+                isSending,
+                isSavingProject,
+                lastSendError,
+                hasProject,
+                hasUnfinishedPlan:
+                  !!selectedAiRequest &&
+                  !!getLatestActivePlan(selectedAiRequest),
+              };
+            },
+          }),
+        [automationRef, setSelectedAiRequestId]
       );
 
       const onStop = React.useCallback(

@@ -431,6 +431,16 @@ const renderEventOwnTextForMatching = (
 };
 
 /**
+ * True if a source has lines standing for events that a read did not
+ * display (collapsed sub-events, other events, a truncated output): it is
+ * not the whole source of an event.
+ */
+export const hasNotDisplayedEventsMarker = (eventSource: string): boolean =>
+  /^\s*# (\.\.\. \d+ (sub-event|other event|line)\(s\)|\(output truncated\))/m.test(
+    eventSource
+  );
+
+/**
  * The current EventScript source of one event, resolved by id or group
  * name: its own lines only (header, local variables, actions), or the whole
  * subtree with `includeSubEvents`. Used as the reference the

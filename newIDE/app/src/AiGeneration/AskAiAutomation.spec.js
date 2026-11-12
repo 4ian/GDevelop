@@ -19,9 +19,37 @@ const options: AutomatedAiRequestOptions = {
   timeoutMs: 10 * 60 * 1000,
 };
 
-const makeFakeAiRequest = (id: string, status: string): any => ({
+const userMessage = {
+  type: 'message',
+  role: 'user',
+  content: [{ type: 'user_request', text: 'Make a racing game' }],
+};
+const assistantTextMessage = {
+  type: 'message',
+  role: 'assistant',
+  content: [{ type: 'output_text', text: 'Which kind of game?' }],
+};
+const assistantFunctionCallMessage = {
+  type: 'message',
+  role: 'assistant',
+  content: [{ type: 'function_call', call_id: 'call-1', name: 'create_scene' }],
+};
+const functionCallOutput = { type: 'function_call_output', call_id: 'call-1' };
+
+// By default, the AI did some work after the request of the user.
+const makeFakeAiRequest = (
+  id: string,
+  status: string,
+  output: Array<any> = [
+    userMessage,
+    assistantFunctionCallMessage,
+    functionCallOutput,
+    assistantTextMessage,
+  ]
+): any => ({
   id,
   status,
+  output,
   error:
     status === 'error' ? { code: 'internal-error', message: 'Failed.' } : null,
 });
@@ -42,10 +70,12 @@ const makeFakeDriver = () => {
   });
   const startNewRequest = jest.fn<[any], void>();
   const sendUserMessage = jest.fn<[string], Promise<void>>(async () => {});
+  const stop = jest.fn<[], Promise<void>>(async () => {});
   const driver: AskAiAutomationDriver = {
     startNewChat,
     startNewRequest,
     sendUserMessage,
+    stop,
     getState: () => ({ ...state }),
   };
   return { state, driver };
@@ -173,9 +203,65 @@ describe('AskAiAutomation', () => {
     await advance(60_000);
     const result = newRun.getResult();
     expect(driver.sendUserMessage).toHaveBeenCalledTimes(2);
-    expect(result && result.status).toBe('finished');
+    expect(result && result.status).toBe('waiting_for_user');
     expect(result && result.userContinuesCount).toBe(2);
     expect(result && result.hasUnfinishedPlan).toBe(true);
+  });
+
+  it('does not take a question of the AI on an opened project as its work done', async () => {
+    const { state, driver } = makeFakeDriver();
+    state.hasProject = true;
+    unregisterDriver = registerAskAiAutomationDriver(driver);
+    const newRun = startAutomatedAiRequest({ ...options, maxUserContinues: 1 });
+    run = newRun;
+    await advance(500);
+    // The AI only answered, without calling any function.
+    state.aiRequest = makeFakeAiRequest('request-1', 'ready', [
+      userMessage,
+      assistantTextMessage,
+    ]);
+    await advance(12_000);
+    expect(driver.sendUserMessage).toHaveBeenCalledTimes(1);
+    expect(newRun.getResult()).toBe(null);
+
+    // Told to continue, it asks again: the run ends, not as finished.
+    state.aiRequest = makeFakeAiRequest('request-1', 'ready', [
+      userMessage,
+      assistantTextMessage,
+      userMessage,
+      assistantTextMessage,
+    ]);
+    await advance(12_000);
+    const result = newRun.getResult();
+    expect(driver.sendUserMessage).toHaveBeenCalledTimes(1);
+    expect(result && result.status).toBe('waiting_for_user');
+    expect(result && result.userContinuesCount).toBe(1);
+  });
+
+  it('finishes once the AI worked after being told to continue', async () => {
+    const { state, driver } = makeFakeDriver();
+    state.hasProject = true;
+    unregisterDriver = registerAskAiAutomationDriver(driver);
+    const newRun = startAutomatedAiRequest({ ...options, maxUserContinues: 1 });
+    run = newRun;
+    await advance(500);
+    state.aiRequest = makeFakeAiRequest('request-1', 'ready', [
+      userMessage,
+      assistantTextMessage,
+    ]);
+    await advance(12_000);
+    state.aiRequest = makeFakeAiRequest('request-1', 'ready', [
+      userMessage,
+      assistantTextMessage,
+      userMessage,
+      assistantFunctionCallMessage,
+      functionCallOutput,
+      assistantTextMessage,
+    ]);
+    await advance(12_000);
+    const result = newRun.getResult();
+    expect(result && result.status).toBe('finished');
+    expect(result && result.userContinuesCount).toBe(1);
   });
 
   it('ends with the error of the request', async () => {
@@ -228,5 +314,7 @@ describe('AskAiAutomation', () => {
     const result = newRun.getResult();
     expect(result && result.status).toBe('timeout');
     expect(result && result.aiRequestId).toBe('request-1');
+    // The AI does not keep working on it.
+    expect(driver.stop).toHaveBeenCalledTimes(1);
   });
 });

@@ -233,6 +233,27 @@ describe('AiRequestTools', () => {
     );
   });
 
+  it('reports a request left waiting for the user, not as an error', async () => {
+    const { aiRequests, setAiRequestId, end } = makeFakeAiRequests();
+    const tools = makeAiRequestTools(aiRequests);
+
+    const startOutputPromise = getTool(tools, 'start_ai_request').call(
+      { user_request: 'A game' },
+      context
+    );
+    setAiRequestId('request-1');
+    await startOutputPromise;
+    end({ status: 'waiting_for_user', hasUnfinishedPlan: true });
+
+    const output = await getTool(tools, 'wait_for_ai_request').call(
+      {},
+      context
+    );
+    expect(output.isError).toBe(false);
+    expect(output.value.status).toBe('waiting_for_user');
+    expect(output.value.has_unfinished_plan).toBe(true);
+  });
+
   it('reports a request ended by an error or a timeout as an error', async () => {
     const { aiRequests, setAiRequestId, end } = makeFakeAiRequests();
     const tools = makeAiRequestTools(aiRequests);

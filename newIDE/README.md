@@ -186,10 +186,12 @@ gdevelop --run-command RUN_AI_REQUEST --json --cmd-args request.json
 
 The request is a JSON object: `userRequest` (required), `aiConfigurationPresetId`, `toolsVersion`
 (instead of the one of the editor), `continueMessage` (answered when the AI stops with work left,
-at most `maxUserContinues` times), `timeoutMs`, `judgeTestSource` (the source of a gameplay test run
+at most `maxUserContinues` times, once by default), `timeoutMs` (the request is then suspended), `judgeTestSource` (the source of a gameplay test run
 once the request is finished, to take the same screenshots of every game), `outputDirectory` (where
 the results of this test and its screenshots are written) and `localCopyPath` (where a copy of the
-project is saved). The result gives the identifier of the request, to read it on the backend.
+project is saved). The result gives the identifier of the request, to read it on the backend, and
+its `status`: `finished`, `waiting_for_user` (the AI stopped with work left and was not answered),
+`error` or `timeout`.
 
 The MCP server of the running editor has the same as two tools: `start_ai_request` and
 `wait_for_ai_request` (called until the request ended, as a request takes minutes).

@@ -29,6 +29,8 @@ export type AskAiAutomationDriver = {|
     aiConfigurationPresetId: string,
   |}) => void,
   sendUserMessage: (userMessage: string) => Promise<void>,
+  // Suspend the request, if the AI is working on it.
+  stop: () => Promise<void>,
   getState: () => AskAiAutomationState,
 |};
 
@@ -61,8 +63,9 @@ export type AutomatedAiRequestOptions = {|
   // The tools version of the request, if not the default one of the editor.
   toolsVersion: string | null,
   // What is answered when the AI stops and waits for the user while the
-  // work is not done (no project created yet: a question, a plan to confirm,
-  // or tasks of its plan left to do), and how many times at most.
+  // work is not done (see `isAiWorkDone`), and how many times at most. Each
+  // answer is a user message the request would not have had otherwise: keep
+  // them rare to compare requests.
   continueMessage: string,
   maxUserContinues: number,
   timeoutMs: number,
@@ -70,11 +73,21 @@ export type AutomatedAiRequestOptions = {|
 
 export const DEFAULT_AI_REQUEST_CONTINUE_MESSAGE =
   "Go ahead, and continue until everything is done. Don't ask me anything: make the decisions yourself.";
-export const DEFAULT_AI_REQUEST_MAX_USER_CONTINUES = 8;
+export const DEFAULT_AI_REQUEST_MAX_USER_CONTINUES = 1;
 export const DEFAULT_AI_REQUEST_TIMEOUT_MS = 45 * 60 * 1000;
 
+// - "finished": the AI did the work and waits for the user.
+// - "waiting_for_user": the AI waits for the user with work left (a question,
+//   a plan to confirm or to finish), and was not answered (anymore).
+// - "timeout": the request was not finished in time, and was suspended.
+export type AutomatedAiRequestStatus =
+  | 'finished'
+  | 'waiting_for_user'
+  | 'error'
+  | 'timeout';
+
 export type AutomatedAiRequestResult = {|
-  status: 'finished' | 'error' | 'timeout',
+  status: AutomatedAiRequestStatus,
   aiRequestId: string | null,
   aiRequestStatus: string | null,
   error: string | null,
@@ -117,6 +130,37 @@ const waitFor = async <T>(
   return null;
 };
 
+/**
+ * The AI called functions (so made changes, launched sub-agents...) since
+ * the last message of the user: otherwise, it only answered (a question, a
+ * plan to confirm...).
+ */
+export const hasAiWorkedSinceLastUserMessage = (
+  aiRequest: AiRequest
+): boolean => {
+  const output = aiRequest.output || [];
+  for (let i = output.length - 1; i >= 0; i--) {
+    const message = output[i];
+    if (message.type === 'function_call_output') return true;
+    if (message.type !== 'message') continue;
+    if (message.role === 'user') return false;
+    if (message.content.some(content => content.type === 'function_call'))
+      return true;
+  }
+  return false;
+};
+
+/**
+ * When the AI waits for the user, its work is done if there is a project,
+ * no task left in its plan (if any), and it did something since the user
+ * last wrote: not if it asked a question instead of working.
+ */
+export const isAiWorkDone = (state: AskAiAutomationState): boolean =>
+  state.hasProject &&
+  !state.hasUnfinishedPlan &&
+  !!state.aiRequest &&
+  hasAiWorkedSinceLastUserMessage(state.aiRequest);
+
 type AutomatedAiRequestProgress = {|
   startTime: number,
   aiRequestId: string | null,
@@ -140,7 +184,7 @@ const runUntilDone = async (
     return driver;
   };
   const makeResult = (
-    status: 'finished' | 'error' | 'timeout',
+    status: AutomatedAiRequestStatus,
     error: string | null
   ): AutomatedAiRequestResult => {
     const state = driver ? driver.getState() : null;
@@ -224,11 +268,10 @@ const runUntilDone = async (
       }
       if (Date.now() - idleSince < IDLE_BEFORE_WAITING_FOR_USER_MS) continue;
 
-      // The AI is waiting for the user: it is done once the project exists
-      // and its plan (if any) has no task left.
-      const isWorkDone = state.hasProject && !state.hasUnfinishedPlan;
-      if (isWorkDone || progress.userContinuesCount >= maxUserContinues) {
-        return makeResult('finished', null);
+      // The AI is waiting for the user.
+      if (isAiWorkDone(state)) return makeResult('finished', null);
+      if (progress.userContinuesCount >= maxUserContinues) {
+        return makeResult('waiting_for_user', null);
       }
       progress.userContinuesCount++;
       console.info(
@@ -240,9 +283,17 @@ const runUntilDone = async (
       idleSince = null;
     }
 
+    // Don't let the AI work (and use credits) on a request given up.
+    try {
+      await getDriver().stop();
+    } catch (error) {
+      console.error('[AI request] The request could not be suspended:', error);
+    }
     return makeResult(
       'timeout',
-      `The AI request was not finished after ${Math.round(timeoutMs / 1000)}s.`
+      `The AI request was not finished after ${Math.round(
+        timeoutMs / 1000
+      )}s: it was suspended.`
     );
   } catch (error) {
     return makeResult('error', error.message || String(error));
@@ -261,7 +312,7 @@ export const getAutomatedAiRequestRun = (): AutomatedAiRequestRun | null =>
  * Start an AI request in the Ask AI editor (which must be opened), run until
  * the AI is done: it is started, `continueMessage` is answered when the AI
  * waits for the user with work left to do (at most `maxUserContinues` times),
- * and it ends once the AI waits with a project and no task left in its plan.
+ * and it ends once the AI waits with its work done (see `isAiWorkDone`).
  * Only one can run at a time (there is one Ask AI editor).
  */
 export const startAutomatedAiRequest = (

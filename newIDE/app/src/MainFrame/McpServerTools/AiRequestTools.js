@@ -71,7 +71,11 @@ const describeRun = (
     value.message =
       'The GDevelop AI is still working: call `wait_for_ai_request` again. Do not call the other tools meanwhile: they would change the project the AI is working on.';
   }
-  return { value, isError: !!result && result.status !== 'finished' };
+  return {
+    value,
+    isError:
+      !!result && (result.status === 'error' || result.status === 'timeout'),
+  };
 };
 
 export const makeAiRequestTools = (
@@ -81,7 +85,7 @@ export const makeAiRequestTools = (
     definition: {
       name: 'start_ai_request',
       description:
-        'Send a request to the GDevelop AI in the Ask AI editor, as the user would type it, and let it work until it is done (it is answered to continue when it stops with work left). Without a project opened, the GDevelop AI creates one (from a game template) then builds the game; otherwise it works on the opened project. This uses the AI credits of the logged in user: only do it when the user asked for the GDevelop AI. It returns once the request is started: call `wait_for_ai_request` until it ended (several minutes). Only one request can run at a time.',
+        'Send a request to the GDevelop AI in the Ask AI editor, as the user would type it, and let it work until it is done (it is answered to continue when it stops with work left, see `max_user_continues`). Without a project opened, the GDevelop AI creates one (from a game template) then builds the game; otherwise it works on the opened project. This uses the AI credits of the logged in user: only do it when the user asked for the GDevelop AI. It returns once the request is started: call `wait_for_ai_request` until it ended (several minutes). Only one request can run at a time.',
       inputSchema: {
         type: 'object',
         properties: {
@@ -106,7 +110,7 @@ export const makeAiRequestTools = (
           },
           max_user_continues: {
             type: 'number',
-            description: `Optional: how many times at most the AI is answered to continue (${DEFAULT_AI_REQUEST_MAX_USER_CONTINUES} if not set).`,
+            description: `Optional: how many times at most the AI is answered to continue (${DEFAULT_AI_REQUEST_MAX_USER_CONTINUES} if not set). Each answer is a user message the request would not have had otherwise.`,
           },
           timeout_minutes: {
             type: 'number',
@@ -176,7 +180,7 @@ export const makeAiRequestTools = (
     definition: {
       name: 'wait_for_ai_request',
       description:
-        'Wait for the end of the request started with `start_ai_request`. It returns after `max_wait_seconds` if the GDevelop AI is still working (`status` is then "running": call again), or as soon as the request ended: "finished" (the AI is done, the project it created or changed is opened in the editor), "error" or "timeout".',
+        'Wait for the end of the request started with `start_ai_request`. It returns after `max_wait_seconds` if the GDevelop AI is still working (`status` is then "running": call again), or as soon as the request ended: "finished" (the AI is done, the project it created or changed is opened in the editor), "waiting_for_user" (the AI stopped with work left and was not answered: a question, a plan to confirm or to finish), "error" or "timeout" (the request was suspended).',
       inputSchema: {
         type: 'object',
         properties: {

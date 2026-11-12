@@ -1348,6 +1348,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         hasProject: !!project,
         onSendMessage,
         getEditorFunctionCallResults,
+        suspendAiRequest,
       });
       React.useEffect(
         () =>
@@ -1371,6 +1372,14 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                     selectedAiRequest.id
                   ) || [],
               });
+            },
+            stop: async () => {
+              const { selectedAiRequest } = automationRef.current;
+              if (!selectedAiRequest) return;
+              if (!automationRef.current.getHasWorkInProgress()) return;
+              await automationRef.current.suspendAiRequest(
+                selectedAiRequest.id
+              );
             },
             getState: () => {
               const {

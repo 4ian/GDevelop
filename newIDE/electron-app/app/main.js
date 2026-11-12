@@ -114,7 +114,9 @@ let liveMcpServer = null;
 const devTools = !!args['dev-tools'];
 
 // See registerGdideProtocol (used for HTML modules support)
-protocol.registerSchemesAsPrivileged([{ scheme: 'gdide' }]);
+protocol.registerSchemesAsPrivileged([
+  { scheme: 'gdide', privileges: { corsEnabled: true } },
+]);
 
 // On computers having an integrated and a discrete graphics card (most gaming
 // laptops), Chromium uses the integrated one by default: the 3D editor and the

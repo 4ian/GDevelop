@@ -208,6 +208,7 @@ type Props = {|
   gameEditorMode: 'embedded-game' | 'instances-editor',
   continueProcessingFunctionCallsOnMount?: boolean,
   onOpenAskAi: (?OpenAskAiOptions) => void,
+  onCloseAskAi: () => void,
   onCheckoutVersion: (
     version: ExpandedCloudProjectVersion,
     options?: {| dontSaveCheckedOutVersionStatus?: boolean |}
@@ -316,6 +317,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         onWillInstallExtension,
         onExtensionInstalled,
         onOpenAskAi,
+        onCloseAskAi,
         gameEditorMode,
         continueProcessingFunctionCallsOnMount,
         onCheckoutVersion,
@@ -592,6 +594,18 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
       );
       const [isSendingUserMessage, setIsSendingUserMessage] = React.useState(
         false
+      );
+
+      const hideAskAi =
+        !!limits &&
+        !!limits.capabilities.classrooms &&
+        limits.capabilities.classrooms.hideAskAi;
+      // Close the tab if it was opened before knowing AI is disabled for this student.
+      React.useEffect(
+        () => {
+          if (hideAskAi) onCloseAskAi();
+        },
+        [hideAskAi, onCloseAskAi]
       );
 
       const availableCredits = limits ? limits.credits.userBalance.amount : 0;
@@ -1880,6 +1894,7 @@ export const renderAskAiEditorContainer = (
         onWillInstallExtension={props.onWillInstallExtension}
         onExtensionInstalled={props.onExtensionInstalled}
         onOpenAskAi={props.onOpenAskAi}
+        onCloseAskAi={props.onCloseAskAi}
         gameEditorMode={props.gameEditorMode}
         continueProcessingFunctionCallsOnMount={
           props.extraEditorProps

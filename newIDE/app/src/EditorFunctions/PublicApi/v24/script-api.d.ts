@@ -751,7 +751,7 @@ declare function inspect_scene_properties_layers_effects(args: {
 }): Promise<InspectScenePropertiesLayersEffectsResult>;
 
 /**
- * Change one or more properties of a scene (background color, rename the scene, etc...) or modify a layer (add, remove, change name, order or initial visibility) or an effect of a layer (add, remove, properties), or modify a group (add, remove, rename, add/remove objects in the group), or move instances to another scene or external layout (`move_instances`). On a variant of a custom object, `changed_properties` are the bounds of its area (`areaMinX`, `areaMinY`, `areaMinZ`, `areaMaxX`, `areaMaxY`, `areaMaxZ`), `delete_this_scene` is invalid (delete a variant with `change_custom_object`) and object groups can only be changed on the default variant (`variant_name` ""). For game-wide properties (resolution, game name...), use `change_project_properties_resources`. An effect of the asset store (a skybox or a fog preset for a 3D layer) is added on a layer with the `asset_id` of a `changed_layer_effects` item.
+ * Change one or more properties of a scene (background color, rename the scene, etc...) or modify a layer (add, remove, change name, order, initial visibility, rendering type or camera) or an effect of a layer (add, remove, properties), or modify a group (add, remove, rename, add/remove objects in the group), or move instances to another scene or external layout (`move_instances`). On a variant of a custom object, `changed_properties` are the bounds of its area (`areaMinX`, `areaMinY`, `areaMinZ`, `areaMaxX`, `areaMaxY`, `areaMaxZ`), `delete_this_scene` is invalid (delete a variant with `change_custom_object`) and object groups can only be changed on the default variant (`variant_name` ""). For game-wide properties (resolution, game name...), use `change_project_properties_resources`. An effect of the asset store (a skybox or a fog preset for a 3D layer) is added on a layer with the `asset_id` of a `changed_layer_effects` item.
  */
 declare function change_scene_properties_layers_effects_groups(args: {
   /** What to update: a scene, an external layout, or a variant of a custom object. Set `type` and the name field(s) of that type. */
@@ -786,6 +786,18 @@ declare function change_scene_properties_layers_effects_groups(args: {
     new_layer_position?: number;
     /** The visibility of the layer when the scene starts. Set to false to hide the layer (and everything on it) initially. Unchanged if not set. To show or hide a layer while the game is running, use the "Show layer" action in events instead. */
     new_visibility?: boolean;
+    /** What the layer displays: "" (2D and 3D objects, the default), "2d" (only 2D objects: a UI layer), "3d" (only 3D objects) or "2d+3d". Unchanged if not set. */
+    new_rendering_type?: '' | '2d' | '3d' | '2d+3d';
+    /** For a layer showing 3D objects: the 3D camera, "perspective" (the default) or "orthographic" (no perspective: isometric or top-down 3D games). Unchanged if not set. */
+    new_camera_type?: 'perspective' | 'orthographic';
+    /** What the camera of the layer does when the game resolution changes and events never moved it: "do-nothing" keeps it centered (best for game content), "top-left-anchored-if-never-moved" keeps the top-left corner fixed (best for content that can extend, like a UI). Unchanged if not set. */
+    new_default_camera_behavior?: 'do-nothing' | 'top-left-anchored-if-never-moved';
+    /** For a layer showing 3D objects: the distance from the 3D camera under which nothing is displayed (the "near plane"), in pixels. Must be greater than 0 and lower than the far plane distance. Unchanged if not set. */
+    new_camera_3d_near_plane_distance?: number;
+    /** For a layer showing 3D objects: the distance from the 3D camera beyond which nothing is displayed (the "far plane"), in pixels. Increase it for large 3D worlds where distant objects or terrain disappear. Unchanged if not set. */
+    new_camera_3d_far_plane_distance?: number;
+    /** For a layer showing 3D objects: the field of view of the 3D camera, in degrees (greater than 0, at most 180; 45 by default). Unchanged if not set. */
+    new_camera_3d_field_of_view?: number;
     /** If true, the layer with this name will be deleted. All instances on the layer will also be removed (if `move_instances_to_layer` is not set). */
     delete_this_layer?: boolean;
     /** If `delete_this_layer` is set to true, this can contain the name of the layer to move the instances to (use an empty string "" to move them to the base layer). If not set, the instances will be removed. */

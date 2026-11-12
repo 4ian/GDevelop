@@ -2,7 +2,10 @@
 import { makeTestExtensions } from '../fixtures/TestExtensions';
 import { editorFunctions, type EditorFunctionGenericOutput } from './index';
 import { makeFakeLaunchFunctionOptionsWithProject } from './TestHelpers';
-import { type ResourceFilesStorage } from './AttachmentResources';
+import {
+  type AttachmentsForResources,
+  type ResourceFilesStorage,
+} from './AttachmentResources';
 import {
   serializeToJSObject,
   unserializeFromJSObject,
@@ -402,7 +405,7 @@ describe('object raw JSON and renames', () => {
     // The browser `File` is not in the test environment: a named Blob is what
     // is read of it.
     const { Blob: NodeBlob } = require('buffer');
-    const attachmentsForResources = {
+    const attachmentsForResources: AttachmentsForResources = {
       getFiles: async (attachmentIds: Array<string>) => {
         const files: { [attachmentId: string]: ?File } = {};
         attachmentIds.forEach(attachmentId => {

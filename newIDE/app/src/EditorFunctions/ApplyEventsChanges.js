@@ -91,6 +91,86 @@ const parseEventPath = (pathString: string): EventPath => {
   });
 };
 
+const findAllGroupEventPathsByName = (
+  eventsList: gdEventsList,
+  lowerCaseName: string,
+  currentPath: EventPath = [],
+  foundPaths: Array<EventPath> = []
+): Array<EventPath> => {
+  for (let i = 0; i < eventsList.getEventsCount(); i++) {
+    const event = eventsList.getEventAt(i);
+    const eventPath = [...currentPath, i];
+
+    if (
+      event.getType() === 'BuiltinCommonInstructions::Group' &&
+      gd
+        .asGroupEvent(event)
+        .getName()
+        .toLowerCase()
+        .trim() === lowerCaseName
+    ) {
+      foundPaths.push(eventPath);
+    }
+
+    if (event.canHaveSubEvents()) {
+      findAllGroupEventPathsByName(
+        event.getSubEvents(),
+        lowerCaseName,
+        eventPath,
+        foundPaths
+      );
+    }
+  }
+  return foundPaths;
+};
+
+/**
+ * The path of the event targeted by an operation: an aiGeneratedEventId, a
+ * path (like "event-0.1.2") or the name of a group event, as events are
+ * designated when they are read.
+ */
+const resolveEventTarget = (
+  eventsList: gdEventsList,
+  target: string
+): {| path: EventPath | null, error: string | null |} => {
+  const pathsWithId = findAllEventPathsByAiGeneratedEventId(eventsList, target);
+  if (pathsWithId.length === 1) return { path: pathsWithId[0], error: null };
+  if (pathsWithId.length > 1) {
+    // A whole generation batch shares one aiGeneratedEventId, so it can
+    // match several events. Refuse to guess instead of editing the wrong one.
+    return {
+      path: null,
+      error: `aiGeneratedEventId "${target}" matches ${
+        pathsWithId.length
+      } events. Target a single event by its path (e.g. "event-7") instead.`,
+    };
+  }
+
+  try {
+    return { path: parseEventPath(target), error: null };
+  } catch (pathParseError) {
+    const groupPaths = findAllGroupEventPathsByName(
+      eventsList,
+      target.toLowerCase().trim()
+    );
+    if (groupPaths.length === 1) return { path: groupPaths[0], error: null };
+    if (groupPaths.length > 1) {
+      return {
+        path: null,
+        error: `${
+          groupPaths.length
+        } group events are named "${target}". Target a single one by its path (${groupPaths
+          .map(groupPath => `"event-${groupPath.join('.')}"`)
+          .join(', ')}) instead.`,
+      };
+    }
+    return {
+      path: null,
+      error: `Could not find event with aiGeneratedEventId "${target}" and could not parse as path or as the name of a group event.`,
+    };
+  }
+};
+
 /**
  * Navigates an event tree to find the parent EventsList and the 0-based index
  * for an event targeted by the given path.
@@ -378,66 +458,31 @@ export const applyEventsChanges = (
           .map(t => t.trim())
           .filter(t => t.length > 0);
         for (const target of targets) {
-          let targetPath = null;
-          const matchingPaths = findAllEventPathsByAiGeneratedEventId(
-            sceneEvents,
-            target
-          );
-          if (matchingPaths.length === 1) {
-            targetPath = matchingPaths[0];
-          } else if (matchingPaths.length > 1) {
-            // A whole generation batch shares one aiGeneratedEventId, so it can
-            // match several events. Refuse to guess instead of deleting the wrong one.
+          const resolvedTarget = resolveEventTarget(sceneEvents, target);
+          if (!resolvedTarget.path) {
             errors.push(
-              `aiGeneratedEventId "${target}" matches ${
-                matchingPaths.length
-              } events. Target a single event by its path (e.g. "event-7") instead. Skipping deletion of "${target}".`
+              `${resolvedTarget.error || ''} Skipping deletion of "${target}".`
             );
             continue;
-          } else {
-            try {
-              targetPath = parseEventPath(target);
-            } catch (pathParseError) {
-              errors.push(
-                `Could not find event with aiGeneratedEventId "${target}" and could not parse as path. Skipping deletion of "${target}".`
-              );
-              continue;
-            }
           }
-          operations.push({ type: 'delete', path: targetPath });
+          operations.push({ type: 'delete', path: resolvedTarget.path });
         }
         return;
       }
 
       if (operationTargetEvent) {
-        // First search for events with the exact aiGeneratedEventId.
-        const matchingPaths = findAllEventPathsByAiGeneratedEventId(
+        const resolvedTarget = resolveEventTarget(
           sceneEvents,
           operationTargetEvent
         );
-
-        if (matchingPaths.length === 1) {
-          parsedPath = matchingPaths[0];
-        } else if (matchingPaths.length > 1) {
-          // A whole generation batch shares one aiGeneratedEventId, so it can
-          // match several events. Refuse to guess instead of editing the wrong one.
+        if (!resolvedTarget.path) {
           errors.push(
-            `aiGeneratedEventId "${operationTargetEvent}" matches ${
-              matchingPaths.length
-            } events. Target a single event by its path (e.g. "event-7") instead. Skipping operation "${operationName}".`
+            `${resolvedTarget.error ||
+              ''} Skipping operation "${operationName}".`
           );
           return;
-        } else {
-          // Then try to parse as a path string (e.g., "event-0.1.2" or "0.1.2")
-          try {
-            parsedPath = parseEventPath(operationTargetEvent);
-          } catch (pathParseError) {
-            errors.push(
-              `Could not find event with aiGeneratedEventId "${operationTargetEvent}" and could not parse as path. Skipping operation "${operationName}".`
-            );
-            return;
-          }
         }
+        parsedPath = resolvedTarget.path;
       } else if (operationName !== 'insert_at_end') {
         // Path is generally required, except for 'insert_at_end'.
         errors.push(

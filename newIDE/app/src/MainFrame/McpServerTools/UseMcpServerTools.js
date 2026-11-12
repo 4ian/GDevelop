@@ -15,6 +15,12 @@ import { type NewProjectSetup } from '../../ProjectCreation/NewProjectSetupDialo
 import { type McpServerTool } from './McpServerTool';
 import { makeLookupTools } from './LookupTools';
 import { makeProjectCreationTools } from './ProjectCreationTools';
+import { makeAiRequestTools } from './AiRequestTools';
+import {
+  startAutomatedAiRequest,
+  getAutomatedAiRequestRun,
+} from '../../AiGeneration/AskAiAutomation';
+import { type OpenAskAiOptions } from '../../AiGeneration/Utils';
 
 const gd: libGDevelop = global.gd;
 
@@ -26,13 +32,16 @@ export const useMcpServerTools = ({
   i18n,
   project,
   projectCreationCallbacks,
+  openAskAi,
 }: {|
   i18n: I18nType,
   project: ?gdProject,
   projectCreationCallbacks: CliProjectCreationCallbacks,
+  openAskAi: (?OpenAskAiOptions) => void,
 |}): {|
   lookupTools: Array<McpServerTool>,
   projectCreationTools: Array<McpServerTool>,
+  aiRequestTools: Array<McpServerTool>,
 |} => {
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
@@ -47,6 +56,8 @@ export const useMcpServerTools = ({
   i18nRef.current = i18n;
   const projectRef = React.useRef(project);
   projectRef.current = project;
+  const openAskAiRef = React.useRef(openAskAi);
+  openAskAiRef.current = openAskAi;
 
   // Like for the GDevelop AI, the extensions of the project are given so that
   // they are documented too.
@@ -161,5 +172,18 @@ export const useMcpServerTools = ({
     []
   );
 
-  return { lookupTools, projectCreationTools };
+  // The request is made in the Ask AI editor, as by the user.
+  const aiRequestTools = React.useMemo(
+    () =>
+      makeAiRequestTools({
+        startAiRequest: options => {
+          openAskAiRef.current({ aiRequestId: null, paneIdentifier: 'center' });
+          return startAutomatedAiRequest(options);
+        },
+        getAiRequestRun: getAutomatedAiRequestRun,
+      }),
+    []
+  );
+
+  return { lookupTools, projectCreationTools, aiRequestTools };
 };

@@ -34,6 +34,17 @@ import { type FileMetadata } from '../ProjectsStorage';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { useEditorFunctionsServices } from '../AiGeneration/UseEditorFunctionsServices';
 import { useMcpServers } from './McpServerTools/UseMcpServers';
+import {
+  runAutomatedAiRequest,
+  DEFAULT_AI_REQUEST_CONTINUE_MESSAGE,
+  DEFAULT_AI_REQUEST_MAX_USER_CONTINUES,
+  DEFAULT_AI_REQUEST_TIMEOUT_MS,
+} from '../AiGeneration/AskAiAutomation';
+import { type OpenAskAiOptions } from '../AiGeneration/Utils';
+import LocalFileStorageProvider from '../ProjectsStorage/LocalFileStorageProvider';
+import { POSITIONAL_ARGUMENTS_KEY } from '../Utils/Window';
+import { readCliLoginForm } from './CliLogin';
+import { removeLocalTempDirOfCli } from '../ExportAndShare/LocalExporters/LocalFileSystem';
 
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
@@ -184,19 +195,21 @@ const sanitizeForFileName = (name: string): string =>
  */
 const writeCliGameplayTestResults = (
   project: gdProject,
-  results: Array<GameplayTestResult>
+  results: Array<GameplayTestResult>,
+  forcedResultsPath?: string
 ): ?string => {
   if (!fs || !path) return null;
 
   const appArguments = Window.getArguments();
-  const resultsPath =
-    typeof appArguments['results-path'] === 'string' &&
-    appArguments['results-path']
-      ? path.resolve(appArguments['results-path'])
-      : path.join(
-          path.dirname(project.getProjectFile()),
-          'gameplay-test-results.json'
-        );
+  const resultsPath = forcedResultsPath
+    ? path.resolve(forcedResultsPath)
+    : typeof appArguments['results-path'] === 'string' &&
+      appArguments['results-path']
+    ? path.resolve(appArguments['results-path'])
+    : path.join(
+        path.dirname(project.getProjectFile()),
+        'gameplay-test-results.json'
+      );
   const screenshotsDirectoryPath = path.join(
     path.dirname(resultsPath),
     'gameplay-test-screenshots'
@@ -552,6 +565,68 @@ const runners: { [commandName: string]: CliCommandRunner } = {
   },
 };
 
+// `RUN_AI_REQUEST`: run a request of the GDevelop AI from start to end, as a
+// user would in the Ask AI editor, to compare what prompts, models or tools
+// versions give. Unlike the other commands, it can start without a project
+// (the AI then creates it), so it is not one of the `runners`.
+const RUN_AI_REQUEST_COMMAND_NAME = 'RUN_AI_REQUEST';
+
+type CliAiRequestInput = {|
+  userRequest: string,
+  aiConfigurationPresetId: string,
+  toolsVersion: string | null,
+  continueMessage: string,
+  maxUserContinues: number,
+  timeoutMs: number,
+  // Pay the request with the credits of the user once the AI credits of
+  // their plan are used (the preference of the chat, which a new profile
+  // does not have: the request would not start).
+  payWithCredits: boolean,
+  // The source of a gameplay test run (and not saved) once the request is
+  // finished, to take the same screenshots of the game for every request.
+  judgeTestSource: string | null,
+  // Where the results of the judge test and its screenshots are written.
+  outputDirectory: string | null,
+  // Where a copy of the project is saved (a `.json` file).
+  localCopyPath: string | null,
+|};
+
+const parseCliAiRequestInput = (json: any): CliAiRequestInput => {
+  if (!json || typeof json !== 'object' || Array.isArray(json)) {
+    throw new Error('[CLI] The AI request must be a JSON object.');
+  }
+  if (typeof json.userRequest !== 'string' || !json.userRequest.trim()) {
+    throw new Error('[CLI] Missing `userRequest`.');
+  }
+  const getString = (name: string): string | null =>
+    typeof json[name] === 'string' && json[name] ? json[name] : null;
+  const getNumber = (name: string, defaultValue: number): number =>
+    typeof json[name] === 'number' && json[name] >= 0
+      ? json[name]
+      : defaultValue;
+  return {
+    userRequest: json.userRequest,
+    aiConfigurationPresetId: getString('aiConfigurationPresetId') || 'default',
+    toolsVersion: getString('toolsVersion'),
+    continueMessage:
+      getString('continueMessage') || DEFAULT_AI_REQUEST_CONTINUE_MESSAGE,
+    maxUserContinues: getNumber(
+      'maxUserContinues',
+      DEFAULT_AI_REQUEST_MAX_USER_CONTINUES
+    ),
+    timeoutMs: getNumber('timeoutMs', DEFAULT_AI_REQUEST_TIMEOUT_MS),
+    payWithCredits: !!json.payWithCredits,
+    judgeTestSource: getString('judgeTestSource'),
+    outputDirectory: getString('outputDirectory'),
+    localCopyPath: getString('localCopyPath'),
+  };
+};
+
+const cliExpectsProject = (appArguments: AppArguments): boolean => {
+  const positionalArguments = appArguments[POSITIONAL_ARGUMENTS_KEY];
+  return Array.isArray(positionalArguments) && positionalArguments.length > 0;
+};
+
 export const getAwaitableCliRunner = (commandName: string): ?CliCommandRunner =>
   runners[commandName] || null;
 
@@ -561,6 +636,7 @@ const CLI_LOGIN_SETTLE_TIMEOUT_MS = 30_000;
 const FIRE_AND_FORGET_GRACE_MS = 1500;
 
 const exitApp = (exitCode: number) => {
+  removeLocalTempDirOfCli();
   if (ipcRenderer) ipcRenderer.send('app-exit', exitCode);
 };
 
@@ -734,6 +810,7 @@ type Props = {|
   ensureProjectSettingsApplied: () => Promise<void>,
   // To create the project an agent connected to the editor works on.
   projectCreationCallbacks: CliProjectCreationCallbacks,
+  openAskAi: (?OpenAskAiOptions) => void,
 |};
 
 export const useCliCommandRunner = ({
@@ -751,22 +828,90 @@ export const useCliCommandRunner = ({
   saveProject,
   ensureProjectSettingsApplied,
   projectCreationCallbacks,
+  openAskAi,
 }: Props) => {
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
   );
   const preferences = React.useContext(PreferencesContext);
   const { triggerUnsavedChanges } = React.useContext(UnsavedChangesContext);
-  const { loginState } = React.useContext(AuthenticatedUserContext);
-  const loginStateRef = React.useRef(loginState);
-  loginStateRef.current = loginState;
+  const {
+    loginState,
+    profile,
+    onLogin,
+    authenticationError,
+  } = React.useContext(AuthenticatedUserContext);
+  const loginRef = React.useRef({
+    loginState,
+    profile,
+    onLogin,
+    authenticationError,
+  });
+  loginRef.current = { loginState, profile, onLogin, authenticationError };
+  const cliLoginPromiseRef = React.useRef<Promise<void> | null>(null);
+  // What `RUN_AI_REQUEST` reads once the request is finished: the project is
+  // then usually not the one (if any) opened when the command started.
+  const latestStateRef = React.useRef({
+    project,
+    profile,
+    fileMetadata,
+    storageProviderName,
+    projectCreationCallbacks,
+    openAskAi,
+    preferences,
+  });
+  latestStateRef.current = {
+    project,
+    profile,
+    fileMetadata,
+    storageProviderName,
+    projectCreationCallbacks,
+    openAskAi,
+    preferences,
+  };
   const ensureLoginSettled = React.useCallback(async () => {
     const startTime = Date.now();
+    const isWaiting = () =>
+      Date.now() - startTime < CLI_LOGIN_SETTLE_TIMEOUT_MS;
+    const loginForm = readCliLoginForm();
     while (
-      loginStateRef.current === 'loggingIn' &&
-      Date.now() - startTime < CLI_LOGIN_SETTLE_TIMEOUT_MS
+      // An account to log in with is only used once it is known that nobody
+      // is logged in.
+      (loginForm
+        ? loginRef.current.loginState !== 'done'
+        : loginRef.current.loginState === 'loggingIn') &&
+      isWaiting()
     ) {
       await delay(200);
+    }
+    if (!loginForm) return;
+
+    const loggedInProfile = loginRef.current.profile;
+    if (loggedInProfile) {
+      if (loggedInProfile.email.toLowerCase() !== loginForm.email.toLowerCase())
+        console.warn(
+          '[CLI] A user is already logged in: the account given in the environment variables is not used.'
+        );
+      return;
+    }
+    if (!cliLoginPromiseRef.current) {
+      console.info(
+        '[CLI] Logging in with the account given in the environment variables...'
+      );
+      cliLoginPromiseRef.current = loginRef.current.onLogin(loginForm);
+    }
+    await cliLoginPromiseRef.current;
+    while (!loginRef.current.profile && isWaiting()) {
+      if (loginRef.current.authenticationError) break;
+      await delay(200);
+    }
+    if (!loginRef.current.profile) {
+      const { authenticationError } = loginRef.current;
+      console.error(
+        `[CLI] Could not log in with the account given in the environment variables${
+          authenticationError ? `: ${authenticationError.code}` : '.'
+        }`
+      );
     }
   }, []);
   const editorFunctionsServices = useEditorFunctionsServices({
@@ -841,6 +986,7 @@ export const useCliCommandRunner = ({
     projectCreationCallbacks,
     runEditorFunctionCalls: latestRunEditorFunctionCalls,
     saveProject: latestSaveProject,
+    openAskAi,
   });
 
   React.useEffect(
@@ -863,6 +1009,8 @@ export const useCliCommandRunner = ({
       const appArguments = Window.getArguments();
       const commandName = appArguments['run-command'];
       if (!commandName || typeof commandName !== 'string') return;
+      // Run by its own effect (it can start without a project).
+      if (commandName === RUN_AI_REQUEST_COMMAND_NAME) return;
 
       cliCommandRanRef.current = true;
       const keepOpen = !!appArguments['keep-open'];
@@ -906,6 +1054,175 @@ export const useCliCommandRunner = ({
       latestRunEditorFunctionCalls,
       triggerUnsavedChanges,
       onMcpProjectReady,
+    ]
+  );
+
+  React.useEffect(
+    () => {
+      if (cliCommandRanRef.current) return;
+      const appArguments = Window.getArguments();
+      if (appArguments['run-command'] !== RUN_AI_REQUEST_COMMAND_NAME) return;
+      // When a project is given, the request is made on it: wait for it.
+      const expectsProject = cliExpectsProject(appArguments);
+      if (expectsProject && !project) return;
+
+      cliCommandRanRef.current = true;
+      const keepOpen = !!appArguments['keep-open'];
+      const cliOptions = getCliOptions(appArguments);
+
+      (async () => {
+        let exitCode = 0;
+        try {
+          const commandArgs = getCommandArgs();
+          if (commandArgs.length !== 1) {
+            throw new Error(
+              '[CLI] RUN_AI_REQUEST requires the request (a JSON file, inline JSON or - for stdin) via --cmd-args.'
+            );
+          }
+          const input = parseCliAiRequestInput(
+            JSON.parse(await readCliInput(commandArgs[0]))
+          );
+
+          if (expectsProject) {
+            if (
+              !(await ensureProjectExtensionsReadyForCli(
+                eventsFunctionsExtensionsState
+              ))
+            ) {
+              throw new Error('[CLI] The project extensions failed to load.');
+            }
+            await ensureProjectSettingsApplied();
+          }
+
+          // The request is made by the logged in user.
+          await ensureLoginSettled();
+          const loginStartTime = Date.now();
+          while (
+            !latestStateRef.current.profile &&
+            Date.now() - loginStartTime < CLI_LOGIN_SETTLE_TIMEOUT_MS
+          ) {
+            await delay(200);
+          }
+          if (!latestStateRef.current.profile) {
+            throw new Error(
+              '[CLI] RUN_AI_REQUEST requires a user logged in GDevelop (or an account given with the GDEVELOP_CLI_EMAIL and GDEVELOP_CLI_PASSWORD environment variables).'
+            );
+          }
+
+          if (!expectsProject && latestStateRef.current.project) {
+            throw new Error(
+              '[CLI] A project is opened while none was given: the AI request was not run on it.'
+            );
+          }
+
+          if (
+            input.payWithCredits &&
+            !latestStateRef.current.preferences.values
+              .automaticallyUseCreditsForAiRequests
+          ) {
+            latestStateRef.current.preferences.setAutomaticallyUseCreditsForAiRequests(
+              true
+            );
+            await delay(200);
+          }
+
+          latestStateRef.current.openAskAi({
+            aiRequestId: null,
+            paneIdentifier: 'center',
+          });
+          const requestResult = await runAutomatedAiRequest({
+            userRequest: input.userRequest,
+            aiConfigurationPresetId: input.aiConfigurationPresetId,
+            toolsVersion: input.toolsVersion,
+            continueMessage: input.continueMessage,
+            maxUserContinues: input.maxUserContinues,
+            timeoutMs: input.timeoutMs,
+          });
+          console.info(
+            `[CLI] AI request ${requestResult.aiRequestId || ''} ${
+              requestResult.status
+            } after ${Math.round(requestResult.durationMs / 1000)}s.`
+          );
+
+          const result: { [string]: any } = { ...requestResult };
+          const finalProject = latestStateRef.current.project;
+          if (finalProject) {
+            result.projectName = finalProject.getName();
+            result.storageProviderName =
+              latestStateRef.current.storageProviderName;
+            const finalFileMetadata = latestStateRef.current.fileMetadata;
+            result.fileIdentifier = finalFileMetadata
+              ? finalFileMetadata.fileIdentifier
+              : null;
+
+            if (input.judgeTestSource) {
+              try {
+                const judgeResults = await runProjectGameplayTests({
+                  project: finalProject,
+                  tests: [
+                    {
+                      scope: { type: 'project' },
+                      testName: 'Judge',
+                      source: input.judgeTestSource,
+                    },
+                  ],
+                  options: { screenshots: 'on', closeFrameWhenFinished: true },
+                });
+                result.judgeTestStatus = judgeResults[0]
+                  ? judgeResults[0].status
+                  : null;
+                result.judgeTestErrors = judgeResults[0]
+                  ? judgeResults[0].errors
+                  : [];
+                if (input.outputDirectory && path) {
+                  result.judgeTestResultsPath = writeCliGameplayTestResults(
+                    finalProject,
+                    judgeResults,
+                    path.join(input.outputDirectory, 'judge-test-results.json')
+                  );
+                }
+              } catch (error) {
+                console.error('[CLI] The judge test could not be run:', error);
+                result.judgeTestStatus = 'error';
+                result.judgeTestErrors = [error.message || String(error)];
+              }
+            }
+
+            // Done last: the project opened is then this copy.
+            if (input.localCopyPath && path) {
+              try {
+                const localCopyPath = path.resolve(input.localCopyPath);
+                const localFileMetadata = await latestStateRef.current.projectCreationCallbacks.saveProjectAsWithStorageProvider(
+                  {
+                    requestedStorageProvider: LocalFileStorageProvider,
+                    forcedSavedAsLocation: { fileIdentifier: localCopyPath },
+                  }
+                );
+                result.localCopyPath = localFileMetadata ? localCopyPath : null;
+              } catch (error) {
+                console.error(
+                  '[CLI] The copy of the project could not be saved:',
+                  error
+                );
+                result.localCopyPath = null;
+              }
+            }
+          }
+
+          await writeCliCommandResult(cliOptions, result);
+          if (requestResult.status !== 'finished') exitCode = 1;
+        } catch (error) {
+          console.error('[CLI] Command "RUN_AI_REQUEST" failed:', error);
+          exitCode = 1;
+        }
+        if (!keepOpen) exitApp(exitCode);
+      })();
+    },
+    [
+      project,
+      eventsFunctionsExtensionsState,
+      ensureProjectSettingsApplied,
+      ensureLoginSettled,
     ]
   );
 
@@ -983,6 +1300,14 @@ export const useCliCommandRunner = ({
     () => {
       if (!Window.isRunningCommandFromCli()) return;
       if (project) return;
+      const appArguments = Window.getArguments();
+      if (
+        appArguments['run-command'] === RUN_AI_REQUEST_COMMAND_NAME &&
+        !cliExpectsProject(appArguments)
+      ) {
+        // No project is opened until the AI creates one.
+        return;
+      }
       const timer = setTimeout(() => {
         console.error('[CLI] Project failed to load within timeout. Exiting.');
         exitApp(1);

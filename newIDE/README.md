@@ -173,6 +173,37 @@ plus `save_project` and `read_script_api_definition`. Add `--show` to watch the 
 editor, `--read-only` to only expose the functions not modifying the project.
 In development, `--generation-api-url http://localhost:3013` uses a local `generation-api`.
 
+#### Running a request of the GDevelop AI
+
+`RUN_AI_REQUEST` sends a request to the GDevelop AI in the Ask AI editor, as a user would type it,
+and lets it work until it is done (login required, this uses the AI credits of the user). It is made
+to compare what prompts, models or tools versions give on the same requests. Without a project, the
+AI creates one:
+
+```bash
+gdevelop --run-command RUN_AI_REQUEST --json --cmd-args request.json
+```
+
+The request is a JSON object: `userRequest` (required), `aiConfigurationPresetId`, `toolsVersion`
+(instead of the one of the editor), `continueMessage` (answered when the AI stops with work left,
+at most `maxUserContinues` times, once by default), `timeoutMs` (the request is then suspended), `payWithCredits` (use the credits of the user once the
+AI credits of their plan are used), `judgeTestSource` (the source of a gameplay test run
+once the request is finished, to take the same screenshots of every game), `outputDirectory` (where
+the results of this test and its screenshots are written) and `localCopyPath` (where a copy of the
+project is saved). The result gives the identifier of the request, to read it on the backend, and
+its `status`: `finished`, `waiting_for_user` (the AI stopped with work left and was not answered),
+`error` or `timeout`.
+
+On a machine where nobody can log in by hand (CI), set the `GDEVELOP_CLI_EMAIL` and
+`GDEVELOP_CLI_PASSWORD` environment variables: an editor running a command logs in with this account
+when nobody is logged in. The account is the same for the development and production APIs: a
+development editor (`npm start`) uses the development API, a packaged one the production API.
+Each editor running a command has its own temporary folder (previews, gameplay tests), so several
+can run at the same time, each with its own `--user-data-dir`.
+
+The MCP server of the running editor has the same as two tools: `start_ai_request` and
+`wait_for_ai_request` (called until the request ended, as a request takes minutes).
+
 Extra flags: `--keep-open` (don't quit after command), `--dev-tools` (open DevTools), 
              `--block-on-diagnostic-errors` / `--no-block-on-diagnostic-errors` (export should fail when the project has diagnostic errors)
 

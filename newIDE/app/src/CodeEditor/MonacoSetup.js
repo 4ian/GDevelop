@@ -147,7 +147,7 @@ export const enableJsTypeDiagnostics = (monaco: any) => {
  * In Electron, `document.execCommand('paste')` fails in newer Chromium
  * versions. This runtime patch wraps the clipboard paste action's `run`
  * method so that when the native paste command fails, we fall back to
- * Electron's clipboard API. Because we patch the action itself (not just
+ * `navigator.clipboard`. Because we patch the action itself (not just
  * keybindings), this covers keyboard shortcuts, the context menu "Paste"
  * item, and any programmatic trigger.
  *
@@ -158,29 +158,21 @@ export const enableJsTypeDiagnostics = (monaco: any) => {
  * See https://github.com/microsoft/monaco-editor/issues/4855
  */
 export const applyElectronClipboardPatch = (editor: any, monaco: any) => {
-  let electronClipboard;
-  try {
-    electronClipboard = window.require('electron').clipboard;
-  } catch (e) {
-    // Not in Electron environment, no patch needed.
-    return;
-  }
-
   const pasteAction = editor.getAction('editor.action.clipboardPasteAction');
   if (!pasteAction) return;
 
   // Replace the run method entirely. The original just does:
   //   editor.focus(); document.execCommand('paste');
-  // We add the Electron clipboard fallback when execCommand fails.
-  pasteAction.run = (accessor: any, ed: any) => {
+  // We add a clipboard fallback when execCommand fails.
+  pasteAction.run = async (accessor: any, ed: any) => {
     const target = ed || editor;
     target.focus();
     const domNode: HTMLElement = target.getDomNode();
     const doc = domNode ? domNode.ownerDocument : document;
     const result = doc.execCommand('paste');
-    if (!result) {
+    if (!result && navigator.clipboard) {
       try {
-        const text = electronClipboard.readText();
+        const text = await navigator.clipboard.readText();
         if (text) {
           const selection = target.getSelection();
           target.executeEdits('paste', [

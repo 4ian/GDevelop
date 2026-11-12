@@ -7,6 +7,10 @@ import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import TextField from '../TextField';
 import optionalRequire from '../../Utils/OptionalRequire';
+import {
+  getLastUsedDialogDirectory,
+  rememberLastUsedDialogDirectory,
+} from '../../Utils/FileSystem';
 import FlatButton from '../FlatButton';
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
@@ -58,12 +62,13 @@ const LocalFolderPicker = ({
       title,
       properties: ['openDirectory', 'createDirectory'],
       message,
-      defaultPath: defaultPath,
+      defaultPath: defaultPath || getLastUsedDialogDirectory(),
     });
 
     if (!filePaths || !filePaths.length) return;
 
     const filePath = filePaths[0];
+    rememberLastUsedDialogDirectory(filePath);
     onChange(filePath);
     setTextValue(filePath);
   };

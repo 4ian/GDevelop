@@ -5,6 +5,10 @@ import { t } from '@lingui/macro';
 import * as React from 'react';
 import TextField from '../TextField';
 import optionalRequire from '../../Utils/OptionalRequire';
+import {
+  getLastUsedDialogDirectory,
+  rememberLastUsedDialogDirectory,
+} from '../../Utils/FileSystem';
 import FlatButton from '../FlatButton';
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
@@ -54,8 +58,9 @@ const LocalFilePicker = ({
       title: title,
       filters: filters,
       message: message,
-      defaultPath: defaultPath,
+      defaultPath: defaultPath || getLastUsedDialogDirectory(),
     });
+    if (filePath) rememberLastUsedDialogDirectory(filePath);
     onChange(filePath || '');
   };
 

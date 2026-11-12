@@ -52,6 +52,7 @@ const {
 } = require('./LocalGDJSDevelopmentWatcher');
 const { setupWatcher, disableWatcher } = require('./LocalFilesystemWatcher');
 const { installCliInPath } = require('./InstallCliInPath');
+const { setupClipboardTextCache } = require('./ClipboardTextCache');
 const {
   setWindowFileIdentifier,
   clearWindowFileIdentifier,
@@ -65,6 +66,13 @@ const {
 
 // Initialize `@electron/remote` module
 require('@electron/remote/main').initialize();
+
+// @electron/remote 2.1.2 walks `module.parent` to the root and requires from
+// there. On Electron 45 that root is the Electron bootstrap, which cannot see
+// app/node_modules. Resolve from this file instead.
+app.on('remote-require', (event, _webContents, moduleName) => {
+  event.returnValue = require(moduleName);
+});
 
 const args = parseGDevelopArgs(process.argv.slice(isDev ? 2 : 1));
 // `--mcp`: serve the editor functions of the project on stdin/stdout, in its
@@ -106,12 +114,18 @@ let liveMcpServer = null;
 const devTools = !!args['dev-tools'];
 
 // See registerGdideProtocol (used for HTML modules support)
-protocol.registerSchemesAsPrivileged([{ scheme: 'gdide' }]);
+protocol.registerSchemesAsPrivileged([
+  { scheme: 'gdide', privileges: { corsEnabled: true } },
+]);
 
 // On computers having an integrated and a discrete graphics card (most gaming
 // laptops), Chromium uses the integrated one by default: the 3D editor and the
 // previews would run a lot slower than they could. Must be set before the app is ready.
 app.commandLine.appendSwitch('force_high_performance_gpu');
+
+// Chromium no longer falls back to software rendering for WebGL by itself:
+// without this, there is no 3D on computers without a usable GPU (virtual machines, blocklisted drivers).
+app.commandLine.appendSwitch('enable-unsafe-swiftshader');
 
 // Notifications on Microsoft Windows platforms show the app user model id.
 // If not set, defaults to `electron.app.{app.name}`.
@@ -207,6 +221,7 @@ function createNewWindow(windowArgs = args) {
       // Allow Node.js API access in renderer process, as long
       // as we've not removed dependency on it and on "@electron/remote".
       nodeIntegration: true,
+      sandbox: false,
       contextIsolation: false,
       // Keep timers and `requestAnimationFrame` running at full speed when
       // the window is minimized or covered by another window (Chromium
@@ -279,17 +294,17 @@ function createNewWindow(windowArgs = args) {
   // Uses process.stdout/stderr directly (not electron-log) to avoid
   // re-entering the renderer console and causing an infinite loop.
   if (isCliWindow) {
-    newWindow.webContents.on('console-message', (_event, level, message) => {
-      if (level < 1) return;
+    newWindow.webContents.on('console-message', ({ level, message }) => {
+      if (level === 'debug') return;
       if (message.startsWith('%c')) return;
       if (message.includes('[renderer:')) return; // break recursion
-      const tag = ['verbose', 'info', 'warning', 'error'][level] || 'log';
+      const isWarningOrError = level === 'warning' || level === 'error';
       // With --json, stdout only holds the result of the command.
       const stream =
-        level >= 2 || windowArgs['json'] || windowArgs['mcp']
+        isWarningOrError || windowArgs['json'] || windowArgs['mcp']
           ? process.stderr
           : process.stdout;
-      stream.write(`[renderer:${tag}] ${message}\n`);
+      stream.write(`[renderer:${level}] ${message}\n`);
     });
   }
 
@@ -308,7 +323,7 @@ function createNewWindow(windowArgs = args) {
   });
 
   if (isDev)
-    newWindow.webContents.session.loadExtension(
+    newWindow.webContents.session.extensions.loadExtension(
       path.join(__dirname, 'extensions/ReactDeveloperTools/4.24.3_0/')
     );
 
@@ -384,6 +399,7 @@ function createNewWindow(windowArgs = args) {
             // nodeIntegration: true,
             // contextIsolation: false,
             webSecurity: false,
+            sandbox: false,
           },
         },
       };
@@ -543,6 +559,8 @@ app.on('ready', async function() {
       },
     ]);
   }
+
+  setupClipboardTextCache();
 
   ipcMain.on('app-exit', (_event, exitCode) => {
     app.exit(typeof exitCode === 'number' ? exitCode : 0);

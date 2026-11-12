@@ -45,7 +45,12 @@ const registerGdideProtocol = ({ isDev }) => {
           if (error) {
             console.error('While while loading ' + request.url, error);
           }
-          callback({ mimeType: 'text/javascript', data: buffer });
+          callback({
+            mimeType: request.url.endsWith('.css')
+              ? 'text/css'
+              : 'text/javascript',
+            data: buffer,
+          });
         }
       );
     });

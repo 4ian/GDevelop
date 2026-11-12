@@ -118,9 +118,9 @@ jobs:
       # - run: sudo sysctl net.inet.tcp.tso=0
 
       # Install a recent version of npm to workaround a notarization issue because of a symlink made by npm: https://github.com/electron-userland/electron-builder/issues/7755
-      # Node.js v20.14.0 comes with npm v10.7.0.
+      # Electron also requires Node.js 22.12 or later to be installed.
       - node/install:
-          node-version: "20.14.0"
+          node-version: "24.13.0"
 
       # System dependencies (for Emscripten and upload)
       - run:

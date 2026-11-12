@@ -5,26 +5,23 @@
 // Modules to control application life and create native browser window
 const { app, BrowserWindow, shell, Menu } = require('electron');
 
-// Chromium reads gamepads through Windows.Gaming.Input, which does not enumerate
-// the virtual controller that Steam Input creates (Steam suppresses XInput,
-// DirectInput and HID, then feeds its own pad to the game). Games launched
-// through Steam with Steam Input enabled therefore see no gamepad at all,
-// including on Steam Deck. Falling back to Chromium's XInput fetcher fixes it.
-// Must be set before the app is ready.
-if (process.platform === 'win32') {
-  app.commandLine.appendSwitch(
-    'disable-features',
-    'EnableWindowsGamingInputDataFetcher'
-  );
-}
-
 // On computers having an integrated and a discrete graphics card (most gaming
 // laptops), Chromium uses the integrated one by default: games would run a lot
 // slower than they could. Must be set before the app is ready.
 app.commandLine.appendSwitch('force_high_performance_gpu');
 
+// Chromium no longer falls back to software rendering for WebGL by itself:
+// without this, 3D games show nothing on computers without a usable GPU.
+app.commandLine.appendSwitch('enable-unsafe-swiftshader');
+
 // Initialize `@electron/remote` module
 require('@electron/remote/main').initialize();
+
+// `@electron/remote` would otherwise look for the modules required by the game
+// (like Steamworks) from Electron itself, and not find them.
+app.on('remote-require', (event, _webContents, moduleName) => {
+  event.returnValue = require(moduleName);
+});
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.

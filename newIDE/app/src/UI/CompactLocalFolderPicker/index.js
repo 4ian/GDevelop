@@ -9,6 +9,10 @@ import IconButton from '../IconButton';
 import Folder from '../CustomSvgIcons/Folder';
 import { LineStackLayout } from '../Layout';
 import optionalRequire from '../../Utils/OptionalRequire';
+import {
+  getLastUsedDialogDirectory,
+  rememberLastUsedDialogDirectory,
+} from '../../Utils/FileSystem';
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
 const dialog = remote ? remote.dialog : null;
@@ -80,12 +84,13 @@ const CompactLocalFolderPicker = ({
       title,
       properties: ['openDirectory', 'createDirectory'],
       message,
-      defaultPath: defaultPath,
+      defaultPath: defaultPath || getLastUsedDialogDirectory(),
     });
 
     if (!filePaths || !filePaths.length) return;
 
     const filePath = filePaths[0];
+    rememberLastUsedDialogDirectory(filePath);
     onChange(filePath);
     setTextValue(filePath);
   };

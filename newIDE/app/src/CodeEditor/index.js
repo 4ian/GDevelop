@@ -9,12 +9,8 @@ import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import PortalContainerContext from '../UI/PortalContainerContext';
 import PoppedOutMonacoEditor from './PoppedOutMonacoEditor';
 import {
-  registerThemes,
-  initializeCompletions,
-  enableJsTypeDiagnostics,
-  applyElectronClipboardPatch,
-  suppressDiagnosticsMessagesForModel,
-  unsuppressDiagnosticsMessagesForModel,
+  initializeMonaco,
+  allowTopLevelAwaitForModel,
   baseEditorOptions,
 } from './MonacoSetup';
 
@@ -38,13 +34,7 @@ export type Props = {|
   onEditorMounted?: () => void,
   onFocus: () => void,
   onBlur: () => void,
-  /**
-   * Diagnostics whose message contains one of these texts are not shown
-   * in this editor. Useful when the code is run in a way the TypeScript
-   * language service can not know about (a gameplay test, for example, is
-   * run inside an async function, so top-level `await` is allowed).
-   */
-  suppressedDiagnosticsMessages?: Array<string>,
+  allowTopLevelAwait?: boolean,
 |};
 
 export const CodeEditor = ({
@@ -59,7 +49,7 @@ export const CodeEditor = ({
   onEditorMounted,
   onFocus,
   onBlur,
-  suppressedDiagnosticsMessages,
+  allowTopLevelAwait,
 }: Props): React.Node => {
   const [MonacoEditor, setMonacoEditor] = React.useState<any>(null);
   const [error, setError] = React.useState<Error | null>(null);
@@ -67,40 +57,16 @@ export const CodeEditor = ({
   const { values: preferences } = React.useContext(PreferencesContext);
   const portalContainer = React.useContext(PortalContainerContext);
 
-  const setupEditorThemes = React.useCallback((monaco: any) => {
-    registerThemes(monaco);
-  }, []);
-
-  const setUpSaveOnEditorBlur = React.useCallback(
-    (editor: any) => {
-      editor.onDidBlurEditorText(onBlur);
-    },
-    [onBlur]
+  const handleEditorWillMount = React.useCallback(
+    (monaco: any) => initializeMonaco(monaco, preferences.showJsTypeError),
+    [preferences.showJsTypeError]
   );
-  const setUpEditorFocus = React.useCallback(
+
+  const handleEditorDidMount = React.useCallback(
     (editor: any) => {
       editor.onDidFocusEditorText(onFocus);
-    },
-    [onFocus]
-  );
-
-  const setupEditorCompletions = React.useCallback(
-    (editor: any, monaco: any) => {
-      setUpEditorFocus(editor);
-      setUpSaveOnEditorBlur(editor);
-      initializeCompletions(monaco);
-      applyElectronClipboardPatch(editor, monaco);
-
-      if (preferences.showJsTypeError) {
-        enableJsTypeDiagnostics(monaco);
-      }
-      if (suppressedDiagnosticsMessages) {
-        suppressDiagnosticsMessagesForModel(
-          monaco,
-          editor.getModel(),
-          suppressedDiagnosticsMessages
-        );
-      }
+      editor.onDidBlurEditorText(onBlur);
+      if (allowTopLevelAwait) allowTopLevelAwaitForModel(editor.getModel());
 
       editor.setScrollTop(initialScrollTop);
       editor.setPosition({
@@ -115,10 +81,9 @@ export const CodeEditor = ({
       initialCursorLine,
       initialScrollTop,
       onEditorMounted,
-      preferences.showJsTypeError,
-      setUpEditorFocus,
-      setUpSaveOnEditorBlur,
-      suppressedDiagnosticsMessages,
+      onFocus,
+      onBlur,
+      allowTopLevelAwait,
     ]
   );
 
@@ -130,12 +95,15 @@ export const CodeEditor = ({
     () => {
       setError(null);
 
-      // Define the global variable used by Monaco Editor to find its worker
-      // (used, at least, for auto-completions).
+      // The bundled editor uses ESM, but the worker copied to public is AMD.
       window.MonacoEnvironment = {
-        getWorkerUrl: function(workerId, label) {
-          return 'external/monaco-editor-min/vs/base/worker/workerMain.js';
-        },
+        getWorker: (_: string, label: string) =>
+          new Worker(
+            'external/monaco-editor-min/vs/base/worker/workerMain.js',
+            {
+              name: label,
+            }
+          ),
       };
 
       import(/* webpackChunkName: "react-monaco-editor" */ 'react-monaco-editor')
@@ -159,14 +127,13 @@ export const CodeEditor = ({
   }, []);
 
   const _saveEditorState = React.useCallback(
-    (editor: any, monaco: any) => {
+    (editor: any) => {
       const cursorPosition = editor.getPosition();
       saveEditorState({
         scrollTop: editor.getScrollTop(),
         cursorColumn: cursorPosition.column,
         cursorLine: cursorPosition.lineNumber,
       });
-      unsuppressDiagnosticsMessagesForModel(monaco, editor.getModel());
     },
     [saveEditorState]
   );
@@ -195,7 +162,7 @@ export const CodeEditor = ({
         onEditorMounted={onEditorMounted}
         onFocus={onFocus}
         onBlur={onBlur}
-        suppressedDiagnosticsMessages={suppressedDiagnosticsMessages}
+        allowTopLevelAwait={allowTopLevelAwait}
       />
     );
   }
@@ -233,8 +200,8 @@ export const CodeEditor = ({
         theme={preferences.codeEditorThemeName}
         value={value}
         onChange={onChange}
-        editorWillMount={setupEditorThemes}
-        editorDidMount={setupEditorCompletions}
+        editorWillMount={handleEditorWillMount}
+        editorDidMount={handleEditorDidMount}
         editorWillUnmount={_saveEditorState}
         options={{
           ...baseEditorOptions,

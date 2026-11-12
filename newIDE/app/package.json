@@ -101,7 +101,11 @@
     "xxhashjs": "^0.2.2",
     "yaml": "^2.8.2"
   },
+  "resolutions": {
+    "monaco-editor": "0.52.2"
+  },
   "overrides": {
+    "monaco-editor": "0.52.2",
     "@esotericsoftware/spine-pixi-v7": {
       "@pixi/assets": "7.4.2",
       "@pixi/core": "7.4.2",

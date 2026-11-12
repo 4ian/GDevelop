@@ -1184,8 +1184,15 @@ const MainFrame = (props: Props): React.MixedElement => {
 
   useDiscordRichPresence(currentProject);
 
+  const hideAskAi =
+    !!authenticatedUser.limits &&
+    !!authenticatedUser.limits.capabilities.classrooms &&
+    authenticatedUser.limits.capabilities.classrooms.hideAskAi;
+
   const openAskAi = React.useCallback(
     (options: ?OpenAskAiOptions) => {
+      if (hideAskAi) return;
+
       const {
         aiRequestId,
         paneIdentifier,
@@ -1262,7 +1269,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         }
       });
     },
-    [setState, getEditorOpeningOptions, currentProject]
+    [setState, getEditorOpeningOptions, currentProject, hideAskAi]
   );
 
   const closeAskAi = React.useCallback(
@@ -6209,10 +6216,6 @@ const MainFrame = (props: Props): React.MixedElement => {
   });
 
   const previewLoading = previewLoadingRef.current;
-  const hideAskAi =
-    !!authenticatedUser.limits &&
-    !!authenticatedUser.limits.capabilities.classrooms &&
-    authenticatedUser.limits.capabilities.classrooms.hideAskAi;
   const showLoaderAfterDelay =
     previewLoading === 'hot-reload-for-in-game-edition';
   const showLoaderImmediately =

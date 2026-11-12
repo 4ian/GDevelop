@@ -43,6 +43,8 @@ import {
 import { type OpenAskAiOptions } from '../AiGeneration/Utils';
 import LocalFileStorageProvider from '../ProjectsStorage/LocalFileStorageProvider';
 import { POSITIONAL_ARGUMENTS_KEY } from '../Utils/Window';
+import { readCliLoginForm } from './CliLogin';
+import { removeLocalTempDirOfCli } from '../ExportAndShare/LocalExporters/LocalFileSystem';
 
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
@@ -576,6 +578,10 @@ type CliAiRequestInput = {|
   continueMessage: string,
   maxUserContinues: number,
   timeoutMs: number,
+  // Pay the request with the credits of the user once the AI credits of
+  // their plan are used (the preference of the chat, which a new profile
+  // does not have: the request would not start).
+  payWithCredits: boolean,
   // The source of a gameplay test run (and not saved) once the request is
   // finished, to take the same screenshots of the game for every request.
   judgeTestSource: string | null,
@@ -609,6 +615,7 @@ const parseCliAiRequestInput = (json: any): CliAiRequestInput => {
       DEFAULT_AI_REQUEST_MAX_USER_CONTINUES
     ),
     timeoutMs: getNumber('timeoutMs', DEFAULT_AI_REQUEST_TIMEOUT_MS),
+    payWithCredits: !!json.payWithCredits,
     judgeTestSource: getString('judgeTestSource'),
     outputDirectory: getString('outputDirectory'),
     localCopyPath: getString('localCopyPath'),
@@ -629,6 +636,7 @@ const CLI_LOGIN_SETTLE_TIMEOUT_MS = 30_000;
 const FIRE_AND_FORGET_GRACE_MS = 1500;
 
 const exitApp = (exitCode: number) => {
+  removeLocalTempDirOfCli();
   if (ipcRenderer) ipcRenderer.send('app-exit', exitCode);
 };
 
@@ -827,9 +835,20 @@ export const useCliCommandRunner = ({
   );
   const preferences = React.useContext(PreferencesContext);
   const { triggerUnsavedChanges } = React.useContext(UnsavedChangesContext);
-  const { loginState, profile } = React.useContext(AuthenticatedUserContext);
-  const loginStateRef = React.useRef(loginState);
-  loginStateRef.current = loginState;
+  const {
+    loginState,
+    profile,
+    onLogin,
+    authenticationError,
+  } = React.useContext(AuthenticatedUserContext);
+  const loginRef = React.useRef({
+    loginState,
+    profile,
+    onLogin,
+    authenticationError,
+  });
+  loginRef.current = { loginState, profile, onLogin, authenticationError };
+  const cliLoginPromiseRef = React.useRef<Promise<void> | null>(null);
   // What `RUN_AI_REQUEST` reads once the request is finished: the project is
   // then usually not the one (if any) opened when the command started.
   const latestStateRef = React.useRef({
@@ -839,6 +858,7 @@ export const useCliCommandRunner = ({
     storageProviderName,
     projectCreationCallbacks,
     openAskAi,
+    preferences,
   });
   latestStateRef.current = {
     project,
@@ -847,14 +867,51 @@ export const useCliCommandRunner = ({
     storageProviderName,
     projectCreationCallbacks,
     openAskAi,
+    preferences,
   };
   const ensureLoginSettled = React.useCallback(async () => {
     const startTime = Date.now();
+    const isWaiting = () =>
+      Date.now() - startTime < CLI_LOGIN_SETTLE_TIMEOUT_MS;
+    const loginForm = readCliLoginForm();
     while (
-      loginStateRef.current === 'loggingIn' &&
-      Date.now() - startTime < CLI_LOGIN_SETTLE_TIMEOUT_MS
+      // An account to log in with is only used once it is known that nobody
+      // is logged in.
+      (loginForm
+        ? loginRef.current.loginState !== 'done'
+        : loginRef.current.loginState === 'loggingIn') &&
+      isWaiting()
     ) {
       await delay(200);
+    }
+    if (!loginForm) return;
+
+    const loggedInProfile = loginRef.current.profile;
+    if (loggedInProfile) {
+      if (loggedInProfile.email.toLowerCase() !== loginForm.email.toLowerCase())
+        console.warn(
+          '[CLI] A user is already logged in: the account given in the environment variables is not used.'
+        );
+      return;
+    }
+    if (!cliLoginPromiseRef.current) {
+      console.info(
+        '[CLI] Logging in with the account given in the environment variables...'
+      );
+      cliLoginPromiseRef.current = loginRef.current.onLogin(loginForm);
+    }
+    await cliLoginPromiseRef.current;
+    while (!loginRef.current.profile && isWaiting()) {
+      if (loginRef.current.authenticationError) break;
+      await delay(200);
+    }
+    if (!loginRef.current.profile) {
+      const { authenticationError } = loginRef.current;
+      console.error(
+        `[CLI] Could not log in with the account given in the environment variables${
+          authenticationError ? `: ${authenticationError.code}` : '.'
+        }`
+      );
     }
   }, []);
   const editorFunctionsServices = useEditorFunctionsServices({
@@ -1038,6 +1095,7 @@ export const useCliCommandRunner = ({
           }
 
           // The request is made by the logged in user.
+          await ensureLoginSettled();
           const loginStartTime = Date.now();
           while (
             !latestStateRef.current.profile &&
@@ -1047,7 +1105,7 @@ export const useCliCommandRunner = ({
           }
           if (!latestStateRef.current.profile) {
             throw new Error(
-              '[CLI] RUN_AI_REQUEST requires a user logged in GDevelop.'
+              '[CLI] RUN_AI_REQUEST requires a user logged in GDevelop (or an account given with the GDEVELOP_CLI_EMAIL and GDEVELOP_CLI_PASSWORD environment variables).'
             );
           }
 
@@ -1055,6 +1113,17 @@ export const useCliCommandRunner = ({
             throw new Error(
               '[CLI] A project is opened while none was given: the AI request was not run on it.'
             );
+          }
+
+          if (
+            input.payWithCredits &&
+            !latestStateRef.current.preferences.values
+              .automaticallyUseCreditsForAiRequests
+          ) {
+            latestStateRef.current.preferences.setAutomaticallyUseCreditsForAiRequests(
+              true
+            );
+            await delay(200);
           }
 
           latestStateRef.current.openAskAi({
@@ -1149,7 +1218,12 @@ export const useCliCommandRunner = ({
         if (!keepOpen) exitApp(exitCode);
       })();
     },
-    [project, eventsFunctionsExtensionsState, ensureProjectSettingsApplied]
+    [
+      project,
+      eventsFunctionsExtensionsState,
+      ensureProjectSettingsApplied,
+      ensureLoginSettled,
+    ]
   );
 
   React.useEffect(

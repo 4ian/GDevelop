@@ -225,7 +225,7 @@ const runUntilDone = async (
           ? `The AI request could not be started: ${
               startState.lastSendError.message
             }`
-          : 'The AI request was not started (is the user logged in, with enough AI credits?).'
+          : 'The AI request was not started: is the user logged in, with AI credits left in their plan (or paying with their credits allowed)?'
       );
     }
     const aiRequestId = startState.aiRequest.id;

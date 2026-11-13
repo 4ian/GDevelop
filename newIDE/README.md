@@ -197,7 +197,8 @@ its `status`: `finished`, `waiting_for_user` (the AI stopped with work left and 
 On a machine where nobody can log in by hand (CI), set the `GDEVELOP_CLI_EMAIL` and
 `GDEVELOP_CLI_PASSWORD` environment variables: an editor running a command logs in with this account
 when nobody is logged in. The account is the same for the development and production APIs: a
-development editor (`npm start`) uses the development API, a packaged one the production API.
+development editor (`npm start`) uses the development API, a packaged one the production API
+(or the development API with the `GDEVELOP_USE_DEV_APIS=1` environment variable).
 Each editor running a command has its own temporary folder (previews, gameplay tests), so several
 can run at the same time, each with its own `--user-data-dir`.
 

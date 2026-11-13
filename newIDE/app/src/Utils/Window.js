@@ -442,6 +442,23 @@ export default class Window {
     return !!electron;
   }
 
+  /**
+   * A packaged editor running a command of the CLI or the MCP server uses
+   * the development APIs when `GDEVELOP_USE_DEV_APIS=1` is in its
+   * environment: to run benchmarks of the GDevelop AI against them.
+   */
+  static isUsingDevelopmentApisForCli(): boolean {
+    if (!remote) return false;
+    const appArguments = Window.getArguments();
+    if (!appArguments['run-command'] && !appArguments['mcp']) return false;
+    try {
+      return remote.process.env.GDEVELOP_USE_DEV_APIS === '1';
+    } catch (error) {
+      console.error('Unable to read the environment variables:', error);
+      return false;
+    }
+  }
+
   static isDev(): boolean {
     if (!electron || !remote) {
       return (

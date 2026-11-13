@@ -54,14 +54,12 @@ namespace gdjs {
   const collisionTestStatics: {
     minMaxA: FloatPoint;
     minMaxB: FloatPoint;
-    edge: FloatPoint;
     axis: FloatPoint;
     move_axis: FloatPoint;
     result: CollisionTestResult;
   } = {
     minMaxA: [0, 0],
     minMaxB: [0, 0],
-    edge: [0, 0],
     axis: [0, 0],
     move_axis: [0, 0],
     result: makeNewCollisionTestResult(),
@@ -217,17 +215,9 @@ namespace gdjs {
       p2: gdjs.Polygon,
       ignoreTouchingEdges: boolean
     ): CollisionTestResult {
-      //Algorithm core :
-      p1.computeEdges();
-      p2.computeEdges();
-      let edge = collisionTestStatics.edge;
       const move_axis = collisionTestStatics.move_axis;
       const result = collisionTestStatics.result;
       let minDist = Number.MAX_VALUE;
-      edge[0] = 0;
-      edge[1] = 0;
-      edge[0] = 0;
-      edge[1] = 0;
       result.collision = false;
       result.move_axis[0] = 0;
       result.move_axis[1] = 0;
@@ -238,17 +228,18 @@ namespace gdjs {
         i < len1 + len2;
         i++
       ) {
-        if (i < len1) {
-          // or <=
-          edge = p1.edges[i];
-        } else {
-          edge = p2.edges[i - len1];
-        }
+        // Edges are computed only when their axis is tested: the test often
+        // stops at the first axes.
+        const vertices = i < len1 ? p1.vertices : p2.vertices;
+        const vertexIndex = i < len1 ? i : i - len1;
+        const v1 = vertices[vertexIndex];
+        const v2 =
+          vertices[vertexIndex + 1 < vertices.length ? vertexIndex + 1 : 0];
         const axis = collisionTestStatics.axis;
 
         //Get the axis to which polygons will be projected
-        axis[0] = -edge[1];
-        axis[1] = edge[0];
+        axis[0] = -(v2[1] - v1[1]);
+        axis[1] = v2[0] - v1[0];
         Polygon.normalise(axis);
         const minMaxA = collisionTestStatics.minMaxA;
         const minMaxB = collisionTestStatics.minMaxB;

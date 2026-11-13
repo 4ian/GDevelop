@@ -17,7 +17,7 @@ namespace gdjs {
    */
   export class SpineRuntimeObjectPixiRenderer {
     private _object: gdjs.SpineRuntimeObject;
-    private _rendererObject: spine.Spine | PIXI.Container;
+    private _rendererObject: spine.Spine | PIXI.Sprite;
     private _isAnimationComplete = true;
     private _areMeshesOutdated = true;
     private _areScaledLocalBoundsOutdated = true;
@@ -408,7 +408,7 @@ namespace gdjs {
       return this._rendererObject.skeleton.data.skins.map((s) => s.name);
     }
 
-    private constructRendererObject(): spine.Spine | PIXI.Container {
+    private constructRendererObject(): spine.Spine | PIXI.Sprite {
       const game = this.instanceContainer.getGame();
       const spineManager = game.getSpineManager();
 
@@ -416,14 +416,14 @@ namespace gdjs {
         !spineManager ||
         !spineManager.isSpineLoaded(this._object.spineResourceName)
       ) {
-        return new PIXI.Container();
+        return new PIXI.Sprite(game.getImageManager().getInvalidPIXITexture());
       }
 
       const aliases = spineManager.getSpineAliases(
         this._object.spineResourceName
       );
       if (!aliases) {
-        return new PIXI.Container();
+        return new PIXI.Sprite(game.getImageManager().getInvalidPIXITexture());
       }
 
       try {
@@ -447,7 +447,7 @@ namespace gdjs {
           `Unable to instantiate Spine container for resource '${this._object.spineResourceName}':`,
           error
         );
-        return new PIXI.Container();
+        return new PIXI.Sprite(game.getImageManager().getInvalidPIXITexture());
       }
     }
 

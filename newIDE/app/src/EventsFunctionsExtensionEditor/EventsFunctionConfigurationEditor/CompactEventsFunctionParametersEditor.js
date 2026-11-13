@@ -512,7 +512,7 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
     const moveParameter = React.useCallback(
       (oldIndex: number, newIndex: number) => {
         const parameters = eventsFunction.getParameters();
-
+        // const sentence = eventsFunction.getSentence()
         if (eventsBasedBehavior) {
           if (onMoveBehaviorEventsParameter)
             onMoveBehaviorEventsParameter(

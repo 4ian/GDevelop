@@ -144,6 +144,7 @@ namespace gdjs {
 
       //Work around a PIXI.js bug.
       this._text.updateText(false);
+      this.updatePosition();
     }
 
     getWidth(): float {

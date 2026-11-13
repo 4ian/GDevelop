@@ -40,7 +40,9 @@ namespace gdjs {
    * @category Objects > Light
    */
   export class LightRuntimeObject extends gdjs.RuntimeObject {
-    _radius: number;
+    _radius: float;
+    _requestedWidth: float = 0;
+    _requestedHeight: float = 0;
 
     /** color in format [r, g, b], where each component is in the range [0, 255] */
     _color: integer[];
@@ -151,10 +153,30 @@ namespace gdjs {
     }
 
     override getHeight(): float {
-      return 2 * this._radius;
+      return this._requestedHeight || 2 * this._radius;
     }
 
     override getWidth(): float {
+      return this._requestedWidth || 2 * this._radius;
+    }
+
+    override setWidth(width: float) {
+      if (this.getInstanceContainer().getGame().isInGameEdition()) {
+        this._requestedWidth = width;
+      }
+    }
+
+    override setHeight(height: float) {
+      if (this.getInstanceContainer().getGame().isInGameEdition()) {
+        this._requestedHeight = height;
+      }
+    }
+
+    override getOriginalWidth(): float {
+      return 2 * this._radius;
+    }
+
+    override getOriginalHeight(): float {
       return 2 * this._radius;
     }
 
@@ -162,16 +184,16 @@ namespace gdjs {
      * Get the x co-ordinate of the top-left vertex/point of light object.
      * @returns x co-ordinate of the top-left vertex/point.
      */
-    getDrawableX(): float {
-      return this.x - this._radius;
+    override getDrawableX(): float {
+      return this.x - this.getWidth() / 2;
     }
 
     /**
      * Get the y co-ordinate of the top-left vertex/point of light object.
      * @returns y co-ordinate of the top-left vertex/point.
      */
-    getDrawableY(): float {
-      return this.y - this._radius;
+    override getDrawableY(): float {
+      return this.y - this.getHeight() / 2;
     }
 
     /**

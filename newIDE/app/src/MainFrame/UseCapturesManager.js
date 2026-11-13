@@ -15,6 +15,28 @@ import PreferencesContext from './Preferences/PreferencesContext';
 
 export const TIME_BETWEEN_PREVIEW_SCREENSHOTS = 1000 * 60 * 3; // 3 minutes
 
+// Must match the format recorded by the game engine.
+export const canRecordPreviewVideo = (): boolean => {
+  const mediaRecorder = window.MediaRecorder;
+  return (
+    !!mediaRecorder && mediaRecorder.isTypeSupported('video/mp4;codecs=avc1')
+  );
+};
+
+const filterUploadedPublicUrls = async (
+  publicUrls: Array<string>
+): Promise<Array<string>> => {
+  const uploadedPublicUrls = await Promise.all(
+    publicUrls.map(
+      async (publicUrl): Promise<string | null> => {
+        const response = await fetch(publicUrl, { method: 'HEAD' });
+        return response.ok ? publicUrl : null;
+      }
+    )
+  );
+  return uploadedPublicUrls.filter(Boolean);
+};
+
 const useCapturesManager = ({
   project,
   gamesList,
@@ -45,10 +67,12 @@ const useCapturesManager = ({
     ): Promise<CaptureOptions> => {
       const captureOptions: CaptureOptions = {
         screenshots: [],
+        previewVideo: null,
       };
+      if (!launchCaptureOptions) return captureOptions;
 
       try {
-        if (launchCaptureOptions && launchCaptureOptions.screenshots.length) {
+        if (launchCaptureOptions.screenshots.length) {
           const screenshotOptions = launchCaptureOptions.screenshots;
           const response = await createGameResourceSignedUrls({
             uploadType: 'game-screenshot',
@@ -76,6 +100,22 @@ const useCapturesManager = ({
             })
             .filter(Boolean);
         }
+
+        if (launchCaptureOptions.previewVideo && canRecordPreviewVideo()) {
+          const response = await createGameResourceSignedUrls({
+            uploadType: 'game-preview-video',
+            files: [{ contentType: 'video/mp4' }],
+          });
+          const signedUrlInfo = response.signedUrls[0];
+          captureOptions.previewVideo = signedUrlInfo
+            ? {
+                signedUrl: signedUrlInfo.signedUrl,
+                publicUrl: signedUrlInfo.publicUrl,
+                isRecordedByUser:
+                  launchCaptureOptions.previewVideo === 'recorded-by-user',
+              }
+            : null;
+        }
       } catch (error) {
         console.error(
           'Error caught while creating signed URLs for game resources. Skipping.',
@@ -94,34 +134,29 @@ const useCapturesManager = ({
       const projectId = project.getProjectUuid();
 
       try {
-        const screenshots = captureOptions.screenshots;
-        if (!screenshots) return;
+        const [
+          uploadedScreenshotPublicUrls,
+          uploadedPreviewVideoPublicUrls,
+        ] = await Promise.all([
+          filterUploadedPublicUrls(
+            captureOptions.screenshots.map(screenshot => screenshot.publicUrl)
+          ),
+          filterUploadedPublicUrls(
+            captureOptions.previewVideo
+              ? [captureOptions.previewVideo.publicUrl]
+              : []
+          ),
+        ]);
+        const uploadedPreviewVideoPublicUrl = uploadedPreviewVideoPublicUrls[0];
+        const isPreviewVideoRecordedByUser =
+          !!captureOptions.previewVideo &&
+          captureOptions.previewVideo.isRecordedByUser;
 
-        const screenshotPublicUrls: string[] = screenshots.map(
-          screenshot => screenshot.publicUrl
-        );
-
-        // Check if they have been properly uploaded.
-        const responseUploadedScreenshotPublicUrls: Array<
-          string | null
-        > = await Promise.all(
-          screenshotPublicUrls.map(
-            async (screenshotUrl): Promise<string | null> => {
-              const response = await fetch(screenshotUrl, { method: 'HEAD' });
-              if (!response.ok) {
-                return null;
-              }
-
-              return screenshotUrl;
-            }
-          )
-        );
-
-        const uploadedScreenshotPublicUrls = responseUploadedScreenshotPublicUrls.filter(
-          Boolean
-        );
-
-        if (!uploadedScreenshotPublicUrls.length) return;
+        if (
+          !uploadedScreenshotPublicUrls.length &&
+          !uploadedPreviewVideoPublicUrl
+        )
+          return;
 
         const game = gamesList.games
           ? gamesList.games.find(game => game.id === projectId)
@@ -135,23 +170,33 @@ const useCapturesManager = ({
         // The game is registered, let's update it.
         if (game && profile) {
           try {
-            const currentGameScreenshotUrls = game.screenshotUrls || [];
-            const newGameScreenshotUrls = [
-              ...currentGameScreenshotUrls,
-              ...uploadedScreenshotPublicUrls,
-            ];
             const updatedGame = await updateGame(
               getAuthorizationHeader,
               profile.id,
               game.id,
               {
-                screenshotUrls: newGameScreenshotUrls,
+                screenshotUrls: uploadedScreenshotPublicUrls.length
+                  ? [
+                      ...(game.screenshotUrls || []),
+                      ...uploadedScreenshotPublicUrls,
+                    ]
+                  : undefined,
+                previewVideoUrls:
+                  uploadedPreviewVideoPublicUrl && !isPreviewVideoRecordedByUser
+                    ? [
+                        ...(game.previewVideoUrls || []),
+                        uploadedPreviewVideoPublicUrl,
+                      ]
+                    : undefined,
+                thumbnailVideoUrl: isPreviewVideoRecordedByUser
+                  ? uploadedPreviewVideoPublicUrl
+                  : undefined,
               }
             );
             gamesList.onGameUpdated(updatedGame);
           } catch (error) {
             console.error(
-              'Error while updating game with new screenshots:',
+              'Error while updating game with new captures:',
               error
             );
             // Do not throw.
@@ -171,11 +216,28 @@ const useCapturesManager = ({
         Date.now() >
           (lastPreviewScreenshotsTakenAt[gameId] || 0) +
             TIME_BETWEEN_PREVIEW_SCREENSHOTS;
-      return shouldTakeScreenshotOnPreview
-        ? { screenshots: [{ delayTimeInSeconds: 3000 }] }
-        : undefined;
+      if (!shouldTakeScreenshotOnPreview) return undefined;
+
+      // Screenshots and automatic videos are only shown when the creator did not choose their own.
+      const game = gamesList.games
+        ? gamesList.games.find(game => game.id === gameId)
+        : null;
+      const shouldTakeScreenshots = !game || !game.thumbnailUrl;
+      const shouldRecordVideo = !game || !game.thumbnailVideoUrl;
+      if (!shouldTakeScreenshots && !shouldRecordVideo) return undefined;
+
+      return {
+        screenshots: shouldTakeScreenshots
+          ? [{ delayTimeInSeconds: 3000 }]
+          : [],
+        previewVideo: shouldRecordVideo ? 'automatic' : null,
+      };
     },
-    [preferences.values.takeScreenshotOnPreview, lastPreviewScreenshotsTakenAt]
+    [
+      preferences.values.takeScreenshotOnPreview,
+      lastPreviewScreenshotsTakenAt,
+      gamesList.games,
+    ]
   );
 
   return {

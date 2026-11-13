@@ -14,12 +14,14 @@ import {
   getGameCategories,
   type GameCategory,
   type Game,
+  type PublicGame,
 } from '../Utils/GDevelopServices/Game';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { I18n } from '@lingui/react';
 import { Column, Line, Spacer } from '../UI/Grid';
 import AlertMessage from '../UI/AlertMessage';
 import { GameThumbnail } from './GameThumbnail';
+import { GameThumbnailVideo } from './GameThumbnailVideo';
 import Text from '../UI/Text';
 import Toggle from '../UI/Toggle';
 
@@ -95,6 +97,8 @@ type Props = {|
   discoverable?: boolean,
   displayThumbnail?: boolean,
   thumbnailUrl?: ?string,
+  /** When set, the video of the game is displayed below the thumbnail. */
+  publicGame?: ?PublicGame,
   canBePublishedOnGdGames?: boolean,
 |};
 
@@ -134,6 +138,7 @@ export function PublicGameProperties({
   acceptsGameComments,
   setAcceptsGameComments,
   thumbnailUrl,
+  publicGame,
   onGameUpdated,
   onUpdatingGame,
   canBePublishedOnGdGames,
@@ -176,7 +181,7 @@ export function PublicGameProperties({
           <ResponsiveLineStackLayout noMargin>
             {displayThumbnail && (
               <>
-                <Column noMargin alignItems="stretch">
+                <ResponsiveLineStackLayout noMargin noColumnMargin>
                   <GameThumbnail
                     gameName={name}
                     thumbnailUrl={thumbnailUrl}
@@ -187,7 +192,13 @@ export function PublicGameProperties({
                     onUpdatingGame={onUpdatingGame}
                     fullWidthOnMobile
                   />
-                </Column>
+                  {publicGame && (
+                    <GameThumbnailVideo
+                      publicGame={publicGame}
+                      disabled={disabled}
+                    />
+                  )}
+                </ResponsiveLineStackLayout>
                 <Spacer />
               </>
             )}

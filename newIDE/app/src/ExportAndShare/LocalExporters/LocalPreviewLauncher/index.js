@@ -374,6 +374,16 @@ export default class LocalPreviewLauncher extends React.Component<
         });
       }
     }
+    if (
+      previewOptions.captureOptions &&
+      previewOptions.captureOptions.previewVideo
+    ) {
+      previewExportOptions.setPreviewVideoCapture(
+        previewOptions.captureOptions.previewVideo.signedUrl,
+        previewOptions.captureOptions.previewVideo.publicUrl,
+        previewOptions.captureOptions.previewVideo.isRecordedByUser
+      );
+    }
     if (previewOptions.editorCameraState3D) {
       previewExportOptions.setEditorCameraState3D(
         previewOptions.editorCameraState3D.cameraMode,

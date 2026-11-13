@@ -1043,7 +1043,7 @@ const PreferencesDialog = ({
             {
               id: 'take-screenshot-on-preview',
               label: i18n._(
-                t`Take a screenshot in previews for the game dashboard and gd.games`
+                t`Take a screenshot and record a video in previews for the game dashboard and gd.games`
               ),
               renderControl: () =>
                 renderToggle(

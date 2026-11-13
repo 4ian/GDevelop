@@ -32,6 +32,7 @@ declare class gdPreviewExportOptions {
   setGDevelopVersionWithHash(gdevelopVersionWithHash: string): gdPreviewExportOptions;
   setProjectTemplateSlug(projectTemplateSlug: string): gdPreviewExportOptions;
   addScreenshotCapture(delayTimeInSeconds: number, signedUrl: string, publicUrl: string): gdPreviewExportOptions;
+  setPreviewVideoCapture(signedUrl: string, publicUrl: string, isRecordedByUser: boolean): gdPreviewExportOptions;
   delete(): void;
   ptr: number;
 };

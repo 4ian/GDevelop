@@ -435,6 +435,19 @@ const GameDashboard = ({
     [fetchPublicGame]
   );
 
+  // A video recorded in a preview is saved on the game when the preview is closed:
+  // refresh the public game to display it.
+  const thumbnailVideoUrl = game.thumbnailVideoUrl;
+  const previousThumbnailVideoUrlRef = React.useRef(thumbnailVideoUrl);
+  React.useEffect(
+    () => {
+      if (previousThumbnailVideoUrlRef.current === thumbnailVideoUrl) return;
+      previousThumbnailVideoUrlRef.current = thumbnailVideoUrl;
+      fetchPublicGame();
+    },
+    [thumbnailVideoUrl, fetchPublicGame]
+  );
+
   React.useEffect(
     () => {
       if (widgetToScrollTo && grid.current) {

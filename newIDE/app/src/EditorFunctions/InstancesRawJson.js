@@ -300,10 +300,9 @@ const getPropertyValueError = ({
         .getType()
         .toLowerCase()
     : null;
-  if (
-    propertyType === null ||
-    (propertyType === 'number') !== (valueType === 'number')
-  ) {
+  const isNumberProperty =
+    propertyType === 'number' || propertyType === 'numberwithchoices';
+  if (propertyType === null || isNumberProperty !== (valueType === 'number')) {
     return `"${name}" is not a ${valueType} property of this object (properties: ${supportedProperties
       .keys()
       .toJSArray()

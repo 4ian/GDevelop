@@ -21,6 +21,7 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
+import { copyTextToClipboard } from '../Utils/Clipboard';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import {
   type HistoryState,
@@ -97,6 +98,7 @@ import {
   hasClipboardConditions,
   pasteInstructionsFromClipboardInInstructionsList,
 } from './ClipboardKind';
+import { copySelectedEventsAsJsonText } from './EventsJson';
 import {
   useScreenType,
   type ScreenType,
@@ -589,6 +591,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         onToggleSearchPanel={this._toggleSearchPanel}
         canMoveEventsIntoNewGroup={hasSomethingSelected(this.state.selection)}
         moveEventsIntoNewGroup={this.moveEventsIntoNewGroup}
+        canCopyEventsAsJson={hasEventSelected(this.state.selection)}
+        onCopyEventsAsJson={this.copySelectedEventsAsJson}
         onOpenSceneVariables={this.openSceneVariables}
       />
     );
@@ -1114,6 +1118,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       label: i18n._(t`Copy`),
       click: () => this.copySelection(),
       accelerator: 'CmdOrCtrl+C',
+    },
+    {
+      label: i18n._(t`Copy events as JSON`),
+      click: () => this.copySelectedEventsAsJson(),
+      enabled: hasEventSelected(this.state.selection),
     },
     {
       label: i18n._(t`Cut`),
@@ -1763,6 +1772,22 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       this.state.selection,
       (events: Array<gdBaseEvent>) => this._getChangedEventRows(events)
     );
+  };
+
+  copySelectedEventsAsJson = () => {
+    const text = copySelectedEventsAsJsonText(
+      this.state.selection,
+      (events: Array<gdBaseEvent>) => this._getChangedEventRows(events)
+    );
+    if (text == null) {
+      return;
+    }
+    copyTextToClipboard(text).catch(error => {
+      console.error(
+        'Unable to copy events as JSON to the clipboard.',
+        error
+      );
+    });
   };
 
   cutSelection = () => {

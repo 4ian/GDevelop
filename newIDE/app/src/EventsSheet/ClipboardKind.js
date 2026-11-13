@@ -68,7 +68,7 @@ const addAllSubEvents = (
   }
 };
 
-const excludeEventsChildren = (
+export const excludeEventsChildren = (
   events: Array<gdBaseEvent>
 ): Array<gdBaseEvent> => {
   const filteredEvents: Array<gdBaseEvent> = [];

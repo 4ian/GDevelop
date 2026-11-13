@@ -43,6 +43,8 @@ type Props = {|
   settingsIcon?: React.Node,
   moveEventsIntoNewGroup: () => void,
   canMoveEventsIntoNewGroup: boolean,
+  onCopyEventsAsJson: () => void,
+  canCopyEventsAsJson: boolean,
   onOpenSceneVariables: () => void,
 |};
 
@@ -70,6 +72,8 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar({
   settingsIcon,
   moveEventsIntoNewGroup,
   canMoveEventsIntoNewGroup,
+  onCopyEventsAsJson,
+  canCopyEventsAsJson,
   onOpenSceneVariables,
 }: Props) {
   const shortcutMap = useShortcutMap();
@@ -99,6 +103,8 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar({
         onOpenSettings={onOpenSettings}
         moveEventsIntoNewGroup={moveEventsIntoNewGroup}
         canMoveEventsIntoNewGroup={canMoveEventsIntoNewGroup}
+        onCopyEventsAsJson={onCopyEventsAsJson}
+        canCopyEventsAsJson={canCopyEventsAsJson}
         onOpenSceneVariables={onOpenSceneVariables}
       />
       <ToolbarGroup lastChild>

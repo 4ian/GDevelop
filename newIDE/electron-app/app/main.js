@@ -291,6 +291,21 @@ function createNewWindow(windowArgs = args) {
   // Enable `@electron/remote` module for renderer process
   require('@electron/remote/main').enable(newWindow.webContents);
 
+  // The app is loaded from file://, so no Referer is sent: YouTube embeds then fail with "Error 153".
+  newWindow.webContents.session.webRequest.onBeforeSendHeaders(
+    {
+      urls: ['https://www.youtube.com/*', 'https://www.youtube-nocookie.com/*'],
+    },
+    (details, callback) => {
+      callback({
+        requestHeaders: {
+          ...details.requestHeaders,
+          Referer: 'https://editor.gdevelop.io/',
+        },
+      });
+    }
+  );
+
   // Uses process.stdout/stderr directly (not electron-log) to avoid
   // re-entering the renderer console and causing an infinite loop.
   if (isCliWindow) {

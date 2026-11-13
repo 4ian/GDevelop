@@ -756,6 +756,68 @@ namespace gdjs {
     };
 
     /**
+     * Helpers for `assertClose` (keep in sync with `assert-close.js`, which
+     * the standalone Node tests import).
+     */
+    const isValidAssertCloseTolerance = (tolerance: number): boolean =>
+      typeof tolerance === 'number' &&
+      Number.isFinite(tolerance) &&
+      tolerance >= 0;
+
+    const numbersAreClose = (
+      actual: number,
+      expected: number,
+      tolerance: number
+    ): boolean =>
+      typeof actual === 'number' &&
+      typeof expected === 'number' &&
+      Number.isFinite(actual) &&
+      Number.isFinite(expected) &&
+      isValidAssertCloseTolerance(tolerance) &&
+      Math.abs(actual - expected) <= tolerance;
+
+    const formatAssertCloseMessage = (
+      message: string,
+      actual: number,
+      expected: number,
+      tolerance: number
+    ): string =>
+      `${message} (actual: ${actual}, expected: ${expected}, tolerance: ${tolerance})`;
+
+    const formatInvalidAssertCloseToleranceMessage = (
+      message: string,
+      tolerance: number
+    ): string =>
+      `${message} (tolerance must be a finite, non-negative number, got ${tolerance})`;
+
+    const evaluateAssertClose = (
+      actual: number,
+      expected: number,
+      tolerance: number,
+      message: string
+    ): {
+      kind: 'pass' | 'fail' | 'invalid-tolerance';
+      passed: boolean;
+      message: string;
+    } => {
+      if (!isValidAssertCloseTolerance(tolerance)) {
+        return {
+          kind: 'invalid-tolerance',
+          passed: false,
+          message: formatInvalidAssertCloseToleranceMessage(message, tolerance),
+        };
+      }
+      if (numbersAreClose(actual, expected, tolerance)) {
+        return { kind: 'pass', passed: true, message };
+      }
+      return {
+        kind: 'fail',
+        passed: false,
+        message: formatAssertCloseMessage(message, actual, expected, tolerance),
+      };
+    };
+
+    /**
      * Whether a Three.js or PixiJS node, or one of its descendants, draws
      * something by itself: a Three.js mesh, sprite, points, line or light,
      * a PixiJS sprite, text, mesh or graphics (they carry a texture or a
@@ -3908,6 +3970,41 @@ namespace gdjs {
       fail(message: string): void {
         this._assertions.push({ message, passed: false });
         throw new GameplayTestAssertionError(message);
+      }
+
+      /**
+       * Record that `actual` is within `tolerance` of `expected`. Throws
+       * immediately on failure, stopping the script (wrap in try/catch if
+       * the check is optional). NaN is never close to anything, including
+       * NaN. Non-finite values are not close, even to themselves.
+       * `tolerance` must be a finite, non-negative number (no default).
+       */
+      assertClose(
+        actual: number,
+        expected: number,
+        tolerance: number,
+        message: string
+      ): void {
+        if (this._assertions.length >= MAX_ASSERTIONS) {
+          throw new GameplayTestAssertionError(
+            `Too many assertions (max ${MAX_ASSERTIONS}).`
+          );
+        }
+        const verdict = evaluateAssertClose(
+          actual,
+          expected,
+          tolerance,
+          message
+        );
+        this._assertions.push({
+          message: verdict.message,
+          passed: verdict.passed,
+        });
+        if (!verdict.passed) {
+          throw new GameplayTestAssertionError(
+            `Assertion failed: ${verdict.message}`
+          );
+        }
       }
 
       /**

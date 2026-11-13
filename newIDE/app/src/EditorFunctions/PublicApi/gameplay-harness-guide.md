@@ -201,6 +201,13 @@ interface Harness {
   /** Record a named assertion. THROWS immediately on failure, stopping the
    * script (wrap in try/catch if the check is optional). */
   assert(condition: boolean, message: string): void;
+  /** Record that actual is within tolerance of expected. THROWS immediately
+   * on failure, stopping the script. NaN is never close to anything
+   * (including NaN); non-finite values are not close, even to themselves.
+   * tolerance must be a finite, non-negative number (no default). The
+   * failure message includes actual, expected and tolerance. */
+  assertClose(actual: number, expected: number, tolerance: number,
+    message: string): void;
   /** Record a failure and throw immediately. */
   fail(message: string): void;
   /** Draw the game and add a screenshot to the result (downscaled to 768px

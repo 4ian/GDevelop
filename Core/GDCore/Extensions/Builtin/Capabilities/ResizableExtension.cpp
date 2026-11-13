@@ -46,7 +46,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsResizableExtension(
                       _("Width"),
                       _("Change the width of the object."),
                       _("the width"),
-                      _("Size"),
+                      _("Size ❯ Size"),
                       "res/actions/scaleWidth24_black.png",
                       "res/actions/scaleWidth_black.png")
       .AddParameter("object", _("Object"))
@@ -60,7 +60,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsResizableExtension(
                          _("Width"),
                          _("Compare the width of the object."),
                          _("the width"),
-                         _("Size"),
+                         _("Size ❯ Size"),
                          "res/conditions/scaleWidth24_black.png",
                          "res/conditions/scaleWidth_black.png")
       .AddParameter("object", _("Object"))
@@ -74,7 +74,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsResizableExtension(
                       _("Height"),
                       _("Change the height of the object."),
                       _("the height"),
-                      _("Size"),
+                      _("Size ❯ Size"),
                       "res/actions/scaleHeight24_black.png",
                       "res/actions/scaleHeight_black.png")
       .AddParameter("object", _("Object"))
@@ -88,7 +88,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsResizableExtension(
                          _("Height"),
                          _("Compare the height of the object."),
                          _("the height"),
-                         _("Size"),
+                         _("Size ❯ Size"),
                          "res/conditions/scaleHeight24_black.png",
                          "res/conditions/scaleHeight_black.png")
       .AddParameter("object", _("Object"))
@@ -102,14 +102,18 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsResizableExtension(
          "SetSize",
          _("Size"),
          _("Change the size of an object."),
-         _("Change the size of _PARAM0_: set to _PARAM2_ x _PARAM3_"),
-         _("Size"),
+         _("Change the size of _PARAM0_: set to _PARAM2_ x _PARAM3_ x "
+           "_PARAM4_"),
+         _("Size ❯ Size"),
          "res/actions/scale24_black.png",
          "res/actions/scale_black.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "ResizableBehavior")
       .AddParameter("expression", _("Width"))
       .AddParameter("expression", _("Height"))
+      .AddParameter("expression", _("Depth"), "", true)
+      .SetParameterRequiredObjectCapability("Scene3D::Base3DBehavior")
+      .SetParameterLongDescription(_("Leave empty to keep the current depth."))
       .MarkAsAdvanced();
 }
 

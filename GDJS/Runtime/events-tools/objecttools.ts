@@ -1043,7 +1043,8 @@ namespace gdjs {
         objectsLists: ObjectsLists,
         x: float,
         y: float,
-        layerName: string
+        layerName: string,
+        z?: float
       ): gdjs.RuntimeObject | null {
         // objectsContext will either be the gdjs.RuntimeScene or, in an events function, the
         // eventsFunctionContext. We can't directly use runtimeScene because the object name could
@@ -1054,6 +1055,11 @@ namespace gdjs {
         if (obj !== null) {
           //Do some extra setup
           obj.setPosition(x, y);
+          // The Z position was added after X and Y: it's undefined for existing
+          // calls (in JS events). It's ignored for 2D objects.
+          if (z !== undefined && gdjs.Base3DHandler.is3D(obj)) {
+            obj.setZ(z);
+          }
           obj.setLayer(layerName);
           obj.setZOrder(layer.getDefaultZOrder());
 
@@ -1073,7 +1079,8 @@ namespace gdjs {
         objectsLists: ObjectsLists,
         x: float,
         y: float,
-        layerName: string
+        layerName: string,
+        z?: float
       ): gdjs.RuntimeObject | null {
         return gdjs.evtTools.object.doCreateObjectOnScene(
           objectsContext,
@@ -1081,7 +1088,8 @@ namespace gdjs {
           objectsLists,
           x,
           y,
-          layerName
+          layerName,
+          z
         );
       };
 
@@ -1094,7 +1102,8 @@ namespace gdjs {
         objectName: string,
         x: float,
         y: float,
-        layerName: string
+        layerName: string,
+        z?: float
       ) {
         gdjs.evtTools.object.doCreateObjectOnScene(
           objectsContext,
@@ -1102,7 +1111,8 @@ namespace gdjs {
           objectsLists,
           x,
           y,
-          layerName
+          layerName,
+          z
         );
       };
 

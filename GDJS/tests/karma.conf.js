@@ -287,6 +287,8 @@ module.exports = function (config) {
         nocache: false,
       },
       `${gdjsRuntimePath}/Extensions/NavMeshPathfinding/NavMeshObstacleRuntimeBehavior.js`,
+      `${gdjsRuntimePath}/Extensions/NavMeshPathfinding/NavMeshObstacleGeometry.js`,
+      `${gdjsRuntimePath}/Extensions/NavMeshPathfinding/NavMeshTileBuilder.js`,
       `${gdjsRuntimePath}/Extensions/NavMeshPathfinding/NavMeshCharacterRuntimeBehavior.js`,
       `${gdjsRuntimePath}/Extensions/PrimitiveDrawing/shapepainterruntimeobject.js`,
       `${gdjsRuntimePath}/Extensions/PrimitiveDrawing/shapepainterruntimeobject-pixi-renderer.js`,

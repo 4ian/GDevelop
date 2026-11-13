@@ -69,6 +69,7 @@ export type CommandName =
   | 'TOGGLE_CONDITION_INVERTED'
   | 'CHOOSE_AND_ADD_EVENT'
   | 'MOVE_EVENTS_IN_NEW_GROUP'
+  | 'COPY_EVENTS_AS_JSON'
   | 'EVENTS_EDITOR_UNDO'
   | 'EVENTS_EDITOR_REDO'
   | 'DELETE_SELECTION'
@@ -400,6 +401,11 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   MOVE_EVENTS_IN_NEW_GROUP: {
     area: 'EVENTS',
     displayText: t`Move events into a new group`,
+  },
+  COPY_EVENTS_AS_JSON: {
+    area: 'EVENTS',
+    displayText: t`Copy selected events as JSON`,
+    noShortcut: true,
   },
   EVENTS_EDITOR_UNDO: {
     area: 'EVENTS',

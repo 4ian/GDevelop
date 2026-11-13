@@ -29,7 +29,7 @@ namespace gdjs {
           return;
         }
         this._graphics.clear();
-        if (!this._object._debugMode) {
+        if (!this._object.isDebugModeEnabled()) {
           return;
         }
         this._graphics.lineStyle(

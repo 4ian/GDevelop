@@ -70,7 +70,7 @@ namespace gdjs {
     /**
      * When set to true, the hitboxes will be shown.
      */
-    _debugMode: boolean;
+    private _debugMode: boolean;
     _fillColor: integer;
     _outlineColor: integer;
     _fillOpacity: float;
@@ -140,12 +140,15 @@ namespace gdjs {
         instanceContainer
       );
       this._updateTileMap();
+      if (instanceContainer.getGame().isInGameEdition()) {
+        this.setDebugModeEnabled(true);
+      }
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
     }
 
-    updatePreRender(instanceContainer: gdjs.RuntimeInstanceContainer) {
+    override updatePreRender(instanceContainer: gdjs.RuntimeInstanceContainer) {
       super.updatePreRender(instanceContainer);
 
       if (this._debugMode && this.hitBoxesDirty) {
@@ -153,20 +156,20 @@ namespace gdjs {
       }
     }
 
-    getRendererObject() {
+    override getRendererObject() {
       return this._renderer.getRendererObject();
     }
 
-    onDestroyed(): void {
+    override onDestroyed(): void {
       super.onDestroyed();
       this._renderer.destroy();
     }
 
-    getVisibilityAABB() {
+    override getVisibilityAABB() {
       return null;
     }
 
-    updateFromObjectData(
+    override updateFromObjectData(
       oldObjectData: TilemapCollisionMaskObjectData,
       newObjectData: TilemapCollisionMaskObjectData
     ): boolean {
@@ -183,7 +186,9 @@ namespace gdjs {
         this.setTilesetJsonFile(newObjectData.content.tilesetJsonFile);
       }
       if (oldObjectData.content.debugMode !== newObjectData.content.debugMode) {
-        this.setDebugMode(newObjectData.content.debugMode);
+        if (!this.getInstanceContainer().getGame().isInGameEdition()) {
+          this.setDebugModeEnabled(newObjectData.content.debugMode);
+        }
       }
       if (oldObjectData.content.fillColor !== newObjectData.content.fillColor) {
         this.setFillColor(
@@ -211,14 +216,14 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(
+    override getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): TilemapCollisionMaskNetworkSyncData {
       return {
         ...super.getNetworkSyncData(syncOptions),
         tmjf: this.getTilemapJsonFile(),
         tsjf: this.getTilesetJsonFile(),
-        dm: this.getDebugMode(),
+        dm: this.isDebugModeEnabled(),
         oc: this.getOutlineColor(),
         fc: this.getFillColor(),
         os: this.getOutlineSize(),
@@ -227,7 +232,7 @@ namespace gdjs {
       };
     }
 
-    updateFromNetworkSyncData(
+    override updateFromNetworkSyncData(
       networkSyncData: TilemapCollisionMaskNetworkSyncData,
       options: UpdateFromNetworkSyncDataOptions
     ): void {
@@ -240,7 +245,7 @@ namespace gdjs {
         this.setTilesetJsonFile(networkSyncData.tsjf);
       }
       if (networkSyncData.dm !== undefined) {
-        this.setDebugMode(networkSyncData.dm);
+        this.setDebugModeEnabled(networkSyncData.dm);
       }
       if (networkSyncData.oc !== undefined) {
         this.setOutlineColor(networkSyncData.oc);
@@ -259,7 +264,7 @@ namespace gdjs {
       }
     }
 
-    extraInitializationFromInitialInstance(initialInstanceData): void {
+    override extraInitializationFromInitialInstance(initialInstanceData): void {
       if (initialInstanceData.customSize) {
         this.setWidth(initialInstanceData.width);
         this.setHeight(initialInstanceData.height);
@@ -295,7 +300,7 @@ namespace gdjs {
       );
     }
 
-    updateHitBoxes(): void {
+    override updateHitBoxes(): void {
       this.updateTransformation();
       // Update the RuntimeObject hitboxes attribute.
       for (const _ of this._collisionTileMap.getAllHitboxes(
@@ -341,7 +346,7 @@ namespace gdjs {
      * This method is expensive and should not be called.
      * Prefer using {@link getHitBoxesAround} rather than getHitBoxes.
      */
-    getHitBoxes(): gdjs.Polygon[] {
+    override getHitBoxes(): gdjs.Polygon[] {
       if (this.hitBoxesDirty) {
         this.updateHitBoxes();
         this.updateAABB();
@@ -350,7 +355,12 @@ namespace gdjs {
       return this.hitBoxes;
     }
 
-    getHitBoxesAround(left: float, top: float, right: float, bottom: float) {
+    override getHitBoxesAround(
+      left: float,
+      top: float,
+      right: float,
+      bottom: float
+    ) {
       // This implementation doesn't call updateHitBoxes.
       // It's important for good performances because there is no need to
       // update the whole collision mask where only a few hitboxes must be
@@ -374,7 +384,7 @@ namespace gdjs {
      * But, in case of a tile map, it makes more sense to look each tile individually.
      * It returns true when there is an hitbox in the tile.
      */
-    insideObject(x: float, y: float): boolean {
+    override insideObject(x: float, y: float): boolean {
       this.updateTransformation();
       // This is more precise than the default implementation.
       return this._collisionTileMap.pointIsInsideTile(
@@ -486,14 +496,14 @@ namespace gdjs {
     /**
      * @returns true if the hitboxes are shown.
      */
-    getDebugMode(): boolean {
+    isDebugModeEnabled(): boolean {
       return this._debugMode;
     }
 
     /**
      * @returns true if the hitboxes are shown.
      */
-    setDebugMode(debugMode: boolean): void {
+    setDebugModeEnabled(debugMode: boolean): void {
       this._debugMode = debugMode;
       this._renderer.redrawCollisionMask();
     }
@@ -554,22 +564,22 @@ namespace gdjs {
       return this._outlineOpacity;
     }
 
-    setX(x: float): void {
+    override setX(x: float): void {
       super.setX(x);
       this._transformationIsUpToDate = false;
     }
 
-    setY(y: float): void {
+    override setY(y: float): void {
       super.setY(y);
       this._transformationIsUpToDate = false;
     }
 
-    setAngle(angle: float): void {
+    override setAngle(angle: float): void {
       super.setAngle(angle);
       this._transformationIsUpToDate = false;
     }
 
-    setWidth(width: float): void {
+    override setWidth(width: float): void {
       if (this._width === width) {
         return;
       }
@@ -579,7 +589,7 @@ namespace gdjs {
       this.invalidateHitboxes();
     }
 
-    setHeight(height: float): void {
+    override setHeight(height: float): void {
       if (this._height === height) {
         return;
       }
@@ -592,6 +602,14 @@ namespace gdjs {
     setSize(newWidth: float, newHeight: float): void {
       this.setWidth(newWidth);
       this.setHeight(newHeight);
+    }
+
+    override getOriginalWidth(): float {
+      return this._collisionTileMap.getWidth();
+    }
+
+    override getOriginalHeight(): float {
+      return this._collisionTileMap.getHeight();
     }
 
     /**

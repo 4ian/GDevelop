@@ -25,6 +25,8 @@ await harness.stepFrames(60);
 // Inspect objects and check the game state - a failed assert fails the test:
 // const players = harness.getObjects('Player');
 // harness.assert(players.length === 1, 'The player is in the scene');
+// Positions, speeds and timers are often approximate:
+// harness.assertClose(players[0].x, 100, 0.5, 'The player is near x=100');
 
 console.log('Scene at the end of the test:', harness.getSceneName());
 `;

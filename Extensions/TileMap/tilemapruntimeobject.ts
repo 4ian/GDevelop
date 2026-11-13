@@ -112,18 +112,20 @@ namespace gdjs {
       this.onCreated();
     }
 
-    getRendererObject() {
+    override getRendererObject() {
       return this._renderer.getRendererObject();
     }
 
-    updatePreRender(instanceContainer: gdjs.RuntimeInstanceContainer): void {
+    override updatePreRender(
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ): void {
       if (!this.isHidden()) {
         this.updateTileMap(this._isTileMapDirty);
         this._isTileMapDirty = false;
       }
     }
 
-    update(instanceContainer: gdjs.RuntimeInstanceContainer): void {
+    override update(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       if (this._animationSpeedScale <= 0 || this._animationFps === 0) {
         return;
       }
@@ -135,7 +137,7 @@ namespace gdjs {
       }
     }
 
-    updateFromObjectData(
+    override updateFromObjectData(
       oldObjectData: TilemapObjectData,
       newObjectData: TilemapObjectData
     ): boolean {
@@ -188,7 +190,7 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(
+    override getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): TilemapNetworkSyncData {
       return {
@@ -204,7 +206,7 @@ namespace gdjs {
       };
     }
 
-    updateFromNetworkSyncData(
+    override updateFromNetworkSyncData(
       networkSyncData: TilemapNetworkSyncData,
       options: UpdateFromNetworkSyncDataOptions
     ): void {
@@ -236,7 +238,7 @@ namespace gdjs {
       }
     }
 
-    extraInitializationFromInitialInstance(initialInstanceData): void {
+    override extraInitializationFromInitialInstance(initialInstanceData): void {
       if (initialInstanceData.customSize) {
         this.setWidth(initialInstanceData.width);
         this.setHeight(initialInstanceData.height);
@@ -257,21 +259,11 @@ namespace gdjs {
         (tileMap: TileMapHelper.EditableTileMap | null) => {
           if (!tileMap) {
             // getOrLoadTileMap already warn.
+            this._renderer.showErrorTexture();
             return;
           }
           this._tileMapManager.getOrLoadTextureCache(
-            (textureName) => {
-              const game = this.getInstanceContainer().getGame();
-              const mappedName = game.resolveEmbeddedResource(
-                this._tilemapJsonFile,
-                textureName
-              );
-              return game
-                .getImageManager()
-                .getPIXITexture(
-                  mappedName
-                ) as unknown as PIXI.BaseTexture<PIXI.Resource>;
-            },
+            (textureName) => this.getTexture(textureName),
             this._tilemapAtlasImage,
             this._tilemapJsonFile,
             this._tilesetJsonFile,
@@ -279,6 +271,7 @@ namespace gdjs {
             (textureCache: TileMapHelper.TileTextureCache | null) => {
               if (!textureCache) {
                 // getOrLoadTextureCache already log warns and errors.
+                this._renderer.showErrorTexture();
                 return;
               }
               this._originalTileMap = tileMap;
@@ -307,20 +300,23 @@ namespace gdjs {
       );
     }
 
+    private getTexture(textureName: string) {
+      const game = this.getInstanceContainer().getGame();
+      const imageManager = game.getImageManager();
+      const mappedName = game.resolveEmbeddedResource(
+        this._tilemapJsonFile,
+        textureName
+      );
+      const texture = imageManager.getPIXITexture(mappedName);
+      if (texture === imageManager.getInvalidPIXITexture()) {
+        this._renderer.showErrorTexture();
+      }
+      return texture as unknown as PIXI.BaseTexture<PIXI.Resource>;
+    }
+
     updateTileMap(forceUpdate: boolean): void {
       this._tileMapManager.getOrLoadTextureCache(
-        (textureName) => {
-          const game = this.getInstanceContainer().getGame();
-          const mappedName = game.resolveEmbeddedResource(
-            this._tilemapJsonFile,
-            textureName
-          );
-          return game
-            .getImageManager()
-            .getPIXITexture(
-              mappedName
-            ) as unknown as PIXI.BaseTexture<PIXI.Resource>;
-        },
+        (textureName) => this.getTexture(textureName),
         this._tilemapAtlasImage,
         this._tilemapJsonFile,
         this._tilesetJsonFile,
@@ -328,6 +324,7 @@ namespace gdjs {
         (textureCache: TileMapHelper.TileTextureCache | null) => {
           if (!textureCache) {
             // getOrLoadTextureCache already log warns and errors.
+            this._renderer.showErrorTexture();
             return;
           }
           this._renderer.refreshPixiTileMap(textureCache, true);
@@ -335,7 +332,7 @@ namespace gdjs {
       );
     }
 
-    onDestroyed(): void {
+    override onDestroyed(): void {
       super.onDestroyed();
       this._renderer.destroy();
     }
@@ -451,12 +448,12 @@ namespace gdjs {
 
     override getOriginalWidth(): float {
       const tileMap = this._tileMap;
-      return tileMap ? tileMap.getWidth() : 20;
+      return tileMap ? tileMap.getWidth() : 192;
     }
 
     override getOriginalHeight(): float {
       const tileMap = this._tileMap;
-      return tileMap ? tileMap.getHeight() : 20;
+      return tileMap ? tileMap.getHeight() : 192;
     }
 
     /**
@@ -524,7 +521,7 @@ namespace gdjs {
       this.invalidateTransformation();
     }
 
-    setAngle(angle: float): void {
+    override setAngle(angle: float): void {
       super.setAngle(angle);
       this._renderer.updateAngle();
       this.invalidateTransformation();
@@ -539,11 +536,11 @@ namespace gdjs {
       return this._opacity;
     }
 
-    getWidth(): float {
+    override getWidth(): float {
       return this._renderer.getWidth();
     }
 
-    getHeight(): float {
+    override getHeight(): float {
       return this._renderer.getHeight();
     }
 

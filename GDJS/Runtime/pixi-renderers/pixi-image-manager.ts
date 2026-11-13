@@ -402,7 +402,7 @@ namespace gdjs {
      * Return a PIXI texture which can be used as a placeholder when no
      * suitable texture can be found.
      */
-    getInvalidPIXITexture() {
+    getInvalidPIXITexture(): PIXI.Texture {
       return this._invalidTexture;
     }
 

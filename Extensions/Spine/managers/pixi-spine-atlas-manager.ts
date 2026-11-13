@@ -4,7 +4,14 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  const logger = new gdjs.Logger('Spine Atlas Manager');
+
   const atlasKinds: ResourceKind[] = ['atlas'];
+
+  type SpineAtlasAsset = {
+    textureAtlas: spine.TextureAtlas;
+    alias: string;
+  };
 
   /**
    * SpineAtlasManager loads `.atlas` files via the official `@esotericsoftware/spine-pixi-v7`
@@ -19,10 +26,9 @@ namespace gdjs {
   export class SpineAtlasManager implements gdjs.ResourceManager {
     private _imageManager: ImageManager;
     private _resourceLoader: ResourceLoader;
-    private _loadedSpineAtlases = new gdjs.ResourceCache<spine.TextureAtlas>();
-    private _loadingSpineAtlases = new gdjs.ResourceCache<
-      Promise<spine.TextureAtlas>
-    >();
+    private _loadedSpineAtlases = new gdjs.ResourceCache<SpineAtlasAsset>();
+    private _loadingSpineAtlases = new Map<string, Promise<SpineAtlasAsset>>();
+    private _unloadingSpineAtlases = new Map<string, Promise<void>>();
 
     /**
      * @param resourceLoader The resources loader of the game.
@@ -49,35 +55,46 @@ namespace gdjs {
     }
 
     /**
-     * Returns a cached promise resolving to the loaded atlas, loading it if needed.
+     * Returns the loaded atlas, sharing any pending load for the same file.
      */
-    getOrLoad(resourceName: string): Promise<spine.TextureAtlas> {
+    async getOrLoad(resourceName: string): Promise<spine.TextureAtlas> {
       const resource = this._getAtlasResource(resourceName);
       if (!resource) {
-        return Promise.reject(
-          new Error(`Unable to find atlas for resource '${resourceName}'.`)
-        );
+        throw new Error(`Unable to find atlas for resource '${resourceName}'.`);
       }
 
       const cachedAtlas = this._loadedSpineAtlases.get(resource);
       if (cachedAtlas) {
-        return Promise.resolve(cachedAtlas);
+        return cachedAtlas.textureAtlas;
       }
 
-      const inflight = this._loadingSpineAtlases.get(resource);
+      const inflight = this._loadingSpineAtlases.get(resource.file);
       if (inflight) {
-        return inflight;
+        return (await inflight).textureAtlas;
       }
 
-      const loadingPromise = this._load(resource).then((atlas) => {
-        this._loadedSpineAtlases.set(resource, atlas);
-        return atlas;
-      });
-      this._loadingSpineAtlases.set(resource, loadingPromise);
-      return loadingPromise;
+      // Capture the preceding unload before publishing this load, so a later
+      // unload can wait for it without creating a circular dependency.
+      const loadingPromise = Promise.resolve(
+        this._unloadingSpineAtlases.get(resource.file)
+      )
+        .then(() => this._load(resource))
+        .then((atlas) => {
+          if (this._loadingSpineAtlases.get(resource.file) === loadingPromise) {
+            this._loadedSpineAtlases.set(resource, atlas);
+          }
+          return atlas;
+        })
+        .finally(() => {
+          if (this._loadingSpineAtlases.get(resource.file) === loadingPromise) {
+            this._loadingSpineAtlases.delete(resource.file);
+          }
+        });
+      this._loadingSpineAtlases.set(resource.file, loadingPromise);
+      return (await loadingPromise).textureAtlas;
     }
 
-    private async _load(resource: ResourceData): Promise<spine.TextureAtlas> {
+    private async _load(resource: ResourceData): Promise<SpineAtlasAsset> {
       const game = this._resourceLoader.getRuntimeGame();
       const embeddedResourcesNames = game.getEmbeddedResourcesNames(
         resource.name
@@ -87,24 +104,23 @@ namespace gdjs {
         throw new Error(`${resource.name} does not have image metadata!`);
       }
 
-      const images = embeddedResourcesNames.reduce<{
-        [key: string]: PIXI.BaseTexture;
-      }>((imagesMap, embeddedResourceName) => {
-        const mappedResourceName = game.resolveEmbeddedResource(
-          resource.name,
-          embeddedResourceName
-        );
-        // The v7 atlas loader expects BaseTexture instances when sharing pages
-        // with already-loaded textures.
-        imagesMap[embeddedResourceName] =
-          this._imageManager.getOrLoadPIXITexture(
-            mappedResourceName
-          ).baseTexture;
-        return imagesMap;
-      }, {});
-
       const url = this._resourceLoader.getFullUrl(resource.file);
       const alias = url;
+
+      const images: { [key: string]: PIXI.BaseTexture } = {};
+      await Promise.all(
+        embeddedResourcesNames.map(async (embeddedResourceName) => {
+          const mappedResourceName = game.resolveEmbeddedResource(
+            resource.name,
+            embeddedResourceName
+          );
+          await this._imageManager.loadResource(mappedResourceName);
+          // The v7 atlas loader expects BaseTexture instances when sharing pages
+          // with already-loaded textures.
+          images[embeddedResourceName] =
+            this._imageManager.getPIXITexture(mappedResourceName).baseTexture;
+        })
+      );
 
       PIXI.Assets.setPreferences({
         preferWorkers: false,
@@ -113,7 +129,13 @@ namespace gdjs {
           : 'anonymous',
       });
       PIXI.Assets.add({ alias, src: url, data: { images } });
-      return PIXI.Assets.load<spine.TextureAtlas>(alias);
+      // Clear PIXI.Assets.resolver._resolverHash (https://github.com/pixijs/pixijs/issues/10069)
+      // so resolve() picks up the newly registered data.images BaseTextures.
+      PIXI.Assets.resolver.prefer();
+      return {
+        textureAtlas: await PIXI.Assets.load<spine.TextureAtlas>(alias),
+        alias,
+      };
     }
 
     /**
@@ -121,7 +143,7 @@ namespace gdjs {
      * @param resourceName The name of the atlas resource.
      */
     isLoaded(resourceName: string): boolean {
-      return !!this._loadedSpineAtlases.getFromName(resourceName);
+      return !!this.getAtlasTexture(resourceName);
     }
 
     /**
@@ -131,16 +153,17 @@ namespace gdjs {
     getAtlasAlias(resourceName: string): string | null {
       const resource = this._getAtlasResource(resourceName);
       if (!resource) return null;
-      return this._loadedSpineAtlases.get(resource)
-        ? this._resourceLoader.getFullUrl(resource.file)
-        : null;
+      const atlas = this._loadedSpineAtlases.get(resource);
+      return atlas ? atlas.alias : null;
     }
 
     /**
      * Returns the loaded TextureAtlas for the given resource, if available.
      */
     getAtlasTexture(resourceName: string): spine.TextureAtlas | null {
-      return this._loadedSpineAtlases.getFromName(resourceName);
+      const resource = this._getAtlasResource(resourceName);
+      const atlas = resource && this._loadedSpineAtlases.get(resource);
+      return atlas ? atlas.textureAtlas : null;
     }
 
     private _getAtlasResource(resourceName: string): ResourceData | null {
@@ -156,19 +179,47 @@ namespace gdjs {
     dispose(): void {
       this._loadedSpineAtlases.clear();
       this._loadingSpineAtlases.clear();
+      this._unloadingSpineAtlases.clear();
     }
 
-    unloadResource(resourceData: ResourceData): void {
-      const resource = this._getAtlasResource(resourceData.name);
-      // PIXI.Assets.unload disposes the TextureAtlas and clears the cache entry,
-      // preventing a stale atlas from being reused on the next load.
-      if (resource) {
-        const alias = this._resourceLoader.getFullUrl(resource.file);
-        PIXI.Assets.unload(alias).catch(() => {});
+    unloadResource(resourceData: ResourceData): Promise<void> {
+      const atlas = this._loadedSpineAtlases.get(resourceData);
+      const loading = this._loadingSpineAtlases.get(resourceData.file);
+      if (!atlas && !loading) {
+        return (
+          this._unloadingSpineAtlases.get(resourceData.file) ||
+          Promise.resolve()
+        );
       }
 
       this._loadedSpineAtlases.delete(resourceData);
-      this._loadingSpineAtlases.delete(resourceData);
+      this._loadingSpineAtlases.delete(resourceData.file);
+
+      const unloadPromise = Promise.resolve(loading || atlas)
+        .then(async (loadedAtlas) => {
+          if (!loadedAtlas) return;
+
+          // Page textures are borrowed from ImageManager, which owns disposal.
+          for (const page of loadedAtlas.textureAtlas.pages) {
+            page.texture = null;
+          }
+          await PIXI.Assets.unload(loadedAtlas.alias);
+        })
+        .catch((error) => {
+          logger.error(
+            `Error while unloading spine atlas resource ${resourceData.name}: ${error}`
+          );
+        })
+        .finally(() => {
+          PIXI.Assets.resolver.prefer();
+          if (
+            this._unloadingSpineAtlases.get(resourceData.file) === unloadPromise
+          ) {
+            this._unloadingSpineAtlases.delete(resourceData.file);
+          }
+        });
+      this._unloadingSpineAtlases.set(resourceData.file, unloadPromise);
+      return unloadPromise;
     }
   }
 }

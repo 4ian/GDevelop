@@ -189,6 +189,9 @@ describe('In-game editor camera stability', function () {
     const scene = inGameEditor.getCurrentScene();
     if (!scene) throw new Error('The editor has no current scene.');
 
+    // The game is paused while being edited (as after the loading screen).
+    if (!runtimeGame.isPaused()) runtimeGame.pause(true);
+
     // Give each layer its own camera, before the editor applies its own.
     layerNames.forEach((layerName, index) => {
       const layer = scene.getLayer(layerName);
@@ -283,6 +286,47 @@ describe('In-game editor camera stability', function () {
     // Moving the editor camera is not a request to move the cameras of the
     // layers: none of them must have changed.
     expect(getLayerCameraStates(scene)).to.eql(initialCameras);
+  });
+
+  it('renders with the camera of the editor while the cameras of the layers stay game state', async () => {
+    const { inGameEditor, scene, initialCameras } =
+      await createEditorWithDistinctLayerCameras();
+    if (!runtimeGame) throw new Error('The game was not created.');
+
+    moveEditorCamera(inGameEditor);
+
+    // The 3D cameras used for rendering are the ones of the editor...
+    const editorCameraState = inGameEditor.getCameraState();
+    const expectedRotationX = gdjs.toRad(90 - editorCameraState.elevationAngle);
+    const expectedRotationZ = -gdjs.toRad(editorCameraState.rotationAngle);
+    for (const layerName of layerNames) {
+      const threeCamera = scene
+        .getLayer(layerName)
+        .getRenderer()
+        .getThreeCamera();
+      if (!threeCamera) throw new Error('The layer has no 3D camera.');
+      expect(threeCamera.rotation.x).to.be.within(
+        expectedRotationX - cameraEpsilon,
+        expectedRotationX + cameraEpsilon
+      );
+      expect(threeCamera.rotation.z).to.be.within(
+        expectedRotationZ - cameraEpsilon,
+        expectedRotationZ + cameraEpsilon
+      );
+    }
+
+    // ...while the cameras of the layers (game state) were not changed.
+    expect(getLayerCameraStates(scene)).to.eql(initialCameras);
+
+    // Playing gives the layers back their own camera to the renderer.
+    runtimeGame.pause(false);
+    const threeCamera = scene.getLayer('').getRenderer().getThreeCamera();
+    if (!threeCamera) throw new Error('The layer has no 3D camera.');
+    const layerRotationX = initialCameras[''].rotationX;
+    expect(gdjs.toDegrees(threeCamera.rotation.x)).to.be.within(
+      layerRotationX - cameraEpsilon,
+      layerRotationX + cameraEpsilon
+    );
   });
 
   it('gives every layer its own camera back after a Play then Stop round-trip', async () => {

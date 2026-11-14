@@ -2255,6 +2255,16 @@ namespace gdjs {
       this._applyEditorCameraToLayers();
     }
 
+    /**
+     * Called by the camera of the editor when it changed (moved, restored by
+     * the IDE, zoomed on an object...). The layers must render with the new
+     * camera immediately, even before the next frame.
+     */
+    _onEditorCameraChanged() {
+      if (!this._isEditorCameraApplied) return;
+      this._applyEditorCameraToLayers();
+    }
+
     moveSelectionUnderCursor() {
       if (!this._currentScene) return;
 
@@ -4250,9 +4260,6 @@ namespace gdjs {
           }
         }
         this._currentScene.render();
-        // The frame is rendered: give the layers back their own camera so that
-        // the game never runs with the camera of the editor.
-        this._clearEditorCameraOverrides();
       }
       this._renderExtensionToolbars(domElementContainer);
 

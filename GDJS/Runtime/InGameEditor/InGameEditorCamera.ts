@@ -411,6 +411,7 @@ namespace gdjs {
 
     onHasCameraChanged() {
       this._hasChanged = true;
+      this.editor._onEditorCameraChanged();
     }
 
     updateCamera(currentScene: RuntimeScene, layer: RuntimeLayer): void {

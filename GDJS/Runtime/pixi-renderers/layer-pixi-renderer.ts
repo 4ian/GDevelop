@@ -283,8 +283,6 @@ namespace gdjs {
      * the camera of the layer, which is game state.
      */
     private _cameraOverride: LayerCameraOverride | null = null;
-    /** The rotations of the 3D camera before a camera override was applied. */
-    private _rotationBeforeCameraOverride: { x: float; y: float } | null = null;
     private _threeEffectComposer: THREE_ADDONS.EffectComposer | null = null;
     private _threeRenderPass: THREE_ADDONS.RenderPass | null = null;
     private _customRenderPass: THREE_ADDONS.N8AOPass | null = null;
@@ -474,25 +472,6 @@ namespace gdjs {
         return;
       }
       this._cameraOverride = cameraOverride;
-
-      if (cameraOverride) {
-        if (!this._rotationBeforeCameraOverride && this._threeCamera) {
-          this._rotationBeforeCameraOverride = {
-            x: this._threeCamera.rotation.x,
-            y: this._threeCamera.rotation.y,
-          };
-        }
-        if (this._threeCamera) {
-          this._threeCamera.rotation.x = gdjs.toRad(cameraOverride.rotationX);
-          this._threeCamera.rotation.y = gdjs.toRad(cameraOverride.rotationY);
-          this.invalidateRotation();
-        }
-      } else if (this._rotationBeforeCameraOverride && this._threeCamera) {
-        this._threeCamera.rotation.x = this._rotationBeforeCameraOverride.x;
-        this._threeCamera.rotation.y = this._rotationBeforeCameraOverride.y;
-        this._rotationBeforeCameraOverride = null;
-        this.invalidateRotation();
-      }
 
       this.updatePosition();
       // The raycasting done by the in-game editor relies on the world matrix
@@ -1217,6 +1196,12 @@ namespace gdjs {
       const cameraRotation = cameraOverride
         ? cameraOverride.rotation
         : this._layer.getCameraRotation();
+      const cameraRotationX = cameraOverride
+        ? cameraOverride.rotationX
+        : this._layer.getCameraRotationX();
+      const cameraRotationY = cameraOverride
+        ? cameraOverride.rotationY
+        : this._layer.getCameraRotationY();
       const cameraZoom = cameraOverride
         ? cameraOverride.zoom
         : this._layer.getCameraZoom();
@@ -1228,6 +1213,9 @@ namespace gdjs {
         // The scene is mirrored on Y
         this._threeCamera.position.y = -cameraY * inverseWorldScale;
         this._threeCamera.rotation.z = angle;
+        this._threeCamera.rotation.x = gdjs.toRad(cameraRotationX);
+        this._threeCamera.rotation.y = gdjs.toRad(cameraRotationY);
+        this.invalidateRotation();
 
         if (this._threeCamera instanceof THREE.OrthographicCamera) {
           this._threeCamera.zoom = cameraZoom;

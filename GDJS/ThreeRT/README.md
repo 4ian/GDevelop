@@ -89,8 +89,10 @@ stand-ins around it, applied from outside its files (`src/`):
 - 2D layers are not drawn: only their texts (as HUD texts) and a centred crosshair. 2D games don't show.
 - GLSL shaders (custom materials, particles, post-processing effects) don't run: their meshes are not drawn, except
   Terrain3D's ground.
-- Game logic runs in an interpreter: heavy games can overrun the 50 ms frame budget (on this machine, the three
-  starters take 15 to 30 ms a frame for the script).
+- Game logic runs in an interpreter: heavy games can overrun the 50 ms frame budget, and an interrupted frame can
+  leave the game in a bad state. Measured on a 4 core Linux VM rendering with a software GPU (llvmpipe, competing with
+  the script for the CPU): the three starters take 15 to 30 ms a frame for the script, with rare overruns (raycasts
+  of extensions, scene syncs). Build with `--profile` to see where the time goes.
 - Sounds are not positioned, and their volume and rate are applied when they start.
 - Only the first 3D layer's camera is used, with the others placed relative to it.
 

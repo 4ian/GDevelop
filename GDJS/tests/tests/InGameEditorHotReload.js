@@ -44,6 +44,7 @@ describe('Hot-reload of objects in the in-game editor', function () {
     gridColor: 0,
     gridAlpha: 1,
     snap: false,
+        windowMask: false,
   };
 
   /**

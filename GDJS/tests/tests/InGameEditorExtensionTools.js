@@ -63,6 +63,7 @@ describe('Tools of extensions in the in-game editor', function () {
       gridColor: 0,
       gridAlpha: 1,
       snap: false,
+        windowMask: false,
     },
   };
 

@@ -182,7 +182,7 @@ describe('gdjs.Layer', () => {
 		const threeScene = layer.getRenderer().getThreeScene();
 		const camera = layer.getRenderer().getThreeCamera();
 		const plane = threeScene.children.find(
-			(child) => child.renderOrder === Number.MAX_SAFE_INTEGER
+			(child) => child.renderOrder === Number.MAX_SAFE_INTEGER - 1
 		);
 		threeScene.updateMatrixWorld(true);
 		camera.updateMatrixWorld(true);

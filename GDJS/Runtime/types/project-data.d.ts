@@ -328,6 +328,9 @@ declare interface LayoutData extends InstanceContainerData {
 }
 
 declare interface InstancesEditorSettings {
+  editorMode?: '2d-editor' | '3d-editor';
+  gameEditorMode?: 'instances-editor' | 'embedded-game';
+  /** `true` if the grid is shown. */
   grid: boolean;
   gridType: 'rectangular' | 'isometric';
   gridWidth: float;
@@ -338,7 +341,10 @@ declare interface InstancesEditorSettings {
   gridOffsetZ?: float;
   gridColor: int;
   gridAlpha: float;
+  /** `true` if grid snapping is activated */
   snap: boolean;
+  /** `true` if the window mask is shown */
+  windowMask: boolean;
 }
 
 declare interface LayoutNetworkSyncData {

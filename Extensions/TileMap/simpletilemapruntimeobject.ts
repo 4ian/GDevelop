@@ -90,9 +90,12 @@ namespace gdjs {
 
       this._loadTileMap(
         this._initialTileMapAsJsObject,
-        (tileMap: TileMapHelper.EditableTileMap) => {
+        (tileMap: TileMapHelper.EditableTileMap | null) => {
           this._renderer.updatePosition();
 
+          if (!tileMap) {
+            return;
+          }
           this._collisionTileMap = new gdjs.TileMap.TransformedCollisionTileMap(
             tileMap,
             hitBoxTag
@@ -106,20 +109,13 @@ namespace gdjs {
       this.onCreated();
     }
 
-    getRendererObject() {
+    override getRendererObject() {
       return this._renderer.getRendererObject();
     }
 
     updateTileMap(forceUpdate: boolean): void {
       this._tileMapManager.getOrLoadSimpleTileMapTextureCache(
-        (textureName) => {
-          return this.getInstanceContainer()
-            .getGame()
-            .getImageManager()
-            .getPIXITexture(
-              textureName
-            ) as unknown as PIXI.BaseTexture<PIXI.Resource>;
-        },
+        (textureName) => this.getTexture(textureName),
         this._atlasImage,
         this._tileSize,
         this._columnCount,
@@ -127,6 +123,7 @@ namespace gdjs {
         (textureCache: TileMapHelper.TileTextureCache | null) => {
           if (!textureCache) {
             // getOrLoadTextureCache already log warns and errors.
+            this._renderer.showErrorTexture();
             return;
           }
           this._renderer.refreshPixiTileMap(textureCache, forceUpdate);
@@ -136,18 +133,21 @@ namespace gdjs {
             `Could not load texture cache for atlas ${this._atlasImage} during prerender. The tilemap might be badly configured or an issues happened with the loaded atlas image:`,
             error
           );
+          this._renderer.showErrorTexture();
         }
       );
     }
 
-    updatePreRender(instanceContainer: gdjs.RuntimeInstanceContainer): void {
+    override updatePreRender(
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ): void {
       if (!this.isHidden()) {
         this.updateTileMap(this._isTileMapDirty);
         this._isTileMapDirty = false;
       }
     }
 
-    updateFromObjectData(
+    override updateFromObjectData(
       oldObjectData: SimpleTileMapObjectData,
       newObjectData: SimpleTileMapObjectData
     ): boolean {
@@ -161,7 +161,7 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(
+    override getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): SimpleTileMapNetworkSyncData {
       const syncData: SimpleTileMapNetworkSyncData = {
@@ -176,7 +176,7 @@ namespace gdjs {
       return syncData;
     }
 
-    updateFromNetworkSyncData(
+    override updateFromNetworkSyncData(
       networkSyncData: SimpleTileMapNetworkSyncData,
       options: UpdateFromNetworkSyncDataOptions
     ): void {
@@ -185,7 +185,10 @@ namespace gdjs {
       if (networkSyncData.tm !== undefined) {
         this._loadTileMap(
           networkSyncData.tm,
-          (tileMap: TileMapHelper.EditableTileMap) => {
+          (tileMap: TileMapHelper.EditableTileMap | null) => {
+            if (!tileMap) {
+              return;
+            }
             if (networkSyncData.w !== undefined) {
               this.setWidth(networkSyncData.w);
             }
@@ -216,7 +219,7 @@ namespace gdjs {
       }
     }
 
-    extraInitializationFromInitialInstance(
+    override extraInitializationFromInitialInstance(
       initialInstanceData: InstanceData
     ): void {
       // 1. load the tilemap from the instance.
@@ -230,7 +233,7 @@ namespace gdjs {
       // (used for width and position calculations).
       this._loadTileMap(
         this._initialTileMapAsJsObject,
-        (tileMap: TileMapHelper.EditableTileMap) => {
+        (tileMap: TileMapHelper.EditableTileMap | null) => {
           // 3. Set custom dimensions & opacity if applicable.
           if (initialInstanceData.customSize) {
             this.setWidth(initialInstanceData.width);
@@ -244,6 +247,10 @@ namespace gdjs {
 
           // 4. Update position (calculations based on renderer's dimensions).
           this._renderer.updatePosition();
+
+          if (!tileMap) {
+            return;
+          }
 
           if (this._collisionTileMap) {
             // If collision tile map is already defined, there's a good chance it means
@@ -264,12 +271,16 @@ namespace gdjs {
 
     private _loadTileMap(
       tileMapAsJsObject: TileMapHelper.EditableTileMapAsJsObject,
-      tileMapLoadingCallback: (tileMap: TileMapHelper.EditableTileMap) => void
+      tileMapLoadingCallback: (
+        tileMap: TileMapHelper.EditableTileMap | null
+      ) => void
     ): void {
       if (this._columnCount <= 0 || this._rowCount <= 0) {
         console.error(
           `Tilemap object ${this.name} is not configured properly.`
         );
+        this._renderer.showErrorTexture();
+        tileMapLoadingCallback(null);
         return;
       }
 
@@ -301,14 +312,7 @@ namespace gdjs {
           });
 
           this._tileMapManager.getOrLoadSimpleTileMapTextureCache(
-            (textureName) => {
-              return this.getInstanceContainer()
-                .getGame()
-                .getImageManager()
-                .getPIXITexture(
-                  textureName
-                ) as unknown as PIXI.BaseTexture<PIXI.Resource>;
-            },
+            (textureName) => this.getTexture(textureName),
             this._atlasImage,
             this._tileSize,
             this._columnCount,
@@ -316,6 +320,8 @@ namespace gdjs {
             (textureCache: TileMapHelper.TileTextureCache | null) => {
               if (!textureCache) {
                 // getOrLoadTextureCache already log warns and errors.
+                this._renderer.showErrorTexture();
+                tileMapLoadingCallback(null);
                 return;
               }
               this._tileMap = tileMap;
@@ -327,18 +333,31 @@ namespace gdjs {
                 `Could not load texture cache for atlas ${this._atlasImage} during initial loading. The tilemap might be badly configured or an issues happened with the loaded atlas image:`,
                 error
               );
+              this._renderer.showErrorTexture();
+              tileMapLoadingCallback(null);
             }
           );
         }
       );
     }
 
-    onDestroyed(): void {
+    private getTexture(textureName: string) {
+      const imageManager = this.getInstanceContainer()
+        .getGame()
+        .getImageManager();
+      const texture = imageManager.getPIXITexture(textureName);
+      if (texture === imageManager.getInvalidPIXITexture()) {
+        this._renderer.showErrorTexture();
+      }
+      return texture as unknown as PIXI.BaseTexture<PIXI.Resource>;
+    }
+
+    override onDestroyed(): void {
       super.onDestroyed();
       this._renderer.destroy();
     }
 
-    setWidth(width: float): void {
+    override setWidth(width: float): void {
       if (this.getWidth() === width) return;
 
       this.invalidateTransformation();
@@ -346,7 +365,7 @@ namespace gdjs {
       this.invalidateHitboxes();
     }
 
-    setHeight(height: float): void {
+    override setHeight(height: float): void {
       if (this.getHeight() === height) return;
 
       this.invalidateTransformation();
@@ -412,19 +431,19 @@ namespace gdjs {
       this.invalidateTransformation();
     }
 
-    setX(x: float): void {
+    override setX(x: float): void {
       super.setX(x);
       this._renderer.updatePosition();
       this.invalidateTransformation();
     }
 
-    setY(y: float): void {
+    override setY(y: float): void {
       super.setY(y);
       this._renderer.updatePosition();
       this.invalidateTransformation();
     }
 
-    setAngle(angle: float): void {
+    override setAngle(angle: float): void {
       super.setAngle(angle);
       this._renderer.updateAngle();
       this.invalidateTransformation();
@@ -440,29 +459,29 @@ namespace gdjs {
       return this._opacity;
     }
 
-    getWidth(): float {
+    override getWidth(): float {
       return this._renderer.getWidth();
     }
 
-    getHeight(): float {
+    override getHeight(): float {
       return this._renderer.getHeight();
     }
 
     override getOriginalWidth(): float {
       const tileMap = this._tileMap;
-      return tileMap ? tileMap.getWidth() : 20;
+      return tileMap ? tileMap.getWidth() : 192;
     }
 
     override getOriginalHeight(): float {
       const tileMap = this._tileMap;
-      return tileMap ? tileMap.getHeight() : 20;
+      return tileMap ? tileMap.getHeight() : 192;
     }
 
-    getScaleX(): float {
+    override getScaleX(): float {
       return this._renderer.getScaleX();
     }
 
-    getScaleY(): float {
+    override getScaleY(): float {
       return this._renderer.getScaleY();
     }
 

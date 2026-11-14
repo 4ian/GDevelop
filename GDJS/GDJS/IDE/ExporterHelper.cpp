@@ -127,8 +127,6 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   includesFiles.clear();
   std::vector<gd::String> resourcesFiles;
 
-  std::vector<gd::InGameEditorResourceMetadata> inGameEditorResources;
-
   // TODO Try to remove side effects to avoid the copy
   // that destroys the AST in cache.
   gd::Project exportedProject = options.project;
@@ -221,20 +219,6 @@ bool ExporterHelper::ExportProjectForPixiPreview(
     }
 
     if (options.isInGameEdition) {
-      // List the in-game editor resources used by the project, so they can
-      // be later included in the exported project resources.
-      for (const auto &inGameEditorResource : usedExtensionsResult.GetUsedInGameEditorResources()) {
-        inGameEditorResources.push_back(inGameEditorResource);
-
-        // Always use absolute paths for in-game editor resources.
-        // There are not copied and instead directly refer to the file in the Runtime folder.
-        gd::String resourceFile = inGameEditorResource.GetFilePath();
-        if (!fs.IsAbsolute(resourceFile)) {
-          fs.MakeAbsolute(resourceFile, gdjsRoot + "/Runtime");
-        }
-        inGameEditorResources.back().SetFilePath(resourceFile);
-      }
-
       // TODO Scan the objects and events of event-based objects
       // (it could be an alternative method ScanProjectAndEventsBasedObjects in
       // UsedExtensionsFinder).
@@ -328,9 +312,8 @@ bool ExporterHelper::ExportProjectForPixiPreview(
     gd::SerializerElement runtimeGameOptions;
     ExporterHelper::SerializeRuntimeGameOptions(fs, gdjsRoot, options,
                                                     includesFiles, runtimeGameOptions);
-    ExportProjectData(fs, exportedProject, codeOutputDir + "/data.js",
-                      runtimeGameOptions, options.isInGameEdition,
-                      inGameEditorResources);
+    ExportProjectData(fs, gdjsRoot, exportedProject, codeOutputDir + "/data.js",
+                      runtimeGameOptions, options.isInGameEdition);
 
     previousTime = LogTimeSpent("Project data export", previousTime);
   }
@@ -364,10 +347,15 @@ bool ExporterHelper::ExportProjectForPixiPreview(
 }
 
 gd::String ExporterHelper::ExportProjectData(
-    gd::AbstractFileSystem &fs, gd::Project &project, gd::String filename,
-    const gd::SerializerElement &runtimeGameOptions, bool isInGameEdition,
-    const std::vector<gd::InGameEditorResourceMetadata> &inGameEditorResources) {
+    gd::AbstractFileSystem &fs, const gd::String &gdjsRoot,
+    gd::Project &project, gd::String filename,
+    const gd::SerializerElement &runtimeGameOptions, bool isInGameEdition) {
   fs.MkDir(fs.DirNameFrom(filename));
+
+  std::vector<gd::InGameEditorResourceMetadata> inGameEditorResources;
+  if (isInGameEdition) {
+    AddAllInGameEditorResources(fs, gdjsRoot, project, inGameEditorResources);
+  }
 
   gd::SerializerElement projectDataElement;
   ExporterHelper::StripAndSerializeProjectData(project, projectDataElement,
@@ -403,8 +391,10 @@ void ExporterHelper::SerializeRuntimeGameOptions(
     initialRuntimeGameStatus.AddChild("isInGameEdition").SetBoolValue(true);
     initialRuntimeGameStatus.AddChild("editorId").SetValue(options.editorId);
     if (!options.editorCamera3DCameraMode.empty()) {
+      auto &editorCamera =
+          initialRuntimeGameStatus.AddChild("editorCamera");
       auto &editorCamera3D =
-          initialRuntimeGameStatus.AddChild("editorCamera3D");
+          editorCamera.AddChild("camera3D");
       editorCamera3D.AddChild("cameraMode").SetStringValue(
           options.editorCamera3DCameraMode);
       editorCamera3D.AddChild("positionX")
@@ -419,6 +409,14 @@ void ExporterHelper::SerializeRuntimeGameOptions(
           .SetDoubleValue(options.editorCamera3DElevationAngle);
       editorCamera3D.AddChild("distance")
           .SetDoubleValue(options.editorCamera3DDistance);
+      auto &editorCamera2D =
+          editorCamera.AddChild("camera2D");
+      editorCamera2D.AddChild("centerX")
+          .SetDoubleValue(options.editorCamera2DCenterX);
+      editorCamera2D.AddChild("centerY")
+          .SetDoubleValue(options.editorCamera2DCenterY);
+      editorCamera2D.AddChild("zoom")
+          .SetDoubleValue(options.editorCamera2DZoom);
     }
   }
   if (!options.externalLayoutName.empty()) {
@@ -552,10 +550,10 @@ void ExporterHelper::AddInGameEditorResources(
 }
 
 void ExporterHelper::SerializeProjectData(gd::AbstractFileSystem &fs,
+                                          const gd::String &gdjsRoot,
                                           const gd::Project &project,
                                           const PreviewExportOptions &options,
-                                          gd::SerializerElement &rootElement,
-                                          const std::vector<gd::InGameEditorResourceMetadata> &inGameEditorResources) {
+                                          gd::SerializerElement &rootElement) {
   gd::Project clonedProject = project;
 
   // Replace all resource file paths with the one used in exported projects.
@@ -582,9 +580,48 @@ void ExporterHelper::SerializeProjectData(gd::AbstractFileSystem &fs,
   gd::ResourceExposer::ExposeWholeProjectResources(clonedProject,
                                                    resourcesMergingHelper);
 
+  std::vector<gd::InGameEditorResourceMetadata> inGameEditorResources;
+  if (options.isInGameEdition) {
+    AddAllInGameEditorResources(fs, gdjsRoot, project, inGameEditorResources);
+  }
+
   ExporterHelper::StripAndSerializeProjectData(clonedProject, rootElement,
                                                 options.isInGameEdition,
                                                 inGameEditorResources);
+}
+
+void ExporterHelper::AddAllInGameEditorResources(
+    gd::AbstractFileSystem &fs, const gd::String &gdjsRoot,
+    const gd::Project &project,
+    std::vector<gd::InGameEditorResourceMetadata> &inGameEditorResources) {
+
+  auto addResources = [&fs, &gdjsRoot, &inGameEditorResources](
+                          const std::vector<gd::InGameEditorResourceMetadata>
+                              &addedInGameEditorResources) {
+    for (const auto &inGameEditorResource : addedInGameEditorResources) {
+      inGameEditorResources.push_back(inGameEditorResource);
+      // Always use absolute paths for in-game editor resources.
+      // There are not copied and instead directly refer to the file in the
+      // Runtime folder.
+      gd::String resourceFile = inGameEditorResource.GetFilePath();
+      if (!fs.IsAbsolute(resourceFile)) {
+        fs.MakeAbsolute(resourceFile, gdjsRoot + "/Runtime");
+      }
+      inGameEditorResources.back().SetFilePath(resourceFile);
+    }
+  };
+
+  for (const auto &platformExtension :
+       project.GetCurrentPlatform().GetAllPlatformExtensions()) {
+    addResources(platformExtension->GetInGameEditorResources());
+
+    for (const auto &objectType :
+         platformExtension->GetExtensionObjectsTypes()) {
+      const auto &objectMetadata =
+          platformExtension->GetObjectMetadata(objectType);
+      addResources(objectMetadata.GetInGameEditorResources());
+    }
+  }
 }
 
 void ExporterHelper::StripAndSerializeProjectData(

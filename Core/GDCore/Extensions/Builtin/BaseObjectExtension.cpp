@@ -81,6 +81,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetResourceName("InGameEditor-HiddenInstanceIcon")
       .SetFilePath("InGameEditor/HiddenInstanceIcon.svg")
       .SetKind("internal-in-game-editor-only-svg");
+  extension.AddInGameEditorResource()
+      .SetResourceName("InGameEditor-rotate24_black")
+      .SetFilePath("InGameEditor/rotate24_black.png")
+      .SetKind("image");
 
   gd::ObjectMetadata& obj = extension.AddObject<gd::ObjectConfiguration>(
       "", _("Base object"), _("Base object"), "res/functions/object_black.svg");

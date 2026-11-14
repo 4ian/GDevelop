@@ -747,6 +747,9 @@ const MainFrame = (props: Props): React.MixedElement => {
     () => setGameEditorMode('embedded-game'),
     []
   );
+  const [editorMode, setEditorMode] = React.useState<'2d-editor' | '3d-editor'>(
+    '2d-editor'
+  );
 
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.
@@ -2397,7 +2400,10 @@ const MainFrame = (props: Props): React.MixedElement => {
 
   React.useEffect(
     () => {
-      if (gameEditorMode === 'embedded-game') {
+      if (
+        gameEditorMode === 'embedded-game' ||
+        preferences.getUseRealTime2DEditor()
+      ) {
         // The in-game editor is never hot-reloaded:
         // - in 2D mode
         // - from a tab without 3D editor
@@ -2439,12 +2445,14 @@ const MainFrame = (props: Props): React.MixedElement => {
         }
       }
     },
-    [gameEditorMode, state.editorTabs, notifyChangesToInGameEditor]
+    [gameEditorMode, state.editorTabs, notifyChangesToInGameEditor, preferences]
   );
 
   useAutomatedRegularInGameEditorRestart({
     onRestartInGameEditor,
-    gameEditorMode,
+    gameEditorMode: preferences.getUseRealTime2DEditor()
+      ? 'embedded-game'
+      : gameEditorMode,
   });
 
   const onExternalLayoutAssociationChanged = React.useCallback(
@@ -3193,8 +3201,8 @@ const MainFrame = (props: Props): React.MixedElement => {
           isForInGameEdition: !!isForInGameEdition,
           isForGameplayTest: false,
           editorId: isForInGameEdition ? isForInGameEdition.editorId : '',
-          editorCameraState3D: isForInGameEdition
-            ? isForInGameEdition.editorCameraState3D
+          editorCameraState: isForInGameEdition
+            ? isForInGameEdition.editorCameraState
             : null,
           inGameEditorSettings: isForInGameEdition
             ? inGameEditorSettings
@@ -3364,11 +3372,11 @@ const MainFrame = (props: Props): React.MixedElement => {
       shouldReloadLibraries,
       shouldReloadResources,
       shouldHardReload,
-      editorCameraState3D,
+      editorCameraState,
     }: {|
       ...PreviewInGameEditorTarget,
       ...HotReloadSteps,
-      editorCameraState3D: EditorCameraState | null,
+      editorCameraState: EditorCameraState | null,
     |}) => {
       await _launchPreview({
         networkPreview: false,
@@ -3385,7 +3393,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           forcedExternalLayoutName: externalLayoutName,
           eventsBasedObjectType,
           eventsBasedObjectVariantName,
-          editorCameraState3D,
+          editorCameraState,
         },
         numberOfWindows: 0,
       });
@@ -6305,8 +6313,11 @@ const MainFrame = (props: Props): React.MixedElement => {
   };
 
   const editorTabsPaneProps: EditorTabsPaneCommonProps = {
-    gameEditorMode,
+    gameEditorMode: preferences.getUseRealTime2DEditor()
+      ? 'embedded-game'
+      : gameEditorMode,
     setGameEditorMode,
+    setEditorMode,
     editorTabs: state.editorTabs,
     currentProject: currentProject,
     currentFileMetadata: currentFileMetadata,
@@ -6456,10 +6467,15 @@ const MainFrame = (props: Props): React.MixedElement => {
         <EmbeddedGameFrame
           key={currentProject ? currentProject.ptr : 0}
           // The in-game editor requires WebGL2 (a message is shown instead).
-          enabled={gameEditorMode === 'embedded-game' && isWebGL2Supported()}
+          enabled={
+            (gameEditorMode === 'embedded-game' ||
+              preferences.getUseRealTime2DEditor()) &&
+            isWebGL2Supported()
+          }
           onEnable={onEnableInGameEditor}
           previewDebuggerServer={previewDebuggerServer || null}
           onLaunchPreviewForInGameEdition={onLaunchPreviewForInGameEdition}
+          editorMode={editorMode}
         >
           <LineStackLayout noMargin>
             <SlowGraphicsRenderingIndicator />

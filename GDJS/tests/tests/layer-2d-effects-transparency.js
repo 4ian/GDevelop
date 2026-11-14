@@ -50,6 +50,7 @@ describe('gdjs.LayerPixiRenderer (2D effects on transparent pixels)', () => {
       gridColor: 0,
       gridAlpha: 1,
       snap: false,
+        windowMask: false,
     },
   });
 

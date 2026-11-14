@@ -251,7 +251,7 @@ struct PreviewExportOptions {
   }
 
   /**
-   * \brief Set the camera state to use in the in-game editor.
+   * \brief Set the 3D camera state to use in the in-game editor.
    */
   PreviewExportOptions &
   SetEditorCameraState3D(const gd::String &cameraMode, double positionX,
@@ -265,6 +265,17 @@ struct PreviewExportOptions {
     editorCamera3DRotationAngle = rotationAngle;
     editorCamera3DElevationAngle = elevationAngle;
     editorCamera3DDistance = distance;
+    return *this;
+  }
+
+  /**
+   * \brief Set the 2D camera state to use in the in-game editor.
+   */
+  PreviewExportOptions &SetEditorCameraState2D(double centerX, double centerY,
+                                               double zoom) {
+    editorCamera2DCenterX = centerX;
+    editorCamera2DCenterY = centerY;
+    editorCamera2DZoom = zoom;
     return *this;
   }
 
@@ -411,6 +422,9 @@ struct PreviewExportOptions {
   double editorCamera3DRotationAngle = 0;
   double editorCamera3DElevationAngle = 0;
   double editorCamera3DDistance = 0;
+  double editorCamera2DCenterX = 0;
+  double editorCamera2DCenterY = 0;
+  double editorCamera2DZoom = 1;
   unsigned int nonRuntimeScriptsCacheBurst;
   gd::String electronRemoteRequirePath;
   gd::String gdevelopResourceToken;
@@ -486,6 +500,7 @@ class ExporterHelper {
    * \brief Export a project without its events and options to 2 JS variables
    *
    * \param fs The abstract file system to use to write the file
+   * \param gdjsRoot The root directory of GDJS, used to copy runtime files.
    * \param project The project to be exported.
    * \param filename The filename where export the project
    * \param runtimeGameOptions The content of the extra configuration to store
@@ -494,25 +509,41 @@ class ExporterHelper {
    * \return Empty string if everything is ok,
    * description of the error otherwise.
    */
-  static gd::String ExportProjectData(
-      gd::AbstractFileSystem &fs, gd::Project &project, gd::String filename,
-      const gd::SerializerElement &runtimeGameOptions, bool isInGameEdition,
-      const std::vector<gd::InGameEditorResourceMetadata> &inGameEditorResources);
+  static gd::String
+  ExportProjectData(gd::AbstractFileSystem &fs, const gd::String &gdjsRoot,
+                    gd::Project &project, gd::String filename,
+                    const gd::SerializerElement &runtimeGameOptions,
+                    bool isInGameEdition);
 
   /**
    * \brief Serialize a project without its events to JSON
    *
    * \param fs The abstract file system to use to write the file
+   * \param gdjsRoot The root directory of GDJS, used to copy runtime files.
    * \param project The project to be exported.
    * \param options The content of the extra configuration
    * \param projectDataElement The element where the project data is serialized
    * \param inGameEditorResources The list of in-game editor resources to be used.
    */
   static void SerializeProjectData(gd::AbstractFileSystem &fs,
+                                   const gd::String &gdjsRoot,
                                    const gd::Project &project,
                                    const PreviewExportOptions &options,
-                                   gd::SerializerElement &projectDataElement,
-                                   const std::vector<gd::InGameEditorResourceMetadata> &inGameEditorResources);
+                                   gd::SerializerElement &projectDataElement);
+
+  /**
+   * List all the in-game editor resources, so they can be later included in the
+   * exported project resources.
+   * \param fs The abstract file system to use to write the file
+   * \param gdjsRoot The root directory of GDJS, used to copy runtime files.
+   * \param project The project to be exported.
+   * \param inGameEditorResources The resources list where the in-game editor
+   * resources are added
+   */
+  static void AddAllInGameEditorResources(
+      gd::AbstractFileSystem &fs, const gd::String &gdjsRoot,
+      const gd::Project &project,
+      std::vector<gd::InGameEditorResourceMetadata> &inGameEditorResources);
 
   /**
    * \brief Serialize the content of the extra configuration to store

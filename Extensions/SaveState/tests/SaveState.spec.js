@@ -83,6 +83,7 @@ describe('SaveState', () => {
       gridColor: 0,
       gridAlpha: 0,
       snap: false,
+      windowMask: false,
     },
   });
 

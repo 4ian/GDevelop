@@ -141,9 +141,9 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
     runtimeGameOptions.AddChild("runtimeFilesBaseUrl")
         .SetStringValue(
             ExporterHelper::GetExportedRuntimeFilesBaseUrl(fs, gdjsRoot));
-    std::vector<gd::InGameEditorResourceMetadata> noInGameEditorResources;
-    helper.ExportProjectData(fs, exportedProject, codeOutputDir + "/data.js",
-                             runtimeGameOptions, false, noInGameEditorResources);
+    helper.ExportProjectData(fs, gdjsRoot, exportedProject,
+                             codeOutputDir + "/data.js", runtimeGameOptions,
+                             false);
     includesFiles.push_back(codeOutputDir + "/data.js");
 
     helper.ExportIncludesAndLibs(includesFiles, exportDir, false);
@@ -209,8 +209,7 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
 void Exporter::SerializeProjectData(const gd::Project &project,
                                     const PreviewExportOptions &options,
                                     gd::SerializerElement &projectDataElement) {
-  std::vector<gd::InGameEditorResourceMetadata> noInGameEditorResources;
-  ExporterHelper::SerializeProjectData(fs, project, options, projectDataElement, noInGameEditorResources);
+  ExporterHelper::SerializeProjectData(fs, gdjsRoot, project, options, projectDataElement);
 }
 
 void Exporter::SerializeRuntimeGameOptions(

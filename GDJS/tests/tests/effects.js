@@ -120,6 +120,7 @@ describe('gdjs.EffectsManager', () => {
         gridColor: 0,
         gridAlpha: 1,
         snap: false,
+        windowMask: false,
       }
     }, usedExtensionsWithVariablesData: []});
 
@@ -285,6 +286,7 @@ describe('gdjs.EffectsManager', () => {
             gridColor: 0,
             gridAlpha: 1,
             snap: false,
+        windowMask: false,
           },
         },
         usedExtensionsWithVariablesData: [],

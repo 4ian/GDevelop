@@ -10,10 +10,12 @@
  *
  *   node GDJS/ThreeRT/scripts/build.js --project <game.json> --gdevelop <path to gdevelop> --threert <ThreeRT> --out <folder>
  *
- * The output folder is a ThreeRT package:
+ * The output folder is a ThreeRT package, and a ThreeRT project:
  *   game.js       the bundle: the game, GDJS and the ThreeRT runtime in one script, for `threert-render play game.js`
  *   assets/       the files of the game (images, 3D models, sounds...), read by the engine
  *   threert.json  the manifest of the package
+ *   game.ts       the game as a ThreeRT project (`threert dev`, `threert check`, `threert shot`...): it imports
+ *                 @threert/scene and @threert/gameplay and evaluates gdjs-game.js (GDJS, the game, the adapter)
  *
  * Options:
  *   --jolt <jolt-physics.js>  the JavaScript (non WebAssembly) build of Jolt Physics, for games using the 3D physics
@@ -168,10 +170,16 @@ const findJoltFile = () => {
     .filter((version) => /^\d+\.\d+\.\d+$/.test(version))
     .reverse()
     .slice(0, 15);
+  // The hash of the .wasm of each version tried, to download only the one that matches next time.
+  const hashesFile = path.join(__dirname, '../.cache/jolt-wasm-hashes.json');
+  const knownHashes = fs.existsSync(hashesFile) ? JSON.parse(fs.readFileSync(hashesFile, 'utf8')) : {};
   for (const version of versions) {
+    if (knownHashes[version] && knownHashes[version] !== exportedHash) continue;
     const dist = getJoltPackage(version);
     const wasm = path.join(dist, 'jolt-physics.wasm.wasm');
-    if (fs.existsSync(wasm) && hash(wasm) === exportedHash) {
+    knownHashes[version] = fs.existsSync(wasm) ? hash(wasm) : 'none';
+    fs.writeFileSync(hashesFile, JSON.stringify(knownHashes, null, 2));
+    if (knownHashes[version] === exportedHash) {
       console.log(`ℹ️ Jolt Physics: jolt-physics@${version} (JavaScript build).`);
       return path.join(dist, 'jolt-physics.js');
     }
@@ -481,6 +489,54 @@ const build = async () => {
 
   const bundle = parts.join('\n;\n');
   fs.writeFileSync(path.join(outDir, 'game.js'), bundle);
+
+  // The same game as a ThreeRT project (`threert dev`, `threert check`...): game.ts takes @threert/scene and
+  // @threert/gameplay from the project's bundler and evaluates the rest (GDJS scripts are scripts, not modules).
+  const libraries = {
+    name: 'threert-libraries-from-game-ts',
+    setup(build) {
+      build.onResolve({ filter: /^@threert\/(scene|gameplay)$/ }, (resolved) => ({ path: resolved.path, namespace: 'threert-library' }));
+      build.onLoad({ filter: /.*/, namespace: 'threert-library' }, (loaded) => ({
+        contents: `module.exports = globalThis.__GDJS_THREERT_LIBS__[${JSON.stringify(loaded.path.split('/')[1])}];`,
+        loader: 'js',
+      }));
+    },
+  };
+  const adapterForProject = await esbuild.build({
+    stdin: {
+      contents: [`import game from ${JSON.stringify(adapterEntry)};`, `globalThis.__GDJS_THREERT_GAME__ = game;`].join('\n'),
+      resolveDir: threertRoot,
+      sourcefile: 'gdjs-threert-project-entry.js',
+    },
+    bundle: true,
+    plugins: [libraries],
+    format: 'iife',
+    platform: 'neutral',
+    target: 'es2022',
+    legalComments: 'none',
+    write: false,
+    logLevel: 'warning',
+  });
+  const projectCode = [parts[0], adapterForProject.outputFiles[0].text, ...parts.slice(2)].join('\n;\n');
+  fs.writeFileSync(path.join(outDir, 'gdjs-game.js'), `// The GDevelop game (GDJS, its game code and the adapter to ThreeRT), evaluated by game.ts.\nexport default ${JSON.stringify(projectCode)};\n`);
+  fs.writeFileSync(path.join(outDir, 'gdjs-game.d.ts'), 'declare const code: string;\nexport default code;\n');
+  fs.writeFileSync(
+    path.join(outDir, 'game.ts'),
+    [
+      `// ${projectData.properties.name || 'A GDevelop game'}, made with GDevelop, on ThreeRT.`,
+      '// Made by GDevelop\'s GDJS/ThreeRT/scripts/build.js from an HTML5 export: change the game in GDevelop and build it again.',
+      'import * as scene from "@threert/scene";',
+      'import * as gameplay from "@threert/gameplay";',
+      'import code from "./gdjs-game.js";',
+      '',
+      '// GDJS and its libraries are scripts sharing global variables: they are evaluated as such.',
+      '(globalThis as any).__GDJS_THREERT_LIBS__ = { scene, gameplay };',
+      '(0, eval)(code);',
+      '',
+      'export default (globalThis as any).__GDJS_THREERT_GAME__;',
+      '',
+    ].join('\n')
+  );
 
   // threert.json, the manifest of the package.
   const sha256 = (buffer) => crypto.createHash('sha256').update(buffer).digest('hex');

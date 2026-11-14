@@ -380,7 +380,12 @@ class ResponseStub {
     return this.text().then((text) => JSON.parse(text));
   }
   arrayBuffer() {
-    return this.text().then((text) => new TextEncoder().encode(text).buffer);
+    return this.text().then((text) => {
+      const buffer: any = new TextEncoder().encode(text).buffer;
+      // (WebAssembly modules are found by the name of their file: see wasm.ts.)
+      buffer.__threertFile = this.url;
+      return buffer;
+    });
   }
   blob() {
     return this.text();
@@ -389,6 +394,8 @@ class ResponseStub {
 
 /** The text of a file of the game: from the manifest for text files, empty for the others (fonts...), else null. */
 const getTextOfFile = (url: string): string | null => {
+  // WebAssembly modules are in the bundle, converted to JavaScript (wasm.ts): their files are empty.
+  if (/\.wasm$/.test(normalizeFilePath(url))) return '';
   const info = getManifest().files[normalizeFilePath(url)];
   if (!info) return null;
   return typeof info.text === 'string' ? info.text : '';

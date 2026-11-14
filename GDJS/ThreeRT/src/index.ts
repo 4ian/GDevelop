@@ -13,6 +13,7 @@ import { defineGame, hud } from '@threert/gameplay';
 import { installBrowserShims, runAnimationFrames, runTimers, setFlushTimersImmediately, gameViewport } from './browser';
 import { installThree } from './three';
 import { installAudio } from './audio';
+import { installWebAssembly, importModule } from './wasm';
 import { installGDJSPatches, installPreGDJS, threertState, getJoltModule } from './gdjs-patches';
 import { ThreeRTView } from './view';
 import { applyInput } from './input';
@@ -24,8 +25,9 @@ const g = globalThis as any;
 
 installBrowserShims();
 installAudio();
+installWebAssembly();
 installPreGDJS();
-g.__GDJS_THREERT__ = { installThree, installGDJSPatches, getJoltModule };
+g.__GDJS_THREERT__ = { installThree, installGDJSPatches, getJoltModule, importModule };
 
 let game: any = null;
 let gameTimeMs = 0;
@@ -74,6 +76,23 @@ const stepGame = (elapsedTimeMs: number) => {
  */
 const WARM_UP = { maxSteps: 240, maxTimeMs: 60000, fastStepMs: 15, fastStepsInARow: 8 };
 
+/** With `--profile`: 30 steps measured by GDJS's profiler, logged. */
+const logGDJSProfile = () => {
+  const scene = game.getSceneStack().getCurrentScene();
+  if (!scene || !scene.startProfiler) return;
+  scene.startProfiler(() => {});
+  for (let i = 0; i < 30; i++) {
+    gameTimeMs += 1000 / 60;
+    stepGame(1000 / 60);
+  }
+  const profiler = scene._profiler;
+  if (!profiler) return;
+  const lines: string[] = [];
+  gdjs.Profiler.getProfilerSectionTexts('step', profiler.getFramesAverageMeasures(), lines);
+  scene.stopProfiler();
+  console.info('[GDJS ThreeRT] GDJS profiler, mean of 30 steps:\n  ' + lines.join('\n  '));
+};
+
 const startGame = () => {
   const projectData = g.gdjs && gdjs.projectData;
   if (!projectData) throw new Error('The game data (gdjs.projectData) was not found in the bundle.');
@@ -100,6 +119,7 @@ const startGame = () => {
         fastSteps = performance.now() - stepStart < WARM_UP.fastStepMs ? fastSteps + 1 : 0;
       }
       console.info(`[GDJS ThreeRT] Game started: ${steps} steps in setup (${(performance.now() - start).toFixed(0)} ms).`);
+      if (isProfiling) logGDJSProfile();
     } catch (error) {
       logError('Error while starting the game', error);
     }

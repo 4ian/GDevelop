@@ -11,6 +11,7 @@ import { AnimationClip, GLTFScene } from './three';
 import { getFileInfo } from './manifest';
 import { ThreeRTView } from './view';
 import { gameViewport } from './browser';
+import { raycastGeometry } from './raycast-bvh';
 
 declare const gdjs: any;
 declare const PIXI: any;
@@ -232,6 +233,150 @@ const createModelMeshes = (model: NonNullable<ReturnType<typeof getFileInfo>>['m
   return meshes;
 };
 
+/** The meshes of each model file (by the path of its GLTFModel), for rays to hit models (`patchRaycaster`). */
+const modelMeshesByUri = new Map<string, S.Mesh[]>();
+
+/**
+ * three.js's raycaster as GDJS extensions use it (Raycaster3D...): intersections with their `normal`, and rays
+ * hitting GLTFModels (their triangles are not in the scene code, but in the manifest).
+ */
+const patchRaycaster = () => {
+  const Raycaster: any = S.Raycaster;
+  if (typeof Raycaster.prototype.mesh !== 'function') return;
+  // Triangles tested through a BVH (raycast-bvh.ts) for meshes of more than a few dozen of them.
+  const testMesh = Raycaster.prototype.mesh;
+  Raycaster.prototype.mesh = function (object: any, geometry: any, materials: any[], world: any, out: any[]) {
+    if (!raycastGeometry(this, object, geometry, materials, world, out)) testMesh.call(this, object, geometry, materials, world, out);
+  };
+
+  // A `raycast` method may change a geometry and put it back (Terrain3D draws a lower level of detail than it
+  // raycasts): ThreeRT is not told (it would update the geometry for nothing).
+  const Geometry: any = S.BufferGeometry.prototype;
+  const changed = Geometry.changed;
+  let geometryChangesSuspended = 0;
+  Geometry.changed = function () {
+    if (!geometryChangesSuspended) changed.call(this);
+  };
+  // three.js's setIndex keeps the array it is given: so does this one for 32 bits indices (no copy), and other
+  // arrays are converted once (a geometry keeps the same index object for the same array: see raycast-bvh.ts).
+  const setIndex = Geometry.setIndex;
+  const convertedIndices = new WeakMap<object, Uint32Array>();
+  Geometry.setIndex = function (index: any) {
+    let array = index && index.isBufferAttribute ? index.array : index;
+    if (array && !(array instanceof Uint32Array) && typeof array === 'object' && typeof array.length === 'number') {
+      let converted = convertedIndices.get(array);
+      if (!converted || converted.length !== array.length) {
+        converted = Uint32Array.from(array);
+        convertedIndices.set(array, converted);
+      }
+      array = converted;
+    }
+    if (array instanceof Uint32Array) {
+      if (this.index === array) return this;
+      this.index = array;
+      this.changed();
+      return this;
+    }
+    return setIndex.call(this, index);
+  };
+  const tmpMatrix = new S.Matrix4();
+  const tmpInverse = new S.Matrix4();
+  const tmpCenter = new S.Vector3();
+
+  /** Instances of an instanced mesh whose bounding sphere the ray meets (in the mesh's space), then their triangles. */
+  const visitInstancedMesh = (raycaster: any, object: any, out: any[]) => {
+    const geometry = object.geometry;
+    if (!geometry || geometry instanceof S.ProceduralGeometry) return;
+    if (!geometry.boundingSphere) geometry.computeBoundingSphere();
+    const sphere = geometry.boundingSphere;
+    if (!sphere) return;
+    const localRay = raycaster.ray.clone().applyMatrix4(tmpInverse.copy(object.matrixWorld).invert());
+    const origin = localRay.origin;
+    const direction = localRay.direction.normalize();
+    const array = object.instanceMatrix.array;
+    for (let i = 0; i < object.count; i++) {
+      const o = i * 16;
+      // The sphere of the instance: its centre through the instance matrix, its radius by its largest scale.
+      const cx = array[o] * sphere.center.x + array[o + 4] * sphere.center.y + array[o + 8] * sphere.center.z + array[o + 12];
+      const cy = array[o + 1] * sphere.center.x + array[o + 5] * sphere.center.y + array[o + 9] * sphere.center.z + array[o + 13];
+      const cz = array[o + 2] * sphere.center.x + array[o + 6] * sphere.center.y + array[o + 10] * sphere.center.z + array[o + 14];
+      const scale = Math.sqrt(
+        Math.max(
+          array[o] * array[o] + array[o + 1] * array[o + 1] + array[o + 2] * array[o + 2],
+          array[o + 4] * array[o + 4] + array[o + 5] * array[o + 5] + array[o + 6] * array[o + 6],
+          array[o + 8] * array[o + 8] + array[o + 9] * array[o + 9] + array[o + 10] * array[o + 10]
+        )
+      );
+      const radius = sphere.radius * scale;
+      const dx = cx - origin.x, dy = cy - origin.y, dz = cz - origin.z;
+      const along = dx * direction.x + dy * direction.y + dz * direction.z;
+      if (along < -radius) continue;
+      const distanceSquared = dx * dx + dy * dy + dz * dz - along * along;
+      if (distanceSquared > radius * radius) continue;
+      object.getMatrixAt(i, tmpMatrix);
+      const hits: any[] = [];
+      raycaster.mesh(object, geometry, object.materials, new S.Matrix4().multiplyMatrices(object.matrixWorld, tmpMatrix), hits);
+      for (const hit of hits) out.push({ ...hit, instanceId: i });
+    }
+  };
+
+  /** A glTF model: the triangles of its file (from the manifest), if the ray meets its bounds. */
+  const visitModel = (raycaster: any, object: any, out: any[]) => {
+    const meshes = modelMeshesByUri.get(object.uri);
+    const bounds = object.__threertBounds;
+    if (!meshes || !bounds) return;
+    const localRay = raycaster.ray.clone().applyMatrix4(tmpInverse.copy(object.matrixWorld).invert());
+    const box = new S.Box3(new S.Vector3(bounds.min[0], bounds.min[1], bounds.min[2]), new S.Vector3(bounds.max[0], bounds.max[1], bounds.max[2]));
+    if (localRay.intersectBox(box) === null) return;
+    for (const mesh of meshes) {
+      mesh.updateMatrix();
+      raycaster.mesh(object, mesh.geometry, mesh.materials, new S.Matrix4().multiplyMatrices(object.matrixWorld, mesh.matrix), out);
+    }
+  };
+
+  /**
+   * three.js's traversal of a raycast, on @threert/scene's triangle tests: world matrices updated once by
+   * traversal, `raycast` methods of objects (Terrain3D's ground answers from its heights) asked.
+   */
+  const visit = function (this: any, object: any, recursive: boolean, out: any[], parentIsUpdated: boolean) {
+    object.updateWorldMatrix(!parentIsUpdated, false);
+    if (Object.prototype.hasOwnProperty.call(object, 'raycast') && typeof object.raycast === 'function') {
+      geometryChangesSuspended++;
+      try {
+        object.raycast(this, out);
+      } finally {
+        geometryChangesSuspended--;
+      }
+    } else if (object instanceof S.InstancedMesh) {
+      visitInstancedMesh(this, object, out);
+    } else if (object instanceof S.Mesh) {
+      this.mesh(object, object.geometry, object.materials, object.matrixWorld, out);
+    } else if (object instanceof S.GLTFModel) {
+      visitModel(this, object, out);
+    } else if (object instanceof S.ProceduralMesh) {
+      this.boxes(object, object.geometry.boxes, object.matrixWorld, out);
+    }
+    if (recursive) for (const child of object.children) visit.call(this, child, true, out, true);
+  };
+  Raycaster.prototype.visit = function (object: any, recursive: boolean, out: any[]) {
+    visit.call(this, object, recursive, out, false);
+  };
+  // three.js's Mesh.raycast, called by `raycast` methods of objects.
+  (S.Mesh.prototype as any).raycast = function (raycaster: any, intersects: any[]) {
+    if (typeof raycaster.mesh === 'function') raycaster.mesh(this, this.geometry, this.materials, this.matrixWorld, intersects);
+  };
+  for (const name of ['intersectObject', 'intersectObjects']) {
+    const intersect = Raycaster.prototype[name];
+    Raycaster.prototype[name] = function (...args: any[]) {
+      const intersections = intersect.apply(this, args);
+      for (const intersection of intersections) {
+        if (!intersection.normal && intersection.face) intersection.normal = intersection.face.normal.clone();
+      }
+      return intersections;
+    };
+  }
+};
+
 const patchModel3DManager = () => {
   const Manager = gdjs.Model3DManager;
   if (!Manager) return;
@@ -248,7 +393,9 @@ const patchModel3DManager = () => {
     model.__threertBounds = { min: info.model.min, max: info.model.max };
     scene.add(model);
     // The meshes of the file, for code reading them (they are not drawn: the GLTFModel is).
-    for (const mesh of createModelMeshes(info.model)) scene.add(mesh);
+    const meshes = createModelMeshes(info.model);
+    modelMeshesByUri.set(info.assetPath, meshes.map((mesh) => mesh.clone()));
+    for (const mesh of meshes) scene.add(mesh);
     const animations = info.model.animations.map((animation) => new AnimationClip(animation.name, animation.duration));
     this._loadedThreeModels.set(resource, {
       scene,
@@ -331,5 +478,6 @@ export const installGDJSPatches = () => {
   patchLoadingScreen();
   patchSessionMetrics();
   patchModel3DManager();
+  patchRaycaster();
   patchImageManager();
 };

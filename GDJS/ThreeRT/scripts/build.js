@@ -20,7 +20,9 @@
  *                             (downloaded from npm, in the version GDJS uses, if not given).
  *   --pointer look|free       how the game reads the mouse (by default "look" when the game locks the pointer).
  *   --name <name>             the id of the game in threert.json.
- *   --profile                 log the time spent in the frame script every 120 frames.
+ *   --profile                 log the time spent in the frame script every 20 frames.
+ *   --jolt-wasm2js            convert the WebAssembly Jolt of the export with wasm2js, as other WebAssembly libraries
+ *                             (instead of the JavaScript build of Jolt from npm).
  */
 const fs = require('fs');
 const path = require('path');
@@ -75,15 +77,66 @@ const replacedScripts = new Set([
   'fontfaceobserver-font-manager/fontfaceobserver.js', // see gdjs-patches.ts
 ]);
 
+/** ES modules imported by the scripts (`import("./x.js")`), by their path in the export. */
+const importedModules = new Set();
+
 /** Changes to the scripts of the export, for what can't be done from outside. */
 const patchScript = (file, code) => {
-  if (code.includes('import("./jolt-physics.wasm.js")')) {
+  if (code.includes('import("./jolt-physics.wasm.js")') && args['jolt-wasm2js'] === undefined) {
     // Jolt is its JavaScript build, embedded in the bundle (no WebAssembly in ThreeRT's JavaScript engine).
     code = code.split('import("./jolt-physics.wasm.js")').join('__GDJS_THREERT__.getJoltModule()');
   }
+  // Other modules imported dynamically are embedded in the bundle (`embedModule`).
+  code = code.replace(/\bimport\(\s*["'](\.\.?\/[^"']+)["']\s*\)/g, (match, relativePath) => {
+    const modulePath = path.posix.normalize(path.posix.join(path.posix.dirname(file), relativePath));
+    if (!fs.existsSync(path.join(exportDir, modulePath))) {
+      console.warn(`⚠️ ${file} imports ${relativePath}, not found in the export.`);
+      return match;
+    }
+    importedModules.add(modulePath);
+    return `__GDJS_THREERT__.importModule(${JSON.stringify(modulePath)})`;
+  });
   const dynamicImports = code.match(/\bimport\(\s*["'][^"']+["']\s*\)/g);
   if (dynamicImports) console.warn(`⚠️ ${file} imports modules dynamically (not supported by ThreeRT): ${dynamicImports.join(', ')}`);
   return code;
+};
+
+/** An ES module of the export as a script registering its exports (`__GDJS_THREERT_MODULES__`). */
+const embedModule = (modulePath) => {
+  let code = fs.readFileSync(path.join(exportDir, modulePath), 'utf8');
+  code = code.split('import.meta.url').join(JSON.stringify('threert://game/' + modulePath));
+  code = code.replace(/\bexport\s+default\s+([\w$]+)\s*;?/g, '__exports.default = $1;');
+  code = code.replace(/\bexport\s*\{([^}]*)\}\s*;?/g, (match, list) =>
+    list
+      .split(',')
+      .map((entry) => entry.trim().split(/\s+as\s+/))
+      .filter((parts) => parts[0])
+      .map(([local, exported]) => `__exports[${JSON.stringify(exported || local)}] = ${local};`)
+      .join('')
+  );
+  if (/^\s*import\s/m.test(code)) console.warn(`⚠️ ${modulePath} has static imports (not supported).`);
+  return `globalThis.__GDJS_THREERT_MODULES__ = globalThis.__GDJS_THREERT_MODULES__ || {};\n` +
+    `globalThis.__GDJS_THREERT_MODULES__[${JSON.stringify(modulePath)}] = (function () { var __exports = {};\n${code}\n;return __exports; })();`;
+};
+
+/** A WebAssembly module converted to JavaScript by binaryen's wasm2js, registered by its file name (see wasm.ts). */
+const embedWasmModule = (wasmPath) => {
+  const cacheDir = path.join(__dirname, '../.cache');
+  fs.mkdirSync(cacheDir, { recursive: true });
+  const content = fs.readFileSync(path.join(exportDir, wasmPath));
+  const cachedFile = path.join(cacheDir, 'wasm2js-' + crypto.createHash('md5').update(content).digest('hex') + '.js');
+  if (!fs.existsSync(cachedFile)) {
+    console.log(`ℹ️ Converting ${wasmPath} to JavaScript (binaryen wasm2js)...`);
+    const features = ['--enable-bulk-memory', '--enable-nontrapping-float-to-int', '--enable-sign-ext', '--enable-mutable-globals'];
+    execFileSync('npx', ['--yes', '-p', 'binaryen@132.0.0', 'wasm2js', path.join(exportDir, wasmPath), ...features, '-O2', '-o', cachedFile], { stdio: 'inherit', cwd: cacheDir });
+  }
+  let code = fs.readFileSync(cachedFile, 'utf8');
+  code = code.replace(/^import \* as [\w$]+ from '[^']*';\s*$/gm, '');
+  const end = code.indexOf('var retasmFunc = asmFunc(');
+  if (end === -1) fail(`Unexpected output of wasm2js for ${wasmPath}.`);
+  code = code.substring(0, end);
+  return `globalThis.__GDJS_THREERT_WASM__ = globalThis.__GDJS_THREERT_WASM__ || {};\n` +
+    `globalThis.__GDJS_THREERT_WASM__[${JSON.stringify(path.posix.basename(wasmPath))}] = function (imports) {\n${code}\nreturn asmFunc(imports); };`;
 };
 
 // ---------------------------------------------------------------------------
@@ -408,7 +461,7 @@ const build = async () => {
   parts.push(`globalThis.__GDJS_THREERT_MANIFEST__ = ${JSON.stringify(manifest)};`);
   parts.push(adapterBuild.outputFiles[0].text);
   // Jolt first: the Physics3D behavior asks for it as soon as it is loaded.
-  if (scriptFiles.some((file) => file.includes('Physics3DBehavior'))) parts.push('// ---- Jolt Physics (JavaScript build)\n' + getJoltCode());
+  if (args['jolt-wasm2js'] === undefined && scriptFiles.some((file) => file.includes('Physics3DBehavior'))) parts.push('// ---- Jolt Physics (JavaScript build)\n' + getJoltCode());
   for (const file of scriptFiles) {
     if (replacedScripts.has(file)) continue;
     const scriptPath = path.join(exportDir, file);
@@ -418,6 +471,11 @@ const build = async () => {
     }
     parts.push(`// ---- ${file}\n` + patchScript(file, fs.readFileSync(scriptPath, 'utf8')));
     if (file === 'pixi-renderers/three.js') parts.push('__GDJS_THREERT__.installThree();');
+  }
+  for (const modulePath of importedModules) {
+    parts.push(`// ---- ${modulePath} (module)\n` + embedModule(modulePath));
+    const wasmPath = modulePath.replace(/\.js$/, '.wasm');
+    if (fs.existsSync(path.join(exportDir, wasmPath))) parts.push(`// ---- ${wasmPath} (wasm2js)\n` + embedWasmModule(wasmPath));
   }
   parts.push('__GDJS_THREERT__.installGDJSPatches();');
 

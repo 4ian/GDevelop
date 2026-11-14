@@ -173,6 +173,10 @@ plus `save_project` and `read_script_api_definition`. Add `--show` to watch the 
 editor, `--read-only` to only expose the functions not modifying the project.
 In development, `--generation-api-url http://localhost:3013` uses a local `generation-api`.
 
+Files of the computer are added as resources with `change_project_properties_resources`: where the GDevelop AI gives the
+id of a file attached by the user (`attachment_id`), give the absolute path of the file. A file already in the folder of
+a project saved on the computer is used where it is, any other file is copied in the project.
+
 #### Running a request of the GDevelop AI
 
 `RUN_AI_REQUEST` sends a request to the GDevelop AI in the Ask AI editor, as a user would type it,

@@ -410,11 +410,15 @@ describe('change_project_properties_resources', () => {
 
     const launchWithAttachments = (
       args: Object,
-      storeResourceFiles: () => Promise<ResourceFilesStorage> = storeResourceFilesInProject
+      storeResourceFiles: () => Promise<ResourceFilesStorage> = storeResourceFilesInProject,
+      getProjectFilePaths?: (
+        attachmentIds: Array<string>
+      ) => { [attachmentId: string]: ?string }
     ) =>
       editorFunctions.change_project_properties_resources.launchFunction({
         ...makeFakeLaunchFunctionOptionsWithProject(project),
         attachmentsForResources: {
+          getProjectFilePaths,
           getFiles: async attachmentIds => {
             const files: { [attachmentId: string]: ?File } = {};
             attachmentIds.forEach(attachmentId => {
@@ -456,6 +460,57 @@ describe('change_project_properties_resources', () => {
       expect(resourcesManager.getResource('hero.png').getFile()).toBe(
         'assets/hero.png'
       );
+    });
+
+    it('uses in place the local files that are already in the folder of the project', async () => {
+      addProjectResources();
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const storeResourceFiles = jest.fn(storeResourceFilesInProject);
+
+      const result: EditorFunctionGenericOutput = await launchWithAttachments(
+        {
+          added_resources: [
+            { attachment_id: '/game/assets/Track.glb' },
+            { attachment_id: '/game/assets/Track.glb', resource_name: 'Road' },
+            { attachment_id: '/game/notes.txt' },
+          ],
+          changed_resources: [
+            {
+              resource_name: 'hero.png',
+              replace_file_with_attachment_id: '/game/assets/new hero.png',
+            },
+          ],
+        },
+        storeResourceFiles,
+        () => ({
+          '/game/assets/Track.glb': 'assets/Track.glb',
+          '/game/assets/new hero.png': 'assets/new hero.png',
+          '/game/notes.txt': 'notes.txt',
+        })
+      );
+
+      expect(result.success).toBe(true);
+      const resourcesManager = project.getResourcesManager();
+      const trackResource = resourcesManager.getResource('assets/Track.glb');
+      expect(trackResource.getKind()).toBe('model3D');
+      expect(trackResource.getFile()).toBe('assets/Track.glb');
+      expect(resourcesManager.getResource('Road').getFile()).toBe(
+        'assets/Track.glb'
+      );
+      expect(resourcesManager.getResource('hero.png').getFile()).toBe(
+        'assets/new hero.png'
+      );
+      expect(result.message).toContain(
+        'Added the model3D resource "assets/Track.glb" (the file "assets/Track.glb" of the project folder).'
+      );
+      expect(result.message).toContain(
+        'Replaced the file of the resource "hero.png" by the file "assets/new hero.png" of the project folder (everything using this resource now uses it).'
+      );
+      expect(result.message).toContain(
+        '"notes.txt" cannot be added as a resource: its extension is not supported.'
+      );
+      // Nothing to store: the files are already where the project reads them.
+      expect(storeResourceFiles).not.toHaveBeenCalled();
     });
 
     it('replaces the file of an existing resource, keeping its name', async () => {

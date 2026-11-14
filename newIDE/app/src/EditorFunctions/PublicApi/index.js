@@ -1,6 +1,6 @@
 // @flow
-import functionsV22 from './v22/functions.json';
-import scriptApiDefinitionV22 from './v22/script-api.d.ts';
+import functionsV24 from './v24/functions.json';
+import scriptApiDefinitionV24 from './v24/script-api.d.ts';
 import eventScriptGuide from './event-script-guide.md';
 import gameplayHarnessGuide from './gameplay-harness-guide.md';
 import multiplayerGameplayTests from '../../../../../Extensions/Multiplayer/gameplay-tests.md';
@@ -44,13 +44,13 @@ export type PublicApi = {|
   gameplayHarnessGuide: string,
 |};
 
-export const PUBLIC_API_TOOLS_VERSION = 'v22';
+export const PUBLIC_API_TOOLS_VERSION = 'v24';
 
 export const getPublicApi = (): PublicApi => ({
-  toolsVersion: functionsV22.toolsVersion,
-  functions: functionsV22.functions,
-  lookupFunctions: functionsV22.lookupFunctions,
-  scriptApiDefinition: scriptApiDefinitionV22,
+  toolsVersion: functionsV24.toolsVersion,
+  functions: functionsV24.functions,
+  lookupFunctions: functionsV24.lookupFunctions,
+  scriptApiDefinition: scriptApiDefinitionV24,
   eventScriptGuide,
   gameplayHarnessGuide: [
     gameplayHarnessGuide.trim(),

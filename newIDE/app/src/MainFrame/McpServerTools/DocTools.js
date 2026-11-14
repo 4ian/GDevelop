@@ -1,6 +1,7 @@
 // @flow
 import { getPublicApi } from '../../EditorFunctions/PublicApi';
 import { type McpServerTool } from './McpServerTool';
+import { getScriptApiDefinitionWithLocalFiles } from './LocalFilesAsAttachments';
 
 export const SCRIPT_API_DEFINITION_URI = 'gdevelop://docs/script-api.d.ts';
 export const EVENT_SCRIPT_GUIDE_URI = 'gdevelop://docs/event-script-guide.md';
@@ -22,7 +23,7 @@ const readScriptApiDefinitionTool: McpServerTool = {
   },
   isAvailable: () => true,
   call: async () => ({
-    value: getPublicApi().scriptApiDefinition,
+    value: getScriptApiDefinitionWithLocalFiles(),
     isError: false,
   }),
 };

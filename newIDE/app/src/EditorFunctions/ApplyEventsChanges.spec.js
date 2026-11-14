@@ -3142,6 +3142,105 @@ describe('applyEventsChanges', () => {
     );
   });
 
+  const makeOperation = (
+    operationName: string,
+    operationTargetEvent: string,
+    generatedEvents: string | null
+  ): AiGeneratedEventChange => ({
+    operationName,
+    operationTargetEvent,
+    generatedEvents,
+    isEventsJsonValid: generatedEvents ? true : null,
+    areEventsValid: generatedEvents ? true : null,
+    diagnosticLines: [],
+    extensionNames: [],
+    undeclaredVariables: [],
+    undeclaredObjectVariables: {},
+    missingObjectBehaviors: {},
+    missingResources: [],
+  });
+
+  const insertGroupEvent = (
+    eventsList: gdEventsList,
+    name: string,
+    index: number
+  ): gdGroupEvent => {
+    const groupEvent = gd.asGroupEvent(
+      eventsList.insertNewEvent(
+        project,
+        'BuiltinCommonInstructions::Group',
+        index
+      )
+    );
+    groupEvent.setName(name);
+    return groupEvent;
+  };
+
+  it('should target a group event by its name', () => {
+    sceneEventsList.clear();
+    insertGroupEvent(sceneEventsList, 'Race', 0);
+    const controlsGroup = insertGroupEvent(sceneEventsList, 'Controls', 1);
+    insertGroupEvent(controlsGroup.getSubEvents(), 'Keyboard', 0);
+
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      [
+        makeOperation(
+          'insert_before_event',
+          'controls',
+          '[{"type":"BuiltinCommonInstructions::Comment","conditions":[],"actions":[]}]'
+        ),
+        makeOperation(
+          'insert_as_sub_event',
+          'Keyboard',
+          '[{"type":"BuiltinCommonInstructions::Standard","conditions":[],"actions":[]}]'
+        ),
+        makeOperation('delete_event', 'Race', null),
+      ],
+      fakeGeneratedEventId
+    );
+
+    expect(result.errors).toEqual([]);
+    expect(result.applied).toBe(3);
+    expect(getEventTypes(sceneEventsList)).toEqual([
+      'BuiltinCommonInstructions::Comment',
+      'BuiltinCommonInstructions::Group',
+    ]);
+    const keyboardGroup = gd.asGroupEvent(
+      gd
+        .asGroupEvent(sceneEventsList.getEventAt(1))
+        .getSubEvents()
+        .getEventAt(0)
+    );
+    expect(keyboardGroup.getName()).toBe('Keyboard');
+    expect(getEventTypes(keyboardGroup.getSubEvents())).toEqual([
+      'BuiltinCommonInstructions::Standard',
+    ]);
+  });
+
+  it('should skip operation when several group events have the targeted name', () => {
+    sceneEventsList.clear();
+    insertGroupEvent(sceneEventsList, 'HUD', 0);
+    const otherGroup = insertGroupEvent(sceneEventsList, 'Other', 1);
+    insertGroupEvent(otherGroup.getSubEvents(), 'HUD', 0);
+
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      [makeOperation('delete_event', 'HUD', null)],
+      fakeGeneratedEventId
+    );
+
+    expect(sceneEventsList.getEventsCount()).toBe(2);
+    expect(result.applied).toBe(0);
+    expect(result.errors).toEqual([
+      expect.stringContaining(
+        '2 group events are named "HUD". Target a single one by its path ("event-0", "event-1.0") instead.'
+      ),
+    ]);
+  });
+
   it('should skip operation if event with aiGeneratedEventId is not found and return error', () => {
     setupInitialSceneEvents(['BuiltinCommonInstructions::Standard']);
 

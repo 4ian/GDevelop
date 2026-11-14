@@ -39,6 +39,234 @@ namespace gdjs {
   }
 
   /**
+   * Index of the instances data edited by the in-game editor.
+   *
+   * Keeping a `Map` avoids scanning the whole list each time an instance is
+   * looked up (which happens for every object, at every frame, to know if it's
+   * locked, sealed or hidden). The array is the one holding the instances (and
+   * is shared with the project data), so that code mutating it still works.
+   */
+  export class InGameEditorInstancesDataIndex {
+    private _instances: InstanceData[] = [];
+    private _instancesByPersistentUuid: Map<string, InstanceData> = new Map();
+
+    /** The instances, in their original order. */
+    getAll(): InstanceData[] {
+      return this._instances;
+    }
+
+    getCount(): number {
+      return this._instances.length;
+    }
+
+    getByPersistentUuid(persistentUuid: string | null): InstanceData | null {
+      if (!persistentUuid) return null;
+      return this._instancesByPersistentUuid.get(persistentUuid) || null;
+    }
+
+    /** Use the given instances list (which is kept as is) and index it. */
+    replaceAll(instances: InstanceData[]): void {
+      this._instances = instances;
+      this.rebuildIndex();
+    }
+
+    /**
+     * Rebuild the index from the list, for when the list is modified without
+     * going through this class (hot reload, extensions...).
+     */
+    rebuildIndex(): void {
+      this._instancesByPersistentUuid.clear();
+      for (const instanceData of this._instances) {
+        this._instancesByPersistentUuid.set(
+          instanceData.persistentUuid,
+          instanceData
+        );
+      }
+    }
+
+    add(instanceData: InstanceData): void {
+      this._instances.push(instanceData);
+      this._instancesByPersistentUuid.set(
+        instanceData.persistentUuid,
+        instanceData
+      );
+    }
+
+    addAll(instances: InstanceData[]): void {
+      for (const instanceData of instances) {
+        this.add(instanceData);
+      }
+    }
+
+    removeByPersistentUuid(persistentUuid: string | null): boolean {
+      if (!persistentUuid) return false;
+      const instanceData = this._instancesByPersistentUuid.get(persistentUuid);
+      if (!instanceData) return false;
+      this._instancesByPersistentUuid.delete(persistentUuid);
+      const index = this._instances.indexOf(instanceData);
+      if (index !== -1) this._instances.splice(index, 1);
+      return true;
+    }
+  }
+
+  /**
+   * Bounds of a top-level 3D object, used to skip the objects that the picking
+   * ray can't hit (broad phase). The bounds are cached and only recomputed
+   * when the object world matrix changes.
+   */
+  type InGameEditorPickingBounds = {
+    box: THREE.Box3;
+    matrixWorld: number[];
+  };
+
+  const inGameEditorPickingBoundsCache = new WeakMap<
+    THREE.Object3D,
+    InGameEditorPickingBounds
+  >();
+
+  const hasSameMatrixWorld = (
+    cachedElements: number[],
+    elements: ArrayLike<number>
+  ): boolean => {
+    for (let index = 0; index < 16; index++) {
+      if (cachedElements[index] !== elements[index]) return false;
+    }
+    return true;
+  };
+
+  const getInGameEditorPickingBounds = (
+    object: THREE.Object3D
+  ): THREE.Box3 | null => {
+    const elements = object.matrixWorld.elements;
+    const cachedBounds = inGameEditorPickingBoundsCache.get(object);
+    if (
+      cachedBounds &&
+      hasSameMatrixWorld(cachedBounds.matrixWorld, elements)
+    ) {
+      return cachedBounds.box;
+    }
+
+    const box = new THREE.Box3();
+    if (object instanceof THREE.Mesh && object.geometry) {
+      if (!object.geometry.boundingBox) object.geometry.computeBoundingBox();
+      if (object.geometry.boundingBox) {
+        box.copy(object.geometry.boundingBox).applyMatrix4(object.matrixWorld);
+      }
+    } else {
+      // Groups (models...) don't have a geometry: compute the bounds of their
+      // content. This is only done when the object moved.
+      box.setFromObject(object);
+    }
+    if (box.isEmpty()) return null;
+
+    inGameEditorPickingBoundsCache.set(object, {
+      box,
+      matrixWorld: Array.from(elements),
+    });
+    return box;
+  };
+
+  /**
+   * Picking helpers shared by the in-game editor and its benchmarks.
+   */
+  export namespace InGameEditorPicking {
+    export type Layer = {
+      threeCamera: THREE.Camera;
+      threeGroup: THREE.Group;
+    };
+
+    /**
+     * Find the closest visible 3D mesh hit by a ray, in the given layers.
+     *
+     * Distances and points are converted to the scene units (the 3D world
+     * scale is applied) so that hits from layers with different scales can be
+     * compared.
+     */
+    export const findClosestIntersection = ({
+      raycaster,
+      layers,
+      setRay,
+      worldScale,
+      isThreeObjectVisible,
+      getRuntimeObject,
+      isRuntimeObjectIgnored,
+      useBroadPhase = true,
+    }: {
+      raycaster: THREE.Raycaster;
+      layers: Layer[];
+      /** Set the ray in the Three.js world coordinates of a layer. */
+      setRay: (
+        raycaster: THREE.Raycaster,
+        threeCamera: THREE.Camera,
+        threeGroup: THREE.Group
+      ) => void;
+      worldScale: number;
+      isThreeObjectVisible: (object: THREE.Object3D) => boolean;
+      getRuntimeObject: (object: THREE.Object3D) => gdjs.RuntimeObject | null;
+      isRuntimeObjectIgnored?: (
+        runtimeObject: gdjs.RuntimeObject | null
+      ) => boolean;
+      /**
+       * Skip the objects whose bounds are not crossed by the ray. Disable it
+       * to compare with the brute force raycasting (only used by benchmarks).
+       */
+      useBroadPhase?: boolean;
+    }): {
+      intersect: THREE.Intersection;
+      runtimeObject: gdjs.RuntimeObject | null;
+    } | null => {
+      let closestHit: {
+        intersect: THREE.Intersection;
+        runtimeObject: gdjs.RuntimeObject | null;
+      } | null = null;
+
+      // Reused for each layer, to avoid allocating an array for each raycast.
+      const candidateObjects: THREE.Object3D[] = [];
+
+      for (const { threeCamera, threeGroup } of layers) {
+        // Note that raycasting is done by Three.js, which means it could slow
+        // down if lots of 3D objects are shown. We consider that if this needs
+        // improvements, this must be handled by the game engine culling.
+        setRay(raycaster, threeCamera, threeGroup);
+
+        candidateObjects.length = 0;
+        for (const child of threeGroup.children) {
+          if (useBroadPhase) {
+            const bounds = getInGameEditorPickingBounds(child);
+            if (bounds && !raycaster.ray.intersectsBox(bounds)) continue;
+          }
+          candidateObjects.push(child);
+        }
+
+        const intersects = raycaster.intersectObjects(candidateObjects, true);
+
+        // Three.js raycasting ignores visibility, so hidden objects are
+        // skipped here.
+        for (const intersect of intersects) {
+          if (!isThreeObjectVisible(intersect.object)) continue;
+          const runtimeObject = getRuntimeObject(intersect.object);
+          if (isRuntimeObjectIgnored && isRuntimeObjectIgnored(runtimeObject))
+            continue;
+
+          intersect.distance *= worldScale;
+          intersect.point.x *= worldScale;
+          intersect.point.y *= worldScale;
+          intersect.point.z *= worldScale;
+          if (
+            !closestHit ||
+            intersect.distance < closestHit.intersect.distance
+          ) {
+            closestHit = { intersect, runtimeObject };
+          }
+          break;
+        }
+      }
+
+      return closestHit;
+    };
+  }
+
+  /**
    * Adapt the Three.js TransformControls gizmos so that the axis are in the same direction as in GDevelop.
    * This does not change the way the controls work (notably when dragged), it's only a visual adaptation.
    */
@@ -1199,7 +1427,7 @@ namespace gdjs {
     private _currentScene: gdjs.RuntimeScene | null = null;
     private _editedInstanceContainer: gdjs.RuntimeInstanceContainer | null =
       null;
-    private _editedInstanceDataList: InstanceData[] = [];
+    private _editedInstancesDataIndex = new InGameEditorInstancesDataIndex();
     private _editedLayerDataList: LayerData[] = [];
     /** Null while switching to another scene or variant. */
     private _editedLocation: InGameEditorEditedLocation | null = null;
@@ -1475,7 +1703,16 @@ namespace gdjs {
     }
 
     getEditedInstanceDataList(): InstanceData[] {
-      return this._editedInstanceDataList;
+      return this._editedInstancesDataIndex.getAll();
+    }
+
+    /**
+     * Rebuild the index of the edited instances.
+     * To be called after the instances list was modified without the editor
+     * knowing it (for example after a hot reload of the instances).
+     */
+    rebuildInstancesDataIndex(): void {
+      this._editedInstancesDataIndex.rebuildIndex();
     }
 
     getEditedLayerDataList(): LayerData[] {
@@ -1643,7 +1880,7 @@ namespace gdjs {
       } else {
         console.warn('eventsBasedObjectType or sceneName must be set.');
       }
-      this._editedInstanceDataList = editedInstanceDataList;
+      this._editedInstancesDataIndex.replaceAll(editedInstanceDataList);
       this._editedLayerDataList = editedLayerDataList;
       this._editedLocation = {
         sceneName: eventsBasedObjectType ? null : sceneName,
@@ -2985,14 +3222,9 @@ namespace gdjs {
       removedInstances: Array<{ persistentUuid: string | null }>
     ) {
       for (const removedInstance of removedInstances) {
-        // TODO: Might be worth indexing instances data
-        const instanceIndex = this._editedInstanceDataList.findIndex(
-          (instance) =>
-            instance.persistentUuid === removedInstance.persistentUuid
+        this._editedInstancesDataIndex.removeByPersistentUuid(
+          removedInstance.persistentUuid
         );
-        if (instanceIndex >= 0) {
-          this._editedInstanceDataList.splice(instanceIndex, 1);
-        }
       }
     }
 
@@ -3015,12 +3247,7 @@ namespace gdjs {
     private _getInstanceData(
       persistentUuid: string | null
     ): InstanceData | null {
-      // TODO: Might be worth indexing instances data
-      return persistentUuid
-        ? this._editedInstanceDataList.find(
-            (instanceData) => instanceData.persistentUuid === persistentUuid
-          ) || null
-        : null;
+      return this._editedInstancesDataIndex.getByPersistentUuid(persistentUuid);
     }
 
     isInstanceLocked(object: gdjs.RuntimeObject): boolean {
@@ -3043,9 +3270,7 @@ namespace gdjs {
     }
 
     private _addInstances(addedInstances: Array<InstanceData>) {
-      for (const addedInstance of addedInstances) {
-        this._editedInstanceDataList.push(addedInstance);
-      }
+      this._editedInstancesDataIndex.addAll(addedInstances);
     }
 
     private _updateInnerAreaOutline(): void {
@@ -3479,15 +3704,16 @@ namespace gdjs {
       const editedInstanceContainer = this.getEditedInstanceContainer();
       if (!editedInstanceContainer) return;
 
-      // TODO: Might be worth indexing instances data and runtime objects by their
-      // persistentUuid (See HotReloader.indexByPersistentUuid).
+      const instancesByPersistentUuid = new Map<string, InstanceData>();
+      for (const instance of instances) {
+        instancesByPersistentUuid.set(instance.persistentUuid, instance);
+      }
       editedInstanceContainer
         .getAdhocListOfAllInstances()
         .forEach((runtimeObject) => {
-          const instance = instances.find(
-            (instance) =>
-              instance.persistentUuid === runtimeObject.persistentUuid
-          );
+          const instance = runtimeObject.persistentUuid
+            ? instancesByPersistentUuid.get(runtimeObject.persistentUuid)
+            : undefined;
           if (instance) {
             runtimeObject.setX(instance.x);
             runtimeObject.setY(instance.y);
@@ -3655,13 +3881,10 @@ namespace gdjs {
         }
       }
 
-      let closestHit: {
-        intersect: THREE.Intersection;
-        runtimeObject: gdjs.RuntimeObject | null;
-      } | null = null;
       const worldScale = currentScene.getRenderer3DWorldScale();
       const layerNames: Array<string> = [];
       currentScene.getAllLayerNames(layerNames);
+      const layers: InGameEditorPicking.Layer[] = [];
       layerNames.forEach((layerName) => {
         const runtimeLayer = currentScene.getLayer(layerName);
         // Three.js raycasting ignores the visibility of objects.
@@ -3671,35 +3894,16 @@ namespace gdjs {
         const threeGroup = runtimeLayerRender.getThreeGroup();
         if (!threeCamera || !threeGroup) return;
 
-        // Note that raycasting is done by Three.js, which means it could slow down
-        // if lots of 3D objects are shown. We consider that if this needs improvements,
-        // this must be handled by the game engine culling
-        setRay(raycaster, threeCamera, threeGroup);
-        const intersects = raycaster.intersectObjects(
-          threeGroup.children,
-          true
-        );
-
-        // Three.js raycasting ignores visibility, so hidden objects are skipped
-        // here.
-        for (const intersect of intersects) {
-          if (!this._isThreeObjectVisible(intersect.object)) continue;
-          const runtimeObject = this._getObject3D(intersect.object);
-          if (isRuntimeObjectIgnored && isRuntimeObjectIgnored(runtimeObject))
-            continue;
-
-          intersect.distance *= worldScale;
-          intersect.point.x *= worldScale;
-          intersect.point.y *= worldScale;
-          intersect.point.z *= worldScale;
-          if (
-            !closestHit ||
-            intersect.distance < closestHit.intersect.distance
-          ) {
-            closestHit = { intersect, runtimeObject };
-          }
-          break;
-        }
+        layers.push({ threeCamera, threeGroup });
+      });
+      const closestHit = InGameEditorPicking.findClosestIntersection({
+        raycaster,
+        layers,
+        setRay,
+        worldScale,
+        isThreeObjectVisible: (object) => this._isThreeObjectVisible(object),
+        getRuntimeObject: (object) => this._getObject3D(object),
+        isRuntimeObjectIgnored,
       });
 
       // Reset selection boxes layers so they are properly displayed.
@@ -4121,8 +4325,18 @@ namespace gdjs {
         this._setupWebGLContextLostListener();
       }
 
+      // The game loop doesn't start a profiler frame in edition mode (the
+      // scene is not stepped), so the editor frame is the profiled frame.
+      // `null` unless the profiler was started (debugger, benchmarks).
+      const profiler = this._currentScene
+        ? this._currentScene.getProfiler()
+        : null;
+      if (profiler) profiler.beginFrame();
+
+      if (profiler) profiler.begin('in-game editor: object under cursor');
       const objectUnderCursor: gdjs.RuntimeObject | null =
         this.getObjectUnderCursor();
+      if (profiler) profiler.end('in-game editor: object under cursor');
 
       this._runtimeGame.getSoundManager().muteEverything('in-game-editor');
 
@@ -4168,13 +4382,19 @@ namespace gdjs {
       this._capturedLeftMouseButton.update(inputManager);
       this._handlePointerLock();
       this._handleTransformControlsMode();
+      if (profiler) profiler.begin('in-game editor: camera');
       this._handleCameraMovement();
+      if (profiler) profiler.end('in-game editor: camera');
+      if (profiler) profiler.begin('in-game editor: selection');
       this._handleSelectedObjectDragging();
       this._selectionControls.step();
       this._updateSelectionBox();
       this._handleSelection({ objectUnderCursor });
       this._updateSelectionOutline({ objectUnderCursor });
+      if (profiler) profiler.end('in-game editor: selection');
+      if (profiler) profiler.begin('in-game editor: markers');
       this._updateHiddenInstanceMarkers();
+      if (profiler) profiler.end('in-game editor: markers');
       // Custom objects only update their position at the end of the frame
       // because they don't override position setters like built-in objects do.
       // Since the instance position is not yet set when `onCreated` is called,
@@ -4206,6 +4426,8 @@ namespace gdjs {
       this._isLeftMouseButtonCaptured = false;
 
       if (this._currentScene) {
+        if (profiler)
+          profiler.begin('in-game editor: objects and extensions (pre-render)');
         this._currentScene._updateObjectsForInGameEditor();
         for (let i = 0; i < gdjs.callbacksInGameEditorPostStep.length; ++i) {
           try {
@@ -4216,11 +4438,28 @@ namespace gdjs {
             });
           }
         }
+        if (profiler)
+          profiler.end('in-game editor: objects and extensions (pre-render)');
         this._currentScene.render();
+        // `RuntimeScene.render` opens a "render" section for its caller (the
+        // game loop closes it): in edition mode, the editor is the caller.
+        if (profiler) profiler.end('render');
       }
+      if (profiler) profiler.begin('in-game editor: toolbars');
       this._renderExtensionToolbars(domElementContainer);
+      if (profiler) profiler.end('in-game editor: toolbars');
 
       this._isFirstFrame = false;
+
+      if (profiler) {
+        const threeRenderer = this._runtimeGame
+          .getRenderer()
+          .getThreeRenderer();
+        if (threeRenderer) {
+          profiler.record3DRendererInfo(threeRenderer.info);
+        }
+        profiler.endFrame();
+      }
     }
 
     _getEditorCamera(): EditorCamera {

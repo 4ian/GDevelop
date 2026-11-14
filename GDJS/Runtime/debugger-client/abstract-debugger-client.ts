@@ -455,6 +455,9 @@ namespace gdjs {
                 data.payload.instances,
                 editedInstanceContainer
               );
+              // The hot reloader copied the new instances in the list, so the
+              // index of the instances data must be updated.
+              inGameEditor.rebuildInstancesDataIndex();
             }
           }
         } else if (data.command === 'switchForInGameEdition') {

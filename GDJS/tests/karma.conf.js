@@ -314,6 +314,7 @@ module.exports = function (config) {
       `${gdjsRuntimePath}/Extensions/3D/HueAndSaturationEffect.js`,
       `${gdjsRuntimePath}/Extensions/3D/ToneMappingEffect.js`,
       `${gdjsRuntimePath}/Extensions/3D/Scene3DTools.js`,
+      `${gdjsRuntimePath}/InGameEditor/InGameEditorCamera.js`,
       `${gdjsRuntimePath}/InGameEditor/InGameEditor.js`,
       {
         pattern: `${gdjsRuntimePath}/Extensions/Physics3DBehavior/jolt-physics.wasm.js`,

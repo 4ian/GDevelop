@@ -246,8 +246,8 @@ describe('In-game editor picking determinism', function () {
     expect(
       runs[0].filter((picking) => picking.instance === null).length
     ).to.be.greaterThan(0);
-    const pickedNames = Array.from(pickedInstances).map(
-      (pickedInstance) => pickedInstance.split('|')[0]
+    const pickedNames = Array.from(pickedInstances).map((pickedInstance) =>
+      pickedInstance ? pickedInstance.split('|')[0] : ''
     );
     expect(pickedNames).to.contain('House');
     expect(pickedNames).to.contain('Tower');

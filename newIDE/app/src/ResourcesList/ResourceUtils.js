@@ -68,6 +68,10 @@ export const copyAllToProjectFolder = (
   }
 
   const projectPath = path.dirname(project.getProjectFile());
+  // The copies run in parallel, so a file name chosen for one resource is not
+  // on disk yet when the name of the next one is computed: keep track of them
+  // to avoid giving the same name to several resources.
+  const alreadyUsedFilePaths = new Set<string>();
 
   // $FlowFixMe[incompatible-type]
   return Promise.all(
@@ -90,7 +94,10 @@ export const copyAllToProjectFolder = (
         tentativeFileName => {
           const tentativePath =
             path.join(projectPath, tentativeFileName) + fileExtension;
-          return fs.existsSync(tentativePath);
+          return (
+            fs.existsSync(tentativePath) ||
+            alreadyUsedFilePaths.has(tentativePath)
+          );
         }
       );
 
@@ -98,6 +105,7 @@ export const copyAllToProjectFolder = (
         projectPath,
         newFileNameWithoutExtension + fileExtension
       );
+      alreadyUsedFilePaths.add(resourceNewPath);
 
       return new Promise(resolve => {
         fs.copyFile(resourcePath, resourceNewPath, err => {

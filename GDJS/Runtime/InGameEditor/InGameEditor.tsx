@@ -1224,6 +1224,11 @@ namespace gdjs {
     private _isVisible = true;
     private _timeSinceLastInteraction = 0;
     private _isFirstFrame = true;
+    /**
+     * True while the camera of the editor is applied to the layers for the
+     * current frame (see `_ensureEditorCameraApplied`).
+     */
+    private _isEditorCameraApplied = false;
 
     private _editorCamera: EditorCamera;
 
@@ -1530,6 +1535,7 @@ namespace gdjs {
       eventsBasedObjectVariantName: string | null,
       editorCamera3D: EditorCameraState | null
     ) {
+      this._isEditorCameraApplied = false;
       if (this._currentScene) {
         this._currentScene.unloadScene();
         this._currentScene = null;
@@ -2256,13 +2262,52 @@ namespace gdjs {
 
       this._getEditorCamera().step();
 
-      const layerNames = [];
-      currentScene.getAllLayerNames(layerNames);
-      layerNames.forEach((layerName) => {
-        const layer = currentScene.getLayer(layerName);
+      // Apply the camera of the editor for the rendering of this frame.
+      this._applyEditorCameraToLayers();
+    }
 
-        this._getEditorCamera().updateCamera(currentScene, layer);
-      });
+    /**
+     * Render the layers with the camera of the editor. The cameras of the
+     * layers are not changed: they are game state.
+     */
+    private _applyEditorCameraToLayers() {
+      const currentScene = this._currentScene;
+      if (!currentScene) return;
+
+      const layerNames: string[] = [];
+      currentScene.getAllLayerNames(layerNames);
+      for (const layerName of layerNames) {
+        this._getEditorCamera().updateCamera(
+          currentScene,
+          currentScene.getLayer(layerName)
+        );
+      }
+      this._isEditorCameraApplied = true;
+    }
+
+    /**
+     * Give the layers back their own camera, for the game to be rendered.
+     */
+    private _clearEditorCameraOverrides() {
+      this._isEditorCameraApplied = false;
+      const currentScene = this._currentScene;
+      if (!currentScene) return;
+
+      const layerNames: string[] = [];
+      currentScene.getAllLayerNames(layerNames);
+      for (const layerName of layerNames) {
+        currentScene.getLayer(layerName).getRenderer().setCameraOverride(null);
+      }
+    }
+
+    /**
+     * Make sure the camera of the editor is applied, for the editor operations
+     * happening outside of a frame (a paste, a new instance dragged from the
+     * IDE...).
+     */
+    private _ensureEditorCameraApplied() {
+      if (this._isEditorCameraApplied) return;
+      this._applyEditorCameraToLayers();
     }
 
     moveSelectionUnderCursor() {
@@ -2825,8 +2870,11 @@ namespace gdjs {
 
     activate(enable: boolean) {
       if (enable) {
-        // Nothing to do.
+        // The editor is shown again: render with the camera of the editor.
+        this._applyEditorCameraToLayers();
       } else {
+        // The game is about to run: give the layers back their own camera.
+        this._clearEditorCameraOverrides();
         this._runtimeGame.getSoundManager().unmuteEverything('in-game-editor');
         this._selectionControls.remove();
         this._renderExtensionToolbars(null);
@@ -3275,6 +3323,10 @@ namespace gdjs {
       const editedInstanceContainer = this.getEditedInstanceContainer();
       if (!editedInstanceContainer) return;
 
+      // This method is called outside of a frame when an instance is dragged
+      // from the IDE: the camera of the editor must be the one used.
+      this._ensureEditorCameraApplied();
+
       const selectedLayer = this.getEditorLayer(this._selectedLayerName);
       if (!selectedLayer) return;
 
@@ -3368,15 +3420,20 @@ namespace gdjs {
 
       if (dropped) {
         if (this._draggedNewObject) {
-          const isLayer3D = selectedLayer.getRenderer().getThreeGroup();
+          const selectedLayerRenderer = selectedLayer.getRenderer();
+          const isLayer3D = selectedLayerRenderer.getThreeGroup();
           if (isLayer3D) {
-            const cameraX = selectedLayer.getCameraX();
-            const cameraY = selectedLayer.getCameraY();
-            const cameraZ = getCameraZ(
-              currentScene,
-              selectedLayer.getName(),
-              0
-            );
+            const selectedLayerCameraOverride =
+              selectedLayerRenderer.getCameraOverride();
+            const cameraX = selectedLayerCameraOverride
+              ? selectedLayerCameraOverride.x
+              : selectedLayer.getCameraX();
+            const cameraY = selectedLayerCameraOverride
+              ? selectedLayerCameraOverride.y
+              : selectedLayer.getCameraY();
+            const cameraZ = selectedLayerCameraOverride
+              ? selectedLayerCameraOverride.z
+              : selectedLayer.getCameraZ(null);
 
             const closestIntersect = this._getClosestIntersectionUnderCursor({
               excludedObjects: [this._draggedNewObject],
@@ -3442,26 +3499,48 @@ namespace gdjs {
         return null;
       }
 
-      const cameraX = layer.getCameraX();
-      const cameraY = layer.getCameraY();
-      const cameraZ = getCameraZ(currentScene, layer.getName(), 0);
+      this._ensureEditorCameraApplied();
 
-      const cursorX = gdjs.evtTools.input.getCursorX(
-        currentScene,
-        layer.getName(),
-        0
-      );
-      const cursorY = gdjs.evtTools.input.getCursorY(
-        currentScene,
-        layer.getName(),
-        0
-      );
+      // The camera actually used to render the layer: the one of the editor,
+      // which is not saved in the layer (which keeps the camera of the game).
+      const layerRenderer = layer.getRenderer();
+      const cameraOverride = layerRenderer.getCameraOverride();
+      const cameraX = cameraOverride ? cameraOverride.x : layer.getCameraX();
+      const cameraY = cameraOverride ? cameraOverride.y : layer.getCameraY();
+      const cameraZ = cameraOverride
+        ? cameraOverride.z
+        : layer.getCameraZ(null);
+      const cameraRotation = cameraOverride
+        ? cameraOverride.rotation
+        : layer.getCameraRotation();
+      const cameraZoom = cameraOverride
+        ? cameraOverride.zoom
+        : layer.getCameraZoom();
+
+      // Opposite of `RuntimeLayer.convertInverseCoords`. The editor camera is
+      // not necessarily saved in the layer, so it can't be used here.
+      const inputManager = this._runtimeGame.getInputManager();
+      const angleInRadians = gdjs.toRad(cameraRotation);
+      const cosValue = Math.cos(angleInRadians);
+      const sinValue = Math.sin(angleInRadians);
+      const unscaledCursorX =
+        (inputManager.getCursorX() -
+          currentScene._cachedGameResolutionWidth / 2) /
+        cameraZoom;
+      const unscaledCursorY =
+        (inputManager.getCursorY() -
+          currentScene._cachedGameResolutionHeight / 2) /
+        cameraZoom;
+      const cursorX =
+        cosValue * unscaledCursorX - sinValue * unscaledCursorY + cameraX;
+      const cursorY =
+        sinValue * unscaledCursorX + cosValue * unscaledCursorY + cameraY;
 
       const deltaX = cursorX - cameraX;
       const deltaY = cursorY - cameraY;
       const deltaZ = 0 - cameraZ;
 
-      const threeCamera = layer.getRenderer().getThreeCamera();
+      const threeCamera = layerRenderer.getThreeCamera();
       if (!threeCamera) {
         return [cursorX, cursorY];
       }
@@ -3913,6 +3992,7 @@ namespace gdjs {
     _getCursorIn3D(
       excludedObjects?: Array<gdjs.RuntimeObject>
     ): Point3D | null {
+      this._ensureEditorCameraApplied();
       const closestIntersect = this._getClosestIntersectionUnderCursor({
         excludedObjects,
       });
@@ -3939,6 +4019,10 @@ namespace gdjs {
     }
 
     getObjectUnderCursor(): gdjs.RuntimeObject | null {
+      // Also called outside of a frame (by the tests, by the debugger): the
+      // picking must always use the camera of the editor.
+      this._ensureEditorCameraApplied();
+
       const closestIntersect = this._getClosestIntersectionUnderCursor({
         ignoreUnselectableInstances: true,
       });
@@ -4121,6 +4205,10 @@ namespace gdjs {
         this._setupWebGLContextLostListener();
       }
 
+      // Picking and the rest of the editor frame use the camera of the editor,
+      // which is applied to the layers for the rendering only.
+      this._ensureEditorCameraApplied();
+
       const objectUnderCursor: gdjs.RuntimeObject | null =
         this.getObjectUnderCursor();
 
@@ -4217,6 +4305,9 @@ namespace gdjs {
           }
         }
         this._currentScene.render();
+        // The frame is rendered: give the layers back their own camera so that
+        // the game never runs with the camera of the editor.
+        this._clearEditorCameraOverrides();
       }
       this._renderExtensionToolbars(domElementContainer);
 
@@ -5666,13 +5757,14 @@ namespace gdjs {
     }
 
     updateCamera(currentScene: RuntimeScene, layer: RuntimeLayer): void {
-      const layerName = layer.getName();
-      layer.setCameraX(this.getCameraX());
-      layer.setCameraY(this.getCameraY());
-      setCameraZ(currentScene, this.getCameraZ(), layerName, 0);
-      setCameraRotationX(currentScene, 90 - this.elevationAngle, layerName, 0);
-      setCameraRotationY(currentScene, 0, layerName, 0);
-      layer.setCameraRotation(this.rotationAngle);
+      setEditorCameraOverrideOnLayer(layer, {
+        x: this.getCameraX(),
+        y: this.getCameraY(),
+        z: this.getCameraZ(),
+        rotation: this.rotationAngle,
+        rotationX: 90 - this.elevationAngle,
+        rotationY: 0,
+      });
     }
 
     zoomBy(zoomFactor: float): void {
@@ -5936,13 +6028,14 @@ namespace gdjs {
     }
 
     updateCamera(currentScene: RuntimeScene, layer: RuntimeLayer): void {
-      const layerName = layer.getName();
-      layer.setCameraX(this.position.x);
-      layer.setCameraY(this.position.y);
-      setCameraZ(currentScene, this.position.z, layerName, 0);
-      setCameraRotationX(currentScene, 90 - this.elevationAngle, layerName, 0);
-      setCameraRotationY(currentScene, 0, layerName, 0);
-      layer.setCameraRotation(this.rotationAngle);
+      setEditorCameraOverrideOnLayer(layer, {
+        x: this.position.x,
+        y: this.position.y,
+        z: this.position.z,
+        rotation: this.rotationAngle,
+        rotationX: 90 - this.elevationAngle,
+        rotationY: 0,
+      });
     }
 
     private getCameraVectors() {
@@ -6028,57 +6121,40 @@ namespace gdjs {
     }
   }
 
-  const getCameraZ = (
-    runtimeScene: RuntimeScene,
-    layerName: string,
-    cameraIndex: integer
-  ): float => {
-    return gdjs.scene3d.camera
-      ? gdjs.scene3d.camera.getCameraZ(runtimeScene, layerName, cameraIndex)
-      : 0;
-  };
-
-  const setCameraZ = (
-    runtimeScene: RuntimeScene,
-    z: float,
-    layerName: string,
-    cameraIndex: integer
-  ) => {
-    if (gdjs.scene3d.camera) {
-      gdjs.scene3d.camera.setCameraZ(runtimeScene, z, layerName, cameraIndex);
+  /**
+   * Render a layer with the camera of the editor without changing the camera
+   * of the layer: the camera of a layer is game state (and is given back when
+   * the game runs).
+   */
+  const setEditorCameraOverrideOnLayer = (
+    layer: RuntimeLayer,
+    camera: {
+      x: float;
+      y: float;
+      z: float;
+      rotation: float;
+      rotationX: float;
+      rotationY: float;
     }
-  };
-
-  const setCameraRotationX = (
-    runtimeScene: RuntimeScene,
-    angle: float,
-    layerName: string,
-    cameraIndex: integer
   ) => {
-    if (gdjs.scene3d.camera) {
-      gdjs.scene3d.camera.setCameraRotationX(
-        runtimeScene,
-        angle,
-        layerName,
-        cameraIndex
-      );
-    }
-  };
-
-  const setCameraRotationY = (
-    runtimeScene: RuntimeScene,
-    angle: float,
-    layerName: string,
-    cameraIndex: integer
-  ) => {
-    if (gdjs.scene3d.camera) {
-      gdjs.scene3d.camera.setCameraRotationY(
-        runtimeScene,
-        angle,
-        layerName,
-        cameraIndex
-      );
-    }
+    const threeCamera = layer.getRenderer().getThreeCamera();
+    const fov =
+      threeCamera && !(threeCamera instanceof THREE.OrthographicCamera)
+        ? threeCamera.fov
+        : null;
+    // The same zoom as the one `setCameraZ` computes from a distance: it is
+    // used to project the cursor on the 2D plane of the layer.
+    const zoom = fov
+      ? Math.min(
+          Number.MAX_SAFE_INTEGER,
+          (0.5 * layer.getHeight()) /
+            (camera.z * Math.tan(0.5 * gdjs.toRad(fov)))
+        )
+      : layer.getCameraZoom();
+    layer.getRenderer().setCameraOverride({
+      ...camera,
+      zoom: zoom > 0 ? zoom : layer.getCameraZoom(),
+    });
   };
 
   const temporaryVector3 = new THREE.Vector3();

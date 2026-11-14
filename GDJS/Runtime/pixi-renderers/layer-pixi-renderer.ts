@@ -212,6 +212,32 @@ namespace gdjs {
   const assumedFovIn2D = 45;
 
   /**
+   * A camera used to render a layer instead of the camera of the layer.
+   * @see LayerPixiRenderer.setCameraOverride
+   */
+  export type LayerCameraOverride = {
+    x: float;
+    y: float;
+    z: float;
+    rotation: float;
+    rotationX: float;
+    rotationY: float;
+    zoom: float;
+  };
+
+  const haveSameCameraOverride = (
+    first: LayerCameraOverride,
+    second: LayerCameraOverride
+  ): boolean =>
+    first.x === second.x &&
+    first.y === second.y &&
+    first.z === second.z &&
+    first.rotation === second.rotation &&
+    first.rotationX === second.rotationX &&
+    first.rotationY === second.rotationY &&
+    first.zoom === second.zoom;
+
+  /**
    * The renderer for a gdjs.Layer using Pixi.js.
    * @category Renderers > Layers
    */
@@ -251,6 +277,14 @@ namespace gdjs {
       | THREE.OrthographicCamera
       | null = null;
     private _threeCameraDirty: boolean = false;
+    /**
+     * A camera temporarily used to render the layer instead of the camera of
+     * the layer. The in-game editor uses it so that its camera never changes
+     * the camera of the layer, which is game state.
+     */
+    private _cameraOverride: LayerCameraOverride | null = null;
+    /** The rotations of the 3D camera before a camera override was applied. */
+    private _rotationBeforeCameraOverride: { x: float; y: float } | null = null;
     private _threeEffectComposer: THREE_ADDONS.EffectComposer | null = null;
     private _threeRenderPass: THREE_ADDONS.RenderPass | null = null;
     private _customRenderPass: THREE_ADDONS.N8AOPass | null = null;
@@ -421,6 +455,57 @@ namespace gdjs {
       | THREE.OrthographicCamera
       | null {
       return this._threeCamera;
+    }
+
+    /**
+     * Render this layer with the given camera instead of the camera of the
+     * layer. Passing `null` gives the layer back its own camera.
+     *
+     * The override is not saved in the layer: the camera getters and setters
+     * of the layer keep working on the camera of the game.
+     */
+    setCameraOverride(cameraOverride: LayerCameraOverride | null): void {
+      const previousOverride = this._cameraOverride;
+      if (
+        cameraOverride &&
+        previousOverride &&
+        haveSameCameraOverride(previousOverride, cameraOverride)
+      ) {
+        return;
+      }
+      this._cameraOverride = cameraOverride;
+
+      if (cameraOverride) {
+        if (!this._rotationBeforeCameraOverride && this._threeCamera) {
+          this._rotationBeforeCameraOverride = {
+            x: this._threeCamera.rotation.x,
+            y: this._threeCamera.rotation.y,
+          };
+        }
+        if (this._threeCamera) {
+          this._threeCamera.rotation.x = gdjs.toRad(cameraOverride.rotationX);
+          this._threeCamera.rotation.y = gdjs.toRad(cameraOverride.rotationY);
+          this.invalidateRotation();
+        }
+      } else if (this._rotationBeforeCameraOverride && this._threeCamera) {
+        this._threeCamera.rotation.x = this._rotationBeforeCameraOverride.x;
+        this._threeCamera.rotation.y = this._rotationBeforeCameraOverride.y;
+        this._rotationBeforeCameraOverride = null;
+        this.invalidateRotation();
+      }
+
+      this.updatePosition();
+      // The raycasting done by the in-game editor relies on the world matrix
+      // of the camera, which is normally only updated by the rendering.
+      if (this._threeCamera) this._threeCamera.updateMatrixWorld();
+    }
+
+    /**
+     * @returns The camera used to render the layer instead of its own camera,
+     * if any.
+     */
+    getCameraOverride(): LayerCameraOverride | null {
+      return this._cameraOverride;
     }
 
     getThreeEffectComposer(): THREE_ADDONS.EffectComposer | null {
@@ -1121,29 +1206,44 @@ namespace gdjs {
         .getRuntimeScene()
         .getRenderer3DInverseWorldScale();
 
+      // The camera of the layer, or the camera overriding it for this render.
+      const cameraOverride = this._cameraOverride;
+      const cameraX = cameraOverride
+        ? cameraOverride.x
+        : this._layer.getCameraX();
+      const cameraY = cameraOverride
+        ? cameraOverride.y
+        : this._layer.getCameraY();
+      const cameraRotation = cameraOverride
+        ? cameraOverride.rotation
+        : this._layer.getCameraRotation();
+      const cameraZoom = cameraOverride
+        ? cameraOverride.zoom
+        : this._layer.getCameraZoom();
+
       // Update the 3D camera position and rotation.
       if (this._threeCamera) {
-        const angle = -gdjs.toRad(this._layer.getCameraRotation());
-        this._threeCamera.position.x =
-          this._layer.getCameraX() * inverseWorldScale;
+        const angle = -gdjs.toRad(cameraRotation);
+        this._threeCamera.position.x = cameraX * inverseWorldScale;
         // The scene is mirrored on Y
-        this._threeCamera.position.y =
-          -this._layer.getCameraY() * inverseWorldScale;
+        this._threeCamera.position.y = -cameraY * inverseWorldScale;
         this._threeCamera.rotation.z = angle;
 
         if (this._threeCamera instanceof THREE.OrthographicCamera) {
-          this._threeCamera.zoom = this._layer.getCameraZoom();
+          this._threeCamera.zoom = cameraZoom;
           this._threeCamera.updateProjectionMatrix();
-          this._threeCamera.position.z =
-            this._layer.getCameraZ(null) * inverseWorldScale;
+          this._threeCamera.position.z = cameraOverride
+            ? cameraOverride.z * inverseWorldScale
+            : this._layer.getCameraZ(null) * inverseWorldScale;
         } else {
-          this._threeCamera.position.z =
-            this._layer.getCameraZ(this._threeCamera.fov) * inverseWorldScale;
+          this._threeCamera.position.z = cameraOverride
+            ? cameraOverride.z * inverseWorldScale
+            : this._layer.getCameraZ(this._threeCamera.fov) * inverseWorldScale;
         }
       }
 
       let effectivePixiZoom = 1;
-      const angle = -gdjs.toRad(this._layer.getCameraRotation());
+      const angle = -gdjs.toRad(cameraRotation);
       const angleCosValue = Math.cos(angle);
       const angleSinValue = Math.sin(angle);
 
@@ -1212,17 +1312,17 @@ namespace gdjs {
       // This also applies to layers configured for 3D but with no 3D objects,
       // since they will be rendered directly in 2D mode.
       if (!shouldRenderLayerIn3D) {
-        effectivePixiZoom = this._layer.getCameraZoom();
+        effectivePixiZoom = cameraZoom;
 
         this._pixiContainer.rotation = angle;
         this._pixiContainer.scale.x = effectivePixiZoom;
         this._pixiContainer.scale.y = effectivePixiZoom;
         const centerX =
-          this._layer.getCameraX() * effectivePixiZoom * angleCosValue -
-          this._layer.getCameraY() * effectivePixiZoom * angleSinValue;
+          cameraX * effectivePixiZoom * angleCosValue -
+          cameraY * effectivePixiZoom * angleSinValue;
         const centerY =
-          this._layer.getCameraX() * effectivePixiZoom * angleSinValue +
-          this._layer.getCameraY() * effectivePixiZoom * angleCosValue;
+          cameraX * effectivePixiZoom * angleSinValue +
+          cameraY * effectivePixiZoom * angleCosValue;
         this._pixiContainer.position.x =
           instanceContainer.getViewportOriginX() - centerX;
         this._pixiContainer.position.y =

@@ -849,6 +849,10 @@ export const createThreeShim = (realThree: any) => {
   const PointLight = withShadowCamera(S.PointLight, PerspectiveCamera);
 
   class Material extends S.MeshStandardMaterial {}
+  /**
+   * GLSL shaders don't run in ThreeRT: meshes with a ShaderMaterial (the 2D content of 2D+3D layers drawn on a plane
+   * in the 3D world, custom effects) draw nothing (a transparent material cut out by its alpha test).
+   */
   class ShaderMaterial extends S.MeshBasicMaterial {
     readonly isShaderMaterial = true;
     uniforms: Record<string, any> = {};
@@ -856,13 +860,13 @@ export const createThreeShim = (realThree: any) => {
     vertexShader = '';
     fragmentShader = '';
     constructor(parameters: Record<string, any> = {}) {
-      super({});
-      const { uniforms, defines, vertexShader, fragmentShader, ...rest } = parameters;
+      super({ transparent: true, opacity: 0, alphaTest: 1 } as any);
+      const { uniforms, defines, vertexShader, fragmentShader } = parameters;
       if (uniforms) this.uniforms = uniforms;
       if (defines) this.defines = defines;
       if (vertexShader) this.vertexShader = vertexShader;
       if (fragmentShader) this.fragmentShader = fragmentShader;
-      this.setValues(rest);
+      warnOnce('A ShaderMaterial (GLSL) is not drawn in ThreeRT.');
     }
   }
   class InstancedBufferGeometry extends S.BufferGeometry {

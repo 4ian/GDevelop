@@ -13,7 +13,11 @@ import { adaptShaderMaterials } from './shader-materials';
 
 declare const gdjs: any;
 
-const degToRad = Math.PI / 180;
+/**
+ * The scale of the 3D layers other than the first one around the camera (their objects are usually a few metres from
+ * their camera: a weapon in the hands of the player, which must not go through walls).
+ */
+const SECONDARY_LAYER_SCALE = 0.04;
 
 /** The average colour (sRGB 0-1) of the image of a cube texture face, from the manifest. */
 const averageColorOfImage = (image: any): [number, number, number] | null => {
@@ -105,16 +109,23 @@ export class ThreeRTView {
         this._shownLayerScenes.set(shownLayer.threeScene, anchor);
       }
       if (shownLayer !== main) {
-        // Seen from the main camera as from its own: anchor = world⁻¹ · mainCamera · layerCamera⁻¹ (in the world).
+        // Seen from the main camera as from its own, scaled down around the camera (the same picture, but in front
+        // of what the main layer has there: a first person weapon is drawn over the scene in GDevelop):
+        // anchor = world⁻¹ · mainCamera · scale · layerCamera⁻¹.
         shownLayer.threeCamera.updateMatrixWorld(true);
         const layerCameraInverse = this._tmpMatrix.copy(shownLayer.threeCamera.matrixWorld).invert();
         this.world.updateWorldMatrix(false, false);
         const worldInverse = this._tmpMatrix2.copy(this.world.matrixWorld).invert();
-        const anchorMatrix = new S.Matrix4().multiplyMatrices(worldInverse, mainCameraMatrix).multiply(layerCameraInverse);
+        const scale = new S.Matrix4().makeScale(SECONDARY_LAYER_SCALE, SECONDARY_LAYER_SCALE, SECONDARY_LAYER_SCALE);
+        const anchorMatrix = new S.Matrix4().multiplyMatrices(worldInverse, mainCameraMatrix).multiply(scale).multiply(layerCameraInverse);
         anchorMatrix.decompose(this._tmpPosition, this._tmpQuaternion, this._tmpScale);
         anchor.position.copy(this._tmpPosition);
         anchor.quaternion.copy(this._tmpQuaternion);
         anchor.scale.copy(this._tmpScale);
+        // Its lights lit it alone in GDevelop: here the main layer's light it.
+        shownLayer.threeScene.traverse((object: any) => {
+          if ((object.isLight || object.isAmbientLight || object.isHemisphereLight) && object.visible) object.visible = false;
+        });
       }
     }
 
@@ -132,11 +143,40 @@ export class ThreeRTView {
     if (this.camera.far !== threeCamera.far) this.camera.far = threeCamera.far;
 
     this._updateEnvironment(main.threeScene, runtimeScene);
+    if ((getManifest() as any).profile && this._renderCount % 120 === 1) this._logLayers(shownLayers);
     // Materials with injected shaders (terrains...), looked for now and then (new objects get them).
     if (this._renderCount++ % 30 === 0) {
       for (const shownLayer of shownLayers) adaptShaderMaterials(shownLayer.threeScene);
     }
     this._hasRenderedOnce = true;
+  }
+
+  /** With `--profile`: the 3D layers shown and where their cameras and objects are. */
+  private _logLayers(shownLayers: Array<{ layer: any; threeScene: any; threeCamera: any }>) {
+    const describe = (v: any) => `(${v.x.toFixed(2)}, ${v.y.toFixed(2)}, ${v.z.toFixed(2)})`;
+    const lines = [`camera ${describe(this.camera.position)} fov ${this.camera.fov.toFixed(1)}`];
+    for (const { layer, threeScene, threeCamera } of shownLayers) {
+      let count = 0;
+      threeScene.traverse(() => count++);
+      const first = threeScene.children[0] && threeScene.children[0].children[0];
+      const firstPosition = first ? describe(first.getWorldPosition(new S.Vector3())) : '-';
+      lines.push(`layer "${layer.getName()}": ${count} objects, layer camera ${describe(threeCamera.position)}, first object at ${firstPosition} (world)`);
+    }
+    // What the centre of the picture shows.
+    const raycaster = new S.Raycaster();
+    const direction = new S.Vector3(0, 0, -1).applyQuaternion(this.camera.quaternion);
+    raycaster.set(this.camera.position.clone(), direction);
+    const hits = raycaster.intersectObject(this.world, true).slice(0, 3);
+    for (const hit of hits) {
+      const object: any = hit.object;
+      const material: any = object.material;
+      let path = '';
+      for (let o = object; o && o !== this.world; o = o.parent) path = (o.name || o.type) + '/' + path;
+      lines.push(
+        `centre hit at ${hit.distance.toFixed(2)} m: ${path} (${object.type}, visible ${object.visible}, material ${material ? material.type + ' opacity ' + material.opacity + ' map ' + (material.map ? material.map.uri : '-') : '-'})`
+      );
+    }
+    console.info('[GDJS ThreeRT] ' + lines.join('\n  '));
   }
 
   private _updateEnvironment(layerScene: LayerScene, runtimeScene: any) {

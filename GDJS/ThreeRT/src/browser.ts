@@ -300,6 +300,21 @@ class CanvasStub extends ElementStub {
   }
 }
 
+/** The size of an image given as a data URI (PNG: read from its header; other formats: 1x1). */
+const sizeOfDataUri = (uri: string): { width: number; height: number } => {
+  const match = /^data:image\/png;base64,(.{0,44})/.exec(uri);
+  if (match) {
+    try {
+      const header = atob(match[1].substring(0, 32));
+      const readUint32 = (offset: number) =>
+        ((header.charCodeAt(offset) << 24) | (header.charCodeAt(offset + 1) << 16) | (header.charCodeAt(offset + 2) << 8) | header.charCodeAt(offset + 3)) >>> 0;
+      const width = readUint32(16), height = readUint32(20);
+      if (width && height) return { width, height };
+    } catch (error) {}
+  }
+  return { width: 1, height: 1 };
+};
+
 /** An image of the game: its size comes from the manifest; it "loads" asynchronously as a browser image does. */
 class ImageStub extends ElementStub {
   private _src = '';
@@ -325,7 +340,7 @@ class ImageStub extends ElementStub {
     this._src = value;
     this.complete = false;
     const file = normalizeFilePath(value);
-    const info = getManifest().files[file];
+    const info = /^data:/.test(value) ? sizeOfDataUri(value) : getManifest().files[file];
     this.__threertFile = file;
     Promise.resolve().then(() => {
       if (info && info.width) {

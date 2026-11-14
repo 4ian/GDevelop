@@ -772,6 +772,26 @@ export const createThreeShim = (realThree: any) => {
     };
   }
 
+  // A mesh whose materials all draw nothing (the hidden faces of Cube3D objects, GLSL materials) is hidden from
+  // ThreeRT: alpha-tested surfaces still cast shadows in it. Raycasts still hit it, as in three.js.
+  const visibility = Object.getOwnPropertyDescriptor(S.Object3D.prototype, 'visible');
+  const drawsNothing = (material: any) =>
+    !material || material.isShaderMaterial || material.visible === false || (material.opacity === 0 && (material.transparent || material.alphaTest > 0));
+  if (visibility && visibility.get && visibility.set) {
+    Object.defineProperty(S.Mesh.prototype, 'visible', {
+      get(this: any) {
+        if (!visibility.get!.call(this)) return false;
+        const materials = this.materials;
+        for (let i = 0; i < materials.length; i++) if (!drawsNothing(materials[i])) return true;
+        return false;
+      },
+      set(this: any, value: boolean) {
+        visibility.set!.call(this, value);
+      },
+      configurable: true,
+    });
+  }
+
   // Materials: three.js properties @threert/scene ignores.
   const M = S.MeshStandardMaterial.prototype as any;
   for (const [name, value] of [

@@ -387,9 +387,11 @@ class ResponseStub {
   }
 }
 
+/** The text of a file of the game: from the manifest for text files, empty for the others (fonts...), else null. */
 const getTextOfFile = (url: string): string | null => {
   const info = getManifest().files[normalizeFilePath(url)];
-  return info && typeof info.text === 'string' ? info.text : null;
+  if (!info) return null;
+  return typeof info.text === 'string' ? info.text : '';
 };
 
 class XMLHttpRequestStub extends EventTargetStub {
@@ -509,7 +511,6 @@ export const installBrowserShims = () => {
   define('self', g);
   define('top', g);
   define('parent', g);
-  define('global', undefined);
   define('setTimeout', (fn: Function, delay?: number, ...args: any[]) => addTimer(fn, delay || 0, args, false));
   define('setInterval', (fn: Function, delay?: number, ...args: any[]) => addTimer(fn, delay || 0, args, true));
   define('clearTimeout', (id: number) => void (timers = timers.filter((t) => t.id !== id)));
@@ -525,6 +526,24 @@ export const installBrowserShims = () => {
     animationFrameCallbacks = animationFrameCallbacks.filter((c) => c.id !== id);
   });
   define('TextDecoder', TextDecoderStub);
+  define('Intl', {
+    NumberFormat: class {
+      format(n: number) {
+        return String(n);
+      }
+      resolvedOptions() {
+        return { locale: 'en-US' };
+      }
+    },
+    DateTimeFormat: class {
+      format(d: Date) {
+        return String(d);
+      }
+      resolvedOptions() {
+        return { locale: 'en-US', timeZone: 'UTC' };
+      }
+    },
+  });
   define('URL', URLStub);
   define('btoa', (s: string) => {
     const A = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';

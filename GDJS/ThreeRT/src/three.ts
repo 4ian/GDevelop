@@ -172,6 +172,7 @@ export class Texture extends textureMixin(S.Texture) {
     const assetPath = typeof image === 'string' ? image : getAssetPathOfImage(image);
     super(assetPath || 'generated:white', 'srgb');
     this.image = typeof image === 'string' ? null : image || null;
+    this.source = { data: this.image || { width: 1, height: 1 }, needsUpdate: false };
     if (!assetPath) this.data = getWhitePixelPNG();
   }
   clone(): this {
@@ -192,6 +193,7 @@ export class DataTexture extends textureMixin(S.DataTexture) {
       (format === undefined || format === 1023);
     super(width, height, isRGBA8 ? new Uint8Array(data.buffer, data.byteOffset, data.length) : new Uint8Array(width * height * 4).fill(255), 'linear');
     this.image = { data, width, height };
+    this.source = { data: this.image, needsUpdate: false };
     this._threeColorSpace = '';
   }
   clone(): this {
@@ -312,6 +314,8 @@ export class LayerScene extends S.Group {
   backgroundBlurriness = 0;
   backgroundIntensity = 1;
   environmentIntensity = 1;
+  backgroundRotation = new S.Euler();
+  environmentRotation = new S.Euler();
   constructor() {
     super();
     this.type = 'Scene';
@@ -624,6 +628,22 @@ const expandBoxByObject = (box: any, object: any, precise: boolean) => {
   for (const child of object.children) expandBoxByObject(box, child, precise);
 };
 
+/** A property created on first access for each instance (not shared through the prototype). */
+const lazyInstanceProperty = (prototype: any, name: string, create: () => any) => {
+  if (name in prototype) return;
+  Object.defineProperty(prototype, name, {
+    get() {
+      const value = create();
+      Object.defineProperty(this, name, { value, writable: true, configurable: true, enumerable: true });
+      return value;
+    },
+    set(value) {
+      Object.defineProperty(this, name, { value, writable: true, configurable: true, enumerable: true });
+    },
+    configurable: true,
+  });
+};
+
 /** Builds `THREE` from @threert/scene and the real three.js (`realThree`, for the classes and methods it lacks). */
 export const createThreeShim = (realThree: any) => {
   const R = realThree || {};
@@ -671,6 +691,17 @@ export const createThreeShim = (realThree: any) => {
     }
   };
 
+  // three.js's Euler keeps its order in `_order` (read by its methods grafted above).
+  Object.defineProperty(S.Euler.prototype, '_order', {
+    get() {
+      return this.order;
+    },
+    set(value) {
+      this.order = value;
+    },
+    configurable: true,
+  });
+
   // Euler <-> quaternion in every rotation order (@threert/scene converts back to XYZ only, but GDJS uses ZYX).
   const rotationMatrix = new S.Matrix4();
   (S.Euler.prototype as any).setFromQuaternion = function (q: any, orderOrNotify?: any, update?: boolean) {
@@ -712,23 +743,13 @@ export const createThreeShim = (realThree: any) => {
     this.scale.copy(scale);
     return this;
   };
-  Object.defineProperty(O, 'layers', {
-    get() {
-      const layers = new Layers();
-      Object.defineProperty(this, 'layers', { value: layers, writable: true, configurable: true });
-      return layers;
-    },
-    set(value) {
-      Object.defineProperty(this, 'layers', { value, writable: true, configurable: true });
-    },
-    configurable: true,
-  });
+  lazyInstanceProperty(O, 'layers', () => new Layers());
+  lazyInstanceProperty(O, 'animations', () => []);
   for (const [name, value] of [
     ['frustumCulled', true],
     ['renderOrder', 0],
     ['matrixWorldNeedsUpdate', false],
     ['matrixWorldAutoUpdate', true],
-    ['animations', []],
   ] as Array<[string, any]>) {
     if (!(name in O)) O[name] = value;
   }
@@ -774,6 +795,8 @@ export const createThreeShim = (realThree: any) => {
   ] as Array<[string, any]>) {
     if (!(name in M)) M[name] = value;
   }
+  lazyInstanceProperty(M, 'defines', () => ({}));
+  lazyInstanceProperty(M, 'uniforms', () => ({}));
   M.onBeforeCompile = M.onBeforeCompile || function () {};
   M.customProgramCacheKey =
     M.customProgramCacheKey ||
@@ -804,6 +827,23 @@ export const createThreeShim = (realThree: any) => {
     return this;
   };
 
+  (S.Object3D as any).DEFAULT_UP = new S.Vector3(0, 1, 0);
+  (S.Object3D as any).DEFAULT_MATRIX_AUTO_UPDATE = true;
+  (S.Object3D as any).DEFAULT_MATRIX_WORLD_AUTO_UPDATE = true;
+
+  /** Lights whose shadow camera is a camera (GDJS places and turns it), though ThreeRT needs no shadow map. */
+  const withShadowCamera = (Light: any, Camera: any) =>
+    class extends Light {
+      constructor(...args: any[]) {
+        super(...args);
+        const camera = new Camera();
+        Object.assign(this.shadow, { camera, map: null, mapSize: new S.Vector2(512, 512), autoUpdate: true, needsUpdate: false, intensity: 1 });
+      }
+    };
+  const DirectionalLight = withShadowCamera(S.DirectionalLight, OrthographicCamera);
+  const SpotLight = withShadowCamera(S.SpotLight, PerspectiveCamera);
+  const PointLight = withShadowCamera(S.PointLight, PerspectiveCamera);
+
   class Material extends S.MeshStandardMaterial {}
   class ShaderMaterial extends S.MeshBasicMaterial {
     readonly isShaderMaterial = true;
@@ -827,6 +867,9 @@ export const createThreeShim = (realThree: any) => {
   }
 
   const extras: Record<string, any> = {
+    DirectionalLight,
+    SpotLight,
+    PointLight,
     Texture,
     DataTexture,
     CubeTexture,

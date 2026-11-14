@@ -42,7 +42,7 @@ const createThreeRendererStub = () => {
     setViewport() {},
     setScissor() {},
     setScissorTest() {},
-    getContext: () => ({ getParameter: () => 4, getExtension: () => null, MAX_SAMPLES: 0x8d57 }),
+    getContext: () => ({ getParameter: () => 4, getExtension: () => null, getContextAttributes: () => null, MAX_SAMPLES: 0x8d57 }),
     getDrawingBufferSize: (target: any) => target.set(gameViewport.width, gameViewport.height),
     getClearColor: (target: any) => target,
     getClearAlpha: () => 1,

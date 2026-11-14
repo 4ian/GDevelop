@@ -14,7 +14,7 @@ import { installBrowserShims, runAnimationFrames, runTimers, setFlushTimersImmed
 import { installThree } from './three';
 import { installAudio } from './audio';
 import { installWebAssembly, importModule } from './wasm';
-import { installGDJSPatches, installPreGDJS, threertState, getJoltModule } from './gdjs-patches';
+import { installGDJSPatches, installPreGDJS, threertState, getJoltModule, raycastState } from './gdjs-patches';
 import { ThreeRTView } from './view';
 import { applyInput } from './input';
 import { updateHud } from './hud';
@@ -32,6 +32,8 @@ g.__GDJS_THREERT__ = { installThree, installGDJSPatches, getJoltModule, importMo
 let game: any = null;
 let gameTimeMs = 0;
 let isGameLoopRunning = false;
+let framesSinceStart = 0;
+const FRAMES_WITHOUT_STEP = 2;
 let lastError = '';
 /** Time spent in the frame script, logged every 120 frames when the game is built with `--profile`. */
 const profile = { frames: 0, step: 0, input: 0, hud: 0, max: 0 };
@@ -62,6 +64,7 @@ const logError = (context: string, error: any) => {
 /** One step of the GDJS game loop: events, behaviors, then the scene shown in ThreeRT's. */
 const stepGame = (elapsedTimeMs: number) => {
   if (!threertState.gameLoop) return;
+  raycastState.epoch++;
   try {
     const keepRunning = threertState.gameLoop(elapsedTimeMs);
     if (keepRunning === false) threertState.gameLoop = null;
@@ -80,6 +83,22 @@ const WARM_UP = { maxSteps: 240, maxTimeMs: 60000, fastStepMs: 15, fastStepsInAR
 const logGDJSProfile = () => {
   const scene = game.getSceneStack().getCurrentScene();
   if (!scene || !scene.startProfiler) return;
+  // Raycasts (3D extensions) timed too.
+  const raycasts = { count: 0, time: 0 };
+  const Raycaster: any = S.Raycaster;
+  const originals: Record<string, Function> = {};
+  for (const name of ['intersectObject', 'intersectObjects']) {
+    originals[name] = Raycaster.prototype[name];
+    Raycaster.prototype[name] = function (...args: any[]) {
+      const start = performance.now();
+      try {
+        return originals[name].apply(this, args);
+      } finally {
+        raycasts.count++;
+        raycasts.time += performance.now() - start;
+      }
+    };
+  }
   scene.startProfiler(() => {});
   for (let i = 0; i < 30; i++) {
     gameTimeMs += 1000 / 60;
@@ -90,6 +109,8 @@ const logGDJSProfile = () => {
   const lines: string[] = [];
   gdjs.Profiler.getProfilerSectionTexts('step', profiler.getFramesAverageMeasures(), lines);
   scene.stopProfiler();
+  for (const name of Object.keys(originals)) Raycaster.prototype[name] = originals[name];
+  lines.push(`raycasts: ${(raycasts.count / 30).toFixed(1)} by step, ${(raycasts.time / 30).toFixed(2)}ms`);
   console.info('[GDJS ThreeRT] GDJS profiler, mean of 30 steps:\n  ' + lines.join('\n  '));
 };
 
@@ -148,6 +169,8 @@ export default defineGame({
     gameTimeMs += elapsedTimeMs;
     runTimers(gameTimeMs);
     if (!isGameLoopRunning || f.dt <= 0) return;
+    // The first frames bind every object of the scene to the engine (a costly sync): no game step in them.
+    if (++framesSinceStart <= FRAMES_WITHOUT_STEP) return;
     const t0 = performance.now();
     try {
       applyInput(game, f.input);

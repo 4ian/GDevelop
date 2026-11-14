@@ -19,6 +19,9 @@ const g = globalThis as any;
 
 export type GameLoop = (elapsedTimeMs: number) => boolean;
 
+/** Raycasts reuse the world matrices computed in the same epoch (a game step: see index.ts). */
+export const raycastState = { epoch: 0 };
+
 export const threertState: {
   view: ThreeRTView | null;
   gameLoop: GameLoop | null;
@@ -335,11 +338,43 @@ const patchRaycaster = () => {
   };
 
   /**
-   * three.js's traversal of a raycast, on @threert/scene's triangle tests: world matrices updated once by
-   * traversal, `raycast` methods of objects (Terrain3D's ground answers from its heights) asked.
+   * World matrices are updated once by game step for raycasts (`raycastEpoch`): an object raycast against hundreds
+   * of times in a step (a group of obstacles) does not update its ancestors each time. three.js itself raycasts with
+   * the matrices of the last rendering.
    */
-  const visit = function (this: any, object: any, recursive: boolean, out: any[], parentIsUpdated: boolean) {
-    object.updateWorldMatrix(!parentIsUpdated, false);
+  const updatedInEpoch = new WeakMap<object, number>();
+  const updateWorldMatrixForRaycasts = (object: any) => {
+    if (updatedInEpoch.get(object) === raycastState.epoch) return;
+    const parent = object.parent;
+    if (parent) updateWorldMatrixForRaycasts(parent);
+    if (object.matrixAutoUpdate) object.updateMatrix();
+    if (parent) object.matrixWorld.multiplyMatrices(parent.matrixWorld, object.matrix);
+    else object.matrixWorld.copy(object.matrix);
+    updatedInEpoch.set(object, raycastState.epoch);
+  };
+
+  /** Whether the ray meets the sphere `center` (local), `radius` (local) of an object placed by `matrixWorld`. */
+  const center = new S.Vector3();
+  const rayMeetsSphere = (raycaster: any, matrixWorld: any, localCenter: any, localRadius: number) => {
+    center.copy(localCenter).applyMatrix4(matrixWorld);
+    const e = matrixWorld.elements;
+    const scale = Math.sqrt(Math.max(e[0] * e[0] + e[1] * e[1] + e[2] * e[2], e[4] * e[4] + e[5] * e[5] + e[6] * e[6], e[8] * e[8] + e[9] * e[9] + e[10] * e[10]));
+    const radius = localRadius * scale;
+    const origin = raycaster.ray.origin, direction = raycaster.ray.direction;
+    const dx = center.x - origin.x, dy = center.y - origin.y, dz = center.z - origin.z;
+    const along = dx * direction.x + dy * direction.y + dz * direction.z;
+    if (along < -radius || along - radius > raycaster.far) return false;
+    return dx * dx + dy * dy + dz * dz - along * along <= radius * radius;
+  };
+
+  const sphereCenter = new S.Vector3();
+  /**
+   * three.js's traversal of a raycast, on @threert/scene's triangle tests: world matrices updated once by step,
+   * objects culled by their bounding sphere, `raycast` methods of objects (Terrain3D's ground answers from its
+   * heights) asked.
+   */
+  const visit = function (this: any, object: any, recursive: boolean, out: any[]) {
+    updateWorldMatrixForRaycasts(object);
     if (Object.prototype.hasOwnProperty.call(object, 'raycast') && typeof object.raycast === 'function') {
       geometryChangesSuspended++;
       try {
@@ -350,16 +385,26 @@ const patchRaycaster = () => {
     } else if (object instanceof S.InstancedMesh) {
       visitInstancedMesh(this, object, out);
     } else if (object instanceof S.Mesh) {
-      this.mesh(object, object.geometry, object.materials, object.matrixWorld, out);
+      const geometry: any = object.geometry;
+      if (!geometry.boundingSphere) geometry.computeBoundingSphere();
+      const sphere = geometry.boundingSphere;
+      if (!sphere || rayMeetsSphere(this, object.matrixWorld, sphere.center, sphere.radius)) {
+        this.mesh(object, object.geometry, object.materials, object.matrixWorld, out);
+      }
     } else if (object instanceof S.GLTFModel) {
-      visitModel(this, object, out);
+      const bounds = (object as any).__threertBounds;
+      if (bounds) {
+        sphereCenter.set((bounds.min[0] + bounds.max[0]) / 2, (bounds.min[1] + bounds.max[1]) / 2, (bounds.min[2] + bounds.max[2]) / 2);
+        const radius = Math.hypot(bounds.max[0] - bounds.min[0], bounds.max[1] - bounds.min[1], bounds.max[2] - bounds.min[2]) / 2;
+        if (rayMeetsSphere(this, object.matrixWorld, sphereCenter, radius)) visitModel(this, object, out);
+      }
     } else if (object instanceof S.ProceduralMesh) {
       this.boxes(object, object.geometry.boxes, object.matrixWorld, out);
     }
-    if (recursive) for (const child of object.children) visit.call(this, child, true, out, true);
+    if (recursive) for (const child of object.children) visit.call(this, child, true, out);
   };
   Raycaster.prototype.visit = function (object: any, recursive: boolean, out: any[]) {
-    visit.call(this, object, recursive, out, false);
+    visit.call(this, object, recursive, out);
   };
   // three.js's Mesh.raycast, called by `raycast` methods of objects.
   (S.Mesh.prototype as any).raycast = function (raycaster: any, intersects: any[]) {

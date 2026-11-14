@@ -70,11 +70,19 @@ class Howl {
     });
   }
 
-  play(id?: number) {
+  /** Starts the sound at the end of the current script: GDJS sets its volume, loop and rate after `play`. */
+  private _startSoon(sound: PlayingSound) {
+    Promise.resolve().then(() => {
+      if (this._sounds.get(sound.id) === sound) this._start(sound);
+    });
+  }
+
+  play(idOrSprite?: number | string) {
+    const id = typeof idOrSprite === 'number' ? idOrSprite : undefined;
     const existing = id !== undefined ? this._sounds.get(id) : undefined;
     if (existing) {
-      this._start(existing);
-      this._emit('play', existing.id);
+      this._startSoon(existing);
+      Promise.resolve().then(() => this._emit('play', existing.id));
       return existing.id;
     }
     const sound: PlayingSound = {
@@ -86,7 +94,7 @@ class Howl {
       loop: this._loop,
     };
     this._sounds.set(sound.id, sound);
-    this._start(sound);
+    this._startSoon(sound);
     const id2 = sound.id;
     Promise.resolve().then(() => this._emit('play', id2));
     return sound.id;

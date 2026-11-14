@@ -24,6 +24,7 @@ export const updateHud = (game: any, hud: { set(state: any): boolean }) => {
   const width = game.getGameResolutionWidth();
   const height = game.getGameResolutionHeight();
   const items: Array<{ y: number; x: number; item: any }> = [];
+  let hasCrosshair = false;
   const layers: any[] = scene._orderedLayers || [];
   for (const layer of layers) {
     if (!layer.isVisible()) continue;
@@ -31,7 +32,16 @@ export const updateHud = (game: any, hud: { set(state: any): boolean }) => {
     if (renderingType === 'THREE_D' || renderingType === '3d') continue;
     const layerName = layer.getName();
     for (const object of scene.getAdhocListOfAllInstances()) {
-      if (object.getLayer() !== layerName || !isTextObject(object) || object.isHidden()) continue;
+      if (object.getLayer() !== layerName || object.isHidden()) continue;
+      // A crosshair: a sprite named like one, at the centre of the screen.
+      if (!hasCrosshair && /cross|reticle|aim/i.test(object.getName()) && !isTextObject(object)) {
+        const [x, y] = layer.convertInverseCoords
+          ? layer.convertInverseCoords(object.getCenterXInScene(), object.getCenterYInScene())
+          : [object.getCenterXInScene(), object.getCenterYInScene()];
+        if (Math.abs(x - width / 2) < width * 0.05 && Math.abs(y - height / 2) < height * 0.05) hasCrosshair = true;
+        continue;
+      }
+      if (!isTextObject(object)) continue;
       if (typeof object.getOpacity === 'function' && object.getOpacity() <= 0) continue;
       const text = String(object.getText() || '').trim();
       if (!text) continue;
@@ -55,5 +65,5 @@ export const updateHud = (game: any, hud: { set(state: any): boolean }) => {
     }
   }
   items.sort((a, b) => a.y - b.y || a.x - b.x);
-  hud.set({ items: items.map((i) => i.item) });
+  hud.set({ items: items.map((i) => i.item), ...(hasCrosshair ? { crosshair: { style: 'cross' } } : {}) });
 };

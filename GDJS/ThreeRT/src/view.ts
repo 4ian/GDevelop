@@ -9,6 +9,7 @@
 import * as S from '@threert/scene';
 import { LayerScene, CubeTexture } from './three';
 import { getManifest } from './manifest';
+import { adaptShaderMaterials } from './shader-materials';
 
 declare const gdjs: any;
 
@@ -40,6 +41,7 @@ export class ThreeRTView {
   private _skyCubeTexture: any = null;
   private _sky: S.SkyGradient | null = null;
   private _hasRenderedOnce = false;
+  private _renderCount = 0;
   private _tmpMatrix = new S.Matrix4();
   private _tmpMatrix2 = new S.Matrix4();
   private _tmpPosition = new S.Vector3();
@@ -130,6 +132,10 @@ export class ThreeRTView {
     if (this.camera.far !== threeCamera.far) this.camera.far = threeCamera.far;
 
     this._updateEnvironment(main.threeScene, runtimeScene);
+    // Materials with injected shaders (terrains...), looked for now and then (new objects get them).
+    if (this._renderCount++ % 30 === 0) {
+      for (const shownLayer of shownLayers) adaptShaderMaterials(shownLayer.threeScene);
+    }
     this._hasRenderedOnce = true;
   }
 

@@ -20,6 +20,7 @@
  *                             (downloaded from npm, in the version GDJS uses, if not given).
  *   --pointer look|free       how the game reads the mouse (by default "look" when the game locks the pointer).
  *   --name <name>             the id of the game in threert.json.
+ *   --profile                 log the time spent in the frame script every 120 frames.
  */
 const fs = require('fs');
 const path = require('path');
@@ -31,7 +32,7 @@ const args = {};
 for (let i = 2; i < process.argv.length; i++) {
   const match = /^--([a-z-]+)(=(.*))?$/.exec(process.argv[i]);
   if (!match) continue;
-  args[match[1]] = match[3] !== undefined ? match[3] : process.argv[++i];
+  args[match[1]] = match[3] !== undefined ? match[3] : process.argv[i + 1] && !process.argv[i + 1].startsWith('--') ? process.argv[++i] : 'true';
 }
 
 const fail = (message) => {
@@ -115,49 +116,141 @@ const getJoltCode = () => {
 // ---------------------------------------------------------------------------
 // The manifest: what the game knows about its files (it can't read them in ThreeRT).
 
-/** Bounds and animations of a glTF binary (.glb) or JSON (.gltf) file. */
-const readModelInfo = (file) => {
+/** The JSON and binary chunk of a glTF binary (.glb) or JSON (.gltf) file. */
+const readGltf = (file) => {
   const buffer = fs.readFileSync(file);
-  let json;
   if (buffer.readUInt32LE(0) === 0x46546c67) {
     const jsonLength = buffer.readUInt32LE(12);
-    json = JSON.parse(buffer.slice(20, 20 + jsonLength).toString('utf8'));
-  } else {
-    json = JSON.parse(buffer.toString('utf8'));
+    const json = JSON.parse(buffer.slice(20, 20 + jsonLength).toString('utf8'));
+    const binStart = 20 + jsonLength;
+    const bin = binStart + 8 <= buffer.length ? buffer.slice(binStart + 8, binStart + 8 + buffer.readUInt32LE(binStart)) : null;
+    return { json, bin };
   }
+  return { json: JSON.parse(buffer.toString('utf8')), bin: null };
+};
+
+const componentArrays = { 5120: Int8Array, 5121: Uint8Array, 5122: Int16Array, 5123: Uint16Array, 5125: Uint32Array, 5126: Float32Array };
+const componentCounts = { SCALAR: 1, VEC2: 2, VEC3: 3, VEC4: 4, MAT2: 4, MAT3: 9, MAT4: 16 };
+
+/** The values of an accessor, as floats (normalized integers are divided) or as indices. */
+const readAccessor = (gltf, buffers, accessorIndex, asFloat) => {
+  const accessor = gltf.json.accessors[accessorIndex];
+  const ArrayType = componentArrays[accessor.componentType];
+  const itemSize = componentCounts[accessor.type];
+  const out = asFloat ? new Float32Array(accessor.count * itemSize) : new Uint32Array(accessor.count * itemSize);
+  if (accessor.bufferView === undefined) return out;
+  const view = gltf.json.bufferViews[accessor.bufferView];
+  const buffer = buffers[view.buffer];
+  if (!buffer) throw new Error('missing buffer ' + view.buffer);
+  const elementBytes = ArrayType.BYTES_PER_ELEMENT;
+  const stride = view.byteStride || itemSize * elementBytes;
+  const base = (view.byteOffset || 0) + (accessor.byteOffset || 0);
+  const dataView = new DataView(buffer.buffer, buffer.byteOffset, buffer.byteLength);
+  const getters = { 5120: 'getInt8', 5121: 'getUint8', 5122: 'getInt16', 5123: 'getUint16', 5125: 'getUint32', 5126: 'getFloat32' };
+  const get = getters[accessor.componentType];
+  const normalizer = accessor.normalized ? { 5120: 127, 5121: 255, 5122: 32767, 5123: 65535 }[accessor.componentType] || 1 : 1;
+  for (let i = 0; i < accessor.count; i++) {
+    for (let k = 0; k < itemSize; k++) {
+      const value = dataView[get](base + i * stride + k * elementBytes, true);
+      out[i * itemSize + k] = asFloat && normalizer !== 1 ? Math.max(value / normalizer, -1) : value;
+    }
+  }
+  return out;
+};
+
+const toBase64 = (typedArray) => Buffer.from(typedArray.buffer, typedArray.byteOffset, typedArray.byteLength).toString('base64');
+
+const multiplyMatrices = (a, b) => {
+  const out = new Array(16).fill(0);
+  for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) for (let k = 0; k < 4; k++) out[j * 4 + i] += a[k * 4 + i] * b[j * 4 + k];
+  return out;
+};
+const nodeMatrix = (node) => {
+  if (node.matrix) return node.matrix;
+  const [tx, ty, tz] = node.translation || [0, 0, 0];
+  const [x, y, z, w] = node.rotation || [0, 0, 0, 1];
+  const [sx, sy, sz] = node.scale || [1, 1, 1];
+  const x2 = x + x, y2 = y + y, z2 = z + z;
+  const xx = x * x2, xy = x * y2, xz = x * z2, yy = y * y2, yz = y * z2, zz = z * z2;
+  const wx = w * x2, wy = w * y2, wz = w * z2;
+  return [
+    (1 - (yy + zz)) * sx, (xy + wz) * sx, (xz - wy) * sx, 0,
+    (xy - wz) * sy, (1 - (xx + zz)) * sy, (yz + wx) * sy, 0,
+    (xz + wy) * sz, (yz - wx) * sz, (1 - (xx + yy)) * sz, 0,
+    tx, ty, tz, 1,
+  ];
+};
+
+/**
+ * Bounds, animations and (for code reading the meshes of models, like the scattered models of Terrain3D) the
+ * geometry and materials of a glTF file. Images embedded in the file are written to `imagesDir`.
+ */
+const readModelInfo = (file, writeImage) => {
+  const gltf = readGltf(file);
+  const json = gltf.json;
   const nodes = json.nodes || [];
   const accessors = json.accessors || [];
   const meshes = json.meshes || [];
   const min = [Infinity, Infinity, Infinity];
   const max = [-Infinity, -Infinity, -Infinity];
+  const buffers = (json.buffers || []).map((buffer, index) => {
+    if (index === 0 && gltf.bin && !buffer.uri) return gltf.bin;
+    if (buffer.uri && buffer.uri.startsWith('data:')) return Buffer.from(buffer.uri.split(',')[1], 'base64');
+    if (buffer.uri) {
+      const bufferPath = path.join(path.dirname(file), decodeURIComponent(buffer.uri));
+      return fs.existsSync(bufferPath) ? fs.readFileSync(bufferPath) : null;
+    }
+    return null;
+  });
+  const usesDraco = (json.extensionsUsed || []).includes('KHR_draco_mesh_compression');
 
-  const multiply = (a, b) => {
-    const out = new Array(16).fill(0);
-    for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) for (let k = 0; k < 4; k++) out[j * 4 + i] += a[k * 4 + i] * b[j * 4 + k];
-    return out;
+  // Images and materials (base colour, its texture, roughness, metalness, transparency).
+  const imagePaths = (json.images || []).map((image, index) => {
+    try {
+      if (image.bufferView !== undefined) {
+        const view = json.bufferViews[image.bufferView];
+        const data = buffers[view.buffer].slice(view.byteOffset || 0, (view.byteOffset || 0) + view.byteLength);
+        const extension = image.mimeType === 'image/jpeg' ? 'jpg' : 'png';
+        return writeImage(index, extension, data);
+      }
+      if (image.uri && image.uri.startsWith('data:')) {
+        const extension = image.uri.startsWith('data:image/jpeg') ? 'jpg' : 'png';
+        return writeImage(index, extension, Buffer.from(image.uri.split(',')[1], 'base64'));
+      }
+    } catch (error) {
+      console.warn(`⚠️ Can't read image ${index} of ${file}: ${error}`);
+    }
+    return null;
+  });
+  const textureImage = (textureInfo) => {
+    if (!textureInfo) return null;
+    const texture = (json.textures || [])[textureInfo.index];
+    return texture && texture.source !== undefined ? imagePaths[texture.source] : null;
   };
-  const localMatrix = (node) => {
-    if (node.matrix) return node.matrix;
-    const [tx, ty, tz] = node.translation || [0, 0, 0];
-    const [x, y, z, w] = node.rotation || [0, 0, 0, 1];
-    const [sx, sy, sz] = node.scale || [1, 1, 1];
-    const x2 = x + x, y2 = y + y, z2 = z + z;
-    const xx = x * x2, xy = x * y2, xz = x * z2, yy = y * y2, yz = y * z2, zz = z * z2;
-    const wx = w * x2, wy = w * y2, wz = w * z2;
-    return [
-      (1 - (yy + zz)) * sx, (xy + wz) * sx, (xz - wy) * sx, 0,
-      (xy - wz) * sy, (1 - (xx + zz)) * sy, (yz + wx) * sy, 0,
-      (xz + wy) * sz, (yz - wx) * sz, (1 - (xx + yy)) * sz, 0,
-      tx, ty, tz, 1,
-    ];
-  };
+  const materials = (json.materials || []).map((material) => {
+    const pbr = material.pbrMetallicRoughness || {};
+    return {
+      color: pbr.baseColorFactor || [1, 1, 1, 1],
+      map: textureImage(pbr.baseColorTexture),
+      roughness: pbr.roughnessFactor !== undefined ? pbr.roughnessFactor : 1,
+      metalness: pbr.metallicFactor !== undefined ? pbr.metallicFactor : 1,
+      emissive: material.emissiveFactor || [0, 0, 0],
+      alphaTest: material.alphaMode === 'MASK' ? (material.alphaCutoff !== undefined ? material.alphaCutoff : 0.5) : 0,
+      transparent: material.alphaMode === 'BLEND',
+      doubleSided: !!material.doubleSided,
+      name: material.name || '',
+    };
+  });
+
+  const meshParts = [];
   const visit = (nodeIndex, parentMatrix) => {
     const node = nodes[nodeIndex];
     if (!node) return;
-    const matrix = multiply(parentMatrix, localMatrix(node));
+    const matrix = multiplyMatrices(parentMatrix, nodeMatrix(node));
     if (node.mesh !== undefined && meshes[node.mesh]) {
       for (const primitive of meshes[node.mesh].primitives || []) {
-        const accessor = accessors[primitive.attributes && primitive.attributes.POSITION];
+        const attributes = primitive.attributes || {};
+        const accessor = accessors[attributes.POSITION];
         if (!accessor || !accessor.min || !accessor.max) continue;
         for (let c = 0; c < 8; c++) {
           const p = [c & 1 ? accessor.max[0] : accessor.min[0], c & 2 ? accessor.max[1] : accessor.min[1], c & 4 ? accessor.max[2] : accessor.min[2]];
@@ -166,6 +259,17 @@ const readModelInfo = (file) => {
             min[i] = Math.min(min[i], v);
             max[i] = Math.max(max[i], v);
           }
+        }
+        if (usesDraco || (primitive.mode !== undefined && primitive.mode !== 4)) continue;
+        try {
+          const part = { matrix, material: primitive.material !== undefined ? primitive.material : -1, name: node.name || '' };
+          part.position = toBase64(readAccessor(gltf, buffers, attributes.POSITION, true));
+          if (attributes.NORMAL !== undefined) part.normal = toBase64(readAccessor(gltf, buffers, attributes.NORMAL, true));
+          if (attributes.TEXCOORD_0 !== undefined) part.uv = toBase64(readAccessor(gltf, buffers, attributes.TEXCOORD_0, true));
+          if (primitive.indices !== undefined) part.index = toBase64(readAccessor(gltf, buffers, primitive.indices, false));
+          meshParts.push(part);
+        } catch (error) {
+          console.warn(`⚠️ Can't read a mesh of ${file}: ${error}`);
         }
       }
     }
@@ -187,7 +291,7 @@ const readModelInfo = (file) => {
     }
     return { name: animation.name || 'Animation ' + index, duration };
   });
-  return { min, max, animations };
+  return { min, max, animations, meshes: meshParts, materials };
 };
 
 const readImageInfo = async (file) => {
@@ -233,7 +337,14 @@ const build = async () => {
       info.assetPath = assetPath;
       try {
         if (resource.kind === 'image') Object.assign(info, await readImageInfo(sourcePath));
-        if (resource.kind === 'model3D') info.model = readModelInfo(sourcePath);
+        if (resource.kind === 'model3D') {
+          info.model = readModelInfo(sourcePath, (index, extension, data) => {
+            const imagePath = `${assetPath}.image${index}.${extension}`;
+            fs.writeFileSync(path.join(outDir, imagePath), data);
+            assetFiles.push(imagePath);
+            return imagePath;
+          });
+        }
       } catch (error) {
         console.warn(`⚠️ Can't read ${file}: ${error}`);
       }
@@ -244,6 +355,7 @@ const build = async () => {
   // The pointer is captured for games locking it (first person, third person cameras with the mouse).
   const usesPointerLock = scriptFiles.some((file) => file.includes('mousepointerlock'));
   manifest.pointer = args.pointer || (usesPointerLock ? 'look' : 'free');
+  if (args.profile !== undefined) manifest.profile = true;
 
   // The adapter and the ThreeRT runtime.
   const adapterEntry = path.join(__dirname, '../src/index.ts');

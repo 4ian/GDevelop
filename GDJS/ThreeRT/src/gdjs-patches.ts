@@ -171,6 +171,60 @@ const patchLoadingScreen = () => {
   gdjs.LoadingScreenRenderer = LoadingScreenThreeRTRenderer;
 };
 
+const decodeBase64 = (base64: string): ArrayBuffer => {
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes.buffer;
+};
+
+/**
+ * The meshes of a model, from the manifest, as meshes of @threert/scene marked `__threertModelPart`: code reading
+ * the meshes of models (Terrain3D's scattered models) gets them; clones of the model (Model3D objects) leave them out.
+ */
+const createModelMeshes = (model: NonNullable<ReturnType<typeof getFileInfo>>['model']): S.Mesh[] => {
+  if (!model || !model.meshes) return [];
+  const materials = (model.materials || []).map((m) => {
+    const color = new S.Color().setRGB(m.color[0], m.color[1], m.color[2]);
+    const material = new S.MeshStandardMaterial({
+      name: m.name,
+      color,
+      roughness: m.roughness,
+      metalness: m.metalness,
+      opacity: m.color[3],
+      transparent: m.transparent,
+      alphaTest: m.alphaTest,
+      side: m.doubleSided ? S.DoubleSide : S.FrontSide,
+    });
+    if (m.emissive && (m.emissive[0] || m.emissive[1] || m.emissive[2])) material.emissive = new S.Color().setRGB(m.emissive[0], m.emissive[1], m.emissive[2]);
+    if (m.map) material.map = new (g.THREE.Texture)(m.map);
+    return material;
+  });
+  const defaultMaterial = new S.MeshStandardMaterial({ color: 0xffffff, roughness: 1 });
+  const meshes: S.Mesh[] = [];
+  for (const part of model.meshes) {
+    const geometry = new S.BufferGeometry();
+    geometry.setAttribute('position', new S.BufferAttribute(new Float32Array(decodeBase64(part.position)), 3));
+    if (part.normal) geometry.setAttribute('normal', new S.BufferAttribute(new Float32Array(decodeBase64(part.normal)), 3));
+    if (part.uv) {
+      // glTF's texture coordinates start at the top of images, three.js's (and these textures') at the bottom.
+      const uv = new Float32Array(decodeBase64(part.uv));
+      for (let i = 1; i < uv.length; i += 2) uv[i] = 1 - uv[i];
+      geometry.setAttribute('uv', new S.BufferAttribute(uv, 2));
+    }
+    if (part.index) geometry.setIndex(new S.BufferAttribute(new Uint32Array(decodeBase64(part.index)), 1));
+    if (!part.normal) geometry.computeVertexNormals();
+    const mesh: any = new S.Mesh(geometry, materials[part.material] || defaultMaterial);
+    mesh.name = part.name;
+    mesh.__threertModelPart = true;
+    const matrix = new S.Matrix4();
+    matrix.elements = part.matrix.slice();
+    matrix.decompose(mesh.position, mesh.quaternion, mesh.scale);
+    meshes.push(mesh);
+  }
+  return meshes;
+};
+
 const patchModel3DManager = () => {
   const Manager = gdjs.Model3DManager;
   if (!Manager) return;
@@ -186,6 +240,8 @@ const patchModel3DManager = () => {
     const model: any = new S.GLTFModel(info.assetPath);
     model.__threertBounds = { min: info.model.min, max: info.model.max };
     scene.add(model);
+    // The meshes of the file, for code reading them (they are not drawn: the GLTFModel is).
+    for (const mesh of createModelMeshes(info.model)) scene.add(mesh);
     const animations = info.model.animations.map((animation) => new AnimationClip(animation.name, animation.duration));
     this._loadedThreeModels.set(resource, {
       scene,

@@ -6,6 +6,19 @@ export type ModelInfo = {
   min: [number, number, number];
   max: [number, number, number];
   animations: Array<{ name: string; duration: number }>;
+  /** The triangles of the model (base64 of Float32 / Uint32 arrays), in the file's coordinates. */
+  meshes?: Array<{ matrix: number[]; material: number; name: string; position: string; normal?: string; uv?: string; index?: string }>;
+  materials?: Array<{
+    color: number[];
+    map: string | null;
+    roughness: number;
+    metalness: number;
+    emissive: number[];
+    alphaTest: number;
+    transparent: boolean;
+    doubleSided: boolean;
+    name: string;
+  }>;
 };
 
 export type FileInfo = {

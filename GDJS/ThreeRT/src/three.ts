@@ -570,7 +570,9 @@ export class AnimationMixer {
     const time = loop || duration <= 0 ? action.time : Math.min(action.time, duration - 1e-4);
     const pose = { clip: action.clip.name, time: Math.max(0, time), loop };
     this._root.traverse((object: any) => {
-      if (object instanceof S.GLTFModel) {
+      if (object.__threertModelPart && object.parent && object.parent.children.some((c: any) => c instanceof S.GLTFModel)) {
+    // (The model's own bounds are those of the GLTFModel next to it.)
+  } else if (object instanceof S.GLTFModel) {
         const current = object.animation;
         if (!current || current.clip !== pose.clip || current.time !== pose.time || current.loop !== pose.loop) object.animation = pose;
       }
@@ -601,7 +603,9 @@ const expandBoxByObject = (box: any, object: any, precise: boolean) => {
       box.expandByPoint(point);
     }
   };
-  if (object instanceof S.GLTFModel) {
+  if (object.__threertModelPart && object.parent && object.parent.children.some((c: any) => c instanceof S.GLTFModel)) {
+    // (The model's own bounds are those of the GLTFModel next to it.)
+  } else if (object instanceof S.GLTFModel) {
     const bounds = (object as any).__threertBounds;
     if (bounds) corners(bounds.min, bounds.max, object.matrixWorld);
   } else if (object.isInstancedMesh) {
@@ -1036,7 +1040,14 @@ export const createThreeAddonsShim = () => {
     UnrealBloomPass: PassStub,
     Pass: PassStub,
     FullScreenQuad: PassStub,
-    SkeletonUtils: { clone: (object: any) => object.clone() },
+    // The meshes of a model given for code reading them (`createModelMeshes`) are not part of its clones.
+    SkeletonUtils: {
+      clone: (object: any) => {
+        const clone = object.clone(false);
+        for (const child of object.children) if (!child.__threertModelPart) clone.add(child.clone());
+        return clone;
+      },
+    },
     // Models are not parsed: Model3DManager is replaced (`gdjs-patches.ts`).
     GLTFLoader: class {
       register() {

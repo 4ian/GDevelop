@@ -8,6 +8,7 @@
 //   5. `__GDJS_THREERT__.installGDJSPatches()`.
 // ThreeRT then calls `setup`: the game is created, its assets and first scene are loaded within setup (its time
 // budget is larger than a frame's), and every frame then runs a step of the GDJS game loop.
+import * as S from '@threert/scene';
 import { defineGame, hud } from '@threert/gameplay';
 import { installBrowserShims, runAnimationFrames, runTimers, setFlushTimersImmediately, gameViewport } from './browser';
 import { installThree } from './three';
@@ -30,6 +31,24 @@ let game: any = null;
 let gameTimeMs = 0;
 let isGameLoopRunning = false;
 let lastError = '';
+/** Time spent in the frame script, logged every 120 frames when the game is built with `--profile`. */
+const profile = { frames: 0, step: 0, input: 0, hud: 0, max: 0 };
+const isProfiling = !!(getManifest() as any).profile;
+const syncProfile = { time: 0, created: 0, updated: 0, removed: 0, structural: 0 };
+if (isProfiling) {
+  const sync = S.SceneBinding.prototype.sync;
+  S.SceneBinding.prototype.sync = function (this: any) {
+    const structural = this.changes && this.changes.structure;
+    const t = performance.now();
+    const stats = sync.call(this);
+    syncProfile.time += performance.now() - t;
+    syncProfile.created += stats.created;
+    syncProfile.updated += stats.updated;
+    syncProfile.removed += stats.removed;
+    if (structural) syncProfile.structural++;
+    return stats;
+  };
+}
 
 const logError = (context: string, error: any) => {
   const message = context + ': ' + (error && error.message ? error.message : String(error));
@@ -99,17 +118,35 @@ export default defineGame({
     gameTimeMs += elapsedTimeMs;
     runTimers(gameTimeMs);
     if (!isGameLoopRunning || f.dt <= 0) return;
+    const t0 = performance.now();
     try {
       applyInput(game, f.input);
     } catch (error) {
       logError('Error while reading the input', error);
     }
+    const t1 = performance.now();
     stepGame(elapsedTimeMs);
     runAnimationFrames(gameTimeMs);
+    const t2 = performance.now();
     try {
       updateHud(game, hud);
     } catch (error) {
       logError('Error while updating the HUD', error);
+    }
+    if (isProfiling) {
+      const t3 = performance.now();
+      profile.frames++;
+      profile.input += t1 - t0;
+      profile.step += t2 - t1;
+      profile.hud += t3 - t2;
+      profile.max = Math.max(profile.max, t3 - t0);
+      if (profile.frames === 20) {
+        const ms = (v: number) => (v / profile.frames).toFixed(1);
+        console.info(`[GDJS ThreeRT] frame script, mean over ${profile.frames} frames: step ${ms(profile.step)} ms, input ${ms(profile.input)} ms, HUD ${ms(profile.hud)} ms (max ${profile.max.toFixed(1)} ms)`);
+        console.info(`[GDJS ThreeRT] scene sync, mean: ${ms(syncProfile.time)} ms, ${ms(syncProfile.created)} created, ${ms(syncProfile.updated)} updated, ${ms(syncProfile.removed)} removed, ${syncProfile.structural} structural syncs`);
+        Object.assign(profile, { frames: 0, step: 0, input: 0, hud: 0, max: 0 });
+        Object.assign(syncProfile, { time: 0, created: 0, updated: 0, removed: 0, structural: 0 });
+      }
     }
   },
 } as any);

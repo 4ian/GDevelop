@@ -93,3 +93,11 @@ stand-ins around it, applied from outside its files (`src/`):
   starters take 15 to 30 ms a frame for the script).
 - Sounds are not positioned, and their volume and rate are applied when they start.
 - Only the first 3D layer's camera is used, with the others placed relative to it.
+
+## ThreeRT changes
+
+`threert-patches/` has changes to ThreeRT made for this prototype (apply with `git am` in a ThreeRT clone). They are
+optional: the adapter runs on ThreeRT as it is.
+
+- `0001-SceneBinding-track-ambient-lights-...`: the scene binding walked the whole scene graph at every sync to find
+  ambient lights (several milliseconds a frame in QuickJS for the hundreds of objects of a GDevelop scene).

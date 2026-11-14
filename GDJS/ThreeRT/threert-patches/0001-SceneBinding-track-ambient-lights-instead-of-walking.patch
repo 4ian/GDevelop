@@ -1,0 +1,97 @@
+From 5bf85707a6166fb6a4af99381e27cc2c3e6e2984 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Sat, 14 Nov 2026 08:21:16 +0000
+Subject: [PATCH] SceneBinding: track ambient lights instead of walking the
+ scene graph at every sync
+
+ambientSky() and lightLevel() ran a full traversal of the scene at every sync
+(through cameraDesc and environmentDesc), which costs milliseconds per frame
+in QuickJS on scenes of hundreds of objects (GDevelop games). The binding now
+keeps the AmbientLight / HemisphereLight objects it binds, and checks that they
+are shown in the scene by walking their ancestors.
+---
+ packages/scene/src/engine.ts | 27 +++++++++++++++++++--------
+ 1 file changed, 19 insertions(+), 8 deletions(-)
+
+diff --git a/packages/scene/src/engine.ts b/packages/scene/src/engine.ts
+index c4d555c..446da89 100644
+--- a/packages/scene/src/engine.ts
++++ b/packages/scene/src/engine.ts
+@@ -318,6 +318,8 @@ export interface SyncStats {
+  */
+ export class SceneBinding {
+   readonly scene: Scene;
++  /** The AmbientLight / HemisphereLight objects bound (they light the scene as its environment: `ambientSky`). */
++  private readonly ambientLights = new Set<Object3D>();
+   camera: PerspectiveCamera;
+   options: RenderOptions;
+   private readonly engine: Engine;
+@@ -432,6 +434,7 @@ export class SceneBinding {
+         if (cut > 0 && Number.isInteger(n) && n >= 1 && n < (this.nameFloor.get(b.name.slice(0, cut)) ?? 1)) this.nameFloor.set(b.name.slice(0, cut), n);
+         if (o instanceof Light) this.lights.delete(o);
+         if (o instanceof PerspectiveCamera) this.cameras.delete(o);
++        this.ambientLights.delete(o);
+         stats.removed++;
+       }
+     } else if (ch.objects.size) {
+@@ -539,6 +542,7 @@ export class SceneBinding {
+         this.byName.set(name, o);
+         if (o instanceof Light) this.lights.set(o, b);
+         if (o instanceof PerspectiveCamera) this.cameras.set(o, b);
++        if (o instanceof AmbientLight || o instanceof HemisphereLight) this.ambientLights.add(o);
+       }
+       b.parent = parent;
+       b.kind = kind;
+@@ -1422,8 +1426,9 @@ export class SceneBinding {
+   private ambientSky(): SkyDesc | null {
+     const amb = [0, 0, 0], sky = [0, 0, 0], ground = [0, 0, 0];
+     let any = false, hemi = false;
+-    const visit = (o: Object3D) => {
+-      if (!o.visible) return;
++    // The ambient lights bound (`ambientLights`), not a walk of the scene: this runs at every sync.
++    for (const o of this.ambientLights) {
++      if (!this.shownInScene(o)) continue;
+       if (o instanceof AmbientLight) {
+         vec3(o.color).forEach((c, k) => (amb[k] += c * o.intensity));
+         any = true;
+@@ -1432,15 +1437,22 @@ export class SceneBinding {
+         vec3(o.groundColor).forEach((c, k) => (ground[k] += c * o.intensity));
+         any = hemi = true;
+       }
+-      for (const c of o.children) visit(c);
+-    };
+-    visit(this.scene);
++    }
+     if (!any) return null;
+     if (!hemi) return { type: "color", color: amb as Vec3, intensity: 1 / Math.PI, skyLightIntensity: 1 };
+     const add = (c: number[]) => c.map((v, k) => v + amb[k]) as Vec3;
+     return { type: "gradient", zenith: add(sky), horizon: add(sky.map((v, k) => (v + ground[k]) / 2)), ground: add(ground), intensity: 1 / Math.PI, skyLightIntensity: 1 };
+   }
+ 
++  /** The object is in the scene and it and its ancestors are visible. */
++  private shownInScene(o: Object3D): boolean {
++    for (let p: Object3D | null = o; p; p = p.parent) {
++      if (!p.visible) return false;
++      if (p === this.scene) return true;
++    }
++    return false;
++  }
++
+   /** A camera as the engine gets it. In a three.js-style scene (lit by ambient / hemisphere lights) a camera whose
+    *  exposure scene code never set takes three.js's fixed exposure (EV 0: radiance 1 shows as 1), not auto exposure. */
+   private cameraDesc(c: PerspectiveCamera): CameraDesc {
+@@ -1456,9 +1468,8 @@ export class SceneBinding {
+    *  lights' irradiance / pi (at least 1 / pi), the radiance of a white diffuse surface in them. */
+   private lightLevel(): number {
+     let key = 0;
+-    this.scene.traverse((o) => {
+-      if (o.visible && (o instanceof AmbientLight || o instanceof HemisphereLight || o instanceof DirectionalLight)) key += o.intensity;
+-    });
++    for (const o of this.ambientLights) if (this.shownInScene(o)) key += (o as AmbientLight | HemisphereLight).intensity;
++    for (const o of this.lights.keys()) if (o instanceof DirectionalLight && this.shownInScene(o)) key += o.intensity;
+     return Math.max(key, 1) / Math.PI;
+   }
+ 
+-- 
+2.43.0
+

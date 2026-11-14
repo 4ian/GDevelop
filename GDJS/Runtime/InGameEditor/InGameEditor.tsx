@@ -1420,6 +1420,29 @@ namespace gdjs {
     'divider',
   ];
 
+  /**
+   * The last result of the picking, with the state it was computed for.
+   * Used to skip the raycast while the cursor, the camera and the instances
+   * didn't change.
+   */
+  type InGameEditorPickingCache = {
+    instancesVersion: integer;
+    /**
+     * The cursor, the game resolution, the 3D world scale, then the world and
+     * projection matrices of the camera of each visible layer.
+     */
+    state: number[];
+    object: gdjs.RuntimeObject | null;
+  };
+
+  const haveSameNumbers = (first: number[], second: number[]): boolean => {
+    if (first.length !== second.length) return false;
+    for (let index = 0; index < first.length; index++) {
+      if (first[index] !== second[index]) return false;
+    }
+    return true;
+  };
+
   /** @category In-Game Editor */
   export class InGameEditor {
     private _editorId: string = '';
@@ -1448,6 +1471,21 @@ namespace gdjs {
     private _tempVector2d: THREE.Vector2 = new THREE.Vector2();
     private _raycaster: THREE.Raycaster = new THREE.Raycaster();
     private _segmentRaycaster: THREE.Raycaster = new THREE.Raycaster();
+
+    /**
+     * Bumped each time the instances or the layers change, so that the result
+     * of `getObjectUnderCursor` is not reused when it may be outdated.
+     */
+    private _pickingInstancesVersion = 0;
+    /**
+     * The instances version used by the last render: 3D objects only get their
+     * new transforms applied while rendering, so a picking computed before is
+     * not stored.
+     */
+    private _pickingVersionAtLastRender = 0;
+    private _pickingCache: InGameEditorPickingCache | null = null;
+    /** Reused to compare the picking state without allocating at each frame. */
+    private _pickingStateScratch: number[] = [];
 
     private _isVisible = true;
     private _timeSinceLastInteraction = 0;
@@ -1658,6 +1696,9 @@ namespace gdjs {
       layersData: Array<LayerData>,
       areEffectsHiddenInEditor: boolean
     ): void {
+      // Layers are about to be reloaded: their visibility and their cameras
+      // may change.
+      this._invalidatePickingCache();
       for (const layerData of layersData) {
         // Camera controls don't work in orthographic.
         if (layerData.cameraType === 'orthographic') {
@@ -1713,6 +1754,7 @@ namespace gdjs {
      */
     rebuildInstancesDataIndex(): void {
       this._editedInstancesDataIndex.rebuildIndex();
+      this._invalidatePickingCache();
     }
 
     getEditedLayerDataList(): LayerData[] {
@@ -1753,6 +1795,7 @@ namespace gdjs {
      * might be caching it.
      */
     onGameResolutionResized() {
+      this._invalidatePickingCache();
       if (!this._currentScene) {
         return;
       }
@@ -1767,6 +1810,7 @@ namespace gdjs {
       eventsBasedObjectVariantName: string | null,
       editorCamera3D: EditorCameraState | null
     ) {
+      this._invalidatePickingCache();
       if (this._currentScene) {
         this._currentScene.unloadScene();
         this._currentScene = null;
@@ -3221,14 +3265,17 @@ namespace gdjs {
     private _removeInstances(
       removedInstances: Array<{ persistentUuid: string | null }>
     ) {
+      if (removedInstances.length === 0) return;
       for (const removedInstance of removedInstances) {
         this._editedInstancesDataIndex.removeByPersistentUuid(
           removedInstance.persistentUuid
         );
       }
+      this._invalidatePickingCache();
     }
 
     private _updateInstances(updatedInstances: Array<InstanceData>) {
+      if (updatedInstances.length === 0) return;
       for (const updatedInstance of updatedInstances) {
         const oldInstance = this._getInstanceData(
           updatedInstance.persistentUuid
@@ -3242,6 +3289,7 @@ namespace gdjs {
           ]);
         }
       }
+      this._invalidatePickingCache();
     }
 
     private _getInstanceData(
@@ -3270,7 +3318,9 @@ namespace gdjs {
     }
 
     private _addInstances(addedInstances: Array<InstanceData>) {
+      if (addedInstances.length === 0) return;
       this._editedInstancesDataIndex.addAll(addedInstances);
+      this._invalidatePickingCache();
     }
 
     private _updateInnerAreaOutline(): void {
@@ -3704,6 +3754,9 @@ namespace gdjs {
       const editedInstanceContainer = this.getEditedInstanceContainer();
       if (!editedInstanceContainer) return;
 
+      // The runtime objects are moved below, before their data is updated.
+      this._invalidatePickingCache();
+
       const instancesByPersistentUuid = new Map<string, InstanceData>();
       for (const instance of instances) {
         instancesByPersistentUuid.set(instance.persistentUuid, instance);
@@ -3805,7 +3858,6 @@ namespace gdjs {
       raycaster.setFromCamera(normalizedDeviceCoordinates, threeCamera);
     }
 
-    // TODO: Cache the result for the frame
     private _getClosestIntersectionUnderCursor(
       options: {
         excludedObjects?: Array<gdjs.RuntimeObject>;
@@ -4143,6 +4195,48 @@ namespace gdjs {
     }
 
     getObjectUnderCursor(): gdjs.RuntimeObject | null {
+      if (!this._currentScene) return null;
+
+      // Picking raycasts every 3D object and scans every 2D object, while the
+      // result only changes when the cursor, a camera or an instance moves.
+      // - Editor callbacks can move instances on their own.
+      // - Dragging (objects, transform controls, selection box) needs a result
+      //   computed for the current frame.
+      if (
+        gdjs.callbacksInGameEditorPostStep.length > 0 ||
+        this._isMouseButtonPressed()
+      ) {
+        this._pickingCache = null;
+        return this._pickObjectUnderCursor();
+      }
+
+      const cache = this._pickingCache;
+      this._fillPickingState(this._pickingStateScratch);
+      if (
+        cache &&
+        cache.instancesVersion === this._pickingInstancesVersion &&
+        haveSameNumbers(cache.state, this._pickingStateScratch)
+      ) {
+        return cache.object;
+      }
+
+      const object = this._pickObjectUnderCursor();
+      // The three.js objects of the instances are moved by the render: if the
+      // instances changed since the last render, this result was computed with
+      // the previous transforms and must not be reused.
+      if (this._pickingInstancesVersion === this._pickingVersionAtLastRender) {
+        // The scratch state was refreshed just before picking, and picking
+        // doesn't move the cameras: it can be stored as is.
+        this._pickingCache = {
+          instancesVersion: this._pickingInstancesVersion,
+          state: this._pickingStateScratch.slice(),
+          object,
+        };
+      }
+      return object;
+    }
+
+    private _pickObjectUnderCursor(): gdjs.RuntimeObject | null {
       const closestIntersect = this._getClosestIntersectionUnderCursor({
         ignoreUnselectableInstances: true,
       });
@@ -4179,6 +4273,64 @@ namespace gdjs {
         return topObject2D;
       }
       return this._getObject3D(closestIntersect.object);
+    }
+
+    private _isMouseButtonPressed(): boolean {
+      const inputManager = this._runtimeGame.getInputManager();
+      return (
+        inputManager.isMouseButtonPressed(0) ||
+        inputManager.isMouseButtonPressed(1) ||
+        inputManager.isMouseButtonPressed(2)
+      );
+    }
+
+    /**
+     * Invalidate the result of `getObjectUnderCursor`.
+     */
+    private _invalidatePickingCache() {
+      this._pickingInstancesVersion++;
+      this._pickingCache = null;
+    }
+
+    /**
+     * Describe what the picking depends on, besides the instances:
+     * the cursor, the resolution and the matrices of the cameras of the
+     * visible layers (as set by the last render, which are the ones used by the
+     * raycast).
+     */
+    private _fillPickingState(state: number[]) {
+      state.length = 0;
+      const currentScene = this._currentScene;
+      if (!currentScene) return;
+
+      const inputManager = this._runtimeGame.getInputManager();
+      state.push(
+        inputManager.getCursorX(),
+        inputManager.getCursorY(),
+        this._runtimeGame.getGameResolutionWidth(),
+        this._runtimeGame.getGameResolutionHeight(),
+        currentScene.getRenderer3DWorldScale()
+      );
+
+      const layerNames: string[] = [];
+      currentScene.getAllLayerNames(layerNames);
+      for (const layerName of layerNames) {
+        const runtimeLayer = currentScene.getLayer(layerName);
+        if (!runtimeLayer.isVisible()) continue;
+        const layerRenderer = runtimeLayer.getRenderer();
+        const threeCamera = layerRenderer.getThreeCamera();
+        const threeGroup = layerRenderer.getThreeGroup();
+        if (!threeCamera || !threeGroup) continue;
+
+        const worldElements = threeCamera.matrixWorld.elements;
+        for (let index = 0; index < 16; index++) {
+          state.push(worldElements[index]);
+        }
+        const projectionElements = threeCamera.projectionMatrix.elements;
+        for (let index = 0; index < 16; index++) {
+          state.push(projectionElements[index]);
+        }
+      }
     }
 
     private _getObject3D(
@@ -4441,6 +4593,9 @@ namespace gdjs {
         if (profiler)
           profiler.end('in-game editor: objects and extensions (pre-render)');
         this._currentScene.render();
+        // The instances have now their new transforms: the next picking can be
+        // cached again.
+        this._pickingVersionAtLastRender = this._pickingInstancesVersion;
         // `RuntimeScene.render` opens a "render" section for its caller (the
         // game loop closes it): in edition mode, the editor is the caller.
         if (profiler) profiler.end('render');

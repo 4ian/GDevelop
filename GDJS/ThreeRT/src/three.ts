@@ -1040,14 +1040,7 @@ export const createThreeAddonsShim = () => {
     UnrealBloomPass: PassStub,
     Pass: PassStub,
     FullScreenQuad: PassStub,
-    // The meshes of a model given for code reading them (`createModelMeshes`) are not part of its clones.
-    SkeletonUtils: {
-      clone: (object: any) => {
-        const clone = object.clone(false);
-        for (const child of object.children) if (!child.__threertModelPart) clone.add(child.clone());
-        return clone;
-      },
-    },
+    SkeletonUtils: { clone: (object: any) => object.clone() },
     // Models are not parsed: Model3DManager is replaced (`gdjs-patches.ts`).
     GLTFLoader: class {
       register() {

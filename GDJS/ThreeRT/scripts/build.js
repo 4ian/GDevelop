@@ -89,26 +89,51 @@ const patchScript = (file, code) => {
 // ---------------------------------------------------------------------------
 // Jolt Physics, JavaScript build.
 
-const getJoltCode = () => {
-  let joltFile = args.jolt ? path.resolve(args.jolt) : null;
-  if (!joltFile) {
-    const readme = path.join(__dirname, '../../../Extensions/Physics3DBehavior/README.md');
-    const versionMatch = fs.existsSync(readme) ? /version (\d+\.\d+\.\d+)/.exec(fs.readFileSync(readme, 'utf8')) : null;
-    const version = versionMatch ? versionMatch[1] : '0.30.0';
-    const cacheDir = path.join(__dirname, '../.cache', 'jolt-physics-' + version);
-    joltFile = path.join(cacheDir, 'package/dist/jolt-physics.js');
-    if (!fs.existsSync(joltFile)) {
-      console.log(`ℹ️ Downloading jolt-physics@${version} (JavaScript build) from npm...`);
-      fs.mkdirSync(cacheDir, { recursive: true });
-      const tarball = execFileSync('npm', ['pack', `jolt-physics@${version}`, '--silent'], { cwd: cacheDir }).toString().trim().split('\n').pop();
-      execFileSync('tar', ['xzf', String(tarball)], { cwd: cacheDir });
-    }
+/** Downloads (once) the npm package of Jolt Physics in a version, returns its folder. */
+const getJoltPackage = (version) => {
+  const cacheDir = path.join(__dirname, '../.cache', 'jolt-physics-' + version);
+  if (!fs.existsSync(path.join(cacheDir, 'package/dist/jolt-physics.js'))) {
+    console.log(`ℹ️ Downloading jolt-physics@${version} from npm...`);
+    fs.mkdirSync(cacheDir, { recursive: true });
+    const tarball = execFileSync('npm', ['pack', `jolt-physics@${version}`, '--silent'], { cwd: cacheDir }).toString().trim().split('\n').pop();
+    execFileSync('tar', ['xzf', String(tarball)], { cwd: cacheDir });
+    fs.rmSync(path.join(cacheDir, String(tarball)), { force: true });
   }
+  return path.join(cacheDir, 'package/dist');
+};
+
+/**
+ * The JavaScript build of Jolt Physics in the version of the WebAssembly one of the export: the npm version whose
+ * `jolt-physics.wasm.wasm` is the same file (the 15 newest versions are tried, newest first).
+ */
+const findJoltFile = () => {
+  const exportedWasm = path.join(exportDir, 'Extensions/Physics3DBehavior/jolt-physics.wasm.wasm');
+  const hash = (file) => crypto.createHash('md5').update(fs.readFileSync(file)).digest('hex');
+  if (!fs.existsSync(exportedWasm)) fail('No Jolt in the export (Extensions/Physics3DBehavior/jolt-physics.wasm.wasm): use --jolt.');
+  const exportedHash = hash(exportedWasm);
+  const versions = JSON.parse(execFileSync('npm', ['view', 'jolt-physics', 'versions', '--json']).toString())
+    .filter((version) => /^\d+\.\d+\.\d+$/.test(version))
+    .reverse()
+    .slice(0, 15);
+  for (const version of versions) {
+    const dist = getJoltPackage(version);
+    const wasm = path.join(dist, 'jolt-physics.wasm.wasm');
+    if (fs.existsSync(wasm) && hash(wasm) === exportedHash) {
+      console.log(`ℹ️ Jolt Physics: jolt-physics@${version} (JavaScript build).`);
+      return path.join(dist, 'jolt-physics.js');
+    }
+    fs.rmSync(path.dirname(path.dirname(dist)), { recursive: true, force: true });
+  }
+  fail('No recent version of jolt-physics on npm matches the Jolt of the export: use --jolt.');
+};
+
+const getJoltCode = () => {
+  const joltFile = args.jolt ? path.resolve(args.jolt) : findJoltFile();
   let code = fs.readFileSync(joltFile, 'utf8');
   // The ES module as a script: no import.meta, no Node code path, the factory on globalThis.
   code = code.split('import.meta.url').join('""');
-  code = code.split('await import("module")').join('({})');
-  code = code.replace(/^export default Jolt;\s*$/m, 'globalThis.__GDJS_THREERT_JOLT__ = Jolt;');
+  code = code.split('import("module")').join('Promise.resolve({})');
+  code = code.replace(/export default Jolt;\s*$/, 'globalThis.__GDJS_THREERT_JOLT__ = Jolt;');
   if (!code.includes('__GDJS_THREERT_JOLT__')) fail(`Unexpected content in ${joltFile} (no "export default Jolt;").`);
   return code;
 };

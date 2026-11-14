@@ -68,8 +68,11 @@ const stepGame = (elapsedTimeMs: number) => {
   }
 };
 
-/** The number of steps run in setup, so that the first scene is created (and its first events run) before frames. */
-const STEPS_IN_SETUP = 2;
+/**
+ * Steps run in setup, where the time budget is larger than a frame's (120 s against 50 ms): the first scene is created,
+ * and its first steps (which make the physics bodies, the terrains...) run, until steps are fast enough for frames.
+ */
+const WARM_UP = { maxSteps: 240, maxTimeMs: 60000, fastStepMs: 15, fastStepsInARow: 8 };
 
 const startGame = () => {
   const projectData = g.gdjs && gdjs.projectData;
@@ -86,10 +89,17 @@ const startGame = () => {
     try {
       game.startGameLoop();
       isGameLoopRunning = true;
-      for (let i = 0; i < STEPS_IN_SETUP; i++) {
+      const start = performance.now();
+      let fastSteps = 0;
+      let steps = 0;
+      while (steps < WARM_UP.maxSteps && performance.now() - start < WARM_UP.maxTimeMs && fastSteps < WARM_UP.fastStepsInARow) {
+        const stepStart = performance.now();
         gameTimeMs += 1000 / 60;
         stepGame(1000 / 60);
+        steps++;
+        fastSteps = performance.now() - stepStart < WARM_UP.fastStepMs ? fastSteps + 1 : 0;
       }
+      console.info(`[GDJS ThreeRT] Game started: ${steps} steps in setup (${(performance.now() - start).toFixed(0)} ms).`);
     } catch (error) {
       logError('Error while starting the game', error);
     }

@@ -158,6 +158,13 @@ const patchSceneRenderer = () => {
   };
 };
 
+/** No session metrics (sent to GDevelop's servers by web games): ThreeRT games have no network of their own. */
+const patchSessionMetrics = () => {
+  if (gdjs.RuntimeGame && gdjs.RuntimeGame.prototype._setupSessionMetrics) {
+    gdjs.RuntimeGame.prototype._setupSessionMetrics = function () {};
+  }
+};
+
 const patchLoadingScreen = () => {
   class LoadingScreenThreeRTRenderer {
     setPercent() {}
@@ -254,6 +261,18 @@ const patchModel3DManager = () => {
     });
   };
   Manager.prototype.processResource = async function () {};
+
+  // Model3D objects draw the GLTFModel of their model, not the meshes given for code reading them.
+  const Renderer = gdjs.Model3DRuntimeObjectRenderer;
+  if (Renderer && Renderer.prototype._updateModel) {
+    const updateModel = Renderer.prototype._updateModel;
+    Renderer.prototype._updateModel = function (...args: any[]) {
+      updateModel.apply(this, args);
+      const parts: any[] = [];
+      if (this._threeObject) this._threeObject.traverse((object: any) => object.__threertModelPart && parts.push(object));
+      for (const part of parts) part.removeFromParent();
+    };
+  }
 };
 
 const patchImageManager = () => {
@@ -310,6 +329,7 @@ export const installGDJSPatches = () => {
   patchGameRenderer();
   patchSceneRenderer();
   patchLoadingScreen();
+  patchSessionMetrics();
   patchModel3DManager();
   patchImageManager();
 };

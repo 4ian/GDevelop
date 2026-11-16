@@ -7306,14 +7306,19 @@ namespace gdjs {
         .getRuntimeScene()
         .getRenderer3DWorldScale();
       if (this.dummyObject3DForObject2D) {
+        const aabb: AABB3D = {
+          min: [0, 0, 0],
+          max: [0, 0, 0],
+        };
+        getInstanceAABB(this.object, aabb);
         this.dummyObject3DForObject2D.position.set(
-          this.object.getCenterXInScene(),
-          -this.object.getCenterYInScene(),
+          (aabb.min[0] + aabb.max[0]) / 2,
+          -(aabb.min[1] + aabb.max[1]) / 2,
           0
         );
         this.dummyObject3DForObject2D.scale.set(
-          this.object.getWidth() + 2,
-          this.object.getHeight() + 2,
+          aabb.max[0] - aabb.min[0] + 2,
+          aabb.max[1] - aabb.min[1] + 2,
           0
         );
         this.container.scale.set(1, -1, 1);

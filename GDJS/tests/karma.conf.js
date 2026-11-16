@@ -412,6 +412,13 @@ module.exports = function (config) {
         nocache: true,
       },
       {
+        pattern: './GDJS/tests/games/capabilities/assets/spineboy.*',
+        watched: false,
+        included: false,
+        served: true,
+        nocache: false,
+      },
+      {
         pattern: './GDJS/tests/tests-utils/simple-tiled-map/*.json',
         watched: false,
         included: false,

@@ -23,6 +23,12 @@ namespace gdjs {
     private _loadingSpineAtlases = new gdjs.ResourceCache<
       Promise<spine.TextureAtlas>
     >();
+    /**
+     * The aliases used to register the atlases in PIXI.Assets. They are stored
+     * because the URL of a resource can change at each call (for instance, the
+     * in-game editor adds a cache burst parameter).
+     */
+    private _spineAtlasAliases = new gdjs.ResourceCache<string>();
 
     /**
      * @param resourceLoader The resources loader of the game.
@@ -105,6 +111,7 @@ namespace gdjs {
 
       const url = this._resourceLoader.getFullUrl(resource.file);
       const alias = url;
+      this._spineAtlasAliases.set(resource, alias);
 
       PIXI.Assets.setPreferences({
         preferWorkers: false,
@@ -132,7 +139,7 @@ namespace gdjs {
       const resource = this._getAtlasResource(resourceName);
       if (!resource) return null;
       return this._loadedSpineAtlases.get(resource)
-        ? this._resourceLoader.getFullUrl(resource.file)
+        ? this._spineAtlasAliases.get(resource)
         : null;
     }
 
@@ -156,19 +163,20 @@ namespace gdjs {
     dispose(): void {
       this._loadedSpineAtlases.clear();
       this._loadingSpineAtlases.clear();
+      this._spineAtlasAliases.clear();
     }
 
     unloadResource(resourceData: ResourceData): void {
-      const resource = this._getAtlasResource(resourceData.name);
       // PIXI.Assets.unload disposes the TextureAtlas and clears the cache entry,
       // preventing a stale atlas from being reused on the next load.
-      if (resource) {
-        const alias = this._resourceLoader.getFullUrl(resource.file);
+      const alias = this._spineAtlasAliases.get(resourceData);
+      if (alias) {
         PIXI.Assets.unload(alias).catch(() => {});
       }
 
       this._loadedSpineAtlases.delete(resourceData);
       this._loadingSpineAtlases.delete(resourceData);
+      this._spineAtlasAliases.delete(resourceData);
     }
   }
 }

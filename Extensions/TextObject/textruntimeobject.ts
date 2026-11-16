@@ -370,8 +370,9 @@ namespace gdjs {
       initialInstanceData: InstanceData
     ) {
       if (initialInstanceData.customSize) {
-        this.setWrappingWidth(initialInstanceData.width);
         this.setWrapping(true);
+        this.setWidth(initialInstanceData.width);
+        this.setHeight(initialInstanceData.height);
       } else {
         this.setWrapping(false);
       }

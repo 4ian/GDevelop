@@ -416,6 +416,7 @@ namespace gdjs {
       this._pixiObject.addChild(this._pixiTextMask);
 
       this.updateString();
+      this.updateFont();
 
       instanceContainer
         .getLayer('')
@@ -548,6 +549,7 @@ namespace gdjs {
         fontManager.getFontFamily(this._object.getFontResourceName()) +
         '"';
       this._pixiText.style.fontFamily = fontName;
+      this._pixiText.dirty = true;
     }
 
     updateOpacity() {

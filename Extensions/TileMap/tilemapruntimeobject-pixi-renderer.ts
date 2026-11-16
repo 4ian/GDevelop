@@ -12,7 +12,9 @@ namespace gdjs {
       | gdjs.TileMapRuntimeObject
       | gdjs.SimpleTileMapRuntimeObject;
 
-    private _pixiObject: PIXI.tilemap.CompositeTilemap;
+    private _pixiObject: PIXI.tilemap.CompositeTilemap | PIXI.Sprite;
+    private _pixiTileMap: PIXI.tilemap.CompositeTilemap;
+    private _errorSprite: PIXI.Sprite | null = null;
     private _lastCullingLeftBound = 0;
     private _lastCullingRightBound = 0;
     private _lastCullingTopBound = 0;
@@ -34,8 +36,9 @@ namespace gdjs {
       PIXI.tilemap.settings.use32bitIndex = true;
 
       // Load (or reset)
-      this._pixiObject = new PIXI.tilemap.CompositeTilemap();
-      this._pixiObject.tileAnim = [0, 0];
+      this._pixiTileMap = new PIXI.tilemap.CompositeTilemap();
+      this._pixiTileMap.tileAnim = [0, 0];
+      this._pixiObject = this._pixiTileMap;
 
       instanceContainer
         .getLayer('')
@@ -51,7 +54,7 @@ namespace gdjs {
     }
 
     incrementAnimationFrameX(instanceContainer: gdjs.RuntimeInstanceContainer) {
-      this._pixiObject.tileAnim[0] += 1;
+      this._pixiTileMap.tileAnim[0] += 1;
     }
 
     updatePosition(): void {
@@ -130,6 +133,31 @@ namespace gdjs {
       return this._pixiObject.scale.y;
     }
 
+    showErrorTexture() {
+      if (this._errorSprite) {
+        return;
+      }
+      const instanceContainer = this._object.getInstanceContainer();
+      const imageManager = instanceContainer.getGame().getImageManager();
+      this._errorSprite = new PIXI.Sprite(imageManager.getInvalidPIXITexture());
+
+      this._pixiObject.removeFromParent();
+      const hasCustomSize =
+        this._pixiObject.scale.x !== 1 && this._pixiObject.scale.y !== 1;
+      if (hasCustomSize) {
+        this._errorSprite.width = this._pixiObject.width;
+        this._errorSprite.height = this._pixiObject.height;
+      }
+      this._pixiObject = this._errorSprite;
+      instanceContainer
+        .getLayer('')
+        .getRenderer()
+        .addRendererObject(this._pixiObject, this._object.getZOrder());
+      this.updateAngle();
+      this.updateOpacity();
+      this.updatePosition();
+    }
+
     refreshPixiTileMap(
       textureCache: TileMapHelper.TileTextureCache,
       forceRefresh: boolean
@@ -197,7 +225,7 @@ namespace gdjs {
         this._lastCullingBottomBound = bottomBound;
 
         TileMapHelper.PixiTileMapHelper.updatePixiTileMap(
-          this._pixiObject,
+          this._pixiTileMap,
           tileMap,
           textureCache,
           // @ts-ignore
@@ -209,12 +237,43 @@ namespace gdjs {
           bottomBound
         );
       }
+
+      if (this._errorSprite) {
+        this._pixiObject.removeFromParent();
+        const hasCustomSize =
+          this._pixiObject.scale.x !== 1 && this._pixiObject.scale.y !== 1;
+        if (hasCustomSize) {
+          this._pixiTileMap.width = this._pixiObject.width;
+          this._pixiTileMap.height = this._pixiObject.height;
+        } else {
+          this._pixiTileMap.scale.x = 1;
+          this._pixiTileMap.scale.y = 1;
+        }
+        this._pixiObject = this._pixiTileMap;
+        const instanceContainer = this._object.getInstanceContainer();
+        instanceContainer
+          .getLayer('')
+          .getRenderer()
+          .addRendererObject(this._pixiObject, this._object.getZOrder());
+        this.updateAngle();
+        this.updateOpacity();
+        this.updatePosition();
+
+        this._errorSprite.removeFromParent();
+        this._errorSprite.destroy();
+        this._errorSprite = null;
+      }
     }
 
     destroy(): void {
       // Destroy the children too, as each one holds a vertex buffer in the
       // GPU memory. Keep textures because they are shared by all tile maps.
-      this._pixiObject.destroy({ children: true });
+      this._pixiTileMap.destroy({ children: true });
+      if (this._errorSprite) {
+        this._errorSprite.removeFromParent();
+        this._errorSprite.destroy();
+        this._errorSprite = null;
+      }
     }
   }
 

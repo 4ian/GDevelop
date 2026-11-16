@@ -736,14 +736,26 @@ namespace gdjs {
     }
 
     override setWidth(newWidth: float): void {
-      const unscaledWidth = this._renderer.getUnscaledWidth();
+      let unscaledWidth = this._renderer.getUnscaledWidth();
+      if (
+        unscaledWidth === 0 &&
+        this.getInstanceContainer().getGame().isInGameEdition()
+      ) {
+        unscaledWidth = 32;
+      }
       if (unscaledWidth !== 0) {
         this.setScaleX(newWidth / unscaledWidth);
       }
     }
 
     override setHeight(newHeight: float): void {
-      const unscaledHeight = this._renderer.getUnscaledHeight();
+      let unscaledHeight = this._renderer.getUnscaledHeight();
+      if (
+        unscaledHeight === 0 &&
+        this.getInstanceContainer().getGame().isInGameEdition()
+      ) {
+        unscaledHeight = 32;
+      }
       if (unscaledHeight !== 0) {
         this.setScaleY(newHeight / unscaledHeight);
       }

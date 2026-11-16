@@ -130,7 +130,9 @@ namespace gdjs {
     private _readOnly: boolean;
     private _spellCheck: boolean;
     private _isSubmitted: boolean;
-    _renderer: TextInputRuntimeObjectRenderer;
+    _renderer:
+      | TextInputRuntimeObjectRenderer
+      | EditorTextInputRuntimeObjectRenderer;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -138,6 +140,7 @@ namespace gdjs {
       instanceData?: InstanceData
     ) {
       super(instanceContainer, objectData, instanceData);
+      const isInGameEdition = instanceContainer.getGame().isInGameEdition();
 
       this._string = objectData.content.initialValue;
       this._placeholder = objectData.content.placeholder;
@@ -152,9 +155,7 @@ namespace gdjs {
       );
       this._borderOpacity = objectData.content.borderOpacity;
       this._borderWidth = objectData.content.borderWidth;
-      this._disabled = instanceContainer.getGame().isInGameEdition()
-        ? true
-        : objectData.content.disabled;
+      this._disabled = isInGameEdition ? true : objectData.content.disabled;
       this._readOnly = objectData.content.readOnly;
       this._spellCheck =
         objectData.content.spellCheck !== undefined
@@ -171,20 +172,19 @@ namespace gdjs {
           ? objectData.content.paddingY
           : 1;
       this._isSubmitted = false;
-      this._renderer = new gdjs.TextInputRuntimeObjectRenderer(
-        this,
-        instanceContainer
-      );
+      this._renderer = isInGameEdition
+        ? new gdjs.EditorTextInputRuntimeObjectRenderer(this, instanceContainer)
+        : new gdjs.TextInputRuntimeObjectRenderer(this, instanceContainer);
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
     }
 
-    getRendererObject() {
-      return null;
+    override getRendererObject() {
+      return this._renderer.getRendererObject();
     }
 
-    updateFromObjectData(
+    override updateFromObjectData(
       oldObjectData: TextInputObjectData,
       newObjectData: TextInputObjectData
     ): boolean {
@@ -280,7 +280,7 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(
+    override getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): TextInputNetworkSyncData {
       return {
@@ -303,7 +303,7 @@ namespace gdjs {
       };
     }
 
-    updateFromNetworkSyncData(
+    override updateFromNetworkSyncData(
       syncData: TextInputNetworkSyncData,
       options: UpdateFromNetworkSyncDataOptions
     ): void {
@@ -326,7 +326,9 @@ namespace gdjs {
       if (syncData.sc !== undefined) this.setSpellCheck(syncData.sc);
     }
 
-    updatePreRender(instanceContainer: RuntimeInstanceContainer): void {
+    override updatePreRender(
+      instanceContainer: RuntimeInstanceContainer
+    ): void {
       this._isSubmitted = false;
       this._renderer.updatePreRender();
     }
@@ -334,7 +336,9 @@ namespace gdjs {
     /**
      * Initialize the extra parameters that could be set for an instance.
      */
-    extraInitializationFromInitialInstance(initialInstanceData: InstanceData) {
+    override extraInitializationFromInitialInstance(
+      initialInstanceData: InstanceData
+    ) {
       for (const property of initialInstanceData.stringProperties) {
         if (property.name === 'initialValue') {
           this.setString(property.value);
@@ -354,11 +358,11 @@ namespace gdjs {
       );
     }
 
-    onScenePaused(runtimeScene: gdjs.RuntimeScene): void {
+    override onScenePaused(runtimeScene: gdjs.RuntimeScene): void {
       this._renderer.onScenePaused();
     }
 
-    onSceneResumed(runtimeScene: gdjs.RuntimeScene): void {
+    override onSceneResumed(runtimeScene: gdjs.RuntimeScene): void {
       this._renderer.onSceneResumed();
     }
 
@@ -381,30 +385,30 @@ namespace gdjs {
       this.setHeight(height);
     }
 
-    setWidth(width: float): void {
+    override setWidth(width: float): void {
       this._width = width;
       this._renderer.updatePadding();
     }
 
-    setHeight(height: float): void {
+    override setHeight(height: float): void {
       this._height = height;
       this._renderer.updatePadding();
     }
 
-    /**
-     * Return the width of the object.
-     * @return The width of the object
-     */
-    getWidth(): float {
+    override getWidth(): float {
       return this._width;
     }
 
-    /**
-     * Return the width of the object.
-     * @return The height of the object
-     */
-    getHeight(): float {
+    override getHeight(): float {
       return this._height;
+    }
+
+    override getOriginalWidth(): float {
+      return DEFAULT_WIDTH;
+    }
+
+    override getOriginalHeight(): float {
+      return DEFAULT_HEIGHT;
     }
 
     /**

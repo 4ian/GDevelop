@@ -10,6 +10,8 @@ namespace gdjs {
    */
   export class Layer extends gdjs.RuntimeLayer {
     _cameraRotation: float = 0;
+    _cameraRotationX: float = 0;
+    _cameraRotationY: float = 0;
     /** The camera zoom factor strictly greater than 0. */
     _zoomFactor: float = 1;
     _cameraX: float;
@@ -262,19 +264,23 @@ namespace gdjs {
     }
 
     override getCameraRotationY(cameraId?: integer): float {
-      return this._renderer.getCameraRotationY();
+      return this._cameraRotationY;
     }
 
     override setCameraRotationY(rotationY: float, cameraId?: integer): void {
-      this._renderer.setCameraRotationY(rotationY);
+      this._cameraRotationY = rotationY;
+      this._renderer.updatePosition();
+      this._renderer.invalidateRotation();
     }
 
     override getCameraRotationX(cameraId?: integer): float {
-      return this._renderer.getCameraRotationX();
+      return this._cameraRotationX;
     }
 
     override setCameraRotationX(rotationX: float, cameraId?: integer): void {
-      this._renderer.setCameraRotationX(rotationX);
+      this._cameraRotationX = rotationX;
+      this._renderer.updatePosition();
+      this._renderer.invalidateRotation();
     }
 
     override getCameraForwardX(cameraId?: integer): number {

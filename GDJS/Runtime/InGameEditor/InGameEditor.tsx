@@ -6191,11 +6191,23 @@ namespace gdjs {
         .getRuntimeScene()
         .getRenderer3DWorldScale();
       if (this.dummyObject3DForObject2D) {
+        // The center point of an object is not always the middle of its
+        // drawn area (for instance, Spine objects use their origin).
+        const angle = gdjs.toRad(this.object.getAngle());
+        const pivotX = this.object.getCenterXInScene();
+        const pivotY = this.object.getCenterYInScene();
+        const deltaX =
+          this.object.getDrawableX() + this.object.getWidth() / 2 - pivotX;
+        const deltaY =
+          this.object.getDrawableY() + this.object.getHeight() / 2 - pivotY;
+        const cos = Math.cos(angle);
+        const sin = Math.sin(angle);
         this.dummyObject3DForObject2D.position.set(
-          this.object.getCenterXInScene(),
-          -this.object.getCenterYInScene(),
+          pivotX + deltaX * cos - deltaY * sin,
+          -(pivotY + deltaX * sin + deltaY * cos),
           0
         );
+        this.dummyObject3DForObject2D.rotation.z = -angle;
         this.dummyObject3DForObject2D.scale.set(
           this.object.getWidth() + 2,
           this.object.getHeight() + 2,

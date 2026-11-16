@@ -81,6 +81,15 @@ namespace gdjs {
       return this._renderer.getRendererObject();
     }
 
+    override extraInitializationFromInitialInstance(
+      initialInstanceData: InstanceData
+    ) {
+      if (initialInstanceData.customSize) {
+        this.setWidth(initialInstanceData.width);
+        this.setHeight(initialInstanceData.height);
+      }
+    }
+
     override updateFromObjectData(
       oldObjectData: LightObjectData,
       newObjectData: LightObjectData

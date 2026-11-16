@@ -924,7 +924,8 @@ module.exports = {
         this._pixiGraphics.lineStyle(
           borderWidth,
           objectsRenderingService.rgbOrHexToHexNumber(borderColor),
-          borderOpacity / 255
+          borderOpacity / 255,
+          0
         );
         this._pixiGraphics.beginFill(
           objectsRenderingService.rgbOrHexToHexNumber(fillColor),

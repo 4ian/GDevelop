@@ -1654,7 +1654,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           // instruction in case of cancellation.
           // As the state change is applied, the inline popover is already
           // gone and we can change the focus without worries.
-          inlineEditingAnchorEl.focus();
+          //
+          // Don't scroll back to it if it was scrolled out of the view.
+          inlineEditingAnchorEl.focus({ preventScroll: true });
         }
       }
     );

@@ -62,7 +62,26 @@ export default function InlinePopover(props: Props): React.Node {
   // never reach the main document so onClickAway never fires.
   // Work around this by attaching our own mouseup listener on the
   // external window's document.
-  const { open, onApply } = props;
+  const { open, onApply, anchorEl } = props;
+
+  // Close the popover when the anchor leaves the view (scrolled away or
+  // unmounted by the virtualized events list), as it can't follow it anymore.
+  const onApplyRef = React.useRef(onApply);
+  onApplyRef.current = onApply;
+  React.useEffect(
+    () => {
+      if (!anchorEl || !open) return;
+
+      // Use the window of the anchor, which can be an external window.
+      const anchorWindow = anchorEl.ownerDocument.defaultView;
+      const observer = new anchorWindow.IntersectionObserver(entries => {
+        if (!entries[entries.length - 1].isIntersecting) onApplyRef.current();
+      });
+      observer.observe(anchorEl);
+      return () => observer.disconnect();
+    },
+    [anchorEl, open]
+  );
   React.useEffect(
     () => {
       if (!portalContainer || !open) return;

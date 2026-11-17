@@ -73,14 +73,20 @@
 
 .dragHandle {
   flex: 0 0 auto;
+  align-self: stretch;
   display: flex;
   align-items: center;
-  width: 16px;
+  justify-content: center;
+  width: 20px;
   color: var(--theme-text-secondary-color);
   opacity: 0.5;
 }
 
-.row:hover .dragHandle {
+.draggableHandle {
+  cursor: move;
+}
+
+.draggableHandle:hover {
   opacity: 1;
 }
 

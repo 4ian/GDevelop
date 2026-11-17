@@ -369,7 +369,12 @@ const VariableRow = React.memo<VariableRowProps>(
                   <span className={classes.dragHandle} />
                 ) : (
                   connectDragSource(
-                    <span className={classes.dragHandle}>
+                    <span
+                      className={classNames(
+                        classes.dragHandle,
+                        classes.draggableHandle
+                      )}
+                    >
                       <DragHandleIcon color="inherit" />
                     </span>
                   )

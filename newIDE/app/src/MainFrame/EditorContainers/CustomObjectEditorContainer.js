@@ -410,6 +410,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
                   )
                 )
               }
+              saveUiSettings={this.saveUiSettings}
               shouldUseRealTime2DEditor={getUseRealTime2DEditor()}
               onOpenEvents={() =>
                 this.props.openObjectEvents(

@@ -467,6 +467,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
                     )
                   )
                 }
+                saveUiSettings={this.saveUiSettings}
                 shouldUseRealTime2DEditor={getUseRealTime2DEditor()}
                 onOpenEvents={this.props.onOpenEvents}
                 onOpenMoreSettings={this.openExternalPropertiesDialog}

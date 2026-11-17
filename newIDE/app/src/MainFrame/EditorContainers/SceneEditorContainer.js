@@ -344,6 +344,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
                 )
               )
             }
+            saveUiSettings={this.saveUiSettings}
             shouldUseRealTime2DEditor={getUseRealTime2DEditor()}
             onOpenEvents={this.props.onOpenEvents}
             isActive={isActive}

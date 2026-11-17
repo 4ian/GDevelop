@@ -215,6 +215,7 @@ type Props = {|
   initialInstances: gdInitialInstancesContainer,
 
   getInitialInstancesEditorSettings: () => InstancesEditorSettings,
+  saveUiSettings: () => void,
   shouldUseRealTime2DEditor: boolean,
 
   onOpenMoreSettings?: ?() => void,
@@ -1186,6 +1187,8 @@ export default class SceneEditor extends React.Component<Props, State> {
       },
       () => {
         this.updateToolbar();
+        // When the editor scene is hot-reloaded, the settings need to be up to date.
+        this.props.saveUiSettings();
       }
     );
     const { previewDebuggerServer } = this.props;

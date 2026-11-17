@@ -24,7 +24,7 @@ import { tooltipEnterDelay } from '../../UI/Tooltip';
 
 type Props = {|
   chosenOrDefaultAiConfigurationPresetId: string,
-  setAiConfigurationPresetId: string => void,
+  onChooseAiConfigurationPresetId: string => void,
   aiConfigurationPresetsWithAvailability: Array<AiConfigurationPresetWithAvailability>,
   disabled?: boolean,
   showSelectedLabel?: boolean,
@@ -100,7 +100,7 @@ const getSubscriptionBadge = (
 
 export const ReasoningLevelSelector = ({
   chosenOrDefaultAiConfigurationPresetId,
-  setAiConfigurationPresetId,
+  onChooseAiConfigurationPresetId,
   aiConfigurationPresetsWithAvailability,
   disabled,
   showSelectedLabel,
@@ -117,30 +117,6 @@ export const ReasoningLevelSelector = ({
         preset => preset.mode === 'orchestrator'
       ),
     [aiConfigurationPresetsWithAvailability]
-  );
-
-  // Deselect the current preset if it becomes disabled
-  React.useEffect(
-    () => {
-      const currentPreset = orchestratorPresets.find(
-        preset => preset.id === chosenOrDefaultAiConfigurationPresetId
-      );
-
-      if (currentPreset && currentPreset.disabled) {
-        const firstEnabledPreset = orchestratorPresets.find(
-          preset => !preset.disabled
-        );
-
-        if (firstEnabledPreset) {
-          setAiConfigurationPresetId(firstEnabledPreset.id);
-        }
-      }
-    },
-    [
-      chosenOrDefaultAiConfigurationPresetId,
-      orchestratorPresets,
-      setAiConfigurationPresetId,
-    ]
   );
 
   if (orchestratorPresets.length === 0) return null;
@@ -207,7 +183,7 @@ export const ReasoningLevelSelector = ({
                 disabled={preset.disabled}
                 selected={preset.id === chosenOrDefaultAiConfigurationPresetId}
                 onClick={() => {
-                  setAiConfigurationPresetId(preset.id);
+                  onChooseAiConfigurationPresetId(preset.id);
                   setAnchorEl(null);
                 }}
               >

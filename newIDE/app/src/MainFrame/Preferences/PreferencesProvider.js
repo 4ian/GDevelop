@@ -96,6 +96,7 @@ export const getInitialPreferences = (): {
   autoDownloadUpdates: boolean,
   autoOpenMostRecentProject: boolean,
   automaticallyApplyAiRequestEditsByProjectId: { [string]: boolean },
+  preferredAiConfigurationPresetId: string | null,
   automaticallyUseCreditsForAiRequests: boolean,
   autosaveOnPreview: boolean,
   backdropClickBehavior: string,
@@ -440,6 +441,10 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     ): any),
     // $FlowFixMe[method-unbinding]
     setAutomaticallyApplyAiRequestEditsForProjectId: (this._setAutomaticallyApplyAiRequestEditsForProjectId.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setPreferredAiConfigurationPresetId: (this._setPreferredAiConfigurationPresetId.bind(
       this
     ): any),
     // $FlowFixMe[method-unbinding]
@@ -1544,6 +1549,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
             ...state.values.automaticallyApplyAiRequestEditsByProjectId,
             [projectId]: newValue,
           },
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setPreferredAiConfigurationPresetId(newValue: string) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          preferredAiConfigurationPresetId: newValue,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

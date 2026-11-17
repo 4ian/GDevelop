@@ -259,6 +259,7 @@ export type PreferencesValues = {|
   showAiAskButtonInTitleBar: boolean,
   automaticallyUseCreditsForAiRequests: boolean,
   automaticallyApplyAiRequestEditsByProjectId: { [string]: boolean },
+  preferredAiConfigurationPresetId: string | null,
   useBackgroundSerializerForSaving: boolean,
   disableNpmScriptConfirmation: boolean,
   showJsTypeError: boolean,
@@ -397,6 +398,7 @@ export type Preferences = {|
     projectId: string,
     enabled: boolean
   ) => void,
+  setPreferredAiConfigurationPresetId: (presetId: string) => void,
   setUseBackgroundSerializerForSaving: (enabled: boolean) => void,
   setShowJsTypeError: (enabled: boolean) => void,
   setCanonicalEventSerialization: (enabled: boolean) => void,
@@ -469,6 +471,7 @@ export const initialPreferences = {
     showAiAskButtonInTitleBar: true,
     automaticallyUseCreditsForAiRequests: false,
     automaticallyApplyAiRequestEditsByProjectId: {},
+    preferredAiConfigurationPresetId: null,
     useBackgroundSerializerForSaving: false,
     disableNpmScriptConfirmation: false,
     showJsTypeError: false,
@@ -570,6 +573,7 @@ export const initialPreferences = {
     projectId: string,
     enabled: boolean
   ) => {},
+  setPreferredAiConfigurationPresetId: (presetId: string) => {},
   setUseBackgroundSerializerForSaving: (enabled: boolean) => {},
   setShowJsTypeError: (enabled: boolean) => {},
   setCanonicalEventSerialization: (enabled: boolean) => {},

@@ -443,7 +443,7 @@
     },
     "image-preview": {
       "background-filter": {
-        "value": "none"
+        "value": "brightness(75%)"
       },
       "border-color": {
         "value": "#aaaaaa"

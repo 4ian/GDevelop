@@ -266,8 +266,10 @@ export const AiRequestChat: React.ComponentType<{
       values: {
         automaticallyUseCreditsForAiRequests,
         automaticallyApplyAiRequestEditsByProjectId,
+        preferredAiConfigurationPresetId,
       },
       setAutomaticallyUseCreditsForAiRequests,
+      setPreferredAiConfigurationPresetId,
       setAutomaticallyApplyAiRequestEditsForProjectId,
     } = React.useContext(PreferencesContext);
     const selectedMode = 'orchestrator';
@@ -328,6 +330,14 @@ export const AiRequestChat: React.ComponentType<{
       aiConfigurationPresetId,
       setAiConfigurationPresetId,
     ] = React.useState<string | null>(null);
+    // Remember the reasoning level picked by the user for the next chats.
+    const chooseAiConfigurationPresetId = React.useCallback(
+      (presetId: string) => {
+        setAiConfigurationPresetId(presetId);
+        setPreferredAiConfigurationPresetId(presetId);
+      },
+      [setPreferredAiConfigurationPresetId]
+    );
 
     // When a chat is opened, show the reasoning level it was created with,
     // so a chat started elsewhere (e.g. from the home page) or reopened later
@@ -576,12 +586,26 @@ export const AiRequestChat: React.ComponentType<{
       />
     );
 
+    // Use the level chosen for this chat, else the one the user last picked,
+    // else the default - skipping those not available to the user.
+    const defaultAiConfigurationPresetId = getDefaultAiConfigurationPresetId(
+      selectedMode,
+      aiConfigurationPresetsWithAvailability
+    );
+    const enabledPresets = aiConfigurationPresetsWithAvailability.filter(
+      preset => preset.mode === selectedMode && !preset.disabled
+    );
     const chosenOrDefaultAiConfigurationPresetId =
-      aiConfigurationPresetId ||
-      getDefaultAiConfigurationPresetId(
-        selectedMode,
-        aiConfigurationPresetsWithAvailability
-      );
+      [
+        aiConfigurationPresetId,
+        preferredAiConfigurationPresetId,
+        defaultAiConfigurationPresetId,
+      ].find(
+        presetId =>
+          !!presetId && enabledPresets.some(preset => preset.id === presetId)
+      ) ||
+      (enabledPresets[0] && enabledPresets[0].id) ||
+      defaultAiConfigurationPresetId;
     const hasFunctionsCallsToProcess =
       aiRequest &&
       getFunctionCallsToProcess({
@@ -1007,7 +1031,9 @@ export const AiRequestChat: React.ComponentType<{
                         chosenOrDefaultAiConfigurationPresetId={
                           chosenOrDefaultAiConfigurationPresetId
                         }
-                        setAiConfigurationPresetId={setAiConfigurationPresetId}
+                        onChooseAiConfigurationPresetId={
+                          chooseAiConfigurationPresetId
+                        }
                         aiConfigurationPresetsWithAvailability={
                           aiConfigurationPresetsWithAvailability
                         }
@@ -1245,7 +1271,9 @@ export const AiRequestChat: React.ComponentType<{
                   chosenOrDefaultAiConfigurationPresetId={
                     chosenOrDefaultAiConfigurationPresetId
                   }
-                  setAiConfigurationPresetId={setAiConfigurationPresetId}
+                  onChooseAiConfigurationPresetId={
+                    chooseAiConfigurationPresetId
+                  }
                   aiConfigurationPresetsWithAvailability={
                     aiConfigurationPresetsWithAvailability
                   }

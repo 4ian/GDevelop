@@ -5,6 +5,9 @@
  */
 #include "ObjectRefactorer.h"
 
+#include <unordered_set>
+#include <vector>
+
 #include "GDCore/IDE/WholeProjectRefactorer.h"
 #include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/InitialInstancesContainer.h"
@@ -190,15 +193,85 @@ void ObjectRefactorer::FillMissingGroupBehaviorToObject(
   object.GetBehaviors().AddBehavior(behavior, behaviorName);
 }
 
-// TODO Handle position changes for group variables.
-// We could try to change the order of object variables in a way that the next
-// call to MergeVariableContainers rebuild them in the same order.
+namespace {
+bool HasGroupVariablesOrderChanged(
+    const gd::VariablesContainer &groupVariablesContainer,
+    const gd::SerializerElement &originalSerializedVariables,
+    const gd::VariablesChangeset &changeset) {
+  gd::VariablesContainer originalVariablesContainer;
+  originalVariablesContainer.UnserializeFrom(originalSerializedVariables);
+
+  std::vector<gd::String> expectedNames;
+  for (std::size_t index = 0; index < originalVariablesContainer.Count();
+       ++index) {
+    const gd::String &originalName = originalVariablesContainer.GetNameAt(index);
+    if (changeset.removedVariableNames.count(originalName)) {
+      continue;
+    }
+    auto renamedIt = changeset.oldToNewVariableNames.find(originalName);
+    expectedNames.push_back(renamedIt != changeset.oldToNewVariableNames.end()
+                                ? renamedIt->second
+                                : originalName);
+  }
+  for (std::size_t index = 0; index < groupVariablesContainer.Count();
+       ++index) {
+    const gd::String &name = groupVariablesContainer.GetNameAt(index);
+    if (changeset.addedVariableNames.count(name)) {
+      expectedNames.push_back(name);
+    }
+  }
+
+  if (expectedNames.size() != groupVariablesContainer.Count()) {
+    return true;
+  }
+  for (std::size_t index = 0; index < expectedNames.size(); ++index) {
+    if (expectedNames[index] != groupVariablesContainer.GetNameAt(index)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+void ReorderGroupVariablesInObject(
+    gd::VariablesContainer &variablesContainer,
+    const gd::VariablesContainer &groupVariablesContainer) {
+  // Group variables keep the slots they occupy in the object (variables
+  // specific to the object stay in place), but are sorted in the group order.
+  std::vector<gd::String> orderedGroupVariableNames;
+  for (std::size_t index = 0; index < groupVariablesContainer.Count();
+       ++index) {
+    const gd::String &name = groupVariablesContainer.GetNameAt(index);
+    if (variablesContainer.Has(name)) {
+      orderedGroupVariableNames.push_back(name);
+    }
+  }
+  std::unordered_set<gd::String> groupVariableNames(
+      orderedGroupVariableNames.begin(), orderedGroupVariableNames.end());
+
+  std::vector<gd::String> newOrder;
+  std::size_t nextGroupVariableIndex = 0;
+  for (std::size_t index = 0; index < variablesContainer.Count(); ++index) {
+    const gd::String &name = variablesContainer.GetNameAt(index);
+    newOrder.push_back(groupVariableNames.count(name)
+                           ? orderedGroupVariableNames[nextGroupVariableIndex++]
+                           : name);
+  }
+  for (std::size_t index = 0; index < newOrder.size(); ++index) {
+    variablesContainer.Move(variablesContainer.GetPosition(newOrder[index]),
+                            index);
+  }
+}
+} // namespace
+
 void ObjectRefactorer::ApplyChangesToObjects(
     gd::ObjectsContainer &globalObjectsContainer,
     gd::ObjectsContainer &objectsContainer,
     const gd::VariablesContainer &groupVariablesContainer,
     const gd::ObjectGroup &objectGroup,
-    const gd::VariablesChangeset &changeset) {
+    const gd::VariablesChangeset &changeset,
+    const gd::SerializerElement &originalSerializedVariables) {
+  const bool hasOrderChanged = HasGroupVariablesOrderChanged(
+      groupVariablesContainer, originalSerializedVariables, changeset);
   for (const gd::String &objectName : objectGroup.GetAllObjectsNames()) {
     const bool hasObject = objectsContainer.HasObjectNamed(objectName);
     if (!hasObject && !globalObjectsContainer.HasObjectNamed(objectName)) {
@@ -210,14 +283,19 @@ void ObjectRefactorer::ApplyChangesToObjects(
     for (const gd::String &variableName : changeset.removedVariableNames) {
       variablesContainer.Remove(variableName);
     }
-    for (const gd::String &variableName : changeset.addedVariableNames) {
+    for (std::size_t index = 0; index < groupVariablesContainer.Count();
+         ++index) {
+      const gd::String &variableName = groupVariablesContainer.GetNameAt(index);
+      if (!changeset.addedVariableNames.count(variableName)) {
+        continue;
+      }
       if (variablesContainer.Has(variableName)) {
         // It can happens if an object already had the variable but it was not
         // shared by other object of the group.
         continue;
       }
       variablesContainer.Insert(variableName,
-                                groupVariablesContainer.Get(variableName),
+                                groupVariablesContainer.Get(index),
                                 variablesContainer.Count());
     }
     // TODO Check what happens if 2 variables exchange their names.
@@ -238,6 +316,10 @@ void ObjectRefactorer::ApplyChangesToObjects(
       variablesContainer.Remove(variableName);
       variablesContainer.Insert(
           variableName, groupVariablesContainer.Get(variableName), index);
+    }
+    if (hasOrderChanged) {
+      ReorderGroupVariablesInObject(variablesContainer,
+                                    groupVariablesContainer);
     }
   }
 }
@@ -306,14 +388,20 @@ void ObjectRefactorer::ApplyChangesToVariants(
     for (const gd::String &variableName : changeset.removedVariableNames) {
       variablesContainer.Remove(variableName);
     }
-    for (const gd::String &variableName : changeset.addedVariableNames) {
+    for (std::size_t index = 0; index < defaultVariablesContainer.Count();
+         ++index) {
+      const gd::String &variableName =
+          defaultVariablesContainer.GetNameAt(index);
+      if (!changeset.addedVariableNames.count(variableName)) {
+        continue;
+      }
       if (variablesContainer.Has(variableName)) {
         // It can happens if a child-object already had the variable but it was
         // missing in other variant child-object.
         continue;
       }
       variablesContainer.Insert(variableName,
-                                defaultVariablesContainer.Get(variableName),
+                                defaultVariablesContainer.Get(index),
                                 variablesContainer.Count());
     }
     // TODO Check what happens if 2 variables exchange their names.

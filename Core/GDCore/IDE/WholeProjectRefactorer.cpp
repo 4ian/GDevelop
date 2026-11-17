@@ -422,7 +422,7 @@ void WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
       originalSerializedVariables);
   gd::ObjectRefactorer::ApplyChangesToObjects(
       globalObjectsContainer, objectsContainer, groupVariablesContainer,
-      objectGroup, changeset);
+      objectGroup, changeset, originalSerializedVariables);
 
   // Switch types of instructions for the group objects.
   for (const gd::String &objectName : objectGroup.GetAllObjectsNames()) {

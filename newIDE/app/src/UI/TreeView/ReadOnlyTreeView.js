@@ -202,6 +202,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
   const [animatedItemId, setAnimatedItemId] = React.useState<string>('');
 
   const isSearching = !!searchText;
+  const lowerCaseSearchText = searchText ? searchText.trim().toLowerCase() : '';
   // $FlowFixMe[recursive-definition]
   // $FlowFixMe[definition-cycle]
   const flattenNode = React.useCallback(
@@ -391,8 +392,8 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
   );
 
   const flattenedData = React.useMemo(
-    () => flattenOpened(items, searchText ? searchText.toLowerCase() : null),
-    [flattenOpened, items, searchText]
+    () => flattenOpened(items, lowerCaseSearchText || null),
+    [flattenOpened, items, lowerCaseSearchText]
   );
 
   const getRowHeight = React.useCallback(
@@ -728,14 +729,14 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
 
   React.useEffect(
     () => {
-      if (!searchText) {
+      if (!lowerCaseSearchText) {
         setOpenedDuringSearchNodeIds([]);
       } else {
         const openedNodes = [];
         browseTree(items, getItemChildren, item => {
           const itemName = getItemName(item);
           if (
-            doesMatchSearch(itemName, searchText) &&
+            doesMatchSearch(itemName, lowerCaseSearchText) &&
             item.openIfSearchMatches
           ) {
             openedNodes.push(getItemId(item));
@@ -746,7 +747,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
     },
     // When the search changes, recompute the nodes that should be opened
     // by default.
-    [searchText, items, getItemName, getItemId, getItemChildren]
+    [lowerCaseSearchText, items, getItemName, getItemId, getItemChildren]
   );
 
   const onKeyDown = React.useCallback(

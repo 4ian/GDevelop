@@ -160,8 +160,8 @@ const getInstancesOfObject = (
 /**
  * The instances starting with one of the animations of the object (see
  * `getInstancesOfObject`). Empty for objects whose instances have no starting
- * animation (3D models). To call before changing the animations: a custom
- * object without animations has no starting animation.
+ * animation. To call before changing the animations: a custom object or a 3D
+ * model without animations has no starting animation.
  */
 export const getInstancesWithStartingAnimation = (
   context: ObjectReferencesContext,

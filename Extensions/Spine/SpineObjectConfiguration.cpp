@@ -80,11 +80,8 @@ bool SpineObjectConfiguration::UpdateInitialInstanceProperty(
 std::map<gd::String, gd::PropertyDescriptor>
 SpineObjectConfiguration::GetInitialInstanceProperties(const gd::InitialInstance &instance) {
   std::map<gd::String, gd::PropertyDescriptor> properties;
-  properties["animation"] =
-      gd::PropertyDescriptor(gd::String::From(instance.GetRawDoubleProperty("animation")))
-        .SetLabel(_("Animation"))
-        .SetType("number");
-  
+  properties["animation"] = GetStartingAnimationProperty(instance);
+
   return properties;
 }
 

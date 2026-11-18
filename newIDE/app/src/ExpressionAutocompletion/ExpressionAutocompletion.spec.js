@@ -2,6 +2,7 @@
 import {
   getAutocompletionsFromDescriptions,
   insertAutocompletionInExpression,
+  type InsertedAutocompletion,
 } from '.';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
@@ -1063,6 +1064,102 @@ describe('ExpressionAutocompletion', () => {
           }
         )
       ).toMatchObject({ expression: '"123" + ToString(Hello.World):+ "456"' });
+    });
+    it('Check insertion before existing function arguments.', () => {
+      const maxCompletion = {
+        completion: 'max',
+        replacementStartPosition: 0,
+        replacementEndPosition: 2,
+        addParenthesis: true,
+        hasVisibleParameters: true,
+      };
+      expect(
+        insertAutocompletionInExpression(
+          { expression: 'ma(contents)', caretLocation: 2 },
+          { ...maxCompletion, shouldConvertToString: false }
+        )
+      ).toEqual({ expression: 'max(contents)', caretLocation: 3 });
+      expect(
+        insertAutocompletionInExpression(
+          { expression: 'ma(contents)', caretLocation: 2 },
+          { ...maxCompletion, shouldConvertToString: true }
+        )
+      ).toEqual({ expression: 'ToString(max(contents))', caretLocation: 12 });
+      expect(
+        insertAutocompletionInExpression(
+          { expression: '"a" + ma(f(1), ")") + "b"', caretLocation: 8 },
+          {
+            ...maxCompletion,
+            replacementStartPosition: 6,
+            replacementEndPosition: 8,
+            shouldConvertToString: true,
+          }
+        )
+      ).toEqual({
+        expression: '"a" + ToString(max(f(1), ")")) + "b"',
+        caretLocation: 18,
+      });
+    });
+    it('Check caret is placed inside added parentheses.', () => {
+      expect(
+        insertAutocompletionInExpression(
+          { expression: 'ma', caretLocation: 2 },
+          {
+            completion: 'max',
+            replacementStartPosition: 0,
+            replacementEndPosition: 2,
+            addParenthesis: true,
+            hasVisibleParameters: true,
+          }
+        )
+      ).toEqual({ expression: 'max()', caretLocation: 4 });
+    });
+    it('Check caret location for usual insertions.', () => {
+      const insert = (
+        expression: string,
+        caretLocation: number,
+        insertedAutocompletion: InsertedAutocompletion
+      ) =>
+        insertAutocompletionInExpression(
+          { expression, caretLocation },
+          {
+            replacementStartPosition: 6,
+            replacementEndPosition: 8,
+            ...insertedAutocompletion,
+          }
+        );
+      expect(insert('1 + 2 ma', 8, { completion: 'max' })).toEqual({
+        expression: '1 + 2 max',
+        caretLocation: 9,
+      });
+      expect(
+        insert('1 + 2 ma', 8, { completion: 'max', addParenthesis: true })
+      ).toEqual({ expression: '1 + 2 max()', caretLocation: 11 });
+      expect(
+        insert('1 + 2 ma', 8, {
+          completion: 'max',
+          addParenthesis: true,
+          hasVisibleParameters: true,
+        })
+      ).toEqual({ expression: '1 + 2 max()', caretLocation: 10 });
+      expect(
+        insert('1 + 2 ma + 3', 8, { completion: 'max', addDot: true })
+      ).toEqual({ expression: '1 + 2 max. + 3', caretLocation: 10 });
+      expect(
+        insert('1 + 2 ma.Child', 8, { completion: 'max', addDot: true })
+      ).toEqual({ expression: '1 + 2 max.Child', caretLocation: 9 });
+      expect(insert('1 + 2 ma', 8, { completion: 'Var[]' })).toEqual({
+        expression: '1 + 2 Var[]',
+        caretLocation: 10,
+      });
+      expect(
+        insert('"a" + ma', 8, {
+          completion: 'max',
+          addParenthesis: true,
+          hasVisibleParameters: true,
+          shouldConvertToString: true,
+        })
+      ).toEqual({ expression: '"a" + ToString(max())', caretLocation: 19 });
     });
   });
 });

@@ -91,7 +91,8 @@ public:
                         gd::ObjectsContainer &objectsContainers,
                         const gd::VariablesContainer &groupVariablesContainer,
                         const gd::ObjectGroup &objectGroup,
-                        const gd::VariablesChangeset &changeset);
+                        const gd::VariablesChangeset &changeset,
+                        const gd::SerializerElement &originalSerializedVariables);
 
   /**
    * @brief Apply the changes done on an object to all its instances.

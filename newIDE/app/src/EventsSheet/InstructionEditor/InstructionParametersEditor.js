@@ -24,6 +24,7 @@ import DismissableTutorialMessage from '../../Hints/DismissableTutorialMessage';
 import { isAnEventFunctionMetadata } from '../../EventsFunctionsExtensionsLoader';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
 import { getObjectParameterIndex } from '../../InstructionOrExpression/EnumerateInstructions';
+import { isParameterUsedByItsObject } from '../../InstructionOrExpression/ParameterRequiredObjectCapability';
 import Text from '../../UI/Text';
 import { getInstructionMetadata } from './InstructionEditor';
 import { ColumnStackLayout } from '../../UI/Layout';
@@ -94,14 +95,28 @@ type Props = {|
 |};
 
 const isParameterVisible = (
-  parameterMetadata: gdParameterMetadata,
+  instruction: gdInstruction,
+  instructionMetadata: gdInstructionMetadata,
   parameterIndex: number,
   objectParameterIndex: number,
   objectName: ?string,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor
 ) => {
   // Hide parameters that are used only for code generation
-  if (parameterMetadata.isCodeOnly()) return false;
+  if (instructionMetadata.getParameter(parameterIndex).isCodeOnly())
+    return false;
+
+  // Hide parameters not used by the object, like the Z position of a created
+  // object which is not a 3D one.
+  if (
+    !isParameterUsedByItsObject(
+      instruction,
+      instructionMetadata,
+      parameterIndex,
+      projectScopedContainersAccessor.get().getObjectsContainersList()
+    )
+  )
+    return false;
 
   // For objects, hide the first object parameter, which is by convention the object name.
   if (
@@ -163,10 +178,10 @@ const InstructionParametersEditor: React.ComponentType<{
 
         return mapFor(0, instructionMetadata.getParametersCount(), i => {
           if (!instructionMetadata) return false;
-          const parameterMetadata = instructionMetadata.getParameter(i);
 
           return isParameterVisible(
-            parameterMetadata,
+            instruction,
+            instructionMetadata,
             i,
             objectParameterIndex,
             objectName,
@@ -174,7 +189,7 @@ const InstructionParametersEditor: React.ComponentType<{
           );
         }).filter(isVisible => isVisible).length;
       },
-      [projectScopedContainersAccessor]
+      [instruction, projectScopedContainersAccessor]
     );
 
     const focus: FieldFocusFunction = React.useCallback(
@@ -373,7 +388,8 @@ const InstructionParametersEditor: React.ComponentType<{
                     );
                     if (
                       !isParameterVisible(
-                        parameterMetadata,
+                        instruction,
+                        instructionMetadata,
                         i,
                         objectParameterIndex,
                         objectName,

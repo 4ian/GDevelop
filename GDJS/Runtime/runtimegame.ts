@@ -1289,7 +1289,7 @@ namespace gdjs {
               ?.eventsBasedObjectVariantName || null;
           const editorId =
             this._options.initialRuntimeGameStatus?.editorId || null;
-          const editorCamera3D =
+          const editorCamera =
             this._options.initialRuntimeGameStatus?.editorCamera || null;
           this._inGameEditor.switchToSceneOrVariant(
             editorId,
@@ -1297,7 +1297,7 @@ namespace gdjs {
             externalLayoutName,
             eventsBasedObjectType,
             eventsBasedObjectVariantName,
-            editorCamera3D
+            editorCamera
           );
         } else {
           if (sceneName) {

@@ -1776,6 +1776,7 @@ namespace gdjs {
     >();
     private _extensionToolbars = new Map<string, ExtensionToolbar>();
     private _extensionToolbarsContainer: HTMLElement | null = null;
+    private _isEditing2DCustomObject = false;
 
     constructor(
       game: RuntimeGame,
@@ -2052,6 +2053,7 @@ namespace gdjs {
       // The 3D scene is rebuilt and the inner area marker is lost in the process.
       this._threeInnerArea = null;
       this._innerArea = null;
+      this._isEditing2DCustomObject = false;
       this._threeWindowMask = null;
       const previousEditorId = this._editorId;
       const previousSelectedLayerName = this._selectedLayerName;
@@ -2084,18 +2086,27 @@ namespace gdjs {
             ),
             () => {}
           );
+          // It sets the eventsBasedObjectVariantData._initialInnerArea.
           const sceneAndCustomObject = this._createSceneWithCustomObject(
             eventsBasedObjectType,
             eventsBasedObjectVariantName || ''
           );
+          editionSettings = eventsBasedObjectVariantData.editionSettings;
+          this._innerArea = eventsBasedObjectVariantData._initialInnerArea;
           if (sceneAndCustomObject) {
             const { scene, customObjectInstanceContainer } =
               sceneAndCustomObject;
             this._currentScene = scene;
             this._editedInstanceContainer = customObjectInstanceContainer;
+            if (
+              this._innerArea &&
+              !is3D(customObjectInstanceContainer.getOwner())
+            ) {
+              this._isEditing2DCustomObject = true;
+              this._innerArea.max[2] = 0;
+              this._innerArea.min[2] = 0;
+            }
           }
-          editionSettings = eventsBasedObjectVariantData.editionSettings;
-          this._innerArea = eventsBasedObjectVariantData._initialInnerArea;
         } else {
           console.warn(
             `Couldn't find any variant named "${eventsBasedObjectVariantName || ''}" for ${eventsBasedObjectType}`
@@ -2387,6 +2398,10 @@ namespace gdjs {
       this._innerArea.max[0] = areaMaxX;
       this._innerArea.max[1] = areaMaxY;
       this._innerArea.max[2] = areaMaxZ;
+      if (this._isEditing2DCustomObject) {
+        this._innerArea.max[2] = 0;
+        this._innerArea.min[2] = 0;
+      }
     }
 
     setSelectedLayerName(layerName: string): void {

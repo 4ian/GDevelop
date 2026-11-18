@@ -22,6 +22,12 @@ export type AttachmentsForResources = {|
   getFiles: (
     attachmentIds: Array<string>
   ) => Promise<{ [attachmentId: string]: ?File }>,
+  // Where attachments are paths of local files (the CLI and the MCP server):
+  // the path, relative to the project, of those already in the folder of a
+  // project saved on this computer. They are used where they are.
+  getProjectFilePaths?: (
+    attachmentIds: Array<string>
+  ) => { [attachmentId: string]: ?string },
   // Stores the files of the resources just added or changed (uploaded to the
   // cloud, or written in the project folder), asking the user to save the
   // project first where files can't be kept in memory until it is saved.
@@ -53,7 +59,8 @@ const getKindsAccepting = (fileName: string): Array<string> =>
 
 type AppliedChange = {|
   resourceName: string,
-  blobUrl: string,
+  // Null for a file of the project folder: there is nothing to store.
+  blobUrl: string | null,
   // What to restore if the file cannot be stored: null for an added resource.
   previousFile: {| file: string, metadata: string |} | null,
   description: string,
@@ -78,15 +85,26 @@ export const addOrReplaceResourcesFromAttachments = async ({
   const changes = [];
   const warnings = [];
   const resourcesManager = project.getResourcesManager();
-  const files = await attachmentsForResources.getFiles([
+  const attachmentIds = [
     ...additions.map(({ attachmentId }) => attachmentId),
     ...replacements.map(({ attachmentId }) => attachmentId),
-  ]);
+  ];
+  const projectFilePaths: {
+    [attachmentId: string]: ?string,
+  } = attachmentsForResources.getProjectFilePaths
+    ? attachmentsForResources.getProjectFilePaths(attachmentIds)
+    : {};
+  const files = await attachmentsForResources.getFiles(
+    attachmentIds.filter(attachmentId => !projectFilePaths[attachmentId])
+  );
   const getFile = (attachmentId: string): ?File => {
     const file = files[attachmentId];
     if (!file) {
       warnings.push(
-        `The attached file "${attachmentId}" is not available (attached files are kept 30 days): ask the user to attach it again.`
+        attachmentsForResources.getProjectFilePaths &&
+          /[\\/]/.test(attachmentId)
+          ? `The file "${attachmentId}" was not found: give the absolute path of an existing file.`
+          : `The attached file "${attachmentId}" is not available (attached files are kept 30 days): ask the user to attach it again.`
       );
     }
     return file;
@@ -112,14 +130,16 @@ export const addOrReplaceResourcesFromAttachments = async ({
   };
 
   additions.forEach(({ attachmentId, resourceName, resourceKind }) => {
-    const file = getFile(attachmentId);
-    if (!file) return;
-    const acceptingKinds = getKindsAccepting(file.name);
+    const projectFilePath = projectFilePaths[attachmentId];
+    const file = projectFilePath ? null : getFile(attachmentId);
+    if (!projectFilePath && !file) return;
+    const fileName = projectFilePath || (file ? file.name : '');
+    const acceptingKinds = getKindsAccepting(fileName);
     const kind =
       resourceKind || (acceptingKinds.length > 0 ? acceptingKinds[0] : null);
     if (!kind || !acceptingKinds.includes(kind)) {
       warnings.push(
-        `"${file.name}" cannot be added as ${
+        `"${fileName}" cannot be added as ${
           resourceKind ? `a ${resourceKind}` : 'a'
         } resource: its extension is not supported. Supported ones: ${allResourceKindsAndMetadata
           .map(
@@ -133,7 +153,7 @@ export const addOrReplaceResourcesFromAttachments = async ({
     const resource = createNewResource(kind);
     if (!resource) return;
     // A unique name keeping the extension ("logo2.png", not "logo.png2").
-    const requestedName = resourceName || file.name;
+    const requestedName = resourceName || fileName;
     const extensionIndex = requestedName.lastIndexOf('.');
     const nameExtension =
       extensionIndex > 0 ? requestedName.slice(extensionIndex) : '';
@@ -144,7 +164,8 @@ export const addOrReplaceResourcesFromAttachments = async ({
           resourcesManager.hasResource(nameWithoutExtension + nameExtension)
       ) + nameExtension;
     resource.setName(name);
-    const blobUrl = setResourceFile(resource, file);
+    if (projectFilePath) resource.setFile(projectFilePath);
+    const blobUrl = file ? setResourceFile(resource, file) : null;
     applyResourceDefaults(project, resource);
     resourcesManager.addResource(resource);
     resource.delete();
@@ -152,9 +173,9 @@ export const addOrReplaceResourcesFromAttachments = async ({
       resourceName: name,
       blobUrl,
       previousFile: null,
-      description: `Added the ${kind} resource "${name}" (from the attached file "${
-        file.name
-      }").`,
+      description: projectFilePath
+        ? `Added the ${kind} resource "${name}" (the file "${projectFilePath}" of the project folder).`
+        : `Added the ${kind} resource "${name}" (from the attached file "${fileName}").`,
     });
   });
 
@@ -165,15 +186,15 @@ export const addOrReplaceResourcesFromAttachments = async ({
       );
       return;
     }
-    const file = getFile(attachmentId);
-    if (!file) return;
+    const projectFilePath = projectFilePaths[attachmentId];
+    const file = projectFilePath ? null : getFile(attachmentId);
+    if (!projectFilePath && !file) return;
+    const fileName = projectFilePath || (file ? file.name : '');
     const resource = resourcesManager.getResource(resourceName);
     const kind = resource.getKind();
-    if (!getKindsAccepting(file.name).includes(kind)) {
+    if (!getKindsAccepting(fileName).includes(kind)) {
       warnings.push(
-        `"${
-          file.name
-        }" cannot be the file of "${resourceName}", which is a ${kind} resource. Skipped.`
+        `"${fileName}" cannot be the file of "${resourceName}", which is a ${kind} resource. Skipped.`
       );
       return;
     }
@@ -181,14 +202,18 @@ export const addOrReplaceResourcesFromAttachments = async ({
       file: resource.getFile(),
       metadata: resource.getMetadata(),
     };
-    const blobUrl = setResourceFile(resource, file);
+    if (projectFilePath) {
+      resource.setFile(projectFilePath);
+      updateResourceJsonMetadata(resource, { localFilePath: undefined });
+    }
+    const blobUrl = file ? setResourceFile(resource, file) : null;
     appliedChanges.push({
       resourceName,
       blobUrl,
       previousFile,
-      description: `Replaced the file of the resource "${resourceName}" by the attached file "${
-        file.name
-      }" (everything using this resource now uses it).`,
+      description: projectFilePath
+        ? `Replaced the file of the resource "${resourceName}" by the file "${projectFilePath}" of the project folder (everything using this resource now uses it).`
+        : `Replaced the file of the resource "${resourceName}" by the attached file "${fileName}" (everything using this resource now uses it).`,
     });
   });
 
@@ -206,10 +231,12 @@ export const addOrReplaceResourcesFromAttachments = async ({
     } else {
       resourcesManager.removeResource(resourceName);
     }
-    URL.revokeObjectURL(blobUrl);
+    if (blobUrl) URL.revokeObjectURL(blobUrl);
   };
 
-  const resourceFilesStorage = await attachmentsForResources.storeResourceFiles();
+  const resourceFilesStorage = appliedChanges.some(({ blobUrl }) => !!blobUrl)
+    ? await attachmentsForResources.storeResourceFiles()
+    : 'stored';
   if (resourceFilesStorage === 'project-not-saved') {
     appliedChanges.forEach(undoChange);
     warnings.push(
@@ -222,20 +249,20 @@ export const addOrReplaceResourcesFromAttachments = async ({
   appliedChanges.forEach(appliedChange => {
     const { resourceName, blobUrl, previousFile, description } = appliedChange;
     const resource = resourcesManager.getResource(resourceName);
-    if (areFilesStored && resource.getFile() === blobUrl) {
+    if (blobUrl && areFilesStored && resource.getFile() === blobUrl) {
       undoChange(appliedChange);
       warnings.push(
         `The file for "${resourceName}" could not be stored in the project: nothing was changed.`
       );
       return;
     }
-    if (areFilesStored) URL.revokeObjectURL(blobUrl);
+    if (blobUrl && areFilesStored) URL.revokeObjectURL(blobUrl);
     // Reload what displays the previous file of the resource.
     if (previousFile)
       triggerOnResourceExternallyChanged({ identifier: resource.getFile() });
     changes.push(description);
   });
-  if (!areFilesStored) {
+  if (!areFilesStored && appliedChanges.some(({ blobUrl }) => !!blobUrl)) {
     changes.push(
       'The project is not saved yet: the files will be stored in it when it is saved.'
     );

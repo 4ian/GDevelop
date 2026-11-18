@@ -29,6 +29,7 @@ import {
 import {
   buildEventScriptSourceView,
   renderEventSourceById,
+  hasNotDisplayedEventsMarker,
   renderScopeSummaryHeaderLines,
   type ScopeSummary,
   type JsCodeExcerpt,
@@ -8055,6 +8056,20 @@ const addSceneEvents: EditorFunction = {
           'No events description/events script provided for some event batches. Provide one for each event(s) to generate.'
         );
       }
+      const batchWithIncompleteExpectedSource = parsedEventBatches.find(
+        batch =>
+          !batch.isEventScriptFromEdits &&
+          !!batch.placementTargetEventSource &&
+          !!batch.expectedEventSource &&
+          hasNotDisplayedEventsMarker(batch.expectedEventSource)
+      );
+      if (batchWithIncompleteExpectedSource) {
+        const targetEventId =
+          batchWithIncompleteExpectedSource.placementTargetEventId || '';
+        return makeGenericFailure(
+          `The \`expected_event_source\` of the event "${targetEventId}" is not its whole source: it has \`# ...\` lines standing for events that were not displayed by the read it was copied from. Read it with \`read_events_source\` and \`event_ids: ["${targetEventId}"]\` (its sub-events are then all returned), and send this source. Nothing was changed.`
+        );
+      }
       // Outside the GDevelop AI (no AI request), the events scripts are only
       // compiled: no agent writes events from a description.
       if (
@@ -9122,6 +9137,12 @@ const describeLayersWithEffects = (
       name: layer.getName(),
       position: i,
       visible: layer.getVisibility(),
+      renderingType: layer.getRenderingType(),
+      defaultCameraBehavior: layer.getDefaultCameraBehavior(),
+      cameraType: layer.getCameraType(),
+      camera3DNearPlaneDistance: layer.getCamera3DNearPlaneDistance(),
+      camera3DFarPlaneDistance: layer.getCamera3DFarPlaneDistance(),
+      camera3DFieldOfView: layer.getCamera3DFieldOfView(),
       effects: mapFor(0, effectsContainer.getEffectsCount(), j => {
         const effect = effectsContainer.getEffectAt(j);
         const effectMetadata = gd.MetadataProvider.getEffectMetadata(
@@ -9828,6 +9849,156 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
           'new_visibility'
         );
 
+        const new_camera_3d_near_plane_distance = SafeExtractor.extractNumberProperty(
+          changed_layer,
+          'new_camera_3d_near_plane_distance'
+        );
+        const new_camera_3d_far_plane_distance = SafeExtractor.extractNumberProperty(
+          changed_layer,
+          'new_camera_3d_far_plane_distance'
+        );
+        const new_camera_3d_field_of_view = SafeExtractor.extractNumberProperty(
+          changed_layer,
+          'new_camera_3d_field_of_view'
+        );
+        const new_rendering_type = SafeExtractor.extractStringProperty(
+          changed_layer,
+          'new_rendering_type'
+        );
+        const new_camera_type = SafeExtractor.extractStringProperty(
+          changed_layer,
+          'new_camera_type'
+        );
+        const new_default_camera_behavior = SafeExtractor.extractStringProperty(
+          changed_layer,
+          'new_default_camera_behavior'
+        );
+        const hasRenderingChanges =
+          new_rendering_type !== null ||
+          new_camera_type !== null ||
+          new_default_camera_behavior !== null ||
+          new_camera_3d_near_plane_distance !== null ||
+          new_camera_3d_far_plane_distance !== null ||
+          new_camera_3d_field_of_view !== null;
+        // The same rules as in the layer properties dialog.
+        const applyRenderingChanges = (layer: gdLayer) => {
+          if (new_rendering_type !== null) {
+            if (!['', '2d', '3d', '2d+3d'].includes(new_rendering_type)) {
+              warnings.push(
+                `Unknown rendering type "${new_rendering_type}" for layer "${layer.getName()}": use "" (2D and 3D objects, the default), "2d", "3d" or "2d+3d".`
+              );
+            } else if (
+              layer.isLightingLayer() &&
+              new_rendering_type !== '2d' &&
+              new_rendering_type !== ''
+            ) {
+              warnings.push(
+                `Layer "${layer.getName()}" is a 2D lighting layer: it cannot display 3D objects, its rendering type was not changed.`
+              );
+            } else {
+              layer.setRenderingType(new_rendering_type);
+              changes.push(
+                `Set the rendering type of layer "${layer.getName()}" to "${new_rendering_type}" for ${getTargetLabel()}.`
+              );
+            }
+          }
+          if (new_camera_type !== null) {
+            const nearPlaneDistance =
+              new_camera_3d_near_plane_distance !== null
+                ? new_camera_3d_near_plane_distance
+                : layer.getCamera3DNearPlaneDistance();
+            if (!['perspective', 'orthographic'].includes(new_camera_type)) {
+              warnings.push(
+                `Unknown camera type "${new_camera_type}" for layer "${layer.getName()}": use "perspective" or "orthographic".`
+              );
+            } else if (
+              new_camera_type === 'perspective' &&
+              nearPlaneDistance <= 0
+            ) {
+              warnings.push(
+                `The camera of layer "${layer.getName()}" was not changed to "perspective": its near plane distance (${nearPlaneDistance}) must be greater than 0 with a perspective camera. Set \`new_camera_3d_near_plane_distance\` too.`
+              );
+            } else {
+              layer.setCameraType(new_camera_type);
+              changes.push(
+                `Set the camera type of layer "${layer.getName()}" to "${new_camera_type}" for ${getTargetLabel()}.`
+              );
+            }
+          }
+          if (new_default_camera_behavior !== null) {
+            if (
+              !['do-nothing', 'top-left-anchored-if-never-moved'].includes(
+                new_default_camera_behavior
+              )
+            ) {
+              warnings.push(
+                `Unknown default camera behavior "${new_default_camera_behavior}" for layer "${layer.getName()}": use "do-nothing" (the camera stays centered) or "top-left-anchored-if-never-moved".`
+              );
+            } else {
+              layer.setDefaultCameraBehavior(new_default_camera_behavior);
+              changes.push(
+                `Set the default camera behavior of layer "${layer.getName()}" to "${new_default_camera_behavior}" for ${getTargetLabel()}.`
+              );
+            }
+          }
+          const camera3DChanges = [];
+          if (
+            new_camera_3d_near_plane_distance !== null ||
+            new_camera_3d_far_plane_distance !== null
+          ) {
+            const nearPlaneDistance =
+              new_camera_3d_near_plane_distance !== null
+                ? new_camera_3d_near_plane_distance
+                : layer.getCamera3DNearPlaneDistance();
+            const farPlaneDistance =
+              new_camera_3d_far_plane_distance !== null
+                ? new_camera_3d_far_plane_distance
+                : layer.getCamera3DFarPlaneDistance();
+            if (
+              (nearPlaneDistance <= 0 &&
+                layer.getCameraType() !== 'orthographic') ||
+              nearPlaneDistance >= farPlaneDistance
+            ) {
+              warnings.push(
+                `The near plane distance of the 3D camera must be greater than 0 and lower than the far plane distance (asked: near ${nearPlaneDistance}, far ${farPlaneDistance}): the planes of the 3D camera of layer "${layer.getName()}" were not changed.`
+              );
+            } else {
+              if (new_camera_3d_near_plane_distance !== null) {
+                layer.setCamera3DNearPlaneDistance(nearPlaneDistance);
+                camera3DChanges.push(
+                  `near plane distance ${nearPlaneDistance}`
+                );
+              }
+              if (new_camera_3d_far_plane_distance !== null) {
+                layer.setCamera3DFarPlaneDistance(farPlaneDistance);
+                camera3DChanges.push(`far plane distance ${farPlaneDistance}`);
+              }
+            }
+          }
+          if (new_camera_3d_field_of_view !== null) {
+            if (
+              new_camera_3d_field_of_view <= 0 ||
+              new_camera_3d_field_of_view > 180
+            ) {
+              warnings.push(
+                `The field of view of the 3D camera must be greater than 0° and at most 180° (asked: ${new_camera_3d_field_of_view}): the one of layer "${layer.getName()}" was not changed.`
+              );
+            } else {
+              layer.setCamera3DFieldOfView(new_camera_3d_field_of_view);
+              camera3DChanges.push(
+                `field of view ${new_camera_3d_field_of_view}°`
+              );
+            }
+          }
+          if (camera3DChanges.length) {
+            changes.push(
+              `Set the 3D camera of layer "${layer.getName()}" for ${getTargetLabel()}: ${camera3DChanges.join(
+                ', '
+              )}.`
+            );
+          }
+        };
+
         // The base layer must always exist: a scene without it is unable to run.
         if (layerName === '' && (delete_this_layer || new_layer_name)) {
           warnings.push(
@@ -9848,7 +10019,8 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
             !new_layer_name &&
             new_layer_position === null &&
             new_visibility === null &&
-            move_instances_to_layer === null
+            move_instances_to_layer === null &&
+            !hasRenderingChanges
           ) {
             changes.push(
               `Layer "${layerName}" already exists in ${getTargetLabel()}: nothing to change.`
@@ -9921,6 +10093,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
                 } for ${getTargetLabel()}.`
               );
             }
+            applyRenderingChanges(layer);
           }
           if (delete_this_layer && new_layer_position !== null) {
             // Without this guard, the position block below would look up the
@@ -10012,6 +10185,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
                   })`
             }. Layers are now: ${newLayerNames}. If you meant to modify an existing layer, check its exact name.`
           );
+          applyRenderingChanges(layersContainer.getLayer(layerName));
         }
       });
     }

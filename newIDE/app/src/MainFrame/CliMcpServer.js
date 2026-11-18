@@ -9,6 +9,10 @@ import {
   getPublicApi,
   type PublicApiFunction,
 } from '../EditorFunctions/PublicApi';
+import {
+  describeLocalFilesInsteadOfAttachments,
+  getScriptApiDefinitionWithLocalFiles,
+} from './McpServerTools/LocalFilesAsAttachments';
 import { NON_SCRIPTABLE_FUNCTION_NAMES } from '../EditorFunctions/ScriptExecution/NonScriptableFunctionNames';
 import {
   describeProject,
@@ -152,8 +156,8 @@ export const getMcpTools = ({
       description,
     ])
   );
-  const publicApiFunctions = getPublicApi().functions.filter(
-    publicApiFunction => {
+  const publicApiFunctions = getPublicApi()
+    .functions.filter(publicApiFunction => {
       const callableFunction = callableFunctions.get(publicApiFunction.name);
       if (!callableFunction) return false;
       // A read-only script can still run: it only calls read-only functions.
@@ -162,8 +166,8 @@ export const getMcpTools = ({
         !callableFunction.modifiesProject ||
         publicApiFunction.name === 'run_script'
       );
-    }
-  );
+    })
+    .map(describeLocalFilesInsteadOfAttachments);
   const otherTools = [
     ...(isReadOnly ? [] : [saveProjectTool]),
     ...serverTools.map(serverTool => serverTool.definition),
@@ -269,7 +273,10 @@ const resources = [
 
 const readResource = (uri: string): ?{| mimeType: string, text: string |} => {
   if (uri === SCRIPT_API_DEFINITION_URI) {
-    return { mimeType: 'text/plain', text: getPublicApi().scriptApiDefinition };
+    return {
+      mimeType: 'text/plain',
+      text: getScriptApiDefinitionWithLocalFiles(),
+    };
   }
   if (uri === EVENT_SCRIPT_GUIDE_URI) {
     return { mimeType: 'text/markdown', text: getPublicApi().eventScriptGuide };

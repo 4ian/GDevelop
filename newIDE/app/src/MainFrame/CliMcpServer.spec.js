@@ -48,6 +48,7 @@ const getResult = (response: JsonRpcResponse | null): Object => {
   if (!response || !response.result) throw new Error('No result.');
   return response.result;
 };
+import { getScriptApiDefinitionWithLocalFiles } from './McpServerTools/LocalFilesAsAttachments';
 
 describe('CliMcpServer', () => {
   it('answers the initialization with the protocol version asked by the client and the instructions', async () => {
@@ -142,6 +143,35 @@ describe('CliMcpServer', () => {
     expect(toolNames).toContain('run_script');
     expect(toolNames).not.toContain('create_scene');
     expect(toolNames).not.toContain('save_project');
+  });
+
+  it('asks for the paths of local files where the GDevelop AI is given attached files', () => {
+    const tool = getMcpTools({ isReadOnly: false }).find(
+      tool => tool.name === 'change_project_properties_resources'
+    );
+    if (!tool) throw new Error('The tool should be listed.');
+    const { added_resources, changed_resources } = tool.inputSchema.properties;
+
+    expect(
+      getMcpTools({ isReadOnly: false }).filter(tool =>
+        JSON.stringify(tool).includes('attached by the user')
+      )
+    ).toEqual([]);
+    expect(tool.description).toContain('add files of this computer');
+    expect(added_resources.description).not.toContain('attached');
+    expect(
+      added_resources.items.properties.attachment_id.description
+    ).toContain('The absolute path of a file of this computer.');
+    expect(
+      changed_resources.items.properties.replace_file_with_attachment_id
+        .description
+    ).toContain('The absolute path of a file of this computer.');
+
+    const scriptApiDefinition = getScriptApiDefinitionWithLocalFiles();
+    expect(scriptApiDefinition).not.toContain('attached by the user');
+    expect(scriptApiDefinition).toContain(
+      '/** The absolute path of a file of this computer. A file already in the folder'
+    );
   });
 
   it('tells in `run_script` the tools a script cannot call', () => {

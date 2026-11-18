@@ -738,4 +738,164 @@ describe('change_scene_properties_layers_effects_groups', () => {
     );
     expect(testScene.getLayers().hasLayerNamed('HUD')).toBe(true);
   });
+
+  it('changes the 3D camera of a layer', async () => {
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          changed_layers: [
+            {
+              layer_name: '',
+              new_camera_3d_near_plane_distance: 8,
+              new_camera_3d_far_plane_distance: 110000,
+              new_camera_3d_field_of_view: 58,
+            },
+            {
+              layer_name: 'Far',
+              new_camera_3d_far_plane_distance: 50000,
+            },
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(true);
+    const baseLayer = testScene.getLayers().getLayer('');
+    expect(baseLayer.getCamera3DNearPlaneDistance()).toBe(8);
+    expect(baseLayer.getCamera3DFarPlaneDistance()).toBe(110000);
+    expect(baseLayer.getCamera3DFieldOfView()).toBe(58);
+    expect(result.message).toContain(
+      'Set the 3D camera of layer "" for scene "TestScene": near plane distance 8, far plane distance 110000, field of view 58°.'
+    );
+    expect(
+      testScene
+        .getLayers()
+        .getLayer('Far')
+        .getCamera3DFarPlaneDistance()
+    ).toBe(50000);
+  });
+
+  it('refuses values the 3D camera of a layer cannot have', async () => {
+    const baseLayer = testScene.getLayers().getLayer('');
+    const initialNearPlaneDistance = baseLayer.getCamera3DNearPlaneDistance();
+    const initialFarPlaneDistance = baseLayer.getCamera3DFarPlaneDistance();
+    const initialFieldOfView = baseLayer.getCamera3DFieldOfView();
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          changed_layers: [
+            {
+              layer_name: '',
+              new_camera_3d_near_plane_distance: initialFarPlaneDistance + 10,
+              new_camera_3d_field_of_view: 200,
+            },
+          ],
+        },
+      }
+    );
+
+    expect(baseLayer.getCamera3DNearPlaneDistance()).toBe(
+      initialNearPlaneDistance
+    );
+    expect(baseLayer.getCamera3DFarPlaneDistance()).toBe(
+      initialFarPlaneDistance
+    );
+    expect(baseLayer.getCamera3DFieldOfView()).toBe(initialFieldOfView);
+    expect(result.warnings).toContain(
+      'The near plane distance of the 3D camera must be greater than 0 and lower than the far plane distance'
+    );
+    expect(result.warnings).toContain(
+      'The field of view of the 3D camera must be greater than 0° and at most 180°'
+    );
+  });
+
+  it('changes the rendering type, the camera type and the default camera behavior of a layer', async () => {
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          changed_layers: [
+            {
+              layer_name: '',
+              new_rendering_type: '3d',
+              new_camera_type: 'orthographic',
+              new_camera_3d_near_plane_distance: 0,
+            },
+            {
+              layer_name: 'UI',
+              new_rendering_type: '2d',
+              new_default_camera_behavior: 'top-left-anchored-if-never-moved',
+            },
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(true);
+    const baseLayer = testScene.getLayers().getLayer('');
+    expect(baseLayer.getRenderingType()).toBe('3d');
+    expect(baseLayer.getCameraType()).toBe('orthographic');
+    // Allowed with an orthographic camera only.
+    expect(baseLayer.getCamera3DNearPlaneDistance()).toBe(0);
+    const uiLayer = testScene.getLayers().getLayer('UI');
+    expect(uiLayer.getRenderingType()).toBe('2d');
+    expect(uiLayer.getDefaultCameraBehavior()).toBe(
+      'top-left-anchored-if-never-moved'
+    );
+    expect(result.message).toContain(
+      'Set the rendering type of layer "" to "3d" for scene "TestScene".'
+    );
+    expect(result.message).toContain(
+      'Set the camera type of layer "" to "orthographic" for scene "TestScene".'
+    );
+    expect(result.message).toContain(
+      'Set the default camera behavior of layer "UI" to "top-left-anchored-if-never-moved" for scene "TestScene".'
+    );
+  });
+
+  it('refuses values the rendering type, the camera type and the default camera behavior cannot have', async () => {
+    const baseLayer = testScene.getLayers().getLayer('');
+    baseLayer.setCameraType('orthographic');
+    baseLayer.setCamera3DNearPlaneDistance(0);
+    const initialRenderingType = baseLayer.getRenderingType();
+    const initialDefaultCameraBehavior = baseLayer.getDefaultCameraBehavior();
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          changed_layers: [
+            {
+              layer_name: '',
+              new_rendering_type: 'isometric',
+              new_camera_type: 'perspective',
+              new_default_camera_behavior: 'follow-player',
+            },
+          ],
+        },
+      }
+    );
+
+    expect(baseLayer.getRenderingType()).toBe(initialRenderingType);
+    expect(baseLayer.getCameraType()).toBe('orthographic');
+    expect(baseLayer.getDefaultCameraBehavior()).toBe(
+      initialDefaultCameraBehavior
+    );
+    expect(result.warnings).toContain(
+      'Unknown rendering type "isometric" for layer "": use "" (2D and 3D objects, the default), "2d", "3d" or "2d+3d".'
+    );
+    expect(result.warnings).toContain(
+      'The camera of layer "" was not changed to "perspective": its near plane distance (0) must be greater than 0 with a perspective camera. Set `new_camera_3d_near_plane_distance` too.'
+    );
+    expect(result.warnings).toContain(
+      'Unknown default camera behavior "follow-player" for layer "": use "do-nothing" (the camera stays centered) or "top-left-anchored-if-never-moved".'
+    );
+  });
 });

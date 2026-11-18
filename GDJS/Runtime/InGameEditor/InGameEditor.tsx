@@ -2068,6 +2068,7 @@ namespace gdjs {
 
       let editedLayerDataList: Array<LayerData> = [];
       let editedInstanceDataList: Array<InstanceData> = [];
+      let editionSettings: InstancesEditorSettings | null = null;
       if (eventsBasedObjectType) {
         const eventsBasedObjectVariantData =
           this._runtimeGame.getEventsBasedObjectVariantData(
@@ -2093,9 +2094,7 @@ namespace gdjs {
             this._currentScene = scene;
             this._editedInstanceContainer = customObjectInstanceContainer;
           }
-          this.setInstancesEditorSettings(
-            eventsBasedObjectVariantData.editionSettings
-          );
+          editionSettings = eventsBasedObjectVariantData.editionSettings;
           this._innerArea = eventsBasedObjectVariantData._initialInnerArea;
         } else {
           console.warn(
@@ -2128,12 +2127,10 @@ namespace gdjs {
               /*trackByPersistentUuid=*/
               true
             );
-            this.setInstancesEditorSettings(externalLayoutData.editionSettings);
+            editionSettings = externalLayoutData.editionSettings;
           }
         } else {
-          this.setInstancesEditorSettings(
-            sceneAndExtensionsData!.sceneData.uiSettings
-          );
+          editionSettings = sceneAndExtensionsData!.sceneData.uiSettings;
         }
         this._currentScene = newScene;
         this._editedInstanceContainer = newScene;
@@ -2181,6 +2178,9 @@ namespace gdjs {
           },
           true
         );
+      }
+      if (editionSettings) {
+        this.setInstancesEditorSettings(editionSettings);
       }
 
       // Update initialRuntimeGameStatus so that a hard reload
@@ -2440,6 +2440,16 @@ namespace gdjs {
       }
       this._editorGrid.setVisible(false);
       this._editorGrid.setSettings(this._instancesEditorSettings);
+      // Avoid the grid to disapear 1 frame at hot-reloading.
+      // The selection control is not updated the 1st frame in the editor main
+      // loop which makes the 2D grid flash hidden.
+      // Search the following comment for further explanations:
+      // Custom objects only update their position at the end of the frame
+      if (this._instancesEditorSettings.editorMode === '2d-editor') {
+        // Update the camera position to setup the grid correctly
+        this._editorCamera.step();
+        this._selectionControls2D.updateGrid();
+      }
     }
 
     getEditorGrid(): EditorGrid {
@@ -3806,7 +3816,6 @@ namespace gdjs {
         this._draggedNewObject.deleteFromScene();
         this._draggedNewObject = null;
       }
-      this._editorGrid.setVisible(false);
     }
 
     dragNewInstance({
@@ -8339,7 +8348,39 @@ namespace gdjs {
         return;
       }
 
-      // Update the grid.
+      this.updateGrid();
+
+      const selectedObjects = this.editor.getSelectedObjects();
+      if (selectedObjects.length === 0) {
+        this.remove();
+        return;
+      }
+      threeScene.add(this.selectionHandle);
+      this._isShown = true;
+    }
+
+    updateGrid(): void {
+      const currentScene = this.editor.getCurrentScene();
+      if (!currentScene) {
+        console.log('No scene');
+        return;
+      }
+      const topVisibleLayer = this.editor.getTopVisibleLayer();
+      if (!topVisibleLayer) {
+        console.log('No toplayer');
+        return;
+      }
+      const runtimeLayerRender = topVisibleLayer
+        ? topVisibleLayer.getRenderer()
+        : null;
+      const threeScene = runtimeLayerRender
+        ? runtimeLayerRender.getThreeScene()
+        : null;
+      if (!threeScene) {
+        console.log('No threeScene');
+        return;
+      }
+
       const editorGrid = this.editor.getEditorGrid();
       editorGrid.setNormal('Z');
       const game = this.editor.getRuntimeGame();
@@ -8379,14 +8420,6 @@ namespace gdjs {
           )
         ) + 1
       );
-
-      const selectedObjects = this.editor.getSelectedObjects();
-      if (selectedObjects.length === 0) {
-        this.remove();
-        return;
-      }
-      threeScene.add(this.selectionHandle);
-      this._isShown = true;
     }
 
     remove(): void {

@@ -1794,7 +1794,7 @@ namespace gdjs {
         this,
         this._objectMover3D
       );
-      this._selectionControls = this._selectionControls2D;
+      this._selectionControls = this._selectionControls3D;
 
       this._selectionBoxElement = document.createElement('div');
       this._selectionBoxElement.style.position = 'fixed';
@@ -1803,6 +1803,9 @@ namespace gdjs {
 
       this._inGameEditorSettings =
         inGameEditorSettings || defaultInGameEditorSettings;
+      if (this.getEditorMode() === '2d-editor') {
+        this._selectionControls = this._selectionControls2D;
+      }
 
       this._toolbar = new Toolbar({
         getTransformControlsMode: () =>
@@ -1910,6 +1913,7 @@ namespace gdjs {
         ...inGameEditorSettings,
       };
       this._applyInGameEditorSettings();
+      this.applyInstancesEditorSettings();
     }
 
     getRuntimeGame() {
@@ -2417,6 +2421,11 @@ namespace gdjs {
     }
 
     getEditorMode(): '2d-editor' | '3d-editor' {
+      // Without the real-time 2D editor, it's always the 3D editor: the mode
+      // from the scene settings can't be trusted because they can be outdated.
+      if (!this._inGameEditorSettings.isRealTime2DEditorEnabled) {
+        return '3d-editor';
+      }
       return this._instancesEditorSettings
         ? this._instancesEditorSettings.editorMode || '2d-editor'
         : '2d-editor';
@@ -2447,7 +2456,7 @@ namespace gdjs {
           : '3d-editor';
       }
       // end of compatibility code
-      if (this._instancesEditorSettings.editorMode === '3d-editor') {
+      if (this.getEditorMode() === '3d-editor') {
         this._selectionControls2D.remove();
         this._selectionControls = this._selectionControls3D;
       } else {
@@ -2461,7 +2470,7 @@ namespace gdjs {
       // loop which makes the 2D grid flash hidden.
       // Search the following comment for further explanations:
       // Custom objects only update their position at the end of the frame
-      if (this._instancesEditorSettings.editorMode === '2d-editor') {
+      if (this.getEditorMode() === '2d-editor') {
         // Update the camera position to setup the grid correctly
         this._editorCamera.step();
         this._selectionControls2D.updateGrid();
@@ -5439,7 +5448,7 @@ namespace gdjs {
       this.isSnappingEnabledByDefault = instancesEditorSettings.snap;
       this.gridType = instancesEditorSettings.gridType;
       this.divisionsCount = 10;
-      this.editorMode = instancesEditorSettings.editorMode || '2d-editor';
+      this.editorMode = this.editor.getEditorMode();
       this.rebuildGrid();
     }
 

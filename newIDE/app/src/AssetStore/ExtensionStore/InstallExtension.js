@@ -31,6 +31,7 @@ import {
 import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
 import PromisePool from '@supercharge/promise-pool';
 import { retryIfFailed } from '../../Utils/RetryIfFailed';
+import { IMPORTED_FILE_ORIGIN_NAME } from '../../Utils/Extension/ExtensionOrigin';
 
 const gd: libGDevelop = global.gd;
 
@@ -492,7 +493,14 @@ export const installRequiredExtensions = async ({
     eventsFunctionsExtensionsState,
     project,
     installedExtensions,
-    downloadedSerializedExtensions.map(extensions => extensions.name)
+    {
+      fromStoreExtensionNames: downloadedSerializedExtensions.map(
+        extension => extension.name
+      ),
+      fromFileExtensionNames: importedSerializedExtensions.map(
+        extension => extension.name
+      ),
+    }
   );
   onExtensionInstalled(installedExtensionNames);
 
@@ -516,7 +524,13 @@ export const addSerializedExtensionsToProject = async (
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
   project: gdProject,
   serializedExtensions: Array<SerializedExtension>,
-  fromStoreExtensionNames: Array<string>
+  {
+    fromStoreExtensionNames,
+    fromFileExtensionNames,
+  }: {|
+    fromStoreExtensionNames: Array<string>,
+    fromFileExtensionNames: Array<string>,
+  |}
 ): Promise<void> => {
   serializedExtensions.forEach(serializedExtension => {
     const { name } = serializedExtension;
@@ -544,6 +558,22 @@ export const addSerializedExtensionsToProject = async (
       'gdevelop-extension-store',
       extensionName
     );
+  });
+  // Keep track of extensions imported from a file, unless the file tells
+  // where the extension comes from (for instance, the extension store).
+  fromFileExtensionNames.forEach(extensionName => {
+    if (!project.hasEventsFunctionsExtensionNamed(extensionName)) {
+      return;
+    }
+    const serializedExtension = serializedExtensions.find(
+      serializedExtension => serializedExtension.name === extensionName
+    );
+    if (serializedExtension && serializedExtension.origin) {
+      return;
+    }
+    project
+      .getEventsFunctionsExtension(extensionName)
+      .setOrigin(IMPORTED_FILE_ORIGIN_NAME, extensionName);
   });
 
   await eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(

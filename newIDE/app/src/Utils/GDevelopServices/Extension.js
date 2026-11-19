@@ -134,6 +134,7 @@ export type ObjectShortHeader = {
 export type SerializedExtension = {
   name: string,
   requiredExtensions?: Array<ExtensionDependency>,
+  origin?: {| name: string, identifier: string |},
   // This type is inexact because the typing is not complete.
 };
 

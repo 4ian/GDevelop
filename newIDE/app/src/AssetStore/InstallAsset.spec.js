@@ -36,6 +36,7 @@ import {
   type SerializedExtension,
 } from '../Utils/GDevelopServices/Extension';
 import * as Asset from '../Utils/GDevelopServices/Asset';
+import { isDefaultVariantReplacedByUpdates } from '../Utils/Extension/ExtensionOrigin';
 
 const gd: libGDevelop = global.gd;
 
@@ -1029,7 +1030,10 @@ describe('InstallAsset', () => {
         mockEventsFunctionsExtensionsState,
         project,
         [serializedExtension],
-        [serializedExtension.name]
+        {
+          fromStoreExtensionNames: [serializedExtension.name],
+          fromFileExtensionNames: [],
+        }
       );
 
       expect(
@@ -1054,7 +1058,7 @@ describe('InstallAsset', () => {
         mockEventsFunctionsExtensionsState,
         project,
         [serializedExtension],
-        []
+        { fromStoreExtensionNames: [], fromFileExtensionNames: [] }
       );
 
       expect(
@@ -1070,6 +1074,56 @@ describe('InstallAsset', () => {
           .getEventsFunctionsExtension(serializedExtension.name)
           .getOriginIdentifier()
       ).toEqual('');
+    });
+
+    it('adds an extension with origin set if it comes from a file', () => {
+      makeTestExtensions(gd);
+      const { project } = makeTestProject(gd);
+      addSerializedExtensionsToProject(
+        mockEventsFunctionsExtensionsState,
+        project,
+        [serializedExtension],
+        {
+          fromStoreExtensionNames: [],
+          fromFileExtensionNames: [serializedExtension.name],
+        }
+      );
+
+      const eventsFunctionsExtension = project.getEventsFunctionsExtension(
+        serializedExtension.name
+      );
+      expect(eventsFunctionsExtension.getOriginName()).toEqual('imported-file');
+      expect(isDefaultVariantReplacedByUpdates(eventsFunctionsExtension)).toBe(
+        true
+      );
+    });
+
+    it('keeps the origin written in the file of an imported extension', () => {
+      makeTestExtensions(gd);
+      const { project } = makeTestProject(gd);
+      addSerializedExtensionsToProject(
+        mockEventsFunctionsExtensionsState,
+        project,
+        [
+          {
+            ...serializedExtension,
+            origin: {
+              name: 'gdevelop-extension-store',
+              identifier: serializedExtension.name,
+            },
+          },
+        ],
+        {
+          fromStoreExtensionNames: [],
+          fromFileExtensionNames: [serializedExtension.name],
+        }
+      );
+
+      expect(
+        project
+          .getEventsFunctionsExtension(serializedExtension.name)
+          .getOriginName()
+      ).toEqual('gdevelop-extension-store');
     });
   });
 

@@ -1060,7 +1060,10 @@ const ObjectImporterDialog = ({
         eventsFunctionsExtensionsState,
         project,
         serializedExtensions,
-        []
+        {
+          fromStoreExtensionNames: [],
+          fromFileExtensionNames: installedExtensionNames,
+        }
       );
       onExtensionInstalled(installedExtensionNames);
 

@@ -3038,15 +3038,16 @@ namespace gdjs {
               ])
             ) as FloatPoint
           );
-          if (!projectedSelectionBox.vertices.every(Boolean)) {
-            return;
-          }
-          for (const object of editedInstanceContainer.getAdhocListOfAllInstances()) {
-            if (
-              !is3D(object) &&
-              isAABBInsidePolygon(projectedSelectionBox, object.getAABB())
-            ) {
-              objects.add(object);
+          // A corner over the horizon can't be projected on the ground:
+          // 2D objects are not selected, but 3D objects still are.
+          if (projectedSelectionBox.vertices.every(Boolean)) {
+            for (const object of editedInstanceContainer.getAdhocListOfAllInstances()) {
+              if (
+                !is3D(object) &&
+                isAABBInsidePolygon(projectedSelectionBox, object.getAABB())
+              ) {
+                objects.add(object);
+              }
             }
           }
           for (const selectThreeObject of this._selectionBox.select()) {

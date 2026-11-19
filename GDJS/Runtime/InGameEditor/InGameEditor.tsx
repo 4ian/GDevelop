@@ -6269,13 +6269,14 @@ namespace gdjs {
       const sceneAreaCenterX = (sceneArea.maxX + sceneArea.minX) / 2;
       const sceneAreaCenterY = (sceneArea.maxY + sceneArea.minY) / 2;
 
+      // The zoom is set first because it moves the 3D camera target to Z = 0.
+      this.setTopDownAndZoom(zoom, shouldApplyToAllEditorMode);
       this.setTopDownAndCenter(
         sceneAreaCenterX,
         sceneAreaCenterY,
         sceneArea.minZ,
         shouldApplyToAllEditorMode
       );
-      this.setTopDownAndZoom(zoom, shouldApplyToAllEditorMode);
       this.onHasCameraChanged();
     }
 

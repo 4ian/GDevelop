@@ -343,6 +343,91 @@ const replaceOrAddByName = (
 };
 
 /**
+ * Find the path of the folder containing a function in a serialized folder
+ * structure (`{ folderName, children }` for folders, `{ functionName }` for
+ * functions).
+ */
+const findFunctionFolderPath = (
+  folder: SerializedContent,
+  functionName: string
+): Array<string> | null => {
+  for (const child of folder.children || []) {
+    if (child.functionName === functionName) return [];
+    if (child.children) {
+      const path = findFunctionFolderPath(child, functionName);
+      if (path) return [child.folderName, ...path];
+    }
+  }
+  return null;
+};
+
+const removeFunctionFromFolders = (
+  folder: SerializedContent,
+  functionName: string
+) => {
+  if (!folder.children) return;
+  folder.children = folder.children.filter(
+    child => child.functionName !== functionName
+  );
+  folder.children.forEach(child =>
+    removeFunctionFromFolders(child, functionName)
+  );
+};
+
+const getOrCreateFolder = (
+  rootFolder: SerializedContent,
+  path: Array<string>
+): SerializedContent => {
+  let folder = rootFolder;
+  for (const folderName of path) {
+    folder.children = folder.children || [];
+    let childFolder = folder.children.find(
+      child => child.children && child.folderName === folderName
+    );
+    if (!childFolder) {
+      childFolder = { folderName, children: [] };
+      folder.children.push(childFolder);
+    }
+    folder = childFolder;
+  }
+  return folder;
+};
+
+const areSamePaths = (pathA: Array<string>, pathB: Array<string>) =>
+  pathA.length === pathB.length &&
+  pathA.every((folderName, index) => folderName === pathB[index]);
+
+/**
+ * Put the free functions kept from the project in the folders they have in the
+ * project. Otherwise, they would not be in the folders of the new version, or
+ * be in a different folder than their group.
+ */
+const getFolderStructureWithKeptFunctions = (
+  projectFolderStructure: ?SerializedContent,
+  newVersionFolderStructure: ?SerializedContent,
+  keptFunctionNames: Array<string>
+): ?SerializedContent => {
+  if (!projectFolderStructure || !newVersionFolderStructure) {
+    return newVersionFolderStructure;
+  }
+  const folderStructure = JSON.parse(JSON.stringify(newVersionFolderStructure));
+  for (const functionName of keptFunctionNames) {
+    const projectPath = findFunctionFolderPath(
+      projectFolderStructure,
+      functionName
+    );
+    if (!projectPath) continue;
+    const currentPath = findFunctionFolderPath(folderStructure, functionName);
+    if (currentPath && areSamePaths(currentPath, projectPath)) continue;
+    removeFunctionFromFolders(folderStructure, functionName);
+    getOrCreateFolder(folderStructure, projectPath).children.push({
+      functionName,
+    });
+  }
+  return folderStructure;
+};
+
+/**
  * Build the new version of an extension where the chosen members are kept
  * from the project.
  */
@@ -411,6 +496,16 @@ export const getMergedSerializedExtension = (
         { ...omitFields(mergedObject, replacedFields), ...content, name }
       );
     }
+  }
+  const keptFunctionNames = [...allKeptMemberKeys]
+    .filter(key => key.startsWith('function:'))
+    .map(key => key.substring('function:'.length));
+  if (keptFunctionNames.length > 0) {
+    mergedExtension.eventsFunctionsFolderStructure = getFolderStructureWithKeptFunctions(
+      projectSerializedExtension.eventsFunctionsFolderStructure,
+      newSerializedExtension.eventsFunctionsFolderStructure,
+      keptFunctionNames
+    );
   }
   // Deep copy so that the result shares nothing with the given extensions.
   const mergedSerializedExtension: SerializedExtension = JSON.parse(

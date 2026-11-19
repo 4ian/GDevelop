@@ -73,12 +73,14 @@ const createFakeExtension = ({
   functions = [],
   objects = [],
   globalVariableNames = [],
+  functionFolderStructure,
 }: {|
   version?: string,
   description?: string,
   functions?: Array<Object>,
   objects?: Array<Object>,
   globalVariableNames?: Array<string>,
+  functionFolderStructure?: Object,
 |}) => ({
   name: 'MyExtension',
   version,
@@ -90,8 +92,17 @@ const createFakeExtension = ({
   })),
   sceneVariables: [],
   eventsFunctions: functions,
+  eventsFunctionsFolderStructure: functionFolderStructure,
   eventsBasedBehaviors: [],
   eventsBasedObjects: objects,
+});
+
+/** A serialized folder structure, from `{ folderName: [...children] }` and function names. */
+const createFakeFolder = (folderName: string, children: Array<any>) => ({
+  folderName,
+  children: children.map(child =>
+    typeof child === 'string' ? { functionName: child } : child
+  ),
 });
 
 describe('ExtensionChangesToKeep', () => {
@@ -231,6 +242,55 @@ describe('ExtensionChangesToKeep', () => {
           sentence,
         ])
       ).toEqual([['Jump', 'My jump'], ['Land', ''], ['MyStudioHelper', '']]);
+    });
+
+    it('keeps the kept functions in the folders they have in the project', () => {
+      const projectExtensionWithFolders = createFakeExtension({
+        functions: [
+          createFakeFunction({ name: 'Jump', sentence: 'My jump' }),
+          createFakeFunction({ name: 'MyStudioHelper' }),
+        ],
+        functionFolderStructure: createFakeFolder('__ROOT', [
+          createFakeFolder('Moves', [createFakeFolder('Air', ['Jump'])]),
+          createFakeFolder('Studio', [
+            createFakeFolder('Helpers', ['MyStudioHelper']),
+          ]),
+        ]),
+      });
+      const newExtensionWithFolders = createFakeExtension({
+        version: '1.1.0',
+        functions: [
+          createFakeFunction({ name: 'Jump', sentence: 'New jump' }),
+          createFakeFunction({ name: 'Land' }),
+        ],
+        functionFolderStructure: createFakeFolder('__ROOT', [
+          createFakeFolder('Moves', ['Jump', 'Land']),
+        ]),
+      });
+
+      const mergedExtension = getMergedSerializedExtension(
+        projectExtensionWithFolders,
+        newExtensionWithFolders,
+        new Set(['function:Jump', 'function:MyStudioHelper'])
+      );
+
+      expect(mergedExtension.eventsFunctionsFolderStructure).toEqual(
+        createFakeFolder('__ROOT', [
+          createFakeFolder('Moves', [
+            'Land',
+            createFakeFolder('Air', ['Jump']),
+          ]),
+          createFakeFolder('Studio', [
+            createFakeFolder('Helpers', ['MyStudioHelper']),
+          ]),
+        ])
+      );
+      // The new version is not modified.
+      expect(newExtensionWithFolders.eventsFunctionsFolderStructure).toEqual(
+        createFakeFolder('__ROOT', [
+          createFakeFolder('Moves', ['Jump', 'Land']),
+        ])
+      );
     });
 
     it('keeps the children of an object without its logic', () => {

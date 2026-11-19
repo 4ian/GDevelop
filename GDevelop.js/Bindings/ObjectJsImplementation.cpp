@@ -215,6 +215,14 @@ void ObjectJsImplementation::ExposeResources(gd::ArbitraryResourceWorker& worker
       if (newPropertyValue != oldPropertyValue) {
         UpdateProperty(propertyName, newPropertyValue);
       }
+    } else if (propertyDescriptor.GetType() == "pbrConfig") {
+      // The property holds the JSON of a PBR material configuration: expose
+      // the images used as textures so that they can be renamed or removed
+      // safely.
+      gd::String newPropertyValue = propertyDescriptor.GetValue();
+      if (gd::ExposePBRConfigResources(worker, newPropertyValue)) {
+        UpdateProperty(propertyName, newPropertyValue);
+      }
     }
   }
 }

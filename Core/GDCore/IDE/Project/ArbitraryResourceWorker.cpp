@@ -22,6 +22,7 @@
 #include "GDCore/Project/Effect.h"
 #include "GDCore/Tools/Log.h"
 #include "GDCore/IDE/ResourceExposer.h"
+#include "GDCore/Serialization/Serializer.h"
 
 using namespace std;
 
@@ -341,6 +342,51 @@ gd::ResourceWorkerInObjectsWorker GetResourceWorkerOnObjects(
   gd::ResourceWorkerInObjectsWorker resourcesWorker(project, worker,
                                                     shouldCheckObject);
   return resourcesWorker;
+}
+
+namespace {
+
+/**
+ * Recursively expose the images found in the "textures" maps of a PBR
+ * material configuration (already parsed as a serializer element).
+ *
+ * \return true if an image was renamed by the worker.
+ */
+bool ExposePBRTexturesInElement(gd::SerializerElement &element,
+                                gd::ArbitraryResourceWorker &worker) {
+  bool hasChanged = false;
+  for (const auto &childPair : element.GetAllChildren()) {
+    gd::SerializerElement &child = *childPair.second;
+    if (childPair.first == "textures") {
+      for (const auto &texturePair : child.GetAllChildren()) {
+        const gd::SerializerValue &value = texturePair.second->GetValue();
+        if (!value.IsString()) continue;
+        gd::String resourceName = value.GetString();
+        if (resourceName.empty()) continue;
+        worker.ExposeImage(resourceName);
+        if (resourceName != value.GetString()) {
+          texturePair.second->SetValue(resourceName);
+          hasChanged = true;
+        }
+      }
+    } else {
+      hasChanged = ExposePBRTexturesInElement(child, worker) || hasChanged;
+    }
+  }
+  return hasChanged;
+}
+
+}  // namespace
+
+bool ExposePBRConfigResources(gd::ArbitraryResourceWorker &worker,
+                              gd::String &pbrConfigJson) {
+  if (pbrConfigJson.empty()) return false;
+  gd::SerializerElement element = gd::Serializer::FromJSON(pbrConfigJson);
+  if (!ExposePBRTexturesInElement(element, worker)) {
+    return false;
+  }
+  pbrConfigJson = gd::Serializer::ToJSON(element);
+  return true;
 }
 
 }  // namespace gd

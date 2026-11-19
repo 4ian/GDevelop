@@ -5,6 +5,7 @@ import * as PIXI from 'pixi.js-legacy';
 import * as THREE from 'three';
 import { rgbToHexNumber } from '../../Utils/ColorTransformer';
 import Rectangle from '../../Utils/Rectangle';
+import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
 import {
   type BasicProfilingCounters,
   makeBasicProfilingCounters,
@@ -204,6 +205,14 @@ export default class InstancesRenderer {
     backgroundPixiContainer: PIXI.Container
   ) {
     resetBasicProfilingCounters(this._basicProfilingCounters);
+
+    // Project properties are mutable and do not necessarily replace the
+    // project object. Synchronize on render so edits in Project properties
+    // affect already-cached Three.js textures without Preview or restart.
+    PixiResourcesLoader.updateEditorTextureQualitySettings(
+      this.project,
+      threeRenderer
+    );
 
     // Even if no rendering at all has been made already, setting up the Three.js/PixiJS renderers
     // might have changed some WebGL states already. Reset the state for the very first frame.

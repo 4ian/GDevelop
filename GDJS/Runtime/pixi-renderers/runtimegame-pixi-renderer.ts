@@ -145,6 +145,14 @@ namespace gdjs {
           this._game.getGameResolutionHeight()
         );
 
+        // Detect the GPU capabilities (maximum texture size, supported
+        // compressed texture formats, maximum anisotropy...) so that the
+        // advanced texture quality system can adapt the textures to this
+        // device.
+        this._game
+          .getTextureQuality3DManager()
+          .initializeWithRenderer(this._threeRenderer);
+
         // Create a PixiJS renderer that use the same GL context as Three.js
         // so that both can render to the canvas and even have PixiJS rendering
         // reused in Three.js (by using a RenderTexture and the same internal WebGL texture).

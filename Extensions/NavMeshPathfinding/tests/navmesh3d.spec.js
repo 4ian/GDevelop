@@ -8,8 +8,7 @@ describe('gdjs.NavMeshObstacleRuntimeBehavior (3D)', function () {
     await gdjs.getAllAsynchronouslyLoadingLibraryPromise();
   });
 
-  const createScene = () => {
-    const runtimeGame = gdjs.getPixiRuntimeGame();
+  const createScene = (runtimeGame = gdjs.getPixiRuntimeGame()) => {
     const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
     runtimeScene.loadFromScene({
       sceneData: {
@@ -846,6 +845,151 @@ describe('gdjs.NavMeshObstacleRuntimeBehavior (3D)', function () {
         // and each crowd, and 40 bytes for each agent.
         expect(leakedBytes).to.be.below(1024);
       });
+    });
+  });
+
+  describe('with a 3D model as obstacle', function () {
+    // A ramp of 316 triangles, from the "platformer-3d-wipeout" example.
+    const rampResourceName = 'ramp.glb';
+    const createSceneWithRamp = async (shape) => {
+      const runtimeGame = gdjs.getPixiRuntimeGame({
+        resources: {
+          resources: [
+            {
+              kind: 'model3D',
+              name: rampResourceName,
+              file: 'base/GDJS/tests/tests-utils/assets/' + rampResourceName,
+              metadata: '',
+              userAdded: false,
+            },
+          ],
+        },
+      });
+      const model3DManager = runtimeGame.getModel3DManager();
+      await model3DManager.loadResource(rampResourceName);
+      await model3DManager.processResource(rampResourceName);
+      const runtimeScene = createScene(runtimeGame);
+      const ramp = new gdjs.Model3DRuntimeObject(runtimeScene, {
+        name: 'Ramp',
+        type: 'Scene3D::Model3DObject',
+        effects: [],
+        variables: [],
+        behaviors: [
+          {
+            type: 'NavMeshPathfinding::NavMeshObstacleBehavior',
+            name: 'NavMeshObstacle',
+            // @ts-ignore - properties are not typed
+            shape,
+            meshShapeResourceName: '',
+            obstacleOnly: false,
+          },
+        ],
+        content: {
+          modelResourceName: rampResourceName,
+          width: 800,
+          height: 800,
+          depth: 500,
+          rotationX: 90,
+          rotationY: 0,
+          rotationZ: 0,
+          keepAspectRatio: false,
+          materialType: 'Basic',
+          originLocation: 'ModelOrigin',
+          centerLocation: 'ModelOrigin',
+          animations: [],
+          crossfadeDuration: 0,
+          isCastingShadow: false,
+          isReceivingShadow: false,
+        },
+      });
+      runtimeScene.addObject(ramp);
+      return { runtimeScene, ramp, model3DManager };
+    };
+
+    /**
+     * Walk between the two ends of the ramp, 300 pixels from its center.
+     * @param {gdjs.RuntimeScene} runtimeScene
+     * @param {gdjs.RuntimeObject} ramp
+     * @param {{x: number, y: number}} lowEnd Where the low end is, from the
+     * center of the ramp.
+     * @param {number} [destinationZ]
+     * @returns the Z of the character at each frame.
+     */
+    const walkUpRamp = (runtimeScene, ramp, lowEnd, destinationZ = 470) => {
+      const centerX = ramp.getCenterXInScene();
+      const centerY = ramp.getCenterYInScene();
+      const character = addCharacter(runtimeScene);
+      character.setPosition(centerX + lowEnd.x, centerY + lowEnd.y);
+      character.setZ(240);
+      stepOneSecond(runtimeScene);
+      getCharacterBehavior(character).moveTo(
+        centerX - lowEnd.x,
+        centerY - lowEnd.y,
+        destinationZ
+      );
+      expect(getCharacterBehavior(character).pathFound()).to.be(true);
+      const zs = [character.getZ()];
+      stepUntilDestinationIsReached(runtimeScene, character, () => {
+        zs.push(character.getZ());
+      });
+      expect(getCharacterBehavior(character).destinationReached()).to.be(true);
+      return zs;
+    };
+
+    /**
+     * The top of the ramp goes from Z = 195 to Z = 498 along its 800 pixels:
+     * it's at about 233 and 461 at 300 pixels from its center.
+     * @param {Array<number>} zs
+     */
+    const expectToFollowRampSlope = (zs) => {
+      expect(zs[0]).to.be.within(213, 263);
+      expect(zs[zs.length - 1]).to.be.within(441, 491);
+      for (let index = 1; index < zs.length; index++) {
+        // The character never goes down, nor jumps up.
+        expect(zs[index] - zs[index - 1]).to.be.within(-2, 10);
+      }
+    };
+
+    it('walks on the triangles of the model with the "Mesh" shape', async function () {
+      const { runtimeScene, ramp, model3DManager } =
+        await createSceneWithRamp('Mesh');
+      ramp.setPosition(1000, 1000);
+      expectToFollowRampSlope(walkUpRamp(runtimeScene, ramp, { x: 300, y: 0 }));
+      runtimeScene.unloadScene();
+      model3DManager.dispose();
+    });
+
+    it('rotates the triangles of the model with the object', async function () {
+      const { runtimeScene, ramp, model3DManager } =
+        await createSceneWithRamp('Mesh');
+      ramp.setPosition(1000, 1000);
+      ramp.setAngle(90);
+      expectToFollowRampSlope(walkUpRamp(runtimeScene, ramp, { x: 0, y: 300 }));
+      runtimeScene.unloadScene();
+      model3DManager.dispose();
+    });
+
+    it('keeps the triangles of a flipped model walkable', async function () {
+      const { runtimeScene, ramp, model3DManager } =
+        await createSceneWithRamp('Mesh');
+      ramp.setPosition(1000, 1000);
+      ramp.flipX(true);
+      expectToFollowRampSlope(
+        walkUpRamp(runtimeScene, ramp, { x: -300, y: 0 })
+      );
+      runtimeScene.unloadScene();
+      model3DManager.dispose();
+    });
+
+    it('walks on the box of the model with the "Box" shape', async function () {
+      const { runtimeScene, ramp, model3DManager } =
+        await createSceneWithRamp('Box');
+      ramp.setPosition(1000, 1000);
+      const zs = walkUpRamp(runtimeScene, ramp, { x: 300, y: 0 }, 240);
+      // The top of the box is flat.
+      expect(Math.max(...zs) - Math.min(...zs)).to.be.below(1);
+      runtimeScene.unloadScene();
+      model3DManager.dispose();
     });
   });
 

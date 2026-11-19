@@ -1085,21 +1085,22 @@ namespace gdjs {
     instance: gdjs.RuntimeObject,
     unrotatedAABB: AABB3D
   ): AABB3D => {
-    const minX = instance.getDrawableX();
-    const minY = runtimeObjectHelper.getObjectDrawableY(instance);
-    const maxX = minX + runtimeObjectHelper.getObjectWidth(instance);
-    const maxY = minY + runtimeObjectHelper.getObjectHeight(instance);
+    const x0 = instance.getDrawableX();
+    const y0 = runtimeObjectHelper.getObjectDrawableY(instance);
+    const x1 = x0 + runtimeObjectHelper.getObjectWidth(instance);
+    const y1 = y0 + runtimeObjectHelper.getObjectHeight(instance);
     let minZ = 0;
     let maxZ = 0;
     if (is3D(instance)) {
       minZ = instance.getDrawableZ ? instance.getDrawableZ() : instance.getZ();
       maxZ = minZ + instance.getDepth();
     }
-    unrotatedAABB.min[0] = minX;
-    unrotatedAABB.min[1] = minY;
+    // Flipped Spine and shape painter objects have a negative size.
+    unrotatedAABB.min[0] = Math.min(x0, x1);
+    unrotatedAABB.min[1] = Math.min(y0, y1);
     unrotatedAABB.min[2] = minZ;
-    unrotatedAABB.max[0] = maxX;
-    unrotatedAABB.max[1] = maxY;
+    unrotatedAABB.max[0] = Math.max(x0, x1);
+    unrotatedAABB.max[1] = Math.max(y0, y1);
     unrotatedAABB.max[2] = maxZ;
     return unrotatedAABB;
   };
@@ -1109,10 +1110,10 @@ namespace gdjs {
     bounds: AABB3D
   ): AABB3D => {
     const angle = (instance.getAngle() * Math.PI) / 180;
-    //@ts-ignore
-    const isFlippedX = instance.isFlippedX && instance.isFlippedX();
-    //@ts-ignore
-    const isFlippedY = instance.isFlippedY && instance.isFlippedY();
+    // 2D objects already give their flipped position with getDrawableX/Y.
+    // 3D models don't, but they are mirrored around their center point.
+    const isFlippedX = is3D(instance) && instance.isFlippedX();
+    const isFlippedY = is3D(instance) && instance.isFlippedY();
     const unrotatedAABB = getUnrotatedInstanceAABB(instance, bounds);
     if (angle === 0 && !isFlippedX && !isFlippedY) {
       return unrotatedAABB;

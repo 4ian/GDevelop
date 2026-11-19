@@ -91,6 +91,74 @@ describe('gdjs.InputManager', () => {
     inputManager.onKeyReleased(17);
   });
 
+  it('should ignore a numpad location that is contradicted by the code', () => {
+    // Safari on macOS reports the arrow keys with a numpad location, because macOS
+    // sets the "numeric pad" modifier flag for them.
+    inputManager.onKeyPressed(38, 3, 'ArrowUp');
+    expect(inputManager.getLastPressedKey()).to.be(38);
+    expect(inputManager.isKeyPressed(38)).to.be(true);
+    expect(inputManager.isKeyPressed(3038)).to.be(false);
+    inputManager.onKeyReleased(38, 3, 'ArrowUp');
+    expect(inputManager.wasKeyReleased(38)).to.be(true);
+    expect(inputManager.wasKeyReleased(3038)).to.be(false);
+    inputManager.onFrameEnded();
+
+    // A numpad key with NumLock off keeps its numpad location.
+    inputManager.onKeyPressed(38, 3, 'Numpad8');
+    expect(inputManager.getLastPressedKey()).to.be(3038);
+    expect(inputManager.isKeyPressed(3038)).to.be(true);
+    expect(inputManager.isKeyPressed(38)).to.be(false);
+    inputManager.onKeyReleased(38, 3, 'Numpad8');
+    expect(inputManager.wasKeyReleased(3038)).to.be(true);
+    inputManager.onFrameEnded();
+
+    // Without a code, the location is trusted as before.
+    inputManager.onKeyPressed(38, 3);
+    expect(inputManager.getLastPressedKey()).to.be(3038);
+    inputManager.onKeyReleased(38, 3);
+  });
+
+  it('should release the held keys and mouse buttons when the game loses the focus', () => {
+    // A key that was already pressed and released before losing the focus.
+    inputManager.onKeyPressed(65, 0, 'KeyA');
+    inputManager.onKeyReleased(65, 0, 'KeyA');
+    inputManager.onFrameEnded();
+
+    // Keys and mouse buttons still held down when the focus is lost.
+    inputManager.onKeyPressed(87, 0, 'KeyW');
+    inputManager.onKeyPressed(16, 1, 'ShiftLeft');
+    inputManager.onMouseButtonPressed(gdjs.InputManager.MOUSE_LEFT_BUTTON);
+    expect(inputManager.isKeyPressed(87)).to.be(true);
+    expect(inputManager.isKeyPressed(1016)).to.be(true);
+    expect(
+      inputManager.isMouseButtonPressed(gdjs.InputManager.MOUSE_LEFT_BUTTON)
+    ).to.be(true);
+    inputManager.onFrameEnded();
+
+    inputManager.releaseAllPressedKeys();
+    inputManager.releaseAllPressedMouseButtons();
+    expect(inputManager.isKeyPressed(87)).to.be(false);
+    expect(inputManager.isKeyPressed(1016)).to.be(false);
+    expect(inputManager.wasKeyReleased(87)).to.be(true);
+    expect(inputManager.wasKeyReleased(1016)).to.be(true);
+    expect(inputManager.anyKeyPressed()).to.be(false);
+    expect(
+      inputManager.isMouseButtonPressed(gdjs.InputManager.MOUSE_LEFT_BUTTON)
+    ).to.be(false);
+    expect(
+      inputManager.isMouseButtonReleased(gdjs.InputManager.MOUSE_LEFT_BUTTON)
+    ).to.be(true);
+    expect(inputManager.anyMouseButtonPressed()).to.be(false);
+    // The touch simulated by the left button must have ended too.
+    expect(
+      inputManager.hasTouchEnded(gdjs.InputManager.MOUSE_TOUCH_ID)
+    ).to.be(true);
+
+    // The key released before the focus loss must not be released a second time.
+    expect(inputManager.wasKeyReleased(65)).to.be(false);
+    inputManager.onFrameEnded();
+  });
+
   it('should handle mouse events', () => {
     inputManager.onMouseMove(500, 600);
     expect(inputManager.getCursorX()).to.be(500);

@@ -65,11 +65,8 @@ void EventsFunctionsContainer::AddMissingFunctionsInRootFolder() {
           groupSource = &GetEventsFunction(getterName);
         }
       }
-      const gd::String &group = groupSource->GetGroup();
-      // TODO Handle sub-folders
-      auto &folder = !group.empty() ? rootFolder->GetOrCreateChildFolder(group)
-                                    : *rootFolder;
-      folder.InsertFunction(&function);
+      rootFolder->GetOrCreateFolderAtGroupPath(groupSource->GetGroup())
+          .InsertFunction(&function);
       // The function is now in the folders (unless the root is not a folder,
       // which only happens with an invalid serialized folder structure).
       if (rootFolder->IsFolder())

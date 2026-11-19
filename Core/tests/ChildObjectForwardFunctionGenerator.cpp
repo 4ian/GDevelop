@@ -86,6 +86,49 @@ TEST_CASE("ChildObjectForwardFunctionGenerator", "[common]") {
     REQUIRE(action.GetParameter(2).GetPlainString() == "MyNumberParameter");
   }
 
+  SECTION("Puts the generated functions in the folders of the child functions") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &extension =
+        project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
+    auto &parentEventsBasedObject = extension.GetEventsBasedObjects().InsertNew(
+        "MyParentEventsBasedObject", 0);
+    auto &childEventsBasedObject = extension.GetEventsBasedObjects().InsertNew(
+        "MyChildEventsBasedObject", 0);
+    parentEventsBasedObject.GetObjects().InsertNewObject(
+        project, "MyEventsExtension::MyChildEventsBasedObject", "MyChildObject",
+        0);
+
+    auto &childFunctions = childEventsBasedObject.GetEventsFunctions();
+    auto &childFunction = childFunctions.InsertNewEventsFunction("MyFunction", 0);
+    childFunction.SetFunctionType(gd::EventsFunction::FunctionType::Action);
+    childFunctions.GetRootFolder().MoveFunctionFolderOrFunctionToAnotherFolder(
+        childFunctions.GetRootFolder().GetFunctionNamed("MyFunction"),
+        childFunctions.GetRootFolder().GetOrCreateFolderAtGroupPath(
+            "Folder/Sub-folder"),
+        0);
+    REQUIRE(childFunction.GetGroup() == "Folder/Sub-folder");
+
+    gd::ChildObjectForwardFunctionGenerator::
+        GenerateChildObjectForwardFunctions(
+            project, extension, parentEventsBasedObject, "MyChildObject");
+
+    auto &parentRootFolder =
+        parentEventsBasedObject.GetEventsFunctions().GetRootFolder();
+    REQUIRE(parentRootFolder.GetChildrenCount() == 1);
+    auto &folder = parentRootFolder.GetChildAt(0);
+    REQUIRE(folder.GetFolderName() == "Folder");
+    REQUIRE(folder.GetChildrenCount() == 1);
+    auto &subFolder = folder.GetChildAt(0);
+    REQUIRE(subFolder.GetFolderName() == "Sub-folder");
+    REQUIRE(subFolder.GetChildrenCount() == 1);
+    REQUIRE(subFolder.GetChildAt(0).GetFunction().GetName() == "MyFunction");
+    REQUIRE(parentEventsBasedObject.GetEventsFunctions()
+                .GetEventsFunction("MyFunction")
+                .GetGroup() == "Folder/Sub-folder");
+  }
+
   SECTION("Can generate a function to forward a condition") {
     gd::Platform platform;
     gd::Project project;

@@ -3,7 +3,7 @@ import * as React from 'react';
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import PixiResourcesLoader from '../../../ObjectsRendering/PixiResourcesLoader';
-import { type PBRMaterialSettings } from './pbrConfig';
+import { type PBRMaterialSettings, type PBRUvTransform } from './pbrConfig';
 
 type Props = {|
   project: gdProject,
@@ -30,7 +30,10 @@ const textureSlots = [
  * Return a clone of the texture with the UV transform applied (or the texture
  * itself when the transform is the identity).
  */
-const applyUvTransform = (texture, transform) => {
+const applyUvTransform = (
+  texture: ?THREE.Texture,
+  transform: ?PBRUvTransform
+): ?THREE.Texture => {
   if (!texture || !transform) return texture;
   const repeatX = transform.repeatX === undefined ? 1 : transform.repeatX;
   const repeatY = transform.repeatY === undefined ? 1 : transform.repeatY;
@@ -60,7 +63,10 @@ const applyUvTransform = (texture, transform) => {
 /**
  * Merge the global UV transform of the settings with the one of a slot.
  */
-const getSlotUvTransform = (settings, slotName) => {
+const getSlotUvTransform = (
+  settings: PBRMaterialSettings,
+  slotName: string
+): ?PBRUvTransform => {
   const globalTransform = settings.uvTransform;
   const slotTransform =
     settings.slotUvTransforms && settings.slotUvTransforms[slotName];

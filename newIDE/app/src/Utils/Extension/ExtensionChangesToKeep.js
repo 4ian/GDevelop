@@ -607,6 +607,9 @@ export const getExtensionReferenceProblems = (
  */
 export type ExtensionItemChange = 'added' | 'removed' | 'modified';
 
+/** The value of a field of a part of an extension (null when not set). */
+export type ExtensionFieldValue = string | number | boolean | null;
+
 export type ExtensionMemberChangeDetails = {|
   /** The name shown to users: the full name, if any. */
   displayName: string,
@@ -615,8 +618,8 @@ export type ExtensionMemberChangeDetails = {|
   /** Fields holding a text, a number or a boolean that are different. */
   fieldChanges: Array<{|
     field: string,
-    projectValue: string,
-    newVersionValue: string,
+    projectValue: ExtensionFieldValue,
+    newVersionValue: ExtensionFieldValue,
   |}>,
   /** Parameters, properties, functions, children or variables that differ. */
   itemChanges: Array<{|
@@ -673,8 +676,8 @@ const countEvents = (events: ?Array<SerializedContent>): number =>
     0
   );
 
-const formatFieldValue = (value: any): string =>
-  value === undefined || value === null ? '' : String(value);
+const getFieldValue = (value: any): ExtensionFieldValue =>
+  value === undefined ? null : value;
 
 const isFieldValue = (value: any): boolean =>
   value === undefined ||
@@ -732,8 +735,8 @@ export const getExtensionMemberChangeDetails = (
     ) {
       details.fieldChanges.push({
         field,
-        projectValue: formatFieldValue(projectValue),
-        newVersionValue: formatFieldValue(newVersionValue),
+        projectValue: getFieldValue(projectValue),
+        newVersionValue: getFieldValue(newVersionValue),
       });
     }
   }

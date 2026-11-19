@@ -5,6 +5,7 @@ import * as React from 'react';
 import NamedItemsDiff from '../../../UI/Diff/NamedItemsDiff';
 import ValueDiff from '../../../UI/Diff/ValueDiff';
 import Text from '../../../UI/Text';
+import { IconContainer } from '../../../UI/IconContainer';
 import {
   type ExtensionMemberChangeDetails,
   type ExtensionMemberDifference,
@@ -13,6 +14,8 @@ import {
 import {
   getDifferentPartLabel,
   getFieldLabel,
+  getFieldValueLabel,
+  isImageField,
 } from './ExtensionChangesToKeepLabels';
 import classes from './ExtensionChangesToKeep.module.css';
 
@@ -89,25 +92,45 @@ const ExtensionMemberChanges = ({ difference, details }: Props): React.Node => {
               )}
             </ChangeSection>
           )}
-          {details.fieldChanges.map(fieldChange => (
-            <ChangeSection
-              key={fieldChange.field}
-              label={getFieldLabel(i18n, fieldChange.field)}
-            >
-              <ValueDiff
-                layout={
-                  fieldChange.projectValue.length +
-                    fieldChange.newVersionValue.length >
-                  60
-                    ? 'stacked'
-                    : 'inline'
-                }
-                oldValue={fieldChange.projectValue}
-                newValue={fieldChange.newVersionValue}
-                emptyValueLabel={<Trans>Empty</Trans>}
-              />
-            </ChangeSection>
-          ))}
+          {details.fieldChanges.map(
+            ({ field, projectValue, newVersionValue }) => {
+              const oldValueLabel = getFieldValueLabel(
+                i18n,
+                field,
+                projectValue
+              );
+              const newValueLabel = getFieldValueLabel(
+                i18n,
+                field,
+                newVersionValue
+              );
+              const renderImage = (url: string) =>
+                url ? <IconContainer src={url} alt="" size={32} /> : '';
+              return (
+                <ChangeSection key={field} label={getFieldLabel(i18n, field)}>
+                  {isImageField(field) ? (
+                    <ValueDiff
+                      layout="inline"
+                      oldValue={renderImage(oldValueLabel)}
+                      newValue={renderImage(newValueLabel)}
+                      emptyValueLabel={<Trans>Not set</Trans>}
+                    />
+                  ) : (
+                    <ValueDiff
+                      layout={
+                        oldValueLabel.length + newValueLabel.length > 60
+                          ? 'stacked'
+                          : 'inline'
+                      }
+                      oldValue={oldValueLabel}
+                      newValue={newValueLabel}
+                      emptyValueLabel={<Trans>Not set</Trans>}
+                    />
+                  )}
+                </ChangeSection>
+              );
+            }
+          )}
         </div>
       )}
     </I18n>

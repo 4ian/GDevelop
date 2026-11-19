@@ -9,6 +9,7 @@ type FakeFunctionOptions = {|
   parameterNames?: Array<string>,
   calledInstructionTypes?: Array<string>,
   eventsCount?: number,
+  isPrivate?: boolean,
 |};
 
 const createFunction = ({
@@ -19,8 +20,10 @@ const createFunction = ({
   parameterNames = [],
   calledInstructionTypes = [],
   eventsCount = 1,
+  isPrivate,
 }: FakeFunctionOptions) => ({
   name,
+  private: isPrivate,
   fullName,
   functionType,
   sentence,
@@ -54,6 +57,7 @@ const createChild = (name: string, type: string = 'Sprite') => ({
 
 const createLeaderboardExtension = ({
   version,
+  previewIconUrl,
   description,
   functions,
   dialogFunctions,
@@ -62,6 +66,7 @@ const createLeaderboardExtension = ({
   globalVariableNames,
 }: {|
   version: string,
+  previewIconUrl: string,
   description: string,
   functions: Array<any>,
   dialogFunctions: Array<any>,
@@ -72,6 +77,7 @@ const createLeaderboardExtension = ({
   name: 'LeaderboardDialog',
   fullName: 'Leaderboard dialog',
   version,
+  previewIconUrl,
   description,
   author: 'GDevelop',
   globalVariables: globalVariableNames.map(name => ({
@@ -114,6 +120,7 @@ const createLeaderboardExtension = ({
 export const leaderboardProjectExtension: SerializedExtension = createLeaderboardExtension(
   {
     version: '1.0.0',
+    previewIconUrl: 'res/functions/extension_black.svg',
     description: 'A dialog to submit scores.',
     globalVariableNames: ['BestScore', 'StudioTheme'],
     functions: [
@@ -164,6 +171,7 @@ export const leaderboardProjectExtension: SerializedExtension = createLeaderboar
 export const leaderboardNewExtension: SerializedExtension = createLeaderboardExtension(
   {
     version: '1.1.0',
+    previewIconUrl: 'res/functions/object2d_black.svg',
     description:
       'A dialog to submit scores to a leaderboard, with the name of the player and a medal for the best scores.',
     globalVariableNames: ['BestScore', 'MedalThreshold'],
@@ -186,7 +194,8 @@ export const leaderboardNewExtension: SerializedExtension = createLeaderboardExt
       createFunction({
         name: 'IsSubmitted',
         fullName: 'Score is submitted',
-        functionType: 'Condition',
+        functionType: 'ExpressionAndCondition',
+        isPrivate: true,
       }),
       createFunction({
         name: 'HasMedal',

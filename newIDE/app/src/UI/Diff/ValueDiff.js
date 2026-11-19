@@ -5,8 +5,10 @@ import DiffSign from './DiffSign';
 import classes from './Diff.module.css';
 
 type Props = {|
-  oldValue: string,
-  newValue: string,
+  /** The old value: a text, or any element (like an image). */
+  oldValue: React.Node,
+  /** The new value: a text, or any element (like an image). */
+  newValue: React.Node,
   /** Text shown for an empty value. */
   emptyValueLabel?: React.Node,
   /**
@@ -24,19 +26,22 @@ const ValueDiff = ({
   layout,
 }: Props): React.Node => {
   const isInline = layout === 'inline';
-  const renderValue = (value: string, change: 'removed' | 'added') => (
-    <div className={classNames(classes.value, classes[change])}>
-      {!isInline && <DiffSign change={change} />}
-      <span
-        className={classNames({
-          [classes.valueText]: true,
-          [classes.emptyValue]: !value,
-        })}
-      >
-        {value || emptyValueLabel || '—'}
-      </span>
-    </div>
-  );
+  const renderValue = (value: React.Node, change: 'removed' | 'added') => {
+    const isEmpty = value === '' || value === null || value === undefined;
+    return (
+      <div className={classNames(classes.value, classes[change])}>
+        {!isInline && <DiffSign change={change} />}
+        <span
+          className={classNames({
+            [classes.valueText]: true,
+            [classes.emptyValue]: isEmpty,
+          })}
+        >
+          {isEmpty ? emptyValueLabel || '—' : value}
+        </span>
+      </div>
+    );
+  };
   return (
     <div
       className={classNames({

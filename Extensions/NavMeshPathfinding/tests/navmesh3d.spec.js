@@ -705,6 +705,32 @@ describe('gdjs.NavMeshObstacleRuntimeBehavior (3D)', function () {
       );
     });
 
+    it('builds at most one tile per frame, and 40 per second, when many obstacles move', function () {
+      const runtimeScene = createScene();
+      addGround(runtimeScene);
+      const walls = [];
+      for (let index = 0; index < 8; index++) {
+        const wall = addWall(runtimeScene);
+        wall.setHeight(40);
+        wall.setPosition(100 + index * 100, 100 + index * 100);
+        walls.push(wall);
+      }
+      const character = addCharacter(runtimeScene);
+      character.setPosition(100, 900);
+      stepOneSecond(runtimeScene);
+      buildTileSpy.resetHistory();
+
+      for (let stepIndex = 0; stepIndex < 60; stepIndex++) {
+        for (const wall of walls) {
+          wall.setX(wall.getX() + (stepIndex % 2 ? 20 : -20));
+        }
+        const tilesCount = buildTileSpy.callCount;
+        runtimeScene.renderAndStep(1000 / 60);
+        expect(buildTileSpy.callCount - tilesCount).to.be.below(2);
+      }
+      expect(buildTileSpy.callCount).to.be.within(20, 40);
+    });
+
     it('finds shorter paths when an obstacle is deleted', function () {
       const runtimeScene = createScene();
       addGround(runtimeScene);

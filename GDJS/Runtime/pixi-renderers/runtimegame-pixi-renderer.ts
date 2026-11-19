@@ -26,6 +26,17 @@ namespace gdjs {
       ? true
       : false;
 
+  // PixiJS splits every measured text in graphemes (using `Intl.Segmenter`,
+  // which is slow), even without letter spacing. Printable ASCII and Latin-1
+  // characters never combine into a grapheme, so a text made only of them is
+  // split directly.
+  const pixiGraphemeSegmenter = PIXI.TextMetrics.graphemeSegmenter;
+  const printableLatin1TextRegex = /^[\x20-\x7e\xa0-\xff]*$/;
+  PIXI.TextMetrics.graphemeSegmenter = (text: string) =>
+    printableLatin1TextRegex.test(text)
+      ? text.split('')
+      : pixiGraphemeSegmenter(text);
+
   /**
    * The renderer for a gdjs.RuntimeGame using Pixi.js.
    * @category Renderers > Game

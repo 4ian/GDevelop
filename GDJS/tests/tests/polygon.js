@@ -45,4 +45,15 @@ describe('gdjs.Polygon', function() {
 		expect(result.collision).to.eql(true);
 		expect(result.move_axis).to.eql([-2, 0]);
 	});
+	it('can check for collisions separated only by the last edge of a polygon', function(){
+		// Only the edge from the last vertex to the first one of the triangle
+		// separates them.
+		var triangle = new gdjs.Polygon();
+		triangle.vertices.push([0, 0], [10, 0], [0, 10]);
+		var diamond = new gdjs.Polygon();
+		diamond.vertices.push([-6, 0], [-1, 5], [-6, 10], [-11, 5]);
+
+		expect(gdjs.Polygon.collisionTest(triangle, diamond, false).collision).to.be(false);
+		expect(gdjs.Polygon.collisionTest(diamond, triangle, false).collision).to.be(false);
+	});
 });

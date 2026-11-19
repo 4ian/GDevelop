@@ -520,3 +520,79 @@ TEST_CASE("EventsBasedObjectVariantHelper", "[common]") {
             false);
   }
 }
+
+TEST_CASE("EventsBasedObjectVariantHelper (FindAllChildrenCustomObjectType)",
+          "[common]") {
+  SECTION("Can find the types of children custom objects at every level") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension =
+        project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
+
+    auto &grandChildEventsBasedObject =
+        eventsExtension.GetEventsBasedObjects().InsertNew(
+            "MyGrandChildEventsBasedObject", 0);
+    grandChildEventsBasedObject.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MySprite", 0);
+
+    auto &childEventsBasedObject =
+        eventsExtension.GetEventsBasedObjects().InsertNew(
+            "MyChildEventsBasedObject", 1);
+    childEventsBasedObject.GetObjects().InsertNewObject(
+        project, "MyEventsExtension::MyGrandChildEventsBasedObject",
+        "MyGrandChildObject", 0);
+
+    auto &eventsBasedObject = eventsExtension.GetEventsBasedObjects().InsertNew(
+        "MyEventsBasedObject", 2);
+    eventsBasedObject.GetObjects().InsertNewObject(
+        project, "MyEventsExtension::MyChildEventsBasedObject", "MyChildObject",
+        0);
+    eventsBasedObject.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MySprite", 1);
+
+    auto objectTypes =
+        gd::EventsBasedObjectVariantHelper::FindAllChildrenCustomObjectType(
+            project, eventsBasedObject);
+
+    REQUIRE(objectTypes.size() == 2);
+    REQUIRE(std::find(objectTypes.begin(), objectTypes.end(),
+                      "MyEventsExtension::MyChildEventsBasedObject") !=
+            objectTypes.end());
+    REQUIRE(std::find(objectTypes.begin(), objectTypes.end(),
+                      "MyEventsExtension::MyGrandChildEventsBasedObject") !=
+            objectTypes.end());
+  }
+
+  SECTION("Can handle cyclic dependencies between custom objects") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension =
+        project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
+
+    auto &eventsBasedObjectA =
+        eventsExtension.GetEventsBasedObjects().InsertNew(
+            "MyEventsBasedObjectA", 0);
+    auto &eventsBasedObjectB =
+        eventsExtension.GetEventsBasedObjects().InsertNew(
+            "MyEventsBasedObjectB", 1);
+    // This is an invalid project, but it must not make the helper loop forever.
+    eventsBasedObjectA.GetObjects().InsertNewObject(
+        project, "MyEventsExtension::MyEventsBasedObjectB", "MyObjectB", 0);
+    eventsBasedObjectB.GetObjects().InsertNewObject(
+        project, "MyEventsExtension::MyEventsBasedObjectA", "MyObjectA", 0);
+
+    auto objectTypes =
+        gd::EventsBasedObjectVariantHelper::FindAllChildrenCustomObjectType(
+            project, eventsBasedObjectA);
+
+    REQUIRE(objectTypes.size() == 2);
+    REQUIRE(std::find(objectTypes.begin(), objectTypes.end(),
+                      "MyEventsExtension::MyEventsBasedObjectB") !=
+            objectTypes.end());
+    REQUIRE(std::find(objectTypes.begin(), objectTypes.end(),
+                      "MyEventsExtension::MyEventsBasedObjectA") !=
+            objectTypes.end());
+  }
+}

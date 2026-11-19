@@ -284,6 +284,7 @@ type State = {|
   exportedObjects: ?{|
     packName: string,
     objectFolderOrObjects: Array<gdObjectFolderOrObject>,
+    shouldSkipObjectsUnsupportedByTheAssetStore: boolean,
   |},
   isAssetImporterDialogOpen: boolean,
   editedObjectWithContext: ?ObjectWithContext,
@@ -1066,6 +1067,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           objectFolderOrObjects: mapFor(0, rootFolder.getChildrenCount(), i =>
             rootFolder.getChildAt(i)
           ),
+          shouldSkipObjectsUnsupportedByTheAssetStore: true,
         },
       });
       return;
@@ -1083,6 +1085,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             ? layout.getName()
             : 'Objects',
         objectFolderOrObjects,
+        shouldSkipObjectsUnsupportedByTheAssetStore: false,
       },
     });
   };
@@ -3572,6 +3575,10 @@ export default class SceneEditor extends React.Component<Props, State> {
                       packName={this.state.exportedObjects.packName}
                       objectFolderOrObjects={
                         this.state.exportedObjects.objectFolderOrObjects
+                      }
+                      shouldSkipObjectsUnsupportedByTheAssetStore={
+                        this.state.exportedObjects
+                          .shouldSkipObjectsUnsupportedByTheAssetStore
                       }
                       onClose={this.closeObjectExporterDialog}
                     />

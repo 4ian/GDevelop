@@ -14,24 +14,30 @@ export default {
   component: ObjectExporterDialog,
 };
 
-const rootFolder = testProject.testLayout.getObjects().getRootFolder();
+export const AllObjectsOfAScene = (): React.Node => {
+  const rootFolder = testProject.testLayout.getObjects().getRootFolder();
+  return (
+    <ObjectExporterDialog
+      project={testProject.project}
+      packName={testProject.testLayout.getName()}
+      objectFolderOrObjects={mapFor(0, rootFolder.getChildrenCount(), i =>
+        rootFolder.getChildAt(i)
+      )}
+      shouldSkipObjectsUnsupportedByTheAssetStore
+      onClose={() => action('Close the dialog')}
+    />
+  );
+};
 
-export const AllObjectsOfAScene = (): React.Node => (
-  <ObjectExporterDialog
-    project={testProject.project}
-    packName={testProject.testLayout.getName()}
-    objectFolderOrObjects={mapFor(0, rootFolder.getChildrenCount(), i =>
-      rootFolder.getChildAt(i)
-    )}
-    onClose={() => action('Close the dialog')}
-  />
-);
-
-export const OneObject = (): React.Node => (
-  <ObjectExporterDialog
-    project={testProject.project}
-    packName="MySpriteObject"
-    objectFolderOrObjects={[rootFolder.getObjectNamed('MySpriteObject')]}
-    onClose={() => action('Close the dialog')}
-  />
-);
+export const OneObject = (): React.Node => {
+  const rootFolder = testProject.testLayout.getObjects().getRootFolder();
+  return (
+    <ObjectExporterDialog
+      project={testProject.project}
+      packName="MySpriteObject"
+      objectFolderOrObjects={[rootFolder.getObjectNamed('MySpriteObject')]}
+      shouldSkipObjectsUnsupportedByTheAssetStore={false}
+      onClose={() => action('Close the dialog')}
+    />
+  );
+};

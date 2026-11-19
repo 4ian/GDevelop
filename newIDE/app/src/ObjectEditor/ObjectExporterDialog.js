@@ -8,6 +8,7 @@ import { Column } from '../UI/Grid';
 import { ColumnStackLayout } from '../UI/Layout';
 import RaisedButton from '../UI/RaisedButton';
 import Text from '../UI/Text';
+import AlertMessage from '../UI/AlertMessage';
 import { mapFor } from '../Utils/MapFor';
 import Upload from '../UI/CustomSvgIcons/Upload';
 import {
@@ -35,7 +36,7 @@ import { getIDEVersion } from '../Version';
 
 const gd: libGDevelop = global.gd;
 
-const excludedObjectType = [
+const objectTypesUnsupportedByTheAssetStore = [
   'BBText::BBText',
   'Lighting::LightObject',
   'PrimitiveDrawing::Drawer',
@@ -263,6 +264,11 @@ type Props = {|
    * their content, and the folder structure is kept in the pack.
    */
   objectFolderOrObjects: Array<gdObjectFolderOrObject>,
+  /**
+   * Skip the objects that can't be submitted to the asset store, when all the
+   * objects of a scene are exported.
+   */
+  shouldSkipObjectsUnsupportedByTheAssetStore: boolean,
   onClose: () => void,
 |};
 
@@ -270,8 +276,35 @@ const ObjectExporterDialog = ({
   project,
   packName,
   objectFolderOrObjects,
+  shouldSkipObjectsUnsupportedByTheAssetStore,
   onClose,
 }: Props): React.Node => {
+  const { exportedObjects, skippedObjects } = React.useMemo<{|
+    exportedObjects: Array<EnumeratedObject>,
+    skippedObjects: Array<EnumeratedObject>,
+  |}>(
+    () => {
+      const enumeratedObjects: Array<EnumeratedObject> = [];
+      for (const objectFolderOrObject of objectFolderOrObjects) {
+        enumerateAllObjects(objectFolderOrObject, '', enumeratedObjects);
+      }
+      if (!shouldSkipObjectsUnsupportedByTheAssetStore) {
+        return { exportedObjects: enumeratedObjects, skippedObjects: [] };
+      }
+      const isSupportedByTheAssetStore = ({ object }: EnumeratedObject) =>
+        !objectTypesUnsupportedByTheAssetStore.includes(object.getType());
+      return {
+        exportedObjects: enumeratedObjects.filter(isSupportedByTheAssetStore),
+        skippedObjects: enumeratedObjects.filter(
+          enumeratedObject => !isSupportedByTheAssetStore(enumeratedObject)
+        ),
+      };
+    },
+    [objectFolderOrObjects, shouldSkipObjectsUnsupportedByTheAssetStore]
+  );
+  const skippedObjectNames = skippedObjects
+    .map(({ object }) => object.getName())
+    .join(', ');
   const [
     zippedSceneAssetsBlob,
     setZippedSceneAssetsBlob,
@@ -294,16 +327,9 @@ const ObjectExporterDialog = ({
       (async () => {
         setZippedSceneAssetsBlob(null);
 
-        const enumeratedObjects: Array<EnumeratedObject> = [];
-        for (const objectFolderOrObject of objectFolderOrObjects) {
-          enumerateAllObjects(objectFolderOrObject, '', enumeratedObjects);
-        }
-        enumeratedObjects.filter(
-          ({ object }) => !excludedObjectType.includes(object.getType())
-        );
         const zippedLayerAssetsBlob = await zipAssets(
           project,
-          enumeratedObjects,
+          exportedObjects,
           ensureDownloadResourcesAsBlobsIsDone
         );
         setZippedSceneAssetsBlob(zippedLayerAssetsBlob);
@@ -313,7 +339,7 @@ const ObjectExporterDialog = ({
         setZippedSceneAssetsBlob(null);
       };
     },
-    [project, ensureDownloadResourcesAsBlobsIsDone, objectFolderOrObjects]
+    [project, ensureDownloadResourcesAsBlobsIsDone, exportedObjects]
   );
 
   return (
@@ -351,6 +377,15 @@ const ObjectExporterDialog = ({
             documentation.
           </Trans>
         </Text>
+        {skippedObjects.length > 0 && (
+          <AlertMessage kind="info">
+            <Trans>
+              These objects are not exported because the asset store doesn't
+              support them: {skippedObjectNames}. Export them individually to
+              include them in a pack.
+            </Trans>
+          </AlertMessage>
+        )}
         <Column alignItems="center">
           {zippedSceneAssetsBlob ? (
             <BlobDownloadUrlHolder blob={zippedSceneAssetsBlob}>

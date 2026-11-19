@@ -909,13 +909,12 @@ const ObjectImporterDialog = ({
       const replacingVariantsByObjectType = new Map<string, Map<string, any>>();
       for (const [
         objectType,
-        { variantUpdates: conflictedVariants },
+        variantsUpdate,
       ] of conflictedVariantsByObjectType) {
-        const replacingVariants = new Map<string, any>();
-        for (const [variantName, { variant }] of conflictedVariants) {
-          replacingVariants.set(variantName, variant);
-        }
-        replacingVariantsByObjectType.set(objectType, replacingVariants);
+        replacingVariantsByObjectType.set(
+          objectType,
+          variantsUpdate.getAllSelectedVariants()
+        );
       }
       const replacingExtensionNames = conflictedExtensions
         .filter(({ isSelected }) => isSelected)

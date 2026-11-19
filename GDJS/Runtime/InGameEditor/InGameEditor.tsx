@@ -1382,7 +1382,7 @@ namespace gdjs {
     ) {
       for (const selectedInstance of selectedObjects) {
         if (this.editor.isInstanceLocked(selectedInstance)) {
-          return;
+          continue;
         }
         const initialInstanceOriginPosition =
           this._getOrCreateInstanceOriginPosition(selectedInstance);
@@ -1406,7 +1406,7 @@ namespace gdjs {
     ) {
       for (const selectedInstance of selectedObjects) {
         if (this.editor.isInstanceLocked(selectedInstance)) {
-          return;
+          continue;
         }
         const initialAABB = this._getOrCreateInstanceAABB(selectedInstance);
         const initialCenterX = (initialAABB.min[0] + initialAABB.max[0]) / 2;
@@ -1465,7 +1465,7 @@ namespace gdjs {
 
       for (const selectedInstance of selectedObjects) {
         if (this.editor.isInstanceLocked(selectedInstance)) {
-          return;
+          continue;
         }
         const initialUnrotatedInstanceAABB =
           this._getOrCreateUnrotatedInstanceAABB(selectedInstance);
@@ -4624,7 +4624,11 @@ namespace gdjs {
         let topVisibleLayer: gdjs.RuntimeLayer | null = null;
         let topLayerIndex = 0;
         for (const object of editedInstanceContainer.getAdhocListOfAllInstances()) {
-          if (is3D(object) || !cursorOnObject(object)) {
+          if (
+            is3D(object) ||
+            !cursorOnObject(object) ||
+            !this._isInstanceSelectable(object)
+          ) {
             continue;
           }
           const layer = editedInstanceContainer.getLayer(object.getLayer());
@@ -8377,8 +8381,12 @@ namespace gdjs {
 
       this.updateGrid();
 
-      const selectedObjects = this.editor.getSelectedObjects();
-      if (selectedObjects.length === 0) {
+      const lastEditableSelectedObject = this.editor.getLastSelectedObject({
+        ignoreIf: (object) =>
+          this.editor.isInstanceLocked(object) ||
+          this.editor.isInstanceSealed(object),
+      });
+      if (!lastEditableSelectedObject) {
         this.remove();
         return;
       }
@@ -8665,6 +8673,10 @@ namespace gdjs {
     }
 
     step(editor: InGameEditor) {
+      const movableObjectsOnly = {
+        ignoreIf: (object: gdjs.RuntimeObject) =>
+          editor.isInstanceLocked(object),
+      };
       const currentScene = editor.getCurrentScene();
       if (!currentScene) {
         return;
@@ -8679,15 +8691,13 @@ namespace gdjs {
       if (!threeCamera || !threeScene) {
         return;
       }
-      {
-        const selectionAABB = editor.getSelectionAABB();
-        if (selectionAABB) {
-          this.update(
-            selectionAABB,
-            threeCamera,
-            editor.getRuntimeGame().getGameResolutionHeight()
-          );
-        }
+      const movableSelectionAABB = editor.getSelectionAABB(movableObjectsOnly);
+      if (movableSelectionAABB) {
+        this.update(
+          movableSelectionAABB,
+          threeCamera,
+          editor.getRuntimeGame().getGameResolutionHeight()
+        );
       }
 
       const inputManager = editor.getRuntimeGame().getInputManager();
@@ -8697,7 +8707,7 @@ namespace gdjs {
       let isRotationButtonHovered = false;
       let isAreaHovered = false;
       if (this.state === 'idle') {
-        if (editor.getSelectedObjects().length > 0) {
+        if (movableSelectionAABB) {
           const buttonLocation = this._getButtonUnderCursor(editor);
           if (buttonLocation === ButtonLocation.Rotation) {
             isRotationButtonHovered = true;
@@ -8771,7 +8781,7 @@ namespace gdjs {
         this.state = 'idle';
         this.draggedButtonLocation = null;
         this._hasActuallyMoved = false;
-        const selectionAABB = editor.getSelectionAABB();
+        const selectionAABB = editor.getSelectionAABB(movableObjectsOnly);
         if (!selectionAABB) {
           return;
         }
@@ -9078,7 +9088,7 @@ namespace gdjs {
         );
       }
       {
-        const selectionAABB = editor.getSelectionAABB();
+        const selectionAABB = editor.getSelectionAABB(movableObjectsOnly);
         if (!selectionAABB) {
           return;
         }

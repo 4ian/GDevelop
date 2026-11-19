@@ -12,9 +12,10 @@
   width: 100%;
 }
 
+/* Each segment is as wide as its label, except in full width where the
+segments share the width. */
 .segment {
-  flex: 1;
-  min-width: 0;
+  flex: 0 0 auto;
   height: 28px;
   padding: 0 12px;
   border: 0;
@@ -28,6 +29,11 @@
   white-space: nowrap;
   cursor: pointer;
   transition: background-color 0.1s linear, color 0.1s linear;
+}
+
+.fullWidth .segment {
+  flex: 1;
+  min-width: 0;
 }
 
 .small .segment {

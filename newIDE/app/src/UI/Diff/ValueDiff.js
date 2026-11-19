@@ -28,8 +28,13 @@ const ValueDiff = ({
   const isInline = layout === 'inline';
   const renderValue = (value: React.Node, change: 'removed' | 'added') => {
     const isEmpty = value === '' || value === null || value === undefined;
+    const isText = typeof value === 'string' || typeof value === 'number';
     return (
-      <div className={classNames(classes.value, classes[change])}>
+      <div
+        className={classNames(classes.value, classes[change], {
+          [classes.elementValue]: !isEmpty && !isText,
+        })}
+      >
         {!isInline && <DiffSign change={change} />}
         <span
           className={classNames({

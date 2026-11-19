@@ -103,6 +103,17 @@ of the change (via currentColor). */
   padding: 2px 8px;
 }
 
+/* A value that is not a text (like an image) has the same space on all its
+sides, without the space left below images displayed inline. */
+.value.elementValue {
+  padding: 4px;
+}
+
+.elementValue .valueText {
+  display: flex;
+  line-height: 0;
+}
+
 .emptyValue {
   font-style: italic;
   color: var(--theme-text-secondary-color);

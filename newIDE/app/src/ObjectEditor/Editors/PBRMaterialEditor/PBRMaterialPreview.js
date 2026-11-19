@@ -11,6 +11,11 @@ type Props = {|
   height?: number,
 |};
 
+// Three.js does not expose Flow declarations in this project.
+type ThreeTexture = any;
+type ThreeMaterial = any;
+type ThreeMesh = any;
+
 const isColorTextureSlot = (slotName: string) =>
   slotName === 'baseColor' || slotName === 'emissive';
 
@@ -31,9 +36,9 @@ const textureSlots = [
  * itself when the transform is the identity).
  */
 const applyUvTransform = (
-  texture: ?THREE.Texture,
+  texture: ?ThreeTexture,
   transform: ?PBRUvTransform
-): ?THREE.Texture => {
+): ?ThreeTexture => {
   if (!texture || !transform) return texture;
   const repeatX = transform.repeatX === undefined ? 1 : transform.repeatX;
   const repeatY = transform.repeatY === undefined ? 1 : transform.repeatY;
@@ -70,8 +75,30 @@ const getSlotUvTransform = (
   const globalTransform = settings.uvTransform;
   const slotTransform =
     settings.slotUvTransforms && settings.slotUvTransforms[slotName];
-  if (!globalTransform && !slotTransform) return undefined;
-  return { ...globalTransform, ...slotTransform };
+  if (!globalTransform) return slotTransform;
+  if (!slotTransform) return globalTransform;
+  return {
+    repeatX:
+      slotTransform.repeatX === undefined
+        ? globalTransform.repeatX
+        : slotTransform.repeatX,
+    repeatY:
+      slotTransform.repeatY === undefined
+        ? globalTransform.repeatY
+        : slotTransform.repeatY,
+    offsetX:
+      slotTransform.offsetX === undefined
+        ? globalTransform.offsetX
+        : slotTransform.offsetX,
+    offsetY:
+      slotTransform.offsetY === undefined
+        ? globalTransform.offsetY
+        : slotTransform.offsetY,
+    rotation:
+      slotTransform.rotation === undefined
+        ? globalTransform.rotation
+        : slotTransform.rotation,
+  };
 };
 
 /**
@@ -80,7 +107,7 @@ const getSlotUvTransform = (
 const createMaterial = async (
   project: gdProject,
   settings: PBRMaterialSettings
-): Promise<THREE.Material> => {
+): Promise<ThreeMaterial> => {
   // Neutral values do not need the (slower) physical material, like in the
   // game engine (`settingsNeedPhysicalMaterial`).
   const needsPhysical =
@@ -119,8 +146,9 @@ const createMaterial = async (
     material.emissiveIntensity = settings.emissiveIntensity;
   }
   if (settings.opacity !== undefined) {
-    material.opacity = settings.opacity;
-    material.transparent = settings.opacity < 1;
+    const opacity = settings.opacity;
+    material.opacity = opacity;
+    material.transparent = opacity < 1;
   }
   if (
     settings.normalScale !== undefined ||
@@ -156,8 +184,9 @@ const createMaterial = async (
     const physicalMaterial: any = material;
     if (settings.ior !== undefined) physicalMaterial.ior = settings.ior;
     if (settings.transmission !== undefined) {
-      physicalMaterial.transmission = settings.transmission;
-      if (settings.transmission > 0) material.transparent = true;
+      const transmission = settings.transmission;
+      physicalMaterial.transmission = transmission;
+      if (transmission > 0) material.transparent = true;
     }
     if (settings.clearcoat !== undefined)
       physicalMaterial.clearcoat = settings.clearcoat;
@@ -226,7 +255,7 @@ const getPBRThreeTexture = async (
   project: gdProject,
   resourceName: string,
   isColorData: boolean
-): Promise<THREE.Texture> => {
+): Promise<ThreeTexture> => {
   const texture = await PixiResourcesLoader.getThreeTexture(
     project,
     resourceName
@@ -241,10 +270,14 @@ const getPBRThreeTexture = async (
 /**
  * A live preview of a PBR material, rendered with Three.js on a small canvas.
  */
-const PBRMaterialPreview = ({ project, settings, height = 220 }: Props) => {
+const PBRMaterialPreview = ({
+  project,
+  settings,
+  height = 220,
+}: Props): React.Node => {
   const canvasRef = React.useRef<?HTMLCanvasElement>(null);
-  const meshesRef = React.useRef<Array<THREE.Mesh>>([]);
-  const materialRef = React.useRef<?THREE.Material>(null);
+  const meshesRef = React.useRef<Array<ThreeMesh>>([]);
+  const materialRef = React.useRef<?ThreeMaterial>(null);
 
   React.useEffect(() => {
     const canvas = canvasRef.current;

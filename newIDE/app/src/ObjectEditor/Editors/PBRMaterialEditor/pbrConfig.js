@@ -22,6 +22,7 @@
  */
 
 export type PBRMaterialTextures = {|
+  [slot: string]: string | void,
   baseColor?: string,
   metallicRoughness?: string,
   metallic?: string,
@@ -118,13 +119,15 @@ const getTargetSettings = (
   }
   if (!config.targets) {
     if (!createIfMissing) return null;
-    config.targets = {};
+    config.targets = ({}: { [targetName: string]: PBRMaterialSettings });
   }
-  if (!config.targets[targetName]) {
+  const targets = config.targets;
+  if (!targets) return null;
+  if (!targets[targetName]) {
     if (!createIfMissing) return null;
-    config.targets[targetName] = {};
+    targets[targetName] = {};
   }
-  return config.targets[targetName];
+  return targets[targetName];
 };
 
 /**
@@ -589,7 +592,9 @@ export const pbrPresets: { [name: string]: PBRMaterialSettings } = {
   },
 };
 
-export const presetNames = ['custom', ...Object.keys(pbrPresets)];
+export const presetNames: Array<string> = ['custom'].concat(
+  Object.keys(pbrPresets)
+);
 
 /**
  * Apply a preset to a target: the values of the preset become the values of
@@ -622,8 +627,13 @@ export const getMergedSettingsWithDefaults = (
   config: PBRConfig,
   targetName: string
 ): PBRMaterialSettings => {
-  const settings = getTargetSettings(config, '', false) || {};
-  const targetSettings = getTargetSettings(config, targetName, false) || {};
+  const settings: PBRMaterialSettings =
+    getTargetSettings(config, '', false) || {};
+  const targetSettings: PBRMaterialSettings =
+    getTargetSettings(config, targetName, false) || {};
+  const settingsTextures: PBRMaterialTextures = settings.textures || {};
+  const targetSettingsTextures: PBRMaterialTextures =
+    targetSettings.textures || {};
   const merged: PBRMaterialSettings = {
     preset: 'custom',
     baseColor: '255;255;255',
@@ -631,8 +641,8 @@ export const getMergedSettingsWithDefaults = (
     ...settings,
     ...targetSettings,
     textures: {
-      ...(settings.textures || {}),
-      ...(targetSettings.textures || {}),
+      ...settingsTextures,
+      ...targetSettingsTextures,
     },
   };
   const mutableMerged: any = merged;

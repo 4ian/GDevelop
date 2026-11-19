@@ -266,16 +266,8 @@ namespace gdjs {
 
         this._reinitializeContentFromObjectData(newObjectData);
 
-        const inGameEditor = this.getInstanceContainer()
-          .getGame()
-          .getInGameEditor();
-        if (
-          !inGameEditor ||
-          inGameEditor.getEditedInstanceContainer() !== this._instanceContainer
-        ) {
-          // The generated code calls the onCreated super implementation at the end.
-          this.onCreated();
-        }
+        // The generated code calls the onCreated super implementation at the end.
+        this.onCreated();
 
         // Keep the custom size
         if (hasInnerAreaChanged) {

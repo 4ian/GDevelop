@@ -2265,6 +2265,7 @@ namespace gdjs {
               type: eventsBasedObjectType,
               //@ts-ignore
               variant: eventsBasedObjectVariantName,
+              isFakeObjectForVariantEditor: true,
               content: {},
               variables: [],
               // Add all capabilities just in case events need them.

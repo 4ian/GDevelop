@@ -404,7 +404,7 @@ declare namespace Peer {
     /**
      * Errors on the peer are almost always fatal and will destroy the peer.
      */
-    error: (error: Error) => void;
+    error: (error: Error & { type: string }) => void;
   };
 }
 

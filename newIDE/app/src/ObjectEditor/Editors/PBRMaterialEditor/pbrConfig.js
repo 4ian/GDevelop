@@ -22,7 +22,6 @@
  */
 
 export type PBRMaterialTextures = {|
-  [slot: string]: string | void,
   baseColor?: string,
   metallicRoughness?: string,
   metallic?: string,
@@ -322,12 +321,12 @@ export const readTextureValue = (
   const targetSettings = targetName
     ? getTargetSettings(config, targetName, false)
     : null;
-  const targetTextures = targetSettings && targetSettings.textures;
+  const targetTextures: any = targetSettings && targetSettings.textures;
   if (targetTextures && targetTextures[slot] !== undefined) {
     return { value: targetTextures[slot], isOverridden: true };
   }
   const settings = getTargetSettings(config, '', false);
-  const textures = settings && settings.textures;
+  const textures: any = settings && settings.textures;
   if (textures && textures[slot] !== undefined) {
     return { value: textures[slot], isOverridden: false };
   }
@@ -342,8 +341,9 @@ export const writeTextureValue = (
 ) => {
   const settings = getTargetSettings(config, targetName, true);
   if (!settings) return;
-  if (!settings.textures) settings.textures = {};
-  settings.textures[slot] = value;
+  const textures: any = settings.textures || {};
+  textures[slot] = value;
+  settings.textures = textures;
 };
 
 /**

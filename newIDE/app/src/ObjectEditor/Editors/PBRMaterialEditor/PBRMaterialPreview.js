@@ -197,7 +197,7 @@ const createMaterial = async (
     material.side = THREE.DoubleSide;
   }
 
-  const textures = settings.textures || {};
+  const textures: any = settings.textures || {};
   await Promise.all(
     textureSlots.map(async slotName => {
       const resourceName = textures[slotName];

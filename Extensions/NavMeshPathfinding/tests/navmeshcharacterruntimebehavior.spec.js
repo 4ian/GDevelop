@@ -8,7 +8,7 @@ describe('gdjs.NavMeshCharacterRuntimeBehavior', function () {
     await gdjs.getAllAsynchronouslyLoadingLibraryPromise();
   });
 
-  const createScene = (framePerSecond = 60) => {
+  const createScene = (framePerSecond = 60, speedScaleY = 1) => {
     const runtimeGame = gdjs.getPixiRuntimeGame();
     const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
     runtimeScene.loadFromScene({
@@ -66,7 +66,7 @@ describe('gdjs.NavMeshCharacterRuntimeBehavior', function () {
       stairHeightMax: 20,
       walkableRadius: -1,
       walkableDepth: 150,
-      speedScaleY: 1,
+      speedScaleY,
     };
     runtimeScene.setInitialSharedDataForBehavior(
       characterBehaviorName,
@@ -336,6 +336,28 @@ describe('gdjs.NavMeshCharacterRuntimeBehavior', function () {
     getCharacterBehavior(character).moveTo(600, 300, 0);
     runtimeScene.renderAndStep(1000 / 60);
     expect(getPathLength(character)).to.be.within(180, 220);
+  });
+
+  it('goes around an obstacle when the vertical speed is scaled (isometric games)', function () {
+    const runtimeScene = createScene(60, 0.5);
+    const character = addCharacter(runtimeScene);
+    addGroundDelimiters(runtimeScene);
+    const blockingObstacle = addObstacle(runtimeScene, 50, 300);
+    blockingObstacle.setPosition(475, 150);
+    character.setPosition(400, 300);
+    runtimeScene.renderAndStep(1000 / 60);
+
+    getCharacterBehavior(character).moveTo(600, 300, 0);
+    expect(getCharacterBehavior(character).pathFound()).to.be(true);
+    runtimeScene.renderAndStep(1000 / 60);
+    // The obstacle is still 300 pixels high on screen: the path goes
+    // around it.
+    expect(getPathLength(character)).to.be.above(240);
+
+    stepUntilDestinationIsReached(runtimeScene, character);
+    expect(getCharacterBehavior(character).destinationReached()).to.be(true);
+    expect(character.getX()).to.be.within(580, 620);
+    expect(character.getY()).to.be.within(280, 320);
   });
 
   it('extends the walkable area to obstacles created later', function () {

@@ -640,6 +640,71 @@ describe('gdjs.NavMeshObstacleRuntimeBehavior (3D)', function () {
       expect(builtTiles.size).to.be.above(tilesCount - 1);
     });
 
+    it('finds paths around an obstacle that rotated', function () {
+      const runtimeScene = createScene();
+      addGround(runtimeScene);
+      const wall = addWall(runtimeScene);
+      const character = addCharacter(runtimeScene);
+      character.setPosition(100, 300);
+      stepOneSecond(runtimeScene);
+      // Around the bottom of the wall.
+      expect(walkAcross(runtimeScene, character)).to.be.above(700);
+
+      // The wall now lies along the way, below it.
+      wall.setAngle(90);
+      for (let stepIndex = 0; stepIndex < 10; stepIndex++) {
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+      expect(walkAcross(runtimeScene, character)).to.be.below(320);
+    });
+
+    it('finds paths around an obstacle that moved slowly', function () {
+      const runtimeScene = createScene();
+      addGround(runtimeScene);
+      const wall = addWall(runtimeScene);
+      const character = addCharacter(runtimeScene);
+      character.setPosition(100, 300);
+      stepOneSecond(runtimeScene);
+      // Around the bottom of the wall.
+      expect(walkAcross(runtimeScene, character)).to.be.above(700);
+
+      // One pixel per frame is much less than half a cell (5 pixels), but
+      // these small moves add up: the passage is now at the top.
+      for (let stepIndex = 0; stepIndex < 300; stepIndex++) {
+        wall.setY(wall.getY() + 1);
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+      expect(walkAcross(runtimeScene, character)).to.be.below(320);
+    });
+
+    it('keeps characters moving when more than 100 others are created', function () {
+      const runtimeScene = createScene();
+      addGround(runtimeScene);
+      const character = addCharacter(runtimeScene);
+      character.setPosition(100, 300);
+      stepOneSecond(runtimeScene);
+      getCharacterBehavior(character).moveTo(900, 300, 0);
+      runtimeScene.renderAndStep(1000 / 60);
+
+      const otherCharacters = [];
+      for (let index = 0; index < 150; index++) {
+        const otherCharacter = addCharacter(runtimeScene);
+        otherCharacter.setPosition(100 + (index % 15) * 50, 500 + index * 2);
+        otherCharacters.push(otherCharacter);
+      }
+      stepUntilDestinationIsReached(runtimeScene, character);
+      expect(getCharacterBehavior(character).destinationReached()).to.be(true);
+
+      // The last character created can move too.
+      const lastCharacter = otherCharacters[otherCharacters.length - 1];
+      getCharacterBehavior(lastCharacter).moveTo(900, 900, 0);
+      expect(getCharacterBehavior(lastCharacter).pathFound()).to.be(true);
+      stepUntilDestinationIsReached(runtimeScene, lastCharacter);
+      expect(getCharacterBehavior(lastCharacter).destinationReached()).to.be(
+        true
+      );
+    });
+
     it('finds shorter paths when an obstacle is deleted', function () {
       const runtimeScene = createScene();
       addGround(runtimeScene);

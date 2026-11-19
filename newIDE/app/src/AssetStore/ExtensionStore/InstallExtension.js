@@ -32,6 +32,9 @@ import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
 import PromisePool from '@supercharge/promise-pool';
 import { retryIfFailed } from '../../Utils/RetryIfFailed';
 import { IMPORTED_FILE_ORIGIN_NAME } from '../../Utils/Extension/ExtensionOrigin';
+import ExtensionChangesToKeepContext, {
+  type ChooseExtensionChangesToKeep,
+} from './ExtensionChangesToKeep/ExtensionChangesToKeepContext';
 
 const gd: libGDevelop = global.gd;
 
@@ -359,6 +362,9 @@ export const useInstallExtension = (): (({
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
   );
+  const { chooseExtensionChangesToKeep } = React.useContext(
+    ExtensionChangesToKeepContext
+  );
 
   return async ({
     project,
@@ -402,7 +408,7 @@ export const useInstallExtension = (): (({
     if (extensionUpdateAction === 'abort') {
       return false;
     }
-    await installRequiredExtensions({
+    return await installRequiredExtensions({
       requiredExtensionInstallation,
       shouldUpdateExtension: extensionUpdateAction === 'update',
       eventsFunctionsExtensionsState,
@@ -410,8 +416,8 @@ export const useInstallExtension = (): (({
       onWillInstallExtension,
       onExtensionInstalled,
       importedSerializedExtensions,
+      chooseExtensionChangesToKeep,
     });
-    return true;
   };
 };
 
@@ -439,8 +445,12 @@ export type InstallRequiredExtensionsArgs = {|
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   importedSerializedExtensions: Array<SerializedExtension>,
+  chooseExtensionChangesToKeep?: ChooseExtensionChangesToKeep,
 |};
 
+/**
+ * @returns false if users cancelled the installation.
+ */
 export const installRequiredExtensions = async ({
   requiredExtensionInstallation,
   shouldUpdateExtension,
@@ -449,7 +459,8 @@ export const installRequiredExtensions = async ({
   onWillInstallExtension,
   onExtensionInstalled,
   importedSerializedExtensions,
-}: InstallRequiredExtensionsArgs): Promise<void> => {
+  chooseExtensionChangesToKeep,
+}: InstallRequiredExtensionsArgs): Promise<boolean> => {
   const {
     requiredExtensionShortHeaders,
     missingExtensionShortHeaders,
@@ -461,7 +472,7 @@ export const installRequiredExtensions = async ({
     outOfDateExtensionShortHeaders.length === 0 &&
     importedSerializedExtensions.length === 0
   ) {
-    return;
+    return true;
   }
 
   const neededExtensions = uniq(
@@ -481,10 +492,19 @@ export const installRequiredExtensions = async ({
     )
   );
 
-  const installedExtensions = [
+  const extensionsToInstall = [
     ...importedSerializedExtensions,
     ...downloadedSerializedExtensions,
   ];
+  const installedExtensions = chooseExtensionChangesToKeep
+    ? await chooseExtensionChangesToKeep({
+        project,
+        serializedExtensions: extensionsToInstall,
+      })
+    : extensionsToInstall;
+  if (!installedExtensions) {
+    return false;
+  }
   const installedExtensionNames = installedExtensions.map(
     extensions => extensions.name
   );
@@ -514,6 +534,7 @@ export const installRequiredExtensions = async ({
         missingExtensionShortHeaders.map(extension => extension.name).join(', ')
     );
   }
+  return true;
 };
 
 /**

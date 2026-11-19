@@ -46,6 +46,7 @@ import { CourseStoreStateProvider } from '../Course/CourseStoreContext';
 import { Resource3DPreviewProvider } from '../ResourcesList/ResourcePreview/Resource3DPreviewContext';
 import { AiRequestProvider } from '../AiGeneration/AiRequestContext';
 import { LiveMcpServerProvider } from '../LiveMcpServer/LiveMcpServerContext';
+import ExtensionChangesToKeepProvider from '../AssetStore/ExtensionStore/ExtensionChangesToKeep/ExtensionChangesToKeepProvider';
 
 type Props = {|
   authentication: Authentication,
@@ -131,11 +132,13 @@ const Providers = ({
                                                                         <Resource3DPreviewProvider>
                                                                           <AiRequestProvider>
                                                                             <LiveMcpServerProvider>
-                                                                              {children(
-                                                                                {
-                                                                                  i18n,
-                                                                                }
-                                                                              )}
+                                                                              <ExtensionChangesToKeepProvider>
+                                                                                {children(
+                                                                                  {
+                                                                                    i18n,
+                                                                                  }
+                                                                                )}
+                                                                              </ExtensionChangesToKeepProvider>
                                                                             </LiveMcpServerProvider>
                                                                           </AiRequestProvider>
                                                                         </Resource3DPreviewProvider>

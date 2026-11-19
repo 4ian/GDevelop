@@ -150,6 +150,7 @@ export const getInitialPreferences = (): {
   useBackgroundSerializerForSaving: boolean,
   showJsTypeError: boolean,
   canonicalEventSerialization: boolean,
+  showExtensionChangesToKeepOnUpdate: boolean,
   useGDJSDevelopmentWatcher: boolean,
   useShortcutToClosePreviewWindow: boolean,
   userShortcutMap: {},
@@ -450,6 +451,10 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setShowJsTypeError: (this._setShowJsTypeError.bind(this): any),
     // $FlowFixMe[method-unbinding]
     setCanonicalEventSerialization: (this._setCanonicalEventSerialization.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setShowExtensionChangesToKeepOnUpdate: (this._setShowExtensionChangesToKeepOnUpdate.bind(
       this
     ): any),
   };
@@ -1368,6 +1373,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     this.setState(
       state => ({
         values: { ...state.values, canonicalEventSerialization: newValue },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setShowExtensionChangesToKeepOnUpdate(newValue: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          showExtensionChangesToKeepOnUpdate: newValue,
+        },
       }),
       () => this._persistValuesToLocalStorage(this.state)
     );

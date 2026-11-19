@@ -21,6 +21,7 @@ import { type ExtensionDependency } from '../Utils/GDevelopServices/Extension';
 import semverGreaterThan from 'semver/functions/gt';
 import semverValid from 'semver/functions/valid';
 import { addSerializedExtensionsToProject } from '../AssetStore/ExtensionStore/InstallExtension';
+import ExtensionChangesToKeepContext from '../AssetStore/ExtensionStore/ExtensionChangesToKeep/ExtensionChangesToKeepContext';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { GenericRetryableProcessWithProgressDialog } from '../Utils/UseGenericRetryableProcessWithProgress';
 import AlertMessage from '../UI/AlertMessage';
@@ -492,6 +493,9 @@ const ObjectImporterDialog = ({
   const forceUpdate = useForceUpdate();
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
+  );
+  const { chooseExtensionChangesToKeep } = React.useContext(
+    ExtensionChangesToKeepContext
   );
 
   const { showAlert } = useAlertDialog();
@@ -1028,6 +1032,18 @@ const ObjectImporterDialog = ({
           serializedExtensions.push(serializedExtension);
         }
         throwIfCancelRequested();
+        const chosenSerializedExtensions = await chooseExtensionChangesToKeep({
+          project,
+          serializedExtensions,
+        });
+        if (!chosenSerializedExtensions) {
+          throw new ImportCancelledError();
+        }
+        serializedExtensions.splice(
+          0,
+          serializedExtensions.length,
+          ...chosenSerializedExtensions
+        );
       } catch (error) {
         releasePendingResources();
         throw error;
@@ -1131,6 +1147,7 @@ const ObjectImporterDialog = ({
       assetPackBlob,
       archiveFilePaths,
       assetPackContent,
+      chooseExtensionChangesToKeep,
       eventsFunctionsExtensionsState,
       objectsContainer,
       onClose,

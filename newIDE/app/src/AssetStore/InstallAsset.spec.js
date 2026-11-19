@@ -10,6 +10,7 @@ import {
   addSerializedExtensionsToProject,
   installRequiredExtensions,
   checkRequiredExtensionsUpdate,
+  type RequiredExtensionInstallation,
 } from './ExtensionStore/InstallExtension';
 import { makeTestProject } from '../fixtures/TestProject';
 import { type EventsFunctionsExtensionsState } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
@@ -1239,6 +1240,69 @@ describe('InstallAsset', () => {
       });
 
       expect(getExtension).toHaveBeenCalledTimes(1);
+    });
+
+    const noRequiredExtensionInstallation: RequiredExtensionInstallation = {
+      requiredExtensionShortHeaders: [],
+      missingExtensionShortHeaders: [],
+      outOfDateExtensionShortHeaders: [],
+      breakingChangesExtensionShortHeaders: [],
+      incompatibleWithIdeExtensionShortHeaders: [],
+      safeToUpdateExtensions: [],
+      unknownExtensionDependencies: [],
+      isGDevelopUpdateNeeded: false,
+    };
+
+    it('installs the extensions with the changes kept by users', async () => {
+      makeTestExtensions(gd);
+      const { project } = makeTestProject(gd);
+
+      const isInstalled = await installRequiredExtensions({
+        requiredExtensionInstallation: noRequiredExtensionInstallation,
+        shouldUpdateExtension: true,
+        eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
+        project,
+        onWillInstallExtension: () => {},
+        onExtensionInstalled: () => {},
+        importedSerializedExtensions: [
+          { name: 'ImportedExtension', version: '1.1.0' },
+        ],
+        chooseExtensionChangesToKeep: async ({ serializedExtensions }) =>
+          serializedExtensions.map(serializedExtension => ({
+            ...serializedExtension,
+            description: 'Kept description',
+          })),
+      });
+
+      expect(isInstalled).toBe(true);
+      expect(
+        project
+          .getEventsFunctionsExtension('ImportedExtension')
+          .getDescription()
+      ).toBe('Kept description');
+    });
+
+    it('installs nothing when users cancel the choice of the changes to keep', async () => {
+      makeTestExtensions(gd);
+      const { project } = makeTestProject(gd);
+
+      const isInstalled = await installRequiredExtensions({
+        requiredExtensionInstallation: noRequiredExtensionInstallation,
+        shouldUpdateExtension: true,
+        eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
+        project,
+        onWillInstallExtension: () => {},
+        onExtensionInstalled: () => {},
+        importedSerializedExtensions: [
+          { name: 'ImportedExtension', version: '1.1.0' },
+        ],
+        chooseExtensionChangesToKeep: async () => null,
+      });
+
+      expect(isInstalled).toBe(false);
+      expect(
+        project.hasEventsFunctionsExtensionNamed('ImportedExtension')
+      ).toBe(false);
     });
 
     // TODO EBO Add a test for a custom object that contains another custom objet.

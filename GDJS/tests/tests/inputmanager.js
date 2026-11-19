@@ -134,6 +134,71 @@ describe('gdjs.InputManager', () => {
     expect(inputManager.isMouseInsideCanvas()).to.be(true);
   });
 
+  it('should compute mouse movement from the cursor position when the pointer is not locked', () => {
+    // Reset the movement tracking deterministically.
+    inputManager.onMouseEnter();
+
+    // The first move only establishes the reference position: no movement yet.
+    inputManager.onMouseMove(500, 600);
+    expect(inputManager.getMouseMovementX()).to.be(0);
+    expect(inputManager.getMouseMovementY()).to.be(0);
+
+    // Subsequent moves report the delta of the cursor position...
+    inputManager.onMouseMove(520, 615);
+    expect(inputManager.getMouseMovementX()).to.be(20);
+    expect(inputManager.getMouseMovementY()).to.be(15);
+
+    // ...accumulated over the frame.
+    inputManager.onMouseMove(515, 605);
+    expect(inputManager.getMouseMovementX()).to.be(15);
+    expect(inputManager.getMouseMovementY()).to.be(5);
+
+    // The movement is reset at the end of the frame, but the reference position
+    // is kept.
+    inputManager.onFrameEnded();
+    expect(inputManager.getMouseMovementX()).to.be(0);
+    expect(inputManager.getMouseMovementY()).to.be(0);
+
+    inputManager.onMouseMove(525, 600);
+    expect(inputManager.getMouseMovementX()).to.be(10);
+    expect(inputManager.getMouseMovementY()).to.be(-5);
+  });
+
+  it('should use the browser movement deltas when the pointer is locked', () => {
+    inputManager.onMouseEnter();
+    inputManager.onMouseMove(500, 600);
+    inputManager.onFrameEnded();
+
+    // While the pointer is locked, the cursor position is frozen by the browser,
+    // so the browser-provided movement deltas are used (and accumulated over the
+    // frame, as Firefox can report them across several events).
+    inputManager.onMouseMove(500, 600, { movementX: 4, movementY: -3 });
+    inputManager.onMouseMove(500, 600, { movementX: 1, movementY: 2 });
+    expect(inputManager.getMouseMovementX()).to.be(5);
+    expect(inputManager.getMouseMovementY()).to.be(-1);
+
+    inputManager.onFrameEnded();
+    expect(inputManager.getMouseMovementX()).to.be(0);
+    expect(inputManager.getMouseMovementY()).to.be(0);
+  });
+
+  it('should not report a spurious movement after the mouse re-enters the canvas', () => {
+    inputManager.onMouseEnter();
+    inputManager.onMouseMove(100, 100);
+    inputManager.onMouseMove(150, 130);
+    expect(inputManager.getMouseMovementX()).to.be(50);
+    expect(inputManager.getMouseMovementY()).to.be(30);
+    inputManager.onFrameEnded();
+
+    // Leaving then re-entering invalidates the reference position, so the next
+    // move doesn't report a large jump.
+    inputManager.onMouseLeave();
+    inputManager.onMouseEnter();
+    inputManager.onMouseMove(400, 500);
+    expect(inputManager.getMouseMovementX()).to.be(0);
+    expect(inputManager.getMouseMovementY()).to.be(0);
+  });
+
   it('should simulate touch events from mouse events', () => {
     inputManager.onMouseMove(500, 600);
     expect(inputTools.hasAnyTouchOrMouseStarted(runtimeScene)).to.be(false);

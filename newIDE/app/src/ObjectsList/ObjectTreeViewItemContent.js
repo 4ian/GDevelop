@@ -74,6 +74,9 @@ export type ObjectTreeViewItemProps = {|
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
   swapObjectAsset: (objectWithContext: ObjectWithContext) => void,
+  onExportAssets: (
+    objectFolderOrObjectsWithContext: Array<ObjectFolderOrObjectWithContext>
+  ) => void,
   initialInstances?: gdInitialInstancesContainer,
   editName: (itemId: string) => void,
   onObjectModified: (shouldForceUpdateList: boolean) => void,
@@ -355,6 +358,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       onMovedObjectFolderOrObjectToAnotherFolderInSameContainer,
       onAddObjectInstance,
       swapObjectAsset,
+      onExportAssets,
       canSetAsGlobalObject,
       setAsGlobalObject,
       onOpenEventBasedObjectVariantEditor,
@@ -481,6 +485,11 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
             global: this._isGlobal,
           }),
         enabled: canSwapAssetOfObject(object),
+      },
+      {
+        label: i18n._(t`Export as assets`),
+        click: () =>
+          onExportAssets([{ objectFolderOrObject, global: this._isGlobal }]),
       },
       { type: 'separator' },
       globalObjectsContainer && {

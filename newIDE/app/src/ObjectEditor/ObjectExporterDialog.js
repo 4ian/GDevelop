@@ -150,17 +150,6 @@ const enumerateAllObjects = (
   }
 };
 
-const enumerateAllObjectsOfScene = (
-  scene: gdLayout,
-  folderPath: string,
-  allObjects: Array<EnumeratedObject>
-) => {
-  const objectTreeItem = scene.getObjects().getRootFolder();
-  mapFor(0, objectTreeItem.getChildrenCount(), i => {
-    enumerateAllObjects(objectTreeItem.getChildAt(i), folderPath, allObjects);
-  });
-};
-
 const zipAssets = async (
   project: gdProject,
   enumeratedObjects: Array<EnumeratedObject>,
@@ -267,13 +256,20 @@ const zipAssets = async (
 
 type Props = {|
   project: gdProject,
-  layout: gdLayout,
+  /** Name of the pack, used in the dialog title and as the file name. */
+  packName: string,
+  /**
+   * The objects and folders of objects to export. Folders are exported with
+   * their content, and the folder structure is kept in the pack.
+   */
+  objectFolderOrObjects: Array<gdObjectFolderOrObject>,
   onClose: () => void,
 |};
 
 const ObjectExporterDialog = ({
   project,
-  layout: scene,
+  packName,
+  objectFolderOrObjects,
   onClose,
 }: Props): React.Node => {
   const [
@@ -299,7 +295,9 @@ const ObjectExporterDialog = ({
         setZippedSceneAssetsBlob(null);
 
         const enumeratedObjects: Array<EnumeratedObject> = [];
-        enumerateAllObjectsOfScene(scene, '', enumeratedObjects);
+        for (const objectFolderOrObject of objectFolderOrObjects) {
+          enumerateAllObjects(objectFolderOrObject, '', enumeratedObjects);
+        }
         enumeratedObjects.filter(
           ({ object }) => !excludedObjectType.includes(object.getType())
         );
@@ -315,12 +313,12 @@ const ObjectExporterDialog = ({
         setZippedSceneAssetsBlob(null);
       };
     },
-    [project, ensureDownloadResourcesAsBlobsIsDone, scene]
+    [project, ensureDownloadResourcesAsBlobsIsDone, objectFolderOrObjects]
   );
 
   return (
     <Dialog
-      title={<Trans>Export {scene.getName()} assets</Trans>}
+      title={<Trans>Export {packName} assets</Trans>}
       secondaryActions={[
         <HelpButton
           key="free-pack-help"
@@ -348,8 +346,9 @@ const ObjectExporterDialog = ({
       <ColumnStackLayout expand>
         <Text>
           <Trans>
-            Export the scene objects to a file and learn more about the
-            submission process in the documentation.
+            Export the objects to a file to import them in another project.
+            Learn more about submitting them to the asset store in the
+            documentation.
           </Trans>
         </Text>
         <Column alignItems="center">
@@ -360,10 +359,7 @@ const ObjectExporterDialog = ({
                   icon={<Upload />}
                   primary
                   onClick={() =>
-                    openBlobDownloadUrl(
-                      blobDownloadUrl,
-                      scene.getName() + '.gdo'
-                    )
+                    openBlobDownloadUrl(blobDownloadUrl, packName + '.gdo')
                   }
                   label={<Trans>Export as a pack</Trans>}
                 />

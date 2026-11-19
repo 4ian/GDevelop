@@ -4,6 +4,7 @@ import { type BehaviorEditorProps } from './Editors/BehaviorEditorProps.flow';
 import Physics2Editor from './Editors/Physics2Editor';
 import Physics3DEditor from './Editors/Physics3DEditor';
 import AnchorBehaviorEditor from './Editors/AnchorBehaviorEditor';
+import AnimationStateMachineEditor from './Editors/AnimationStateMachineEditor';
 
 /**
  * A service returning editor components for each behavior type.
@@ -26,6 +27,9 @@ const BehaviorsEditorService = {
     },
     'AnchorBehavior::AnchorBehavior': {
       component: AnchorBehaviorEditor,
+    },
+    'AnimationStateMachine::AnimationStateMachineBehavior': {
+      component: AnimationStateMachineEditor,
     },
   },
 };

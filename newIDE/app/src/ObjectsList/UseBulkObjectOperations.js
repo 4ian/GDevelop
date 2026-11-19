@@ -534,17 +534,20 @@ function useBulkObjectOperations({
                 },
               ],
             },
-        canSetAllAsGlobal
-          ? {
+        {
+          label: i18n._(t`More`),
+          submenu: [
+            {
               label: i18n._(t`Set as global object`),
               enabled: !isListLocked,
               click: () => bulkSetAsGlobalObject(i18n),
-            }
-          : null,
-        { type: 'separator' },
-        {
-          label: i18n._(t`Export as assets`),
-          click: () => onExportAssets(topLevelSelectedItems),
+              visible: canSetAllAsGlobal,
+            },
+            {
+              label: i18n._(t`Export as assets`),
+              click: () => onExportAssets(topLevelSelectedItems),
+            },
+          ],
         },
       ];
       return menuItems.filter(Boolean);

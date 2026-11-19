@@ -12,9 +12,14 @@ import {
   rememberLastUsedDialogDirectory,
 } from '../../Utils/FileSystem';
 import FlatButton from '../FlatButton';
+import IconButton from '../IconButton';
+import UndoIcon from '../CustomSvgIcons/Undo';
+import { findDefaultFolder } from '../../ProjectsStorage/LocalFileStorageProvider/LocalPathFinder';
+
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
 const dialog = remote ? remote.dialog : null;
+const app = remote ? remote.app : null;
 
 const styles = {
   container: {
@@ -77,6 +82,12 @@ const LocalFolderPicker = ({
     onChange(textValue);
   };
 
+  const workspacePathDefaultFolder = findDefaultFolder(app);
+  const resetWorkspacePathToDefaultFolder = () => {
+    onChange(workspacePathDefaultFolder);
+    setTextValue(workspacePathDefaultFolder);
+  };
+
   const getTitleAndMessage = (i18n: I18nType): TitleAndMessage => {
     if (type === 'export') {
       return {
@@ -117,6 +128,21 @@ const LocalFolderPicker = ({
               onChange={(event, value) => setTextValue(value)}
               onBlur={onBlur}
             />
+            {type === 'default-workspace' && (
+              <div
+                style={{
+                  marginLeft: '8px',
+                }}
+              >
+                <IconButton
+                  onClick={resetWorkspacePathToDefaultFolder}
+                  tooltip={t`Reset to default`}
+                  disabled={workspacePathDefaultFolder === textValue}
+                >
+                  <UndoIcon />
+                </IconButton>
+              </div>
+            )}
             <FlatButton
               label={<Trans>Choose folder</Trans>}
               // $FlowFixMe[incompatible-type]

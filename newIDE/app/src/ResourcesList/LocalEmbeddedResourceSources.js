@@ -47,6 +47,9 @@ export async function copyAllEmbeddedResourcesToProjectFolder(
 
   const projectPath = path.dirname(project.getProjectFile());
   const copies = [];
+  // The copies run in parallel: remember the file names already chosen, as
+  // they are not on disk yet when the next name is computed.
+  const alreadyUsedFilePaths = new Set<string>();
 
   for (const {
     hasAnyEmbeddedResourceOutsideProjectFolder,
@@ -69,7 +72,10 @@ export async function copyAllEmbeddedResourcesToProjectFolder(
         tentativeFileName => {
           const tentativePath =
             path.join(projectPath, tentativeFileName) + fileExtension;
-          return fs.existsSync(tentativePath);
+          return (
+            fs.existsSync(tentativePath) ||
+            alreadyUsedFilePaths.has(tentativePath)
+          );
         }
       );
 
@@ -77,6 +83,7 @@ export async function copyAllEmbeddedResourcesToProjectFolder(
         projectPath,
         newFileNameWithoutExtension + fileExtension
       );
+      alreadyUsedFilePaths.add(resourceNewPath);
 
       embedded.resourceName = newFileNameWithoutExtension + fileExtension;
 

@@ -23,6 +23,7 @@ import {
   type Game,
   type PublicGame,
   type ShowcasedGame,
+  type MarketingPlan,
 } from '../../Utils/GDevelopServices/Game';
 import { type GameMetrics } from '../../Utils/GDevelopServices/Analytics';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
@@ -2354,13 +2355,13 @@ const generateGameRollingMetricsFor364Days = () => {
         ),
       },
       retention: {
-        d1RetainedPlayers: 193,
-        d2RetainedPlayers: 153,
-        d3RetainedPlayers: 121,
-        d4RetainedPlayers: 83,
-        d5RetainedPlayers: 74,
-        d6RetainedPlayers: 73,
-        d7RetainedPlayers: 67,
+        d1RetainedPlayers: 9,
+        d2RetainedPlayers: 6,
+        d3RetainedPlayers: 5,
+        d4RetainedPlayers: 4,
+        d5RetainedPlayers: 3,
+        d6RetainedPlayers: 3,
+        d7RetainedPlayers: 2,
       },
     });
   }
@@ -2416,6 +2417,22 @@ export const gameRollingMetricsWithHoles: GameMetrics[] = [
   110,
   230,
 ].map(index => gameRollingMetricsFor364Days[index]);
+export const gameRollingMetricsWithFewPlayers: GameMetrics[] = [1, 2, 4].map(
+  (daysCount, index) => ({
+    date: formatISO(subDays(new Date(), daysCount)),
+    sessions: { d0Sessions: 3 - index, d0SessionsDurationTotal: 200 },
+    players: {
+      d0Players: 3 - index,
+      d0NewPlayers: 1,
+      d0PlayersBelow60s: 1,
+      d0PlayersBelow180s: 1,
+      d0PlayersBelow300s: 2 - index,
+      d0PlayersBelow600s: 3 - index,
+      d0PlayersBelow900s: 3 - index,
+    },
+    retention: null,
+  })
+);
 export const gameRollingMetricsWithoutPlayersAndRetention1: GameMetrics[] = [
   {
     date: '2020-10-01',
@@ -3209,7 +3226,7 @@ export const mockSigningCredentials: Array<SigningCredential> = [
   },
 ];
 
-export const basicFeaturingMarketingPlan = {
+export const basicFeaturingMarketingPlan: MarketingPlan = {
   id: 'featuring-basic',
   nameByLocale: {
     en: 'Basic',
@@ -3309,6 +3326,10 @@ export const basicFeaturingMarketingPlan = {
     'zh-CN':
       '确保您的游戏是公开的，并且您已经为gd.games配置了缩略图。您的游戏在平台上可见可能需要几分钟。',
   },
+  ownedBulletPointsByLocale: [
+    { en: 'Your game is promoted on gd.games homepage' },
+  ],
+  showExpirationDate: true,
 };
 
 export const videoBasedCourseChapter: VideoBasedCourseChapter = {

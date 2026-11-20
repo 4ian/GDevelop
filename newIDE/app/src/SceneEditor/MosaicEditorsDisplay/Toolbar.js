@@ -31,8 +31,8 @@ import Grid2d from '../../UI/CustomSvgIcons/Grid2d';
 import Grid3d from '../../UI/CustomSvgIcons/Grid3d';
 
 type Props = {|
-  gameEditorMode: 'embedded-game' | 'instances-editor',
-  setGameEditorMode: ('embedded-game' | 'instances-editor') => void,
+  editorMode: '2d-editor' | '3d-editor',
+  setEditorMode: ('2d-editor' | '3d-editor') => void,
   toggleObjectsList: () => void,
   isObjectsListShown: boolean,
   toggleObjectGroupsList: () => void,
@@ -94,9 +94,9 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar(
               tooltip: <Trans>Top-down, classic editor</Trans>,
               label: '2D',
               onClick: () => {
-                props.setGameEditorMode('instances-editor');
+                props.setEditorMode('2d-editor');
               },
-              isActive: props.gameEditorMode === 'instances-editor',
+              isActive: props.editorMode === '2d-editor',
             },
             {
               id: '3d-game-editor',
@@ -104,9 +104,9 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar(
               tooltip: <Trans>3D, real-time editor (new)</Trans>,
               label: '3D',
               onClick: () => {
-                props.setGameEditorMode('embedded-game');
+                props.setEditorMode('3d-editor');
               },
-              isActive: props.gameEditorMode === 'embedded-game',
+              isActive: props.editorMode === '3d-editor',
             },
           ]}
         />

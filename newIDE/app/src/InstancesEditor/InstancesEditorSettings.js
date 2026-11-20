@@ -27,6 +27,7 @@ export type InstancesEditorSettings = {|
   selectedLayer: string,
 
   gameEditorMode: 'embedded-game' | 'instances-editor',
+  editorMode: '2d-editor' | '3d-editor',
 |};
 
 export const getRecommendedInitialZoomFactor = (
@@ -65,6 +66,11 @@ export const prepareInstancesEditorSettings = (
     windowMask: object.windowMask || false,
     selectedLayer: object.selectedLayer || '',
     gameEditorMode: object.gameEditorMode || 'instances-editor',
+    editorMode:
+      object.editorMode ||
+      // Compatibility with GD <= 5.6.286
+      (object.gameEditorMode === 'embedded-game' ? '3d-editor' : '2d-editor'),
+    // end of compatibility code
   };
 };
 
@@ -72,6 +78,7 @@ export const cloneInstancesEditorSettings = (
   instancesEditorSettings: InstancesEditorSettings
 ): {
   gameEditorMode: 'embedded-game' | 'instances-editor',
+  editorMode: '2d-editor' | '3d-editor',
   grid: boolean,
   gridAlpha: number,
   gridColor: number,

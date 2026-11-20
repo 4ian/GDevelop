@@ -77,6 +77,7 @@ namespace gdjs {
     _scaleY: number;
     _wrapping: boolean = false;
     _wrappingWidth: float;
+    _requestedHeight: float = 0;
     _textAlign: string;
     _verticalTextAlignment: string;
 
@@ -232,8 +233,9 @@ namespace gdjs {
       initialInstanceData: InstanceData
     ) {
       if (initialInstanceData.customSize) {
-        this.setWrappingWidth(initialInstanceData.width);
         this.setWrapping(true);
+        this.setWidth(initialInstanceData.width);
+        this.setHeight(initialInstanceData.height);
       }
       this.setOpacity(
         initialInstanceData.opacity === undefined
@@ -443,6 +445,14 @@ namespace gdjs {
 
     override getHeight(): float {
       return this._renderer.getHeight();
+    }
+
+    getRequestedHeight(): float {
+      return this._requestedHeight;
+    }
+
+    override setHeight(height: float): void {
+      this._requestedHeight = height;
     }
 
     override setWidth(width: float): void {

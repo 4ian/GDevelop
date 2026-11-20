@@ -3439,6 +3439,7 @@ export class PreviewExportOptions extends EmscriptenObject {
   setInGameEditorSettingsJson(inGameEditorSettingsJson: string): PreviewExportOptions;
   setEditorId(editorId: string): PreviewExportOptions;
   setEditorCameraState3D(cameraMode: string, positionX: number, positionY: number, positionZ: number, rotationAngle: number, elevationAngle: number, distance: number): PreviewExportOptions;
+  setEditorCameraState2D(centerX: number, centerY: number, zoom: number): PreviewExportOptions;
   setNonRuntimeScriptsCacheBurst(value: number): PreviewExportOptions;
   setElectronRemoteRequirePath(electronRemoteRequirePath: string): PreviewExportOptions;
   setGDevelopResourceToken(gdevelopResourceToken: string): PreviewExportOptions;

@@ -200,6 +200,7 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
         gridColor: 0,
         gridAlpha: 1,
         snap: false,
+        windowMask: false,
       },
     };
   };
@@ -247,6 +248,7 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
         gridColor: 0,
         gridAlpha: 1,
         snap: false,
+        windowMask: false,
       },
     };
   };

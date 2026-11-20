@@ -29,7 +29,7 @@ export type LaunchPreviewOptions = {
     forcedExternalLayoutName: string | null,
     eventsBasedObjectType: string | null,
     eventsBasedObjectVariantName: string | null,
-    editorCameraState3D: EditorCameraState | null,
+    editorCameraState: EditorCameraState | null,
   |},
   launchCaptureOptions?: LaunchCaptureOptions,
 };
@@ -75,7 +75,7 @@ export type PreviewOptions = {|
   onCaptureFinished: CaptureOptions => Promise<void>,
   inAppTutorialMessageInPreview: string,
   inAppTutorialMessagePositionInPreview: string,
-  editorCameraState3D: EditorCameraState | null,
+  editorCameraState: EditorCameraState | null,
   inGameEditorSettings: InGameEditorSettings | null,
   numberOfWindows: number,
 

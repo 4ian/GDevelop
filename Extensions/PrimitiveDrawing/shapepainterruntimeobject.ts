@@ -141,11 +141,11 @@ namespace gdjs {
       this.onCreated();
     }
 
-    getRendererObject() {
+    override getRendererObject() {
       return this._renderer.getRendererObject();
     }
 
-    updateFromObjectData(
+    override updateFromObjectData(
       oldObjectData: ShapePainterObjectData,
       newObjectData: ShapePainterObjectData
     ): boolean {
@@ -222,7 +222,7 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(
+    override getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): ShapePainterNetworkSyncData {
       return {
@@ -242,7 +242,7 @@ namespace gdjs {
       };
     }
 
-    updateFromNetworkSyncData(
+    override updateFromNetworkSyncData(
       networkSyncData: ShapePainterNetworkSyncData,
       options: UpdateFromNetworkSyncDataOptions
     ): void {
@@ -290,12 +290,20 @@ namespace gdjs {
      * Initialize the extra parameters that could be set for an instance.
      * @param initialInstanceData The extra parameters
      */
-    extraInitializationFromInitialInstance(initialInstanceData: InstanceData) {
+    override extraInitializationFromInitialInstance(
+      initialInstanceData: InstanceData
+    ) {
       this.flipX(!!initialInstanceData.flippedX);
       this.flipY(!!initialInstanceData.flippedY);
+      if (initialInstanceData.customSize) {
+        this.setWidth(initialInstanceData.width);
+        this.setHeight(initialInstanceData.height);
+      }
     }
 
-    stepBehaviorsPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
+    override stepBehaviorsPreEvents(
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ) {
       //We redefine stepBehaviorsPreEvents just to clear the graphics before running events.
       if (this._clearBetweenFrames) {
         this.clear();
@@ -303,7 +311,7 @@ namespace gdjs {
       super.stepBehaviorsPreEvents(instanceContainer);
     }
 
-    onDestroyed(): void {
+    override onDestroyed(): void {
       super.onDestroyed();
       this._renderer.destroy();
     }
@@ -315,7 +323,7 @@ namespace gdjs {
       this._renderer.clear();
     }
 
-    getVisibilityAABB() {
+    override getVisibilityAABB() {
       return this._useAbsoluteCoordinates ? null : this.getAABB();
     }
 
@@ -637,7 +645,7 @@ namespace gdjs {
       return this._outlineOpacity;
     }
 
-    setX(x: float): void {
+    override setX(x: float): void {
       if (x === this.x) {
         return;
       }
@@ -645,7 +653,7 @@ namespace gdjs {
       this._renderer.updatePositionX();
     }
 
-    setY(y: float): void {
+    override setY(y: float): void {
       if (y === this.y) {
         return;
       }
@@ -653,7 +661,7 @@ namespace gdjs {
       this._renderer.updatePositionY();
     }
 
-    setAngle(angle: float): void {
+    override setAngle(angle: float): void {
       if (angle === this.angle) {
         return;
       }
@@ -705,7 +713,7 @@ namespace gdjs {
             this._renderer.getFrameRelativeOriginY();
     }
 
-    getCenterX(): float {
+    override getCenterX(): float {
       if (!this._customCenter) {
         return super.getCenterX();
       }
@@ -716,7 +724,7 @@ namespace gdjs {
       );
     }
 
-    getCenterY(): float {
+    override getCenterY(): float {
       if (!this._customCenter) {
         return super.getCenterY();
       }
@@ -727,15 +735,27 @@ namespace gdjs {
       );
     }
 
-    setWidth(newWidth: float): void {
-      const unscaledWidth = this._renderer.getUnscaledWidth();
+    override setWidth(newWidth: float): void {
+      let unscaledWidth = this._renderer.getUnscaledWidth();
+      if (
+        unscaledWidth === 0 &&
+        this.getInstanceContainer().getGame().isInGameEdition()
+      ) {
+        unscaledWidth = 32;
+      }
       if (unscaledWidth !== 0) {
         this.setScaleX(newWidth / unscaledWidth);
       }
     }
 
-    setHeight(newHeight: float): void {
-      const unscaledHeight = this._renderer.getUnscaledHeight();
+    override setHeight(newHeight: float): void {
+      let unscaledHeight = this._renderer.getUnscaledHeight();
+      if (
+        unscaledHeight === 0 &&
+        this.getInstanceContainer().getGame().isInGameEdition()
+      ) {
+        unscaledHeight = 32;
+      }
       if (unscaledHeight !== 0) {
         this.setScaleY(newHeight / unscaledHeight);
       }
@@ -849,23 +869,33 @@ namespace gdjs {
       this.invalidateHitboxes();
     }
 
-    getDrawableX(): float {
+    override getDrawableX(): float {
       return this._renderer.getDrawableX();
     }
 
-    getDrawableY(): float {
+    override getDrawableY(): float {
       return this._renderer.getDrawableY();
     }
 
-    getWidth(): float {
+    override getWidth(): float {
       return this._renderer.getWidth();
     }
 
-    getHeight(): float {
+    override getHeight(): float {
       return this._renderer.getHeight();
     }
 
-    updatePreRender(instanceContainer: gdjs.RuntimeInstanceContainer): void {
+    override getOriginalWidth(): float {
+      return this.getWidth() / this._scaleX;
+    }
+
+    override getOriginalHeight(): float {
+      return this.getHeight() / this._scaleY;
+    }
+
+    override updatePreRender(
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ): void {
       this._renderer.updatePreRender();
     }
 
@@ -930,7 +960,7 @@ namespace gdjs {
       this.invalidateHitboxes();
     }
 
-    updateHitBoxes(): void {
+    override updateHitBoxes(): void {
       this.hitBoxes = this._defaultHitBoxes;
       const width = this.getWidth();
       const height = this.getHeight();

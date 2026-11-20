@@ -360,6 +360,40 @@ describe('gdjs.NavMeshCharacterRuntimeBehavior', function () {
     expect(character.getY()).to.be.within(280, 320);
   });
 
+  it('can find a shorter path when the collision mask of an obstacle changes without it moving', function () {
+    // Like a door, a sprite whose animations have different collision masks.
+    const door = addObstacle(runtimeScene, 50, 300);
+    let isDoorOpen = false;
+    door.updateHitBoxes = function () {
+      gdjs.RuntimeObject.prototype.updateHitBoxes.call(this);
+      if (isDoorOpen) {
+        // Only the top 50 pixels of the door stay solid.
+        // @ts-ignore - hitBoxes is protected: this function is a method of the object.
+        const vertices = this.hitBoxes[0].vertices;
+        vertices[2][1] = vertices[1][1] + 50;
+        vertices[3][1] = vertices[0][1] + 50;
+      }
+    };
+    door.setPosition(475, 150);
+    character.setPosition(400, 300);
+    runtimeScene.renderAndStep(1000 / 60);
+    runtimeScene.renderAndStep(1000 / 60);
+
+    getCharacterBehavior(character).moveTo(600, 300, 0);
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(getPathLength(character)).to.be.above(240);
+
+    isDoorOpen = true;
+    door.invalidateHitboxes();
+    for (let stepIndex = 0; stepIndex < 10; stepIndex++) {
+      runtimeScene.renderAndStep(1000 / 60);
+    }
+    character.setPosition(400, 300);
+    getCharacterBehavior(character).moveTo(600, 300, 0);
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(getPathLength(character)).to.be.within(180, 220);
+  });
+
   it('extends the walkable area to obstacles created later', function () {
     const runtimeScene = createScene();
     const character = addCharacter(runtimeScene);

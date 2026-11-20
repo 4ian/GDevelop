@@ -731,6 +731,129 @@ describe('gdjs.NavMeshObstacleRuntimeBehavior (3D)', function () {
       expect(buildTileSpy.callCount).to.be.within(20, 40);
     });
 
+    /**
+     * The vertices and polygons of each tile of a navigation mesh.
+     * @param {gdjs.RuntimeScene} runtimeScene
+     * @returns {Record<string, string>}
+     */
+    const getTilesDescription = (runtimeScene) => {
+      const navMesh = runtimeScene.navMeshObstaclesManager.navMesh;
+      if (!navMesh) throw new Error('The navigation mesh is not built.');
+      /** @type {Record<string, string>} */
+      const tilesDescription = {};
+      for (let tileIndex = 0; tileIndex < navMesh.getMaxTiles(); tileIndex++) {
+        const tile = navMesh.getTile(tileIndex);
+        const header = tile.header();
+        if (!header) continue;
+        const values = [];
+        for (let index = 0; index < header.vertCount() * 3; index++) {
+          values.push(tile.verts(index).toFixed(2));
+        }
+        for (let index = 0; index < header.polyCount(); index++) {
+          const polygon = tile.polys(index);
+          values.push('polygon');
+          for (let vertex = 0; vertex < polygon.vertCount(); vertex++) {
+            values.push(polygon.verts(vertex));
+          }
+        }
+        tilesDescription[header.x() + ';' + header.y()] = values.join(' ');
+      }
+      return tilesDescription;
+    };
+
+    it('gives the same tiles after many changes of obstacles as when built from their final state', function () {
+      // Changes are picked at random, but the same ones at every run.
+      let seed = 1;
+      const random = () => {
+        seed = (seed * 16807) % 2147483647;
+        return seed / 2147483647;
+      };
+      /** A whole number of cells: every change is big enough to count. */
+      const pickBetween = (min, max) =>
+        min + 10 * Math.floor((random() * (max - min)) / 10);
+
+      const addBox = (runtimeScene, state) => {
+        const box = addObstacle(runtimeScene, { obstacleOnly: true });
+        box.setZ(0);
+        box.setDepth(100);
+        applyState(box, state);
+        return box;
+      };
+      const applyState = (box, state) => {
+        box.setWidth(state.width);
+        box.setHeight(state.height);
+        box.setPosition(state.x, state.y);
+        box.setAngle(state.angle);
+      };
+      // The ground is about 100 tiles: most tiles are changed once or
+      // twice, so a tile wrongly left as it was stays wrong until the end.
+      const addLargeGround = (runtimeScene) => {
+        const ground = addGround(runtimeScene);
+        ground.setWidth(3000);
+        ground.setHeight(3000);
+      };
+      const pickState = () => ({
+        x: pickBetween(100, 2800),
+        y: pickBetween(100, 2800),
+        width: pickBetween(20, 120),
+        height: pickBetween(20, 120),
+        angle: 15 * Math.floor(random() * 12),
+      });
+
+      const runtimeScene = createScene();
+      addLargeGround(runtimeScene);
+      const character = addCharacter(runtimeScene);
+      character.setPosition(50, 50);
+      let boxes = [];
+      for (let index = 0; index < 30; index++) {
+        const state = pickState();
+        boxes.push({ state, box: addBox(runtimeScene, state) });
+      }
+      stepOneSecond(runtimeScene);
+
+      for (let changeIndex = 0; changeIndex < 100; changeIndex++) {
+        const boxIndex = Math.floor(random() * boxes.length);
+        const { box } = boxes[boxIndex];
+        const change = Math.floor(random() * 3);
+        if (change === 0) {
+          // Moved, resized and rotated.
+          boxes[boxIndex].state = pickState();
+          applyState(box, boxes[boxIndex].state);
+        } else if (change === 1) {
+          box.deleteFromScene();
+          boxes.splice(boxIndex, 1);
+        } else {
+          const state = pickState();
+          boxes.push({ state, box: addBox(runtimeScene, state) });
+        }
+        // Changes happen while tiles of the previous ones are still built.
+        runtimeScene.renderAndStep(1000 / 60);
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+      for (let second = 0; second < 5; second++) stepOneSecond(runtimeScene);
+
+      const expectedRuntimeScene = createScene();
+      addLargeGround(expectedRuntimeScene);
+      addCharacter(expectedRuntimeScene).setPosition(50, 50);
+      for (const { state } of boxes) addBox(expectedRuntimeScene, state);
+      for (let second = 0; second < 5; second++) {
+        stepOneSecond(expectedRuntimeScene);
+      }
+
+      const tilesDescription = getTilesDescription(runtimeScene);
+      const expectedTilesDescription =
+        getTilesDescription(expectedRuntimeScene);
+      expect(Object.keys(tilesDescription).length).to.be.above(80);
+      expect(Object.keys(tilesDescription).sort()).to.eql(
+        Object.keys(expectedTilesDescription).sort()
+      );
+      for (const tileKey in expectedTilesDescription) {
+        expect(tilesDescription[tileKey]).to.be(
+          expectedTilesDescription[tileKey]
+        );
+      }
+    });
+
     it('finds shorter paths when an obstacle is deleted', function () {
       const runtimeScene = createScene();
       addGround(runtimeScene);
@@ -1064,6 +1187,20 @@ describe('gdjs.NavMeshObstacleRuntimeBehavior (3D)', function () {
       const { runtimeScene, ramp, model3DManager } =
         await createSceneWithRamp('Mesh');
       ramp.setPosition(1000, 1000);
+      ramp.flipX(true);
+      expectToFollowRampSlope(
+        walkUpRamp(runtimeScene, ramp, { x: -300, y: 0 })
+      );
+      runtimeScene.unloadScene();
+      model3DManager.dispose();
+    });
+
+    it('converts the model again when it is flipped', async function () {
+      const { runtimeScene, ramp, model3DManager } =
+        await createSceneWithRamp('Mesh');
+      ramp.setPosition(1000, 1000);
+      expectToFollowRampSlope(walkUpRamp(runtimeScene, ramp, { x: 300, y: 0 }));
+
       ramp.flipX(true);
       expectToFollowRampSlope(
         walkUpRamp(runtimeScene, ramp, { x: -300, y: 0 })

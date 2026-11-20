@@ -1117,6 +1117,11 @@ namespace gdjs {
     _oldRotationX: float = 0;
     _oldRotationY: float = 0;
     _oldRotationZ: float = 0;
+    _oldIsFlippedX: boolean = false;
+    _oldIsFlippedY: boolean = false;
+    _oldIsFlippedZ: boolean = false;
+    /** The X and Y of the vertices of the hit boxes of a 2D object. */
+    _oldHitBoxesVertices: Array<float> = [];
     _manager: NavMeshObstaclesManager;
     _registeredInManager: boolean = false;
 
@@ -1180,7 +1185,7 @@ namespace gdjs {
       this._oldSurface = surface;
       this._oldSurfaceVersion = surfaceVersion;
 
-      if (this.hasMovedNoticeably()) {
+      if (this.hasMovedNoticeably() || this.haveHitBoxesChangedNoticeably()) {
         this.rememberTransformation();
         this._manager.updateObstacle(this);
       } else if (hasSurfaceChanged) {
@@ -1213,7 +1218,50 @@ namespace gdjs {
         this._oldDepth = owner.getDepth();
         this._oldRotationX = owner.getRotationX();
         this._oldRotationY = owner.getRotationY();
+        this._oldIsFlippedX = owner.isFlippedX();
+        this._oldIsFlippedY = owner.isFlippedY();
+        this._oldIsFlippedZ = owner.isFlippedZ();
+      } else if (!this._manager.is3D) {
+        const vertices = this._oldHitBoxesVertices;
+        let index = 0;
+        for (const hitBox of owner.getHitBoxes()) {
+          for (const vertex of hitBox.vertices) {
+            vertices[index++] = vertex[0];
+            vertices[index++] = vertex[1];
+          }
+        }
+        vertices.length = index;
       }
+    }
+
+    /**
+     * The hit boxes of a 2D object can change without the object moving
+     * (a sprite changing of animation, or flipped): like for movements,
+     * vertices moving by less than half a cell are ignored.
+     */
+    private haveHitBoxesChangedNoticeably(): boolean {
+      const owner = this.owner;
+      if (this._manager.is3D || gdjs.Base3DHandler.is3D(owner)) {
+        return false;
+      }
+      const oldVertices = this._oldHitBoxesVertices;
+      const distanceMax = this._manager.cellSize / 2;
+      const { inverseSpeedScaleY } = this._manager;
+      let index = 0;
+      for (const hitBox of owner.getHitBoxes()) {
+        for (const vertex of hitBox.vertices) {
+          if (
+            index + 1 >= oldVertices.length ||
+            Math.abs(vertex[0] - oldVertices[index]) > distanceMax ||
+            Math.abs(vertex[1] - oldVertices[index + 1]) * inverseSpeedScaleY >
+              distanceMax
+          ) {
+            return true;
+          }
+          index += 2;
+        }
+      }
+      return index !== oldVertices.length;
     }
 
     /**
@@ -1232,6 +1280,13 @@ namespace gdjs {
       let rotationX = 0;
       let rotationY = 0;
       if (gdjs.Base3DHandler.is3D(owner)) {
+        if (
+          owner.isFlippedX() !== this._oldIsFlippedX ||
+          owner.isFlippedY() !== this._oldIsFlippedY ||
+          owner.isFlippedZ() !== this._oldIsFlippedZ
+        ) {
+          return true;
+        }
         centerZ = owner.getCenterZInScene();
         depth = owner.getDepth();
         rotationX = owner.getRotationX();

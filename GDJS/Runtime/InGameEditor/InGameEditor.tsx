@@ -8378,12 +8378,10 @@ namespace gdjs {
     updateGrid(): void {
       const currentScene = this.editor.getCurrentScene();
       if (!currentScene) {
-        console.log('No scene');
         return;
       }
       const topVisibleLayer = this.editor.getTopVisibleLayer();
       if (!topVisibleLayer) {
-        console.log('No toplayer');
         return;
       }
       const runtimeLayerRender = topVisibleLayer
@@ -8393,7 +8391,6 @@ namespace gdjs {
         ? runtimeLayerRender.getThreeScene()
         : null;
       if (!threeScene) {
-        console.log('No threeScene');
         return;
       }
 

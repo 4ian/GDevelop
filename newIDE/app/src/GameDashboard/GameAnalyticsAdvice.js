@@ -5,9 +5,15 @@ import type { I18n as I18nType } from '@lingui/core';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { type Game } from '../Utils/GDevelopServices/Game';
 import Paper from '../UI/Paper';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
+import LampBulb from '../UI/CustomSvgIcons/LampBulb';
 import Text from '../UI/Text';
 import FlatButton from '../UI/FlatButton';
-import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
+import {
+  ColumnStackLayout,
+  LineStackLayout,
+  ResponsiveLineStackLayout,
+} from '../UI/Layout';
 import { Column } from '../UI/Grid';
 import Window from '../Utils/Window';
 import { getHelpLink } from '../Utils/HelpLink';
@@ -22,6 +28,15 @@ const publishingHelpLink = getHelpLink('/publishing');
 
 const styles = {
   paper: { padding: 16 },
+  iconContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+  },
 };
 
 type Tip = {| title: MessageDescriptor, body: MessageDescriptor |};
@@ -192,6 +207,7 @@ const GameAnalyticsAdvice = ({
     marketingPlansDialogOpen,
     setMarketingPlansDialogOpen,
   ] = React.useState<boolean>(false);
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { insight, summary, retentionDays } = gameAnalytics;
   const insightTips = insight !== 'readyToGrow' ? tips[insight] : null;
   const tip = insightTips
@@ -199,54 +215,69 @@ const GameAnalyticsAdvice = ({
     : null;
 
   return (
-    <Paper background="medium" variant="outlined" style={styles.paper}>
+    <Paper
+      background="medium"
+      variant="outlined"
+      style={{ ...styles.paper, borderColor: gdevelopTheme.chart.dataColor1 }}
+    >
       <ResponsiveLineStackLayout
         noMargin
         alignItems="center"
         justifyContent="space-between"
       >
-        <Column noMargin expand>
-          <ColumnStackLayout noMargin>
-            <Text noMargin size="sub-title">
-              {insight === 'highBounce' &&
-              summary.bounceRatePercent !== null ? (
-                <Trans>
-                  {Math.round(summary.bounceRatePercent)}% of players leave in
-                  the first minute, more than on most GDevelop games.
-                </Trans>
-              ) : insight === 'lowRetention' && retentionDays ? (
-                <Trans>
-                  Players try your game, but only{' '}
-                  {formatPercent(retentionDays[0].retentionPercent)} of new
-                  players come back the next day.
-                </Trans>
-              ) : insight === 'readyToGrow' ? (
-                <Trans>
-                  Your game holds attention better than most GDevelop games.
-                </Trans>
+        <LineStackLayout noMargin alignItems="center" expand>
+          <div
+            style={{
+              ...styles.iconContainer,
+              backgroundColor: gdevelopTheme.credits.backgroundColor,
+              color: gdevelopTheme.credits.color,
+            }}
+          >
+            <LampBulb />
+          </div>
+          <Column noMargin expand>
+            <ColumnStackLayout noMargin>
+              <Text noMargin size="sub-title">
+                {insight === 'highBounce' &&
+                summary.bounceRatePercent !== null ? (
+                  <Trans>
+                    {Math.round(summary.bounceRatePercent)}% of players leave in
+                    the first minute, more than on most GDevelop games.
+                  </Trans>
+                ) : insight === 'lowRetention' && retentionDays ? (
+                  <Trans>
+                    Players try your game, but only{' '}
+                    {formatPercent(retentionDays[0].retentionPercent)} of new
+                    players come back the next day.
+                  </Trans>
+                ) : insight === 'readyToGrow' ? (
+                  <Trans>
+                    Your game holds attention better than most GDevelop games.
+                  </Trans>
+                ) : (
+                  <Trans>
+                    With {minPlayersCountForRates} players in the period, you
+                    will see how long they stay and whether they come back.
+                  </Trans>
+                )}
+              </Text>
+              {tip ? (
+                <Text noMargin color="secondary">
+                  <b>{i18n._(tip.title)}.</b> {i18n._(tip.body)}
+                </Text>
               ) : (
-                <Trans>
-                  With {minPlayersCountForRates} players in the period, you will
-                  see how long they stay and whether they come back.
-                </Trans>
+                <Text noMargin color="secondary">
+                  <Trans>
+                    <b>Time to find more players.</b> More visibility is now the
+                    best use of your time: share your game, post it in
+                    communities, or put it in front of thousands of players on
+                    gd.games with a Marketing Boost.
+                  </Trans>
+                </Text>
               )}
-            </Text>
-            {tip ? (
-              <Text noMargin color="secondary">
-                <b>{i18n._(tip.title)}.</b> {i18n._(tip.body)}
-              </Text>
-            ) : (
-              <Text noMargin color="secondary">
-                <Trans>
-                  <b>Time to find more players.</b> More visibility is now the
-                  best use of your time: share your game, post it in
-                  communities, or put it in front of thousands of players on
-                  gd.games with a Marketing Boost.
-                </Trans>
-              </Text>
-            )}
-          </ColumnStackLayout>
-        </Column>
+            </ColumnStackLayout>
+          </Column>
+        </LineStackLayout>
         {insight === 'readyToGrow' && (
           <FlatButton
             primary

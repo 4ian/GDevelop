@@ -235,3 +235,48 @@ describe('Light with obstacles around it', function () {
     ).to.be(true);
   });
 });
+
+describe('Light with an obstacle turning around it', function () {
+  PIXI.settings.FAIL_IF_MAJOR_PERFORMANCE_CAVEAT = false;
+  const runtimeGame = gdjs.getPixiRuntimeGame();
+  const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
+  runtimeScene.loadFromScene({
+    sceneData: {
+      layers: [{ name: '', visibility: true, effects: [] }],
+      variables: [],
+      behaviorsSharedData: [],
+      objects: [],
+      instances: [],
+    },
+    usedExtensionsWithVariablesData: [],
+  });
+  runtimeScene._timeManager.getElapsedTime = function () {
+    return (1 / 60) * 1000;
+  };
+
+  it('is occluded by a door turning in front of it', function () {
+    // A long door, horizontal and far from the light...
+    const door = addLightObstacle(runtimeScene, 300, 10);
+    door.setPosition(50, 195);
+    const light = addLightObject(runtimeScene, 50);
+    light.setPosition(230, 100);
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(light._renderer._computeLightVertices().length).to.be(0);
+
+    // ...turns around its center and becomes vertical, from y = 50 to 350,
+    // between x = 195 and 205: it hides the left of the light.
+    door.setAngle(90);
+    runtimeScene.renderAndStep(1000 / 60);
+    const vertices = light._renderer._computeLightVertices();
+    expect(vertices.length).to.be.greaterThan(0);
+    expect(vertices.every((vertex) => vertex[0] >= 205 - 0.01)).to.be(true);
+    expect(vertices.some((vertex) => Math.abs(vertex[0] - 205) < 0.01)).to.be(
+      true
+    );
+
+    // The light is no more occluded when the door is back horizontal.
+    door.setAngle(0);
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(light._renderer._computeLightVertices().length).to.be(0);
+  });
+});

@@ -8,7 +8,7 @@ describe('gdjs.NavMeshCharacterRuntimeBehavior', function () {
     await gdjs.getAllAsynchronouslyLoadingLibraryPromise();
   });
 
-  const createScene = (framePerSecond = 60) => {
+  const createScene = (framePerSecond = 60, speedScaleY = 1) => {
     const runtimeGame = gdjs.getPixiRuntimeGame();
     const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
     runtimeScene.loadFromScene({
@@ -66,7 +66,7 @@ describe('gdjs.NavMeshCharacterRuntimeBehavior', function () {
       stairHeightMax: 20,
       walkableRadius: -1,
       walkableDepth: 150,
-      speedScaleY: 1,
+      speedScaleY,
     };
     runtimeScene.setInitialSharedDataForBehavior(
       characterBehaviorName,
@@ -313,6 +313,131 @@ describe('gdjs.NavMeshCharacterRuntimeBehavior', function () {
     runtimeScene.renderAndStep(1000 / 60);
     // The path is a straight line as the obstacle is gone.
     expect(getPathLength(character)).to.be.within(180, 220);
+  });
+
+  it('can find a shorter path when an obstacle moves away', function () {
+    const blockingObstacle = addObstacle(runtimeScene, 50, 300);
+    blockingObstacle.setPosition(475, 150);
+    character.setPosition(400, 300);
+    runtimeScene.renderAndStep(1000 / 60);
+    runtimeScene.renderAndStep(1000 / 60);
+
+    getCharacterBehavior(character).moveTo(600, 300, 0);
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(getPathLength(character)).to.be.above(240);
+
+    blockingObstacle.setPosition(475, 500);
+    // Only the tiles around the obstacle are built again, without waiting
+    // for a whole second.
+    for (let stepIndex = 0; stepIndex < 10; stepIndex++) {
+      runtimeScene.renderAndStep(1000 / 60);
+    }
+    character.setPosition(400, 300);
+    getCharacterBehavior(character).moveTo(600, 300, 0);
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(getPathLength(character)).to.be.within(180, 220);
+  });
+
+  it('goes around an obstacle when the vertical speed is scaled (isometric games)', function () {
+    const runtimeScene = createScene(60, 0.5);
+    const character = addCharacter(runtimeScene);
+    addGroundDelimiters(runtimeScene);
+    const blockingObstacle = addObstacle(runtimeScene, 50, 300);
+    blockingObstacle.setPosition(475, 150);
+    character.setPosition(400, 300);
+    runtimeScene.renderAndStep(1000 / 60);
+
+    getCharacterBehavior(character).moveTo(600, 300, 0);
+    expect(getCharacterBehavior(character).pathFound()).to.be(true);
+    runtimeScene.renderAndStep(1000 / 60);
+    // The obstacle is still 300 pixels high on screen: the path goes
+    // around it.
+    expect(getPathLength(character)).to.be.above(240);
+
+    stepUntilDestinationIsReached(runtimeScene, character);
+    expect(getCharacterBehavior(character).destinationReached()).to.be(true);
+    expect(character.getX()).to.be.within(580, 620);
+    expect(character.getY()).to.be.within(280, 320);
+  });
+
+  it('can find a shorter path when the collision mask of an obstacle changes without it moving', function () {
+    // Like a door, a sprite whose animations have different collision masks.
+    const door = addObstacle(runtimeScene, 50, 300);
+    let isDoorOpen = false;
+    door.updateHitBoxes = function () {
+      gdjs.RuntimeObject.prototype.updateHitBoxes.call(this);
+      if (isDoorOpen) {
+        // Only the top 50 pixels of the door stay solid.
+        // @ts-ignore - hitBoxes is protected: this function is a method of the object.
+        const vertices = this.hitBoxes[0].vertices;
+        vertices[2][1] = vertices[1][1] + 50;
+        vertices[3][1] = vertices[0][1] + 50;
+      }
+    };
+    door.setPosition(475, 150);
+    character.setPosition(400, 300);
+    runtimeScene.renderAndStep(1000 / 60);
+    runtimeScene.renderAndStep(1000 / 60);
+
+    getCharacterBehavior(character).moveTo(600, 300, 0);
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(getPathLength(character)).to.be.above(240);
+
+    isDoorOpen = true;
+    door.invalidateHitboxes();
+    for (let stepIndex = 0; stepIndex < 10; stepIndex++) {
+      runtimeScene.renderAndStep(1000 / 60);
+    }
+    character.setPosition(400, 300);
+    getCharacterBehavior(character).moveTo(600, 300, 0);
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(getPathLength(character)).to.be.within(180, 220);
+  });
+
+  it('extends the walkable area to obstacles created later', function () {
+    const runtimeScene = createScene();
+    const character = addCharacter(runtimeScene);
+    character.setPosition(400, 300);
+    // Without any obstacle, the walkable area is the screen.
+    runtimeScene.renderAndStep(1000 / 60);
+    runtimeScene.renderAndStep(1000 / 60);
+
+    // The walkable area goes around obstacles by the size of the screen.
+    const farObstacle = addObstacle(runtimeScene);
+    farObstacle.setPosition(1100, 300);
+    for (let stepIndex = 0; stepIndex < 62; stepIndex++) {
+      runtimeScene.renderAndStep(1000 / 60);
+    }
+    getCharacterBehavior(character).moveTo(1800, 300, 0);
+    expect(getCharacterBehavior(character).pathFound()).to.be(true);
+  });
+
+  it('builds the navigation mesh again only once when an obstacle goes out of the ground', function () {
+    const createNavMeshSpy = sinon.spy(
+      gdjs.NavMeshTileBuilder.prototype,
+      'createNavMesh'
+    );
+    try {
+      const obstacle = addObstacle(runtimeScene);
+      obstacle.setPosition(400, 600);
+      character.setPosition(400, 300);
+      runtimeScene.renderAndStep(1000 / 60);
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(createNavMeshSpy.callCount).to.be(1);
+
+      // It goes out, and keeps moving before the navigation mesh is built
+      // again (at most once per second).
+      for (let stepIndex = 0; stepIndex < 30; stepIndex++) {
+        obstacle.setY(2000 + stepIndex * 10);
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+      for (let stepIndex = 0; stepIndex < 180; stepIndex++) {
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+      expect(createNavMeshSpy.callCount).to.be(2);
+    } finally {
+      createNavMeshSpy.restore();
+    }
   });
 
   it('frees the navigation mesh and the crowd when the scene is unloaded', function () {

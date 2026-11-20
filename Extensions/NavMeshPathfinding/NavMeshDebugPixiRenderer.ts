@@ -4,6 +4,12 @@ Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
  */
 
 namespace gdjs {
+  const tileDebugDrawingColors = {
+    even: 0x778ee8,
+    odd: 0x5f77d6,
+    rebuilt: 0xb3c2ff,
+  };
+
   class NavMeshDebuggerPixiRenderer {
     obstaclesManager: NavMeshObstaclesManager;
     debugDrawerUtils: RecastNav.DebugDrawerUtils | null = null;
@@ -53,9 +59,7 @@ namespace gdjs {
           const layer = scene.getLayer(firstObstacle.owner.getLayer());
           const workingPoint: FloatPoint = [0, 0];
 
-          rendererObject.beginFill();
-          rendererObject.fill.alpha = 0.5;
-          rendererObject.fill.color = 0x778ee8;
+          let fillColor = -1;
 
           if (!this.debugDrawerUtils) {
             this.debugDrawerUtils = new RecastNav.DebugDrawerUtils();
@@ -70,6 +74,20 @@ namespace gdjs {
                   if (y0 < 1) {
                     const [x1, _y1, z1] = primitive.vertices[i + 1];
                     const [x2, _y2, z2] = primitive.vertices[i + 2];
+                    const color =
+                      tileDebugDrawingColors[
+                        this.obstaclesManager.getTileDebugDrawing(
+                          (x0 + x1 + x2) / 3,
+                          (z0 + z1 + z2) / 3
+                        )
+                      ];
+                    if (color !== fillColor) {
+                      if (fillColor !== -1) {
+                        rendererObject.endFill();
+                      }
+                      fillColor = color;
+                      rendererObject.beginFill(color, 0.5);
+                    }
 
                     const positions: Array<float> = [];
                     positions.push.apply(
@@ -105,13 +123,16 @@ namespace gdjs {
                 break;
             }
           }
-          rendererObject.endFill();
+          if (fillColor !== -1) {
+            rendererObject.endFill();
+          }
         });
     }
 
     removeFor3D() {
       for (const mesh of this.meshes) {
         mesh.removeFromParent();
+        mesh.geometry.dispose();
       }
       this.meshes.length = 0;
     }
@@ -154,6 +175,8 @@ namespace gdjs {
           case 'tris':
             const geometry = new THREE.BufferGeometry();
             const positions = new Float32Array(primitive.vertices.length * 3);
+            const colors = new Float32Array(primitive.vertices.length * 3);
+            const color = new THREE.Color();
 
             for (let i = 0; i < primitive.vertices.length; i++) {
               const [x, y, z] = primitive.vertices[i];
@@ -171,15 +194,35 @@ namespace gdjs {
               positions[vertexIndex * 3 + 1] = z;
               positions[vertexIndex * 3 + 2] = y;
             }
+            for (let i = 0; i + 2 < primitive.vertices.length; i += 3) {
+              const [x0, , z0] = primitive.vertices[i];
+              const [x1, , z1] = primitive.vertices[i + 1];
+              const [x2, , z2] = primitive.vertices[i + 2];
+              color.setHex(
+                tileDebugDrawingColors[
+                  this.obstaclesManager.getTileDebugDrawing(
+                    (x0 + x1 + x2) / 3,
+                    (z0 + z1 + z2) / 3
+                  )
+                ]
+              );
+              for (let vertexIndex = i; vertexIndex < i + 3; vertexIndex++) {
+                color.toArray(colors, vertexIndex * 3);
+              }
+            }
 
             geometry.setAttribute(
               'position',
               new THREE.BufferAttribute(positions, 3)
             );
+            geometry.setAttribute(
+              'color',
+              new THREE.BufferAttribute(colors, 3)
+            );
 
             if (!this.material) {
               this.material = new THREE.MeshStandardMaterial({
-                color: 0x778ee8,
+                vertexColors: true,
               });
             }
             const mesh = new THREE.Mesh(geometry, this.material);

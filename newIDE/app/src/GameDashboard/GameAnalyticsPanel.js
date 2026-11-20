@@ -36,10 +36,14 @@ import {
   formatPercent,
   PlayedDurationChart,
   PlayedDurationStepsChart,
+  PlayerDevicesChart,
+  PlayerSourcesChart,
   PlayersChart,
   PlayersChartLegend,
   RetentionChart,
 } from './GameAnalyticsCharts';
+import GameAnalyticsAdvice from './GameAnalyticsAdvice';
+import { type Build } from '../Utils/GDevelopServices/Build';
 import MarketingPlanSingleDisplay from '../MarketingPlans/MarketingPlanSingleDisplay';
 
 const chartHeight = 260;
@@ -156,6 +160,7 @@ type Props = {|
   recommendedMarketingPlan?: ?MarketingPlan,
   gameFeaturings?: ?(GameFeaturing[]),
   fetchGameFeaturings?: () => Promise<void>,
+  builds?: ?Array<Build>,
 |};
 
 export const GameAnalyticsPanel = ({
@@ -163,6 +168,7 @@ export const GameAnalyticsPanel = ({
   recommendedMarketingPlan,
   gameFeaturings,
   fetchGameFeaturings,
+  builds,
 }: Props): React.Node => {
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
@@ -173,8 +179,9 @@ export const GameAnalyticsPanel = ({
   );
   const [period, setPeriod] = React.useState<GameAnalyticsPeriod>('month');
   const gameAnalytics = React.useMemo(
-    () => getGameAnalytics(gameRollingMetrics, period),
-    [gameRollingMetrics, period]
+    () =>
+      getGameAnalytics(gameRollingMetrics, period, { gameFeaturings, builds }),
+    [gameRollingMetrics, period, gameFeaturings, builds]
   );
 
   const [gameRollingMetricsError, setGameMetricsError] = React.useState<?Error>(
@@ -237,6 +244,7 @@ export const GameAnalyticsPanel = ({
     overTime,
     playedDurationSteps,
     retentionDays,
+    playerPlatforms,
   } = gameAnalytics;
   const {
     playersCount,
@@ -292,6 +300,11 @@ export const GameAnalyticsPanel = ({
               <SelectOption value="year" label={t`Last 12 months`} />
             </SelectField>
           </Line>
+          <GameAnalyticsAdvice
+            i18n={i18n}
+            game={game}
+            gameAnalytics={gameAnalytics}
+          />
           {playersCount === 0 ? (
             <EmptyMessage>
               <Trans>
@@ -387,7 +400,9 @@ export const GameAnalyticsPanel = ({
               >
                 <ChartBlock
                   title={<Trans>Players</Trans>}
-                  description={<PlayersChartLegend i18n={i18n} />}
+                  description={
+                    <PlayersChartLegend i18n={i18n} overTime={overTime} />
+                  }
                 >
                   <PlayersChart
                     i18n={i18n}
@@ -481,6 +496,44 @@ export const GameAnalyticsPanel = ({
                     <PlayedDurationChart
                       i18n={i18n}
                       overTime={overTime}
+                      height={chartHeight}
+                    />
+                  </ChartBlock>
+                </Grid>
+              )}
+              {playerPlatforms && (
+                <Grid item xs={12} sm={6}>
+                  <ChartBlock
+                    title={<Trans>Devices</Trans>}
+                    description={
+                      <Trans>
+                        Share of players on a device with a touch screen: mostly
+                        phones and tablets.
+                      </Trans>
+                    }
+                  >
+                    <PlayerDevicesChart
+                      i18n={i18n}
+                      playerPlatforms={playerPlatforms}
+                      height={chartHeight}
+                    />
+                  </ChartBlock>
+                </Grid>
+              )}
+              {playerPlatforms && (
+                <Grid item xs={12} sm={6}>
+                  <ChartBlock
+                    title={<Trans>Where players play</Trans>}
+                    description={
+                      <Trans>
+                        Share of players on gd.games, in the game published as a
+                        mobile app, or elsewhere (other websites, desktop).
+                      </Trans>
+                    }
+                  >
+                    <PlayerSourcesChart
+                      i18n={i18n}
+                      playerPlatforms={playerPlatforms}
                       height={chartHeight}
                     />
                   </ChartBlock>

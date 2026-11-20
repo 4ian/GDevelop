@@ -74,7 +74,7 @@ describe('GameAnalyticsEvaluator', () => {
         }),
       ],
       'week',
-      todayDate
+      { todayDate }
     );
 
     expect(gameAnalytics.summary).toEqual({
@@ -126,6 +126,102 @@ describe('GameAnalyticsEvaluator', () => {
     ]);
   });
 
+  it('gives the same advice as the weekly email', () => {
+    const getInsight = (
+      bouncedPlayersCount: number,
+      d1RetainedPlayersCount: number
+    ) =>
+      getGameAnalytics(
+        [
+          createFakeGameMetrics('2026-11-20', {
+            playersCount: 100,
+            newPlayersCount: 50,
+            bouncedPlayersCount,
+            d1RetainedPlayersCount,
+          }),
+          createFakeGameMetrics('2026-11-19', {
+            playersCount: 100,
+            newPlayersCount: 100,
+            bouncedPlayersCount,
+            d1RetainedPlayersCount: 0,
+          }),
+        ],
+        'week',
+        { todayDate }
+      ).insight;
+
+    expect(getInsight(35, 50)).toBe('highBounce');
+    expect(getInsight(34, 3)).toBe('lowRetention');
+    expect(getInsight(34, 4)).toBe('readyToGrow');
+  });
+
+  it('marks the days with a Marketing Boost or a new build, and counts the players per platform', () => {
+    const gameAnalytics = getGameAnalytics(
+      [
+        {
+          ...createFakeGameMetrics('2026-11-19', {
+            playersCount: 40,
+            newPlayersCount: 20,
+            bouncedPlayersCount: 4,
+            d1RetainedPlayersCount: 0,
+          }),
+          platforms: {
+            d0TouchPlayers: 30,
+            d0GamesPlatformPlayers: 10,
+            d0MobileAppPlayers: 4,
+          },
+        },
+        // A day before the players were counted per platform.
+        createFakeGameMetrics('2026-11-18', {
+          playersCount: 60,
+          newPlayersCount: 20,
+          bouncedPlayersCount: 4,
+          d1RetainedPlayersCount: 0,
+        }),
+      ],
+      'week',
+      {
+        todayDate,
+        gameFeaturings: [
+          {
+            gameId: 'game-id',
+            featuring: 'games-platform-home',
+            createdAt: Date.parse('2026-11-16T15:00:00Z') / 1000,
+            updatedAt: Date.parse('2026-11-16T15:00:00Z') / 1000,
+            expiresAt: Date.parse('2026-11-18T15:00:00Z') / 1000,
+          },
+        ],
+        builds: [
+          {
+            id: 'build-id',
+            userId: 'user-id',
+            type: 'web-build',
+            status: 'complete',
+            updatedAt: Date.parse('2026-11-19T08:00:00Z'),
+          },
+        ],
+      }
+    );
+
+    expect(
+      gameAnalytics.overTime.map(point => point.hasMarketingBoost)
+    ).toEqual([false, false, true, true, true, false, false]);
+    expect(gameAnalytics.overTime.map(point => point.buildsCount)).toEqual([
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+    ]);
+    expect(gameAnalytics.playerPlatforms).toEqual({
+      touchPlayersPercent: 75,
+      gamesPlatformPlayersPercent: 25,
+      mobileAppPlayersPercent: 10,
+    });
+  });
+
   it('hides the rates of a game with too few players', () => {
     const gameAnalytics = getGameAnalytics(
       [
@@ -137,7 +233,7 @@ describe('GameAnalyticsEvaluator', () => {
         }),
       ],
       'month',
-      todayDate
+      { todayDate }
     );
 
     expect(gameAnalytics.summary.playersCount).toBe(3);
@@ -146,6 +242,8 @@ describe('GameAnalyticsEvaluator', () => {
     expect(gameAnalytics.previousSummary).toBe(null);
     expect(gameAnalytics.playedDurationSteps).toBe(null);
     expect(gameAnalytics.retentionDays).toBe(null);
+    expect(gameAnalytics.playerPlatforms).toBe(null);
+    expect(gameAnalytics.insight).toBe('fewPlayers');
     expect(gameAnalytics.overTime.length).toBe(30);
   });
 
@@ -172,7 +270,7 @@ describe('GameAnalyticsEvaluator', () => {
         }),
       ],
       'quarter',
-      todayDate
+      { todayDate }
     );
 
     expect(gameAnalytics.overTime.length).toBe(12);

@@ -14,6 +14,8 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
+  ReferenceArea,
+  ReferenceLine,
 } from 'recharts';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { type GDevelopTheme } from '../UI/Theme';
@@ -23,6 +25,7 @@ import Text from '../UI/Text';
 import {
   type GameAnalyticsOverTimePoint,
   type GameAnalyticsPlayedDurationStep,
+  type GameAnalyticsPlayerPlatforms,
   type GameAnalyticsRetentionDay,
 } from './GameAnalyticsEvaluator';
 
@@ -37,6 +40,7 @@ const chartMargins = {
 const chartWidth = '99%';
 const barRadius = [3, 3, 0, 0];
 const returningPlayersOpacity = 0.45;
+const marketingBoostOpacity = 0.18;
 
 const getChartsStyleFromTheme = (gdevelopTheme: GDevelopTheme) => ({
   tooltipContent: {
@@ -69,11 +73,13 @@ const ChartTooltip = ({
   title,
   customStyle,
   formatValue,
+  notes,
 }: {|
   payload: ?Array<{ name: string, value: number, ... }>,
   title: ?string,
   customStyle: Object,
   formatValue: (value: number) => string,
+  notes?: Array<string>,
 |}) =>
   payload && payload.length > 0 ? (
     <Paper style={customStyle} background="light">
@@ -88,6 +94,11 @@ const ChartTooltip = ({
             {name}: {formatValue(value)}
           </Text>
         ))}
+        {(notes || []).map(note => (
+          <Text noMargin key={note} color="secondary">
+            {note}
+          </Text>
+        ))}
       </ColumnStackLayout>
     </Paper>
   ) : null;
@@ -98,6 +109,42 @@ const getFullLabel = (
   payload && payload.length > 0 && payload[0].payload
     ? payload[0].payload.fullLabel
     : null;
+
+/**
+ * @returns the label of the first and last point of each run of points with a Marketing Boost.
+ */
+const getMarketingBoostLabelRanges = (
+  overTime: Array<GameAnalyticsOverTimePoint>
+): Array<[string, string]> => {
+  const labelRanges: Array<[string, string]> = [];
+  let firstLabel = null;
+  overTime.forEach((point, index) => {
+    if (point.hasMarketingBoost && firstLabel === null)
+      firstLabel = point.label;
+    const nextPoint = overTime[index + 1];
+    if (
+      firstLabel !== null &&
+      point.hasMarketingBoost &&
+      (!nextPoint || !nextPoint.hasMarketingBoost)
+    ) {
+      labelRanges.push([firstLabel, point.label]);
+      firstLabel = null;
+    }
+  });
+  return labelRanges;
+};
+
+const getPointNotes = (
+  i18n: I18nType,
+  payload: ?Array<{ payload?: GameAnalyticsOverTimePoint, ... }>
+): Array<string> => {
+  const point = payload && payload.length > 0 ? payload[0].payload : null;
+  if (!point) return [];
+  return [
+    point.hasMarketingBoost ? i18n._(t`Marketing Boost active`) : null,
+    point.buildsCount > 0 ? i18n._(t`New build`) : null,
+  ].filter(Boolean);
+};
 
 type OverTimeChartProps = {|
   i18n: I18nType,
@@ -112,6 +159,7 @@ export const PlayersChart = ({
 }: OverTimeChartProps): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const styles = getChartsStyleFromTheme(gdevelopTheme);
+  const marketingBoostLabelRanges = getMarketingBoostLabelRanges(overTime);
 
   return (
     <ResponsiveContainer width={chartWidth} height={height} debounce={1}>
@@ -142,9 +190,21 @@ export const PlayersChart = ({
               title={getFullLabel(payload)}
               customStyle={styles.tooltipContent}
               formatValue={value => value.toString()}
+              notes={getPointNotes(i18n, payload)}
             />
           )}
         />
+        {marketingBoostLabelRanges.map(([firstLabel, lastLabel]) => (
+          <ReferenceArea
+            key={firstLabel}
+            x1={firstLabel}
+            x2={lastLabel}
+            fill={gdevelopTheme.statusIndicator.success}
+            fillOpacity={marketingBoostOpacity}
+            strokeOpacity={0}
+            ifOverflow="visible"
+          />
+        ))}
         <Bar
           name={i18n._(t`New players`)}
           dataKey="newPlayersCount"
@@ -161,6 +221,16 @@ export const PlayersChart = ({
           radius={barRadius}
           isAnimationActive={false}
         />
+        {overTime
+          .filter(point => point.buildsCount > 0)
+          .map(point => (
+            <ReferenceLine
+              key={point.label}
+              x={point.label}
+              stroke={gdevelopTheme.chart.textColor}
+              strokeDasharray="4 3"
+            />
+          ))}
       </BarChart>
     </ResponsiveContainer>
   );
@@ -168,8 +238,10 @@ export const PlayersChart = ({
 
 export const PlayersChartLegend = ({
   i18n,
+  overTime,
 }: {|
   i18n: I18nType,
+  overTime: Array<GameAnalyticsOverTimePoint>,
 |}): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const squareStyle = {
@@ -180,14 +252,43 @@ export const PlayersChartLegend = ({
     marginRight: 6,
     backgroundColor: gdevelopTheme.chart.dataColor1,
   };
+  const itemStyle = { display: 'inline-block', marginRight: 16 };
 
   return (
     <Text noMargin size="body-small" color="secondary">
-      <span style={squareStyle} />
-      {i18n._(t`New players`)}
-      <span style={{ display: 'inline-block', width: 16 }} />
-      <span style={{ ...squareStyle, opacity: returningPlayersOpacity }} />
-      {i18n._(t`Returning players`)}
+      <span style={itemStyle}>
+        <span style={squareStyle} />
+        {i18n._(t`New players`)}
+      </span>
+      <span style={itemStyle}>
+        <span style={{ ...squareStyle, opacity: returningPlayersOpacity }} />
+        {i18n._(t`Returning players`)}
+      </span>
+      {overTime.some(point => point.hasMarketingBoost) && (
+        <span style={itemStyle}>
+          <span
+            style={{
+              ...squareStyle,
+              backgroundColor: gdevelopTheme.statusIndicator.success,
+              opacity: marketingBoostOpacity * 2,
+            }}
+          />
+          {i18n._(t`Marketing Boost`)}
+        </span>
+      )}
+      {overTime.some(point => point.buildsCount > 0) && (
+        <span style={itemStyle}>
+          <span
+            style={{
+              display: 'inline-block',
+              height: 10,
+              marginRight: 6,
+              borderLeft: `2px dashed ${gdevelopTheme.chart.textColor}`,
+            }}
+          />
+          {i18n._(t`New build`)}
+        </span>
+      )}
     </Text>
   );
 };
@@ -386,5 +487,64 @@ export const PlayedDurationStepsChart = ({
           : i18n._(t`${durationInMinutes} min`),
       percent: playersPercent,
     }))}
+  />
+);
+
+export const PlayerDevicesChart = ({
+  i18n,
+  playerPlatforms,
+  height,
+}: {|
+  i18n: I18nType,
+  playerPlatforms: GameAnalyticsPlayerPlatforms,
+  height: number,
+|}): React.Node => (
+  <PercentBarsChart
+    name={i18n._(t`Players`)}
+    height={height}
+    data={[
+      {
+        label: i18n._(t`Touch screen`),
+        percent: playerPlatforms.touchPlayersPercent,
+      },
+      {
+        label: i18n._(t`No touch screen`),
+        percent: 100 - playerPlatforms.touchPlayersPercent,
+      },
+    ]}
+  />
+);
+
+export const PlayerSourcesChart = ({
+  i18n,
+  playerPlatforms,
+  height,
+}: {|
+  i18n: I18nType,
+  playerPlatforms: GameAnalyticsPlayerPlatforms,
+  height: number,
+|}): React.Node => (
+  <PercentBarsChart
+    name={i18n._(t`Players`)}
+    height={height}
+    data={[
+      {
+        label: i18n._(t`gd.games`),
+        percent: playerPlatforms.gamesPlatformPlayersPercent,
+      },
+      {
+        label: i18n._(t`Mobile app`),
+        percent: playerPlatforms.mobileAppPlayersPercent,
+      },
+      {
+        label: i18n._(t`Elsewhere`),
+        percent: Math.max(
+          0,
+          100 -
+            playerPlatforms.gamesPlatformPlayersPercent -
+            playerPlatforms.mobileAppPlayersPercent
+        ),
+      },
+    ]}
   />
 );

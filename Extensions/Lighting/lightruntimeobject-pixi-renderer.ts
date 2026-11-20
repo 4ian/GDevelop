@@ -75,9 +75,15 @@ namespace gdjs {
     _angularRangesCount: integer = 0;
     /** The angular ranges indices, by increasing start angle. */
     _angularRangesByStart: Int32Array = new Int32Array(0);
-    _compareAngularRangesStart = (rangeIndexA: integer, rangeIndexB: integer) =>
-      this._angularRangesStart[rangeIndexA] -
-      this._angularRangesStart[rangeIndexB];
+    // Returns an integer: a float would be allocated at each comparison.
+    _compareAngularRangesStart = (
+      rangeIndexA: integer,
+      rangeIndexB: integer
+    ): integer => {
+      const startA = this._angularRangesStart[rangeIndexA];
+      const startB = this._angularRangesStart[rangeIndexB];
+      return startA < startB ? -1 : startA > startB ? 1 : 0;
+    };
     /** The angular ranges containing the angle of the current ray. */
     _activeAngularRanges: Int32Array = new Int32Array(0);
     /**
@@ -722,10 +728,11 @@ namespace gdjs {
       }
 
       // Build the list of polygons, reusing the class-level array to avoid
-      // per-frame heap allocation.
+      // per-frame heap allocation (overwritten then truncated, rather than
+      // emptied then filled, to keep the memory of the array).
       const obstaclePolygons = this._obstaclePolygonsTemp;
-      obstaclePolygons.length = 0;
-      obstaclePolygons.push(this._lightBoundingPoly);
+      let obstaclePolygonsCount = 0;
+      obstaclePolygons[obstaclePolygonsCount++] = this._lightBoundingPoly;
       for (let i = 0; i < lightObstacles.length; i++) {
         const obstacleHitBoxes = lightObstacles[i].owner.getHitBoxesAround(
           searchAreaLeft,
@@ -733,10 +740,18 @@ namespace gdjs {
           searchAreaRight,
           searchAreaBottom
         );
-        for (const hitbox of obstacleHitBoxes) {
-          obstaclePolygons.push(hitbox);
+        if (Array.isArray(obstacleHitBoxes)) {
+          // Avoid allocating an iterator for the most common case.
+          for (let j = 0; j < obstacleHitBoxes.length; j++) {
+            obstaclePolygons[obstaclePolygonsCount++] = obstacleHitBoxes[j];
+          }
+        } else {
+          for (const hitbox of obstacleHitBoxes) {
+            obstaclePolygons[obstaclePolygonsCount++] = hitbox;
+          }
         }
       }
+      obstaclePolygons.length = obstaclePolygonsCount;
       if (
         !this._updateLightVerticesInputs(searchHalfExtent, obstaclePolygons)
       ) {
@@ -755,12 +770,12 @@ namespace gdjs {
       let minY = searchAreaTop;
       let maxY = searchAreaBottom;
       const flattenVertices = this._flattenVerticesTemp;
-      flattenVertices.length = 0;
+      let flattenVerticesCount = 0;
       for (let i = 1; i < obstaclePolygons.length; i++) {
         const vertices = obstaclePolygons[i].vertices;
         const verticesCount = vertices.length;
         for (let j = 0; j < verticesCount; j++) {
-          flattenVertices.push(vertices[j]);
+          flattenVertices[flattenVerticesCount++] = vertices[j];
           if (vertices[j][0] < minX) {
             minX = vertices[j][0];
           }
@@ -805,12 +820,13 @@ namespace gdjs {
 
       // Add the vertices of the light bounding polygon.
       for (let i = 0; i < 4; i++) {
-        flattenVertices.push(obstaclePolygons[0].vertices[i]);
+        flattenVertices[flattenVerticesCount++] =
+          obstaclePolygons[0].vertices[i];
       }
+      flattenVertices.length = flattenVerticesCount;
       // Rays are cast toward each vertex, and 0.0001 radian on each side of
       // it. The hit of a ray only depends on its angle: rays are cast once
       // per angle, in the order of their angles.
-      const flattenVerticesCount = flattenVertices.length;
       if (this._vertexAngles.length < flattenVerticesCount) {
         this._vertexAngles = new Float64Array(2 * flattenVerticesCount);
       }
@@ -1143,13 +1159,15 @@ namespace gdjs {
       }
       this._polygonsWithoutAngularRangeCount = polygonsWithoutAngularRangeCount;
       this._angularRangesCount = rangesCount;
-      if (this._angularRangesByStart.length !== rangesCount) {
-        this._angularRangesByStart = new Int32Array(rangesCount);
+      if (this._angularRangesByStart.length < rangesCount) {
+        this._angularRangesByStart = new Int32Array(3 * polyCount);
       }
       for (let i = 0; i < rangesCount; i++) {
         this._angularRangesByStart[i] = i;
       }
-      this._angularRangesByStart.sort(this._compareAngularRangesStart);
+      this._angularRangesByStart
+        .subarray(0, rangesCount)
+        .sort(this._compareAngularRangesStart);
     }
 
     static _defaultIndexBuffer = new Uint16Array([0, 1, 2, 0, 2, 3]);

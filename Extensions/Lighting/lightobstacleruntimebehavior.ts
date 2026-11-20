@@ -74,10 +74,12 @@ namespace gdjs {
       searchArea.maxY = y + radius;
       const nearbyObstacles: gdjs.BehaviorRBushAABB<gdjs.LightObstacleRuntimeBehavior>[] =
         this._obstacleRBush.search(searchArea);
-      result.length = 0;
-      nearbyObstacles.forEach((nearbyObstacle) =>
-        result.push(nearbyObstacle.behavior)
-      );
+      // Overwritten then truncated, rather than emptied then filled, to keep
+      // the memory of the array.
+      for (let i = 0; i < nearbyObstacles.length; i++) {
+        result[i] = nearbyObstacles[i].behavior;
+      }
+      result.length = nearbyObstacles.length;
     }
   }
 

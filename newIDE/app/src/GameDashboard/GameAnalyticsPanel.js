@@ -37,7 +37,6 @@ import {
   PlayedDurationChart,
   PlayedDurationStepsChart,
   PlayerDevicesChart,
-  PlayerSourcesChart,
   PlayersChart,
   PlayersChartLegend,
   RetentionChart,
@@ -513,25 +512,6 @@ export const GameAnalyticsPanel = ({
                     }
                   >
                     <PlayerDevicesChart
-                      i18n={i18n}
-                      playerPlatforms={playerPlatforms}
-                      height={chartHeight}
-                    />
-                  </ChartBlock>
-                </Grid>
-              )}
-              {playerPlatforms && (
-                <Grid item xs={12} sm={6}>
-                  <ChartBlock
-                    title={<Trans>Where players play</Trans>}
-                    description={
-                      <Trans>
-                        Share of players on gd.games, in the game published as a
-                        mobile app, or elsewhere (other websites, desktop).
-                      </Trans>
-                    }
-                  >
-                    <PlayerSourcesChart
                       i18n={i18n}
                       playerPlatforms={playerPlatforms}
                       height={chartHeight}

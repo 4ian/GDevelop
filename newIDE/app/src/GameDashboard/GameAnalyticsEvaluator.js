@@ -44,8 +44,6 @@ export type GameAnalyticsRetentionDay = {|
 export type GameAnalyticsPlayerPlatforms = {|
   /** Mostly phones and tablets. */
   touchPlayersPercent: number,
-  gamesPlatformPlayersPercent: number,
-  mobileAppPlayersPercent: number,
 |};
 
 export type GameAnalyticsInsight =
@@ -156,8 +154,6 @@ type DaysMetrics = {|
   /** Players of the days having the numbers of players per platform. */
   playersWithPlatformsCount: number,
   touchPlayersCount: number,
-  gamesPlatformPlayersCount: number,
-  mobileAppPlayersCount: number,
 |};
 
 const sumDaysMetrics = (
@@ -173,8 +169,6 @@ const sumDaysMetrics = (
     playersBelowDurationCounts: playedDurationsInMinutes.map(() => 0),
     playersWithPlatformsCount: 0,
     touchPlayersCount: 0,
-    gamesPlatformPlayersCount: 0,
-    mobileAppPlayersCount: 0,
   };
   isoDays.forEach(isoDay => {
     const gameMetrics = gameMetricsByIsoDay[isoDay];
@@ -190,9 +184,6 @@ const sumDaysMetrics = (
     if (platforms && platforms.d0TouchPlayers != null) {
       daysMetrics.playersWithPlatformsCount += players.d0Players;
       daysMetrics.touchPlayersCount += platforms.d0TouchPlayers;
-      daysMetrics.gamesPlatformPlayersCount +=
-        platforms.d0GamesPlatformPlayers || 0;
-      daysMetrics.mobileAppPlayersCount += platforms.d0MobileAppPlayers || 0;
     }
 
     const playersBelowDurationCounts = [
@@ -333,10 +324,6 @@ const getPlayerPlatforms = (
   return {
     touchPlayersPercent:
       (100 * daysMetrics.touchPlayersCount) / playersWithPlatformsCount,
-    gamesPlatformPlayersPercent:
-      (100 * daysMetrics.gamesPlatformPlayersCount) / playersWithPlatformsCount,
-    mobileAppPlayersPercent:
-      (100 * daysMetrics.mobileAppPlayersCount) / playersWithPlatformsCount,
   };
 };
 

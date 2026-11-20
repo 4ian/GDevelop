@@ -155,7 +155,7 @@ describe('GameAnalyticsEvaluator', () => {
     expect(getInsight(34, 4)).toBe('readyToGrow');
   });
 
-  it('marks the days with a Marketing Boost or a new build, and counts the players per platform', () => {
+  it('marks the days with a Marketing Boost or a new build, and counts the players on a touch device', () => {
     const gameAnalytics = getGameAnalytics(
       [
         {
@@ -167,8 +167,6 @@ describe('GameAnalyticsEvaluator', () => {
           }),
           platforms: {
             d0TouchPlayers: 30,
-            d0GamesPlatformPlayers: 10,
-            d0MobileAppPlayers: 4,
           },
         },
         // A day before the players were counted per platform.
@@ -217,8 +215,6 @@ describe('GameAnalyticsEvaluator', () => {
     ]);
     expect(gameAnalytics.playerPlatforms).toEqual({
       touchPlayersPercent: 75,
-      gamesPlatformPlayersPercent: 25,
-      mobileAppPlayersPercent: 10,
     });
   });
 

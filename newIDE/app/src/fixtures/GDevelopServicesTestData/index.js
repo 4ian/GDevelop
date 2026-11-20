@@ -2380,8 +2380,6 @@ const generateGameRollingMetricsFor364Days = ({
         index < 45
           ? {
               d0TouchPlayers: Math.round(playersCount * 0.62),
-              d0GamesPlatformPlayers: Math.round(playersCount * 0.71),
-              d0MobileAppPlayers: Math.round(playersCount * 0.08),
             }
           : null,
     });

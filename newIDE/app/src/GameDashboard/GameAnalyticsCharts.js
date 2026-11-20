@@ -514,37 +514,3 @@ export const PlayerDevicesChart = ({
     ]}
   />
 );
-
-export const PlayerSourcesChart = ({
-  i18n,
-  playerPlatforms,
-  height,
-}: {|
-  i18n: I18nType,
-  playerPlatforms: GameAnalyticsPlayerPlatforms,
-  height: number,
-|}): React.Node => (
-  <PercentBarsChart
-    name={i18n._(t`Players`)}
-    height={height}
-    data={[
-      {
-        label: i18n._(t`gd.games`),
-        percent: playerPlatforms.gamesPlatformPlayersPercent,
-      },
-      {
-        label: i18n._(t`Mobile app`),
-        percent: playerPlatforms.mobileAppPlayersPercent,
-      },
-      {
-        label: i18n._(t`Elsewhere`),
-        percent: Math.max(
-          0,
-          100 -
-            playerPlatforms.gamesPlatformPlayersPercent -
-            playerPlatforms.mobileAppPlayersPercent
-        ),
-      },
-    ]}
-  />
-);

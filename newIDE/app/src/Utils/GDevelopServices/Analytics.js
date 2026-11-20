@@ -47,6 +47,15 @@ export type GameMetrics = {
     /** Day 7 retained players (number of players who played this day, and were new players 7 days earlier). */
     d7RetainedPlayers: number,
   },
+  /** The numbers are not defined for the days before they were counted (2026-11). */
+  platforms?: ?{
+    /** Number of players for this day on a device with a touch screen (mostly phones and tablets). */
+    d0TouchPlayers?: ?number,
+    /** Number of players for this day playing on gd.games. */
+    d0GamesPlatformPlayers?: ?number,
+    /** Number of players for this day playing the game packaged as a mobile app. */
+    d0MobileAppPlayers?: ?number,
+  },
 };
 
 // $FlowFixMe[cannot-resolve-name]

@@ -2312,7 +2312,13 @@ const interpolateWithNoise = (
   ((1 - ratio) * leftValue + ratio * rightValue) *
   (0.95 + 0.1 * numberGenerator.getNextRandomNumber());
 
-const generateGameRollingMetricsFor364Days = () => {
+const generateGameRollingMetricsFor364Days = ({
+  recentBouncedPlayersRatio = 0.4,
+  d1RetainedPlayersCount = 9,
+}: {|
+  recentBouncedPlayersRatio?: number,
+  d1RetainedPlayersCount?: number,
+|} = {}) => {
   const numberGenerator = new NumberGenerator();
   const metrics = [];
   const count = 364;
@@ -2338,7 +2344,13 @@ const generateGameRollingMetricsFor364Days = () => {
           interpolateWithNoise(80, 120, ratio, numberGenerator)
         ),
         d0PlayersBelow60s: Math.round(
-          playersCount * interpolateWithNoise(0.8, 0.4, ratio, numberGenerator)
+          playersCount *
+            interpolateWithNoise(
+              0.8,
+              recentBouncedPlayersRatio,
+              ratio,
+              numberGenerator
+            )
         ),
         d0PlayersBelow180s: Math.round(
           playersCount * interpolateWithNoise(0.9, 0.55, ratio, numberGenerator)
@@ -2355,7 +2367,7 @@ const generateGameRollingMetricsFor364Days = () => {
         ),
       },
       retention: {
-        d1RetainedPlayers: 9,
+        d1RetainedPlayers: d1RetainedPlayersCount,
         d2RetainedPlayers: 6,
         d3RetainedPlayers: 5,
         d4RetainedPlayers: 4,
@@ -2363,6 +2375,15 @@ const generateGameRollingMetricsFor364Days = () => {
         d6RetainedPlayers: 3,
         d7RetainedPlayers: 2,
       },
+      // The players per platform are only counted on recent days.
+      platforms:
+        index < 45
+          ? {
+              d0TouchPlayers: Math.round(playersCount * 0.62),
+              d0GamesPlatformPlayers: Math.round(playersCount * 0.71),
+              d0MobileAppPlayers: Math.round(playersCount * 0.08),
+            }
+          : null,
     });
   }
   return metrics;
@@ -2392,6 +2413,14 @@ const deleteDurationMetrics = (
 
 // $FlowFixMe[incompatible-type]
 export const gameRollingMetricsFor364Days: GameMetrics[] = generateGameRollingMetricsFor364Days();
+// $FlowFixMe[incompatible-type]
+export const gameRollingMetricsWithLowRetention: GameMetrics[] = generateGameRollingMetricsFor364Days(
+  { recentBouncedPlayersRatio: 0.2, d1RetainedPlayersCount: 3 }
+);
+// $FlowFixMe[incompatible-type]
+export const gameRollingMetricsReadyToGrow: GameMetrics[] = generateGameRollingMetricsFor364Days(
+  { recentBouncedPlayersRatio: 0.2 }
+);
 export const gameRollingMetricsWithUndefinedDurationMetrics: GameMetrics[] = deleteDurationMetrics(
   // $FlowFixMe[incompatible-type]
   generateGameRollingMetricsFor364Days(),

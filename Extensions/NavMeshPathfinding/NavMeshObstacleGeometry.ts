@@ -88,24 +88,28 @@ namespace gdjs {
     }
 
     /**
-     * Add the triangles of a box, 3 vertices per triangle.
+     * Write the triangles of a box, 3 vertices per triangle.
+     * @param vertices Where the X, Y and Z of the vertices are written.
+     * @param verticesLength How much of `vertices` is already used.
      * @param min The X, Y and Z of the corner with the smallest coordinates.
      * @param max The X, Y and Z of the opposite corner.
+     * @returns How much of `vertices` is now used.
      */
-    static appendBoxTriangles(
+    static writeBoxTriangles(
       vertices: Array<float>,
+      verticesLength: integer,
       min: [float, float, float],
       max: [float, float, float]
-    ): void {
+    ): integer {
       for (const vertexIndex of cubeIndices) {
         for (let axis = 0; axis < 3; axis++) {
-          vertices.push(
+          vertices[verticesLength++] =
             min[axis] +
-              (cubePositions[vertexIndex * 3 + axis] + 0.5) *
-                (max[axis] - min[axis])
-          );
+            (cubePositions[vertexIndex * 3 + axis] + 0.5) *
+              (max[axis] - min[axis]);
         }
       }
+      return verticesLength;
     }
 
     /**
@@ -144,42 +148,54 @@ namespace gdjs {
     }
 
     /**
-     * Add the vertices of the triangles touching a tile, 3 per triangle.
+     * Write the vertices of the triangles touching a tile, 3 per triangle.
+     * @param vertices Where the X, Y and Z of the vertices are written.
+     * @param verticesLength How much of `vertices` is already used.
+     * @returns How much of `vertices` is now used.
      */
-    appendTileTriangles(
+    writeTileTriangles(
       tileBuilder: NavMeshTileBuilder,
       tileX: integer,
       tileY: integer,
-      vertices: Array<float>
-    ): void {
+      vertices: Array<float>,
+      verticesLength: integer
+    ): integer {
       const triangleCount = this.indices.length / 3;
       if (triangleCount < indexedTrianglesCountMin) {
         for (let triangle = 0; triangle < triangleCount; triangle++) {
-          this.appendTriangle(triangle, vertices);
+          verticesLength = this.writeTriangle(
+            triangle,
+            vertices,
+            verticesLength
+          );
         }
-        return;
+        return verticesLength;
       }
       const tileTriangles = this.getTrianglesByTile(tileBuilder).get(
         tileBuilder.getTileKey(tileX, tileY)
       );
       if (!tileTriangles) {
-        return;
+        return verticesLength;
       }
       for (const triangle of tileTriangles) {
-        this.appendTriangle(triangle, vertices);
+        verticesLength = this.writeTriangle(triangle, vertices, verticesLength);
       }
+      return verticesLength;
     }
 
-    private appendTriangle(triangle: integer, vertices: Array<float>): void {
+    private writeTriangle(
+      triangle: integer,
+      vertices: Array<float>,
+      verticesLength: integer
+    ): integer {
       const { positions, indices } = this;
       for (let corner = 0; corner < 3; corner++) {
         const positionIndex = indices[triangle * 3 + corner] * 3;
-        vertices.push(
-          positions[positionIndex],
-          positions[positionIndex + 1],
-          positions[positionIndex + 2]
-        );
+        vertices[verticesLength++] = positions[positionIndex];
+        vertices[verticesLength++] = positions[positionIndex + 1];
+        vertices[verticesLength++] = positions[positionIndex + 2];
       }
+      return verticesLength;
     }
 
     private getTrianglesByTile(

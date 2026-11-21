@@ -515,19 +515,33 @@ namespace gdjs {
         return;
       }
       const geometryArea = tileBuilder.getTileGeometryArea(tile.x, tile.y);
+      // Overwritten then truncated, rather than emptied then filled, to keep
+      // the memory of the array from a tile to the next.
       const vertices = this.tileVertices;
-      vertices.length = 0;
+      let verticesLength = 0;
       for (const obstacle of this.obstacles) {
         // Obstacles added since the last update of changed obstacles are
         // not in the navigation mesh yet: their tiles will be built then.
         const geometry = this.obstacleGeometries.get(obstacle);
         if (geometry && geometry.overlaps(geometryArea)) {
-          geometry.appendTileTriangles(tileBuilder, tile.x, tile.y, vertices);
+          verticesLength = geometry.writeTileTriangles(
+            tileBuilder,
+            tile.x,
+            tile.y,
+            vertices,
+            verticesLength
+          );
         }
       }
       if (this.groundArea) {
-        this.addGroundFor2D(this.groundArea, geometryArea, vertices);
+        verticesLength = this.writeGroundFor2D(
+          this.groundArea,
+          geometryArea,
+          vertices,
+          verticesLength
+        );
       }
+      vertices.length = verticesLength;
       this.tileBuildTimes.set(
         tileBuilder.getTileKey(tile.x, tile.y),
         this.time
@@ -672,21 +686,23 @@ namespace gdjs {
     /**
      * Add the part of the ground in the area of a tile.
      */
-    private addGroundFor2D(
+    private writeGroundFor2D(
       groundArea: gdjs.NavMeshArea,
       tileGeometryArea: gdjs.NavMeshArea,
-      vertices: Array<float>
-    ): void {
+      vertices: Array<float>,
+      verticesLength: integer
+    ): integer {
       const minX = Math.max(groundArea.minX, tileGeometryArea.minX);
       const minZ = Math.max(groundArea.minZ, tileGeometryArea.minZ);
       const maxX = Math.min(groundArea.maxX, tileGeometryArea.maxX);
       const maxZ = Math.min(groundArea.maxZ, tileGeometryArea.maxZ);
       if (minX >= maxX || minZ >= maxZ) {
-        return;
+        return verticesLength;
       }
       // Y is the top for Recast
-      gdjs.NavMeshObstacleGeometry.appendBoxTriangles(
+      return gdjs.NavMeshObstacleGeometry.writeBoxTriangles(
         vertices,
+        verticesLength,
         [minX, -this.cellSize, minZ],
         [maxX, -1, maxZ]
       );

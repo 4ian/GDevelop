@@ -10,6 +10,7 @@ import {
   addSerializedExtensionsToProject,
   installRequiredExtensions,
   checkRequiredExtensionsUpdate,
+  type RequiredExtensionInstallation,
 } from './ExtensionStore/InstallExtension';
 import { makeTestProject } from '../fixtures/TestProject';
 import { type EventsFunctionsExtensionsState } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
@@ -36,6 +37,7 @@ import {
   type SerializedExtension,
 } from '../Utils/GDevelopServices/Extension';
 import * as Asset from '../Utils/GDevelopServices/Asset';
+import { isDefaultVariantReplacedByUpdates } from '../Utils/Extension/ExtensionOrigin';
 
 const gd: libGDevelop = global.gd;
 
@@ -1029,7 +1031,10 @@ describe('InstallAsset', () => {
         mockEventsFunctionsExtensionsState,
         project,
         [serializedExtension],
-        [serializedExtension.name]
+        {
+          fromStoreExtensionNames: [serializedExtension.name],
+          fromFileExtensionNames: [],
+        }
       );
 
       expect(
@@ -1054,7 +1059,7 @@ describe('InstallAsset', () => {
         mockEventsFunctionsExtensionsState,
         project,
         [serializedExtension],
-        []
+        { fromStoreExtensionNames: [], fromFileExtensionNames: [] }
       );
 
       expect(
@@ -1070,6 +1075,56 @@ describe('InstallAsset', () => {
           .getEventsFunctionsExtension(serializedExtension.name)
           .getOriginIdentifier()
       ).toEqual('');
+    });
+
+    it('adds an extension with origin set if it comes from a file', () => {
+      makeTestExtensions(gd);
+      const { project } = makeTestProject(gd);
+      addSerializedExtensionsToProject(
+        mockEventsFunctionsExtensionsState,
+        project,
+        [serializedExtension],
+        {
+          fromStoreExtensionNames: [],
+          fromFileExtensionNames: [serializedExtension.name],
+        }
+      );
+
+      const eventsFunctionsExtension = project.getEventsFunctionsExtension(
+        serializedExtension.name
+      );
+      expect(eventsFunctionsExtension.getOriginName()).toEqual('imported-file');
+      expect(isDefaultVariantReplacedByUpdates(eventsFunctionsExtension)).toBe(
+        true
+      );
+    });
+
+    it('keeps the origin written in the file of an imported extension', () => {
+      makeTestExtensions(gd);
+      const { project } = makeTestProject(gd);
+      addSerializedExtensionsToProject(
+        mockEventsFunctionsExtensionsState,
+        project,
+        [
+          {
+            ...serializedExtension,
+            origin: {
+              name: 'gdevelop-extension-store',
+              identifier: serializedExtension.name,
+            },
+          },
+        ],
+        {
+          fromStoreExtensionNames: [],
+          fromFileExtensionNames: [serializedExtension.name],
+        }
+      );
+
+      expect(
+        project
+          .getEventsFunctionsExtension(serializedExtension.name)
+          .getOriginName()
+      ).toEqual('gdevelop-extension-store');
     });
   });
 
@@ -1185,6 +1240,69 @@ describe('InstallAsset', () => {
       });
 
       expect(getExtension).toHaveBeenCalledTimes(1);
+    });
+
+    const noRequiredExtensionInstallation: RequiredExtensionInstallation = {
+      requiredExtensionShortHeaders: [],
+      missingExtensionShortHeaders: [],
+      outOfDateExtensionShortHeaders: [],
+      breakingChangesExtensionShortHeaders: [],
+      incompatibleWithIdeExtensionShortHeaders: [],
+      safeToUpdateExtensions: [],
+      unknownExtensionDependencies: [],
+      isGDevelopUpdateNeeded: false,
+    };
+
+    it('installs the extensions with the changes kept by users', async () => {
+      makeTestExtensions(gd);
+      const { project } = makeTestProject(gd);
+
+      const isInstalled = await installRequiredExtensions({
+        requiredExtensionInstallation: noRequiredExtensionInstallation,
+        shouldUpdateExtension: true,
+        eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
+        project,
+        onWillInstallExtension: () => {},
+        onExtensionInstalled: () => {},
+        importedSerializedExtensions: [
+          { name: 'ImportedExtension', version: '1.1.0' },
+        ],
+        chooseExtensionChangesToKeep: async ({ serializedExtensions }) =>
+          serializedExtensions.map(serializedExtension => ({
+            ...serializedExtension,
+            description: 'Kept description',
+          })),
+      });
+
+      expect(isInstalled).toBe(true);
+      expect(
+        project
+          .getEventsFunctionsExtension('ImportedExtension')
+          .getDescription()
+      ).toBe('Kept description');
+    });
+
+    it('installs nothing when users cancel the choice of the changes to keep', async () => {
+      makeTestExtensions(gd);
+      const { project } = makeTestProject(gd);
+
+      const isInstalled = await installRequiredExtensions({
+        requiredExtensionInstallation: noRequiredExtensionInstallation,
+        shouldUpdateExtension: true,
+        eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
+        project,
+        onWillInstallExtension: () => {},
+        onExtensionInstalled: () => {},
+        importedSerializedExtensions: [
+          { name: 'ImportedExtension', version: '1.1.0' },
+        ],
+        chooseExtensionChangesToKeep: async () => null,
+      });
+
+      expect(isInstalled).toBe(false);
+      expect(
+        project.hasEventsFunctionsExtensionNamed('ImportedExtension')
+      ).toBe(false);
     });
 
     // TODO EBO Add a test for a custom object that contains another custom objet.

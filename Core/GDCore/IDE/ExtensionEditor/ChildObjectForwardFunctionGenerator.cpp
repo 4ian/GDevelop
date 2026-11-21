@@ -77,11 +77,8 @@ void ChildObjectForwardFunctionGenerator::GenerateChildObjectForwardFunction(
       .AddMissingFunctionsInRootFolder();
   auto &rootFolder =
       parentEventsBasedObject.GetEventsFunctions().GetRootFolder();
-  // TODO Handle sub-folders
   auto &folder =
-      !childEventsFunction.GetGroup().empty()
-          ? rootFolder.GetOrCreateChildFolder(childEventsFunction.GetGroup())
-          : rootFolder;
+      rootFolder.GetOrCreateFolderAtGroupPath(childEventsFunction.GetGroup());
   rootFolder.MoveFunctionFolderOrFunctionToAnotherFolder(
       rootFolder.GetFunctionNamed(parentEventsFunction.GetName()), folder,
       folder.GetChildrenCount());

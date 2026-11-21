@@ -93,4 +93,32 @@ TEST_CASE("EventsFunctionsContainer", "[common]") {
             "Function3");
 
   }
+  SECTION("Functions missing from the folders are added in their group folders") {
+    gd::EventsFunctionsContainer eventsFunctionContainer(
+        gd::EventsFunctionsContainer::FunctionOwner::Extension);
+    eventsFunctionContainer.InsertNewEventsFunction("Function1", 0);
+    eventsFunctionContainer.InsertNewEventsFunction("Function2", 1);
+    eventsFunctionContainer.InsertNewEventsFunction("Function3", 2);
+
+    // Forget the folders, like when a serialized folder structure is missing
+    // some functions.
+    eventsFunctionContainer.GetRootFolder().Clear();
+    eventsFunctionContainer.GetEventsFunction(0).SetGroup("Folder/Sub-folder");
+    eventsFunctionContainer.GetEventsFunction(1).SetGroup("Folder");
+    eventsFunctionContainer.AddMissingFunctionsInRootFolder();
+
+    auto &rootFolder = eventsFunctionContainer.GetRootFolder();
+    REQUIRE(rootFolder.GetChildrenCount() == 2);
+    auto &folder = rootFolder.GetChildAt(0);
+    REQUIRE(folder.GetFolderName() == "Folder");
+    REQUIRE(folder.GetChildrenCount() == 2);
+    auto &subFolder = folder.GetChildAt(0);
+    REQUIRE(subFolder.GetFolderName() == "Sub-folder");
+    REQUIRE(subFolder.GetChildrenCount() == 1);
+    REQUIRE(subFolder.GetChildAt(0).GetFunction().GetName() == "Function1");
+    REQUIRE(folder.GetChildAt(1).GetFunction().GetName() == "Function2");
+    REQUIRE(rootFolder.GetChildAt(1).GetFunction().GetName() == "Function3");
+    REQUIRE(eventsFunctionContainer.GetEventsFunction(0).GetGroup() ==
+            "Folder/Sub-folder");
+  }
 }

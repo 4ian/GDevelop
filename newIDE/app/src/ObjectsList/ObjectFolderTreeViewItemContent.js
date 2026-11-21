@@ -74,6 +74,9 @@ export type ObjectFolderTreeViewItemProps = {|
   ) => void,
   addFolder: (items: Array<ObjectFolderOrObjectWithContext>) => void,
   onAddNewObject: (item: ObjectFolderOrObjectWithContext | null) => void,
+  onExportAssets: (
+    objectFolderOrObjectsWithContext: Array<ObjectFolderOrObjectWithContext>
+  ) => void,
   onMovedObjectFolderOrObjectToAnotherFolderInSameContainer: (
     objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext
   ) => void,
@@ -215,6 +218,7 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
       expandFolders,
       addFolder,
       onAddNewObject,
+      onExportAssets,
       onMovedObjectFolderOrObjectToAnotherFolderInSameContainer,
       isListLocked,
     } = this.props;
@@ -334,6 +338,14 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
         label: i18n._(t`Expand all sub folders`),
         click: () =>
           expandAllSubfolders(this.objectFolder, this._isGlobal, expandFolders),
+      },
+      { type: 'separator' },
+      {
+        label: i18n._(t`Export as assets`),
+        click: () =>
+          onExportAssets([
+            { objectFolderOrObject: this.objectFolder, global: this._isGlobal },
+          ]),
       },
     ];
   }

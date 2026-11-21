@@ -50,6 +50,7 @@ const allowedPreferenceKeys: $ReadOnlyArray<
   'showAiAskButtonInTitleBar',
   'automaticallyUseCreditsForAiRequests',
   'canonicalEventSerialization',
+  'showExtensionChangesToKeepOnUpdate',
 ];
 
 const allowedPreferences: Set<string> = new Set(allowedPreferenceKeys);

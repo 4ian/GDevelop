@@ -123,6 +123,14 @@ class GD_CORE_API FunctionFolderOrFunction {
   FunctionFolderOrFunction& GetOrCreateChildFolder(const gd::String& name);
 
   /**
+   * \brief Returns the folder at the given path from this folder, creating the
+   * missing folders. The path has the format of the group of functions, like
+   * "Folder/Sub-folder". An empty path gives this folder.
+   */
+  FunctionFolderOrFunction& GetOrCreateFolderAtGroupPath(
+      const gd::String& groupPath);
+
+  /**
    * \brief Returns the parent of the instance. If the instance has no parent
    * (root folder), the null function is returned.
    */

@@ -65,6 +65,7 @@ import { MarkdownText } from '../../../UI/MarkdownText';
 import ResponsiveFlatButton from '../../../UI/ResponsiveFlatButton';
 import propertiesMapToSchema from '../../../PropertiesEditor/PropertiesMapToSchema';
 import { renameObjectPointReferences } from '../../../Utils/ObjectAnimationsRefactoring';
+import { isDefaultVariantReplacedByUpdates } from '../../../Utils/Extension/ExtensionOrigin';
 
 const gd: libGDevelop = global.gd;
 
@@ -130,7 +131,7 @@ export const isVariantEditable = (
     ).getAssetStoreAssetId() === '' &&
     // The default variant is reset when updating the extension.
     (!!getVariantName(eventsBasedObject, customObjectConfiguration) ||
-      eventsFunctionsExtension.getOriginName() !== 'gdevelop-extension-store')
+      !isDefaultVariantReplacedByUpdates(eventsFunctionsExtension))
   );
 };
 

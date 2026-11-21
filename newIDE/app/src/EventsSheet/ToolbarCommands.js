@@ -29,6 +29,8 @@ type Props = {|
   onOpenSettings?: ?() => void,
   moveEventsIntoNewGroup: () => void,
   canMoveEventsIntoNewGroup: boolean,
+  onCopyEventsAsJson: () => void,
+  canCopyEventsAsJson: boolean,
   onOpenSceneVariables: () => void,
 |};
 
@@ -74,6 +76,10 @@ const ToolbarCommands = (props: Props): null => {
 
   useCommand('MOVE_EVENTS_IN_NEW_GROUP', props.canMoveEventsIntoNewGroup, {
     handler: props.moveEventsIntoNewGroup,
+  });
+
+  useCommand('COPY_EVENTS_AS_JSON', props.canCopyEventsAsJson, {
+    handler: props.onCopyEventsAsJson,
   });
 
   useCommand('DELETE_SELECTION', props.canRemove, {

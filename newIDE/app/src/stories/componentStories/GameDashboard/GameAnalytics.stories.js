@@ -14,11 +14,19 @@ import {
   gameRollingMetricsWithOnly19Days,
   gameRollingMetricsWithOnly1Day,
   gameRollingMetricsWithHoles,
+  gameRollingMetricsWithFewPlayers,
+  gameRollingMetricsWithLowRetention,
+  gameRollingMetricsReadyToGrow,
+  completeWebBuild,
+  basicFeaturingMarketingPlan,
   gameRollingMetricsWithoutPlayersAndRetention1,
 } from '../../../fixtures/GDevelopServicesTestData';
 import { GDevelopAnalyticsApi } from '../../../Utils/GDevelopServices/ApiConfigs';
-import axios from 'axios';
+import { client as analyticsApiClient } from '../../../Utils/GDevelopServices/Analytics';
 import MockAdapter from 'axios-mock-adapter';
+import { type GameMetrics } from '../../../Utils/GDevelopServices/Analytics';
+import { type GameFeaturing } from '../../../Utils/GDevelopServices/Game';
+import { type Build } from '../../../Utils/GDevelopServices/Build';
 
 export default {
   title: 'GameDashboard/GameAnalytics',
@@ -27,7 +35,7 @@ export default {
 };
 
 export const ErrorLoadingAnalytics = (): React.Node => {
-  const mock = new MockAdapter(axios);
+  const mock = new MockAdapter(analyticsApiClient);
   mock
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
     .reply(500)
@@ -45,7 +53,7 @@ export const ErrorLoadingAnalytics = (): React.Node => {
 };
 
 export const MissingAnalytics = (): React.Node => {
-  const mock = new MockAdapter(axios);
+  const mock = new MockAdapter(analyticsApiClient);
   mock
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
     .reply(404)
@@ -63,7 +71,7 @@ export const MissingAnalytics = (): React.Node => {
 };
 
 export const WithPartialAnalytics = (): React.Node => {
-  const mock = new MockAdapter(axios);
+  const mock = new MockAdapter(analyticsApiClient);
   mock
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
     .reply(200, gameRollingMetricsWithoutPlayersAndRetention1)
@@ -81,7 +89,7 @@ export const WithPartialAnalytics = (): React.Node => {
 };
 
 export const WithAnalytics = (): React.Node => {
-  const mock = new MockAdapter(axios);
+  const mock = new MockAdapter(analyticsApiClient);
   mock
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
     .reply(200, gameRollingMetricsFor364Days)
@@ -99,7 +107,7 @@ export const WithAnalytics = (): React.Node => {
 };
 
 export const WithAnalyticsWithMissingNewMetrics = (): React.Node => {
-  const mock = new MockAdapter(axios);
+  const mock = new MockAdapter(analyticsApiClient);
   mock
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
     .reply(200, gameRollingMetricsWithUndefinedDurationMetrics)
@@ -117,7 +125,7 @@ export const WithAnalyticsWithMissingNewMetrics = (): React.Node => {
 };
 
 export const WithAnalyticsOnlyFor19Days = (): React.Node => {
-  const mock = new MockAdapter(axios);
+  const mock = new MockAdapter(analyticsApiClient);
   mock
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
     .reply(200, gameRollingMetricsWithOnly19Days)
@@ -135,7 +143,7 @@ export const WithAnalyticsOnlyFor19Days = (): React.Node => {
 };
 
 export const WithAnalyticsWithHoles = (): React.Node => {
-  const mock = new MockAdapter(axios);
+  const mock = new MockAdapter(analyticsApiClient);
   mock
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
     .reply(200, gameRollingMetricsWithHoles)
@@ -152,8 +160,137 @@ export const WithAnalyticsWithHoles = (): React.Node => {
   );
 };
 
+export const WithAnalyticsAndMarketingPlan = (): React.Node => {
+  const mock = new MockAdapter(analyticsApiClient);
+  mock
+    .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
+    .reply(200, gameRollingMetricsFor364Days)
+    .onAny()
+    .reply(config => {
+      console.error(`Unexpected call to ${config.url} (${config.method})`);
+      return [504, null];
+    });
+
+  return (
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+      <GameAnalyticsPanel
+        game={game1}
+        recommendedMarketingPlan={basicFeaturingMarketingPlan}
+        gameFeaturings={[]}
+        fetchGameFeaturings={async () => {}}
+      />
+    </AuthenticatedUserContext.Provider>
+  );
+};
+
+const mockGameMetrics = (gameMetrics: Array<GameMetrics>) => {
+  const mock = new MockAdapter(analyticsApiClient);
+  mock
+    .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
+    .reply(200, gameMetrics)
+    .onAny()
+    .reply(config => {
+      console.error(`Unexpected call to ${config.url} (${config.method})`);
+      return [504, null];
+    });
+};
+
+const oneDayInMs = 24 * 60 * 60 * 1000;
+
+const gameFeaturings: Array<GameFeaturing> = [
+  {
+    gameId: game1.id,
+    featuring: 'games-platform-home',
+    createdAt: (Date.now() - 16 * oneDayInMs) / 1000,
+    updatedAt: (Date.now() - 16 * oneDayInMs) / 1000,
+    expiresAt: (Date.now() - 9 * oneDayInMs) / 1000,
+  },
+];
+
+const builds: Array<Build> = [
+  {
+    ...completeWebBuild,
+    id: 'build-1',
+    updatedAt: Date.now() - 22 * oneDayInMs,
+  },
+  {
+    ...completeWebBuild,
+    id: 'build-2',
+    updatedAt: Date.now() - 4 * oneDayInMs,
+  },
+];
+
+// The advice is about players leaving in the first minute.
+export const WithMarketingBoostAndBuilds = (): React.Node => {
+  mockGameMetrics(gameRollingMetricsFor364Days);
+
+  return (
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+      <GameAnalyticsPanel
+        game={game1}
+        gameFeaturings={gameFeaturings}
+        builds={builds}
+      />
+    </AuthenticatedUserContext.Provider>
+  );
+};
+
+export const WithAdviceAboutRetention = (): React.Node => {
+  mockGameMetrics(gameRollingMetricsWithLowRetention);
+
+  return (
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+      <GameAnalyticsPanel game={game1} />
+    </AuthenticatedUserContext.Provider>
+  );
+};
+
+export const WithAdviceToGrow = (): React.Node => {
+  mockGameMetrics(gameRollingMetricsReadyToGrow);
+
+  return (
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+      <GameAnalyticsPanel game={game1} />
+    </AuthenticatedUserContext.Provider>
+  );
+};
+
+// The players per platform are not returned by the backend yet.
+export const WithoutPlatforms = (): React.Node => {
+  mockGameMetrics(
+    gameRollingMetricsFor364Days.map(gameMetrics => ({
+      ...gameMetrics,
+      platforms: null,
+    }))
+  );
+
+  return (
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+      <GameAnalyticsPanel game={game1} />
+    </AuthenticatedUserContext.Provider>
+  );
+};
+
+export const WithFewPlayers = (): React.Node => {
+  const mock = new MockAdapter(analyticsApiClient);
+  mock
+    .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
+    .reply(200, gameRollingMetricsWithFewPlayers)
+    .onAny()
+    .reply(config => {
+      console.error(`Unexpected call to ${config.url} (${config.method})`);
+      return [504, null];
+    });
+
+  return (
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+      <GameAnalyticsPanel game={game1} />
+    </AuthenticatedUserContext.Provider>
+  );
+};
+
 export const WithAnalyticsOnlyFor1Day = (): React.Node => {
-  const mock = new MockAdapter(axios);
+  const mock = new MockAdapter(analyticsApiClient);
   mock
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
     .reply(200, gameRollingMetricsWithOnly1Day)
@@ -171,7 +308,7 @@ export const WithAnalyticsOnlyFor1Day = (): React.Node => {
 };
 
 export const WithAnalyticsLongLoading = (): React.Node => {
-  const mock = new MockAdapter(axios, { delayResponse: 2000 });
+  const mock = new MockAdapter(analyticsApiClient, { delayResponse: 2000 });
   mock
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
     .reply(200, gameRollingMetricsFor364Days)

@@ -23,6 +23,7 @@ import {
   type Game,
   type PublicGame,
   type ShowcasedGame,
+  type MarketingPlan,
 } from '../../Utils/GDevelopServices/Game';
 import { type GameMetrics } from '../../Utils/GDevelopServices/Analytics';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
@@ -2311,7 +2312,13 @@ const interpolateWithNoise = (
   ((1 - ratio) * leftValue + ratio * rightValue) *
   (0.95 + 0.1 * numberGenerator.getNextRandomNumber());
 
-const generateGameRollingMetricsFor364Days = () => {
+const generateGameRollingMetricsFor364Days = ({
+  recentBouncedPlayersRatio = 0.4,
+  d1RetainedPlayersCount = 9,
+}: {|
+  recentBouncedPlayersRatio?: number,
+  d1RetainedPlayersCount?: number,
+|} = {}) => {
   const numberGenerator = new NumberGenerator();
   const metrics = [];
   const count = 364;
@@ -2337,7 +2344,13 @@ const generateGameRollingMetricsFor364Days = () => {
           interpolateWithNoise(80, 120, ratio, numberGenerator)
         ),
         d0PlayersBelow60s: Math.round(
-          playersCount * interpolateWithNoise(0.8, 0.4, ratio, numberGenerator)
+          playersCount *
+            interpolateWithNoise(
+              0.8,
+              recentBouncedPlayersRatio,
+              ratio,
+              numberGenerator
+            )
         ),
         d0PlayersBelow180s: Math.round(
           playersCount * interpolateWithNoise(0.9, 0.55, ratio, numberGenerator)
@@ -2354,14 +2367,21 @@ const generateGameRollingMetricsFor364Days = () => {
         ),
       },
       retention: {
-        d1RetainedPlayers: 193,
-        d2RetainedPlayers: 153,
-        d3RetainedPlayers: 121,
-        d4RetainedPlayers: 83,
-        d5RetainedPlayers: 74,
-        d6RetainedPlayers: 73,
-        d7RetainedPlayers: 67,
+        d1RetainedPlayers: d1RetainedPlayersCount,
+        d2RetainedPlayers: 6,
+        d3RetainedPlayers: 5,
+        d4RetainedPlayers: 4,
+        d5RetainedPlayers: 3,
+        d6RetainedPlayers: 3,
+        d7RetainedPlayers: 2,
       },
+      // The players per platform are only counted on recent days.
+      platforms:
+        index < 45
+          ? {
+              d0TouchPlayers: Math.round(playersCount * 0.62),
+            }
+          : null,
     });
   }
   return metrics;
@@ -2391,6 +2411,14 @@ const deleteDurationMetrics = (
 
 // $FlowFixMe[incompatible-type]
 export const gameRollingMetricsFor364Days: GameMetrics[] = generateGameRollingMetricsFor364Days();
+// $FlowFixMe[incompatible-type]
+export const gameRollingMetricsWithLowRetention: GameMetrics[] = generateGameRollingMetricsFor364Days(
+  { recentBouncedPlayersRatio: 0.2, d1RetainedPlayersCount: 3 }
+);
+// $FlowFixMe[incompatible-type]
+export const gameRollingMetricsReadyToGrow: GameMetrics[] = generateGameRollingMetricsFor364Days(
+  { recentBouncedPlayersRatio: 0.2 }
+);
 export const gameRollingMetricsWithUndefinedDurationMetrics: GameMetrics[] = deleteDurationMetrics(
   // $FlowFixMe[incompatible-type]
   generateGameRollingMetricsFor364Days(),
@@ -2416,6 +2444,22 @@ export const gameRollingMetricsWithHoles: GameMetrics[] = [
   110,
   230,
 ].map(index => gameRollingMetricsFor364Days[index]);
+export const gameRollingMetricsWithFewPlayers: GameMetrics[] = [1, 2, 4].map(
+  (daysCount, index) => ({
+    date: formatISO(subDays(new Date(), daysCount)),
+    sessions: { d0Sessions: 3 - index, d0SessionsDurationTotal: 200 },
+    players: {
+      d0Players: 3 - index,
+      d0NewPlayers: 1,
+      d0PlayersBelow60s: 1,
+      d0PlayersBelow180s: 1,
+      d0PlayersBelow300s: 2 - index,
+      d0PlayersBelow600s: 3 - index,
+      d0PlayersBelow900s: 3 - index,
+    },
+    retention: null,
+  })
+);
 export const gameRollingMetricsWithoutPlayersAndRetention1: GameMetrics[] = [
   {
     date: '2020-10-01',
@@ -3209,7 +3253,7 @@ export const mockSigningCredentials: Array<SigningCredential> = [
   },
 ];
 
-export const basicFeaturingMarketingPlan = {
+export const basicFeaturingMarketingPlan: MarketingPlan = {
   id: 'featuring-basic',
   nameByLocale: {
     en: 'Basic',
@@ -3309,6 +3353,10 @@ export const basicFeaturingMarketingPlan = {
     'zh-CN':
       '确保您的游戏是公开的，并且您已经为gd.games配置了缩略图。您的游戏在平台上可见可能需要几分钟。',
   },
+  ownedBulletPointsByLocale: [
+    { en: 'Your game is promoted on gd.games homepage' },
+  ],
+  showExpirationDate: true,
 };
 
 export const videoBasedCourseChapter: VideoBasedCourseChapter = {

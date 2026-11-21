@@ -1227,6 +1227,12 @@ namespace gdjs {
     vec2 topleft = vec2(-radius, -radius);
     vec2 texCoord = (rotatedPos - topleft)/(2.0 * radius);
 
+    // Sample before any discard: once a fragment of a 2x2 block is
+    // discarded, some GPUs (Apple Metal) choose a wrong mipmap level for
+    // the others, which shows as dotted lines in the very thin triangles
+    // of the light mesh.
+    vec4 texColor = texture2D(uSampler, texCoord);
+
     // See the comment in defaultFragmentShader above: discard (rather than
     // just writing a transparent color) any fragment outside the texture's
     // square, and any fragment whose texture pixel is itself fully
@@ -1235,7 +1241,6 @@ namespace gdjs {
     if (texCoord.x <= 0.0 || texCoord.x >= 1.0 || texCoord.y <= 0.0 || texCoord.y >= 1.0) {
       discard;
     }
-    vec4 texColor = texture2D(uSampler, texCoord);
     if (texColor.a <= 0.0) {
       discard;
     }

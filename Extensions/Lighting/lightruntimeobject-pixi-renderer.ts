@@ -45,15 +45,83 @@ namespace gdjs {
      */
     _obstaclePolygonsAABB: Float32Array = new Float32Array(0);
 
+    /**
+     * For each obstacle polygon, a distance from the light that is at most
+     * the distance of any point of the polygon (0 if the light is in its
+     * bounding box), and its square.
+     */
+    _obstaclePolygonsMinDistance: Float64Array = new Float64Array(0);
+    _obstaclePolygonsMinSquaredDistance: Float64Array = new Float64Array(0);
+    /**
+     * Index, in `_obstaclePolygonsEdges`, of the first vertex of each
+     * obstacle polygon (and of the end of the last one).
+     */
+    _obstaclePolygonsFirstVertex: Int32Array = new Int32Array(0);
+    /**
+     * The vertices and edges of all the obstacle polygons, laid out as
+     * [x, y, edgeX, edgeY, x, y, ...] (4 floats per vertex). The edges are
+     * computed like `gdjs.Polygon.computeEdges` does.
+     */
+    _obstaclePolygonsEdges: Float64Array = new Float64Array(0);
+
+    /**
+     * The angular ranges, seen from the light, out of which rays can't hit
+     * an obstacle polygon: [start, end] angles, possibly beyond [-PI, PI]
+     * (a polygon can have up to 3 ranges, shifted by 2 PI).
+     */
+    _angularRangesStart: Float64Array = new Float64Array(0);
+    _angularRangesEnd: Float64Array = new Float64Array(0);
+    _angularRangesPolygon: Int32Array = new Int32Array(0);
+    _angularRangesCount: integer = 0;
+    /** The angular ranges indices, by increasing start angle. */
+    _angularRangesByStart: Int32Array = new Int32Array(0);
+    // Returns an integer: a float would be allocated at each comparison.
+    _compareAngularRangesStart = (
+      rangeIndexA: integer,
+      rangeIndexB: integer
+    ): integer => {
+      const startA = this._angularRangesStart[rangeIndexA];
+      const startB = this._angularRangesStart[rangeIndexB];
+      return startA < startB ? -1 : startA > startB ? 1 : 0;
+    };
+    /** The angular ranges containing the angle of the current ray. */
+    _activeAngularRanges: Int32Array = new Int32Array(0);
+    /**
+     * The polygons that are too close to the light to have an angular range
+     * (including the light bounding polygon): every ray tests them.
+     */
+    _polygonsWithoutAngularRange: Int32Array = new Int32Array(0);
+    _polygonsWithoutAngularRangeCount: integer = 0;
+    /** The polygons tested by the current ray. */
+    _rayPolygons: Int32Array = new Int32Array(0);
+    _rayPolygonsCount: integer = 0;
+
+    /**
+     * What the last computed light vertices depend on: the light position,
+     * the half size of the area where obstacles are searched, then for each
+     * obstacle polygon its vertex count and its vertices. The vertices are
+     * not computed again while these stay the same.
+     */
+    _lightVerticesInputs: Float64Array = new Float64Array(0);
+    _newLightVerticesInputs: Float64Array = new Float64Array(0);
+    /** The length used in `_lightVerticesInputs`, -1 when it's not valid. */
+    _lightVerticesInputsLength: integer = -1;
+    /** Incremented every time the light vertices are computed. */
+    _lightVerticesVersion: integer = 0;
+    /**
+     * The version of the light vertices in the mesh geometry, -1 when the
+     * geometry holds something else.
+     */
+    _meshLightVerticesVersion: integer = -1;
+
     // Reusable arrays for _computeLightVertices — cleared and refilled each call
     // to avoid per-frame heap allocations that would otherwise pressure the GC.
     _lightObstaclesTemp: gdjs.LightObstacleRuntimeBehavior[] = [];
     _obstaclePolygonsTemp: gdjs.Polygon[] = [];
     _flattenVerticesTemp: FloatPoint[] = [];
-    _closestVerticesTemp: { vertex: FloatPoint; angle: float }[] = [];
-    _closestVertexAnglePool: { vertex: FloatPoint; angle: float }[] = [];
-    _closestVertexAnglePoolIndex: integer = 0;
     _filteredVerticesTemp: FloatPoint[] = [];
+    /** The angles of the vertices toward which rays are cast. */
+    _vertexAngles: Float64Array = new Float64Array(0);
 
     constructor(
       runtimeObject: gdjs.LightRuntimeObject,
@@ -139,26 +207,23 @@ namespace gdjs {
       // We dot not destroy the texture, as it is managed by the PixiImageManager.
     }
 
-    static _verticesWithAngleComparator(vertexWithAngleA, vertexWithAngleB) {
-      if (vertexWithAngleA.angle < vertexWithAngleB.angle) {
-        return -1;
-      }
-      if (vertexWithAngleA.angle > vertexWithAngleB.angle) {
-        return 1;
-      }
-      return 0;
-    }
-
-    static _computeClosestIntersectionPoint(
-      lightObject: gdjs.LightRuntimeObject,
+    /**
+     * Find where a ray from the light center hits the closest obstacle
+     * polygon (or the light bounding polygon).
+     *
+     * The result is the one of `gdjs.Polygon.raycastTest` called on every
+     * polygon in order, keeping the closest hit, or the last one of the
+     * closest hits at the same distance. Only the polygons that the ray can
+     * hit (`_rayPolygons`) are tested, in any order.
+     */
+    _computeClosestIntersectionPoint(
       angle: float,
       polygons: Array<gdjs.Polygon>,
-      polygonAABBs: Float32Array,
       boundingSquareHalfDiag: float,
       result: FloatPoint
     ): FloatPoint | null {
-      const centerX = lightObject.getX();
-      const centerY = lightObject.getY();
+      const centerX = this._object.getX();
+      const centerY = this._object.getY();
       const targetX = centerX + boundingSquareHalfDiag * Math.cos(angle);
       const targetY = centerY + boundingSquareHalfDiag * Math.sin(angle);
       const dx = targetX - centerX;
@@ -169,10 +234,22 @@ namespace gdjs {
       const isDySmall = Math.abs(dy) < 1e-8;
       const invDx = isDxSmall ? 0 : 1.0 / dx;
       const invDy = isDySmall ? 0 : 1.0 / dy;
+      const polygonAABBs = this._obstaclePolygonsAABB;
+      const polygonsMinSquaredDistance =
+        this._obstaclePolygonsMinSquaredDistance;
+      const rayPolygons = this._rayPolygons;
+      const polygonsFirstVertex = this._obstaclePolygonsFirstVertex;
+      const polygonsEdges = this._obstaclePolygonsEdges;
       let minSqDist = boundingSquareHalfDiag * boundingSquareHalfDiag;
+      let closestPolygonIndex = -1;
       result[0] = 0;
       result[1] = 0;
-      for (let i = 0; i < polygons.length; i++) {
+      for (let k = 0; k < this._rayPolygonsCount; k++) {
+        const i = rayPolygons[k];
+        if (polygonsMinSquaredDistance[i] > minSqDist) {
+          // This polygon is farther than the closest hit.
+          continue;
+        }
         const aabbBase = i * 4;
         const pMinX = polygonAABBs[aabbBase];
         const pMinY = polygonAABBs[aabbBase + 1];
@@ -211,17 +288,68 @@ namespace gdjs {
           }
           if (tNear > tFar) continue;
         }
-        const raycastResult = gdjs.Polygon.raycastTest(
-          polygons[i],
-          centerX,
-          centerY,
-          targetX,
-          targetY
-        );
-        if (raycastResult.collision && raycastResult.closeSqDist <= minSqDist) {
-          minSqDist = raycastResult.closeSqDist;
-          result[0] = raycastResult.closeX;
-          result[1] = raycastResult.closeY;
+
+        // Same computations as gdjs.Polygon.raycastTest, with the edges
+        // computed once for all the rays.
+        const firstVertex = polygonsFirstVertex[i];
+        const endVertex = polygonsFirstVertex[i + 1];
+        if (endVertex - firstVertex < 2) continue;
+        let hasCollision = false;
+        let isCollinear = false;
+        let closeX = 0;
+        let closeY = 0;
+        let closeSqDist = Number.MAX_VALUE;
+        for (let v = firstVertex; v < endVertex; v++) {
+          const base = v * 4;
+          const deltaQPX = polygonsEdges[base] - centerX;
+          const deltaQPY = polygonsEdges[base + 1] - centerY;
+          const edgeX = polygonsEdges[base + 2];
+          const edgeY = polygonsEdges[base + 3];
+          const crossRS = dx * edgeY - dy * edgeX;
+          const crossQPR = deltaQPX * dy - deltaQPY * dx;
+          if (Math.abs(crossRS) <= 0.0001 && Math.abs(crossQPR) <= 0.0001) {
+            isCollinear = true;
+            break;
+          }
+          const t = (deltaQPX * edgeY - deltaQPY * edgeX) / crossRS;
+          if (!(crossRS !== 0 && 0 <= t && t <= 1)) continue;
+          const u = crossQPR / crossRS;
+          if (0 <= u && u <= 1) {
+            const x = centerX + t * dx;
+            const y = centerY + t * dy;
+            const sqDist =
+              (x - centerX) * (x - centerX) + (y - centerY) * (y - centerY);
+            if (sqDist < closeSqDist) {
+              closeSqDist = sqDist;
+              closeX = x;
+              closeY = y;
+              hasCollision = true;
+            }
+          }
+        }
+        if (isCollinear) {
+          // Rare: let raycastTest handle the edges along the ray.
+          const raycastResult = gdjs.Polygon.raycastTest(
+            polygons[i],
+            centerX,
+            centerY,
+            targetX,
+            targetY
+          );
+          hasCollision = raycastResult.collision;
+          closeX = raycastResult.closeX;
+          closeY = raycastResult.closeY;
+          closeSqDist = raycastResult.closeSqDist;
+        }
+        if (
+          hasCollision &&
+          (closeSqDist < minSqDist ||
+            (closeSqDist === minSqDist && i > closestPolygonIndex))
+        ) {
+          minSqDist = closeSqDist;
+          closestPolygonIndex = i;
+          result[0] = closeX;
+          result[1] = closeY;
         }
       }
       if (result[0] && result[1]) {
@@ -238,25 +366,6 @@ namespace gdjs {
       this._closestPointsPool.push(point);
       this._closestPointsPoolIndex++;
       return point;
-    }
-
-    _getNextPooledVertexAngle(
-      vertex: FloatPoint,
-      angle: float
-    ): { vertex: FloatPoint; angle: float } {
-      if (
-        this._closestVertexAnglePoolIndex < this._closestVertexAnglePool.length
-      ) {
-        const obj =
-          this._closestVertexAnglePool[this._closestVertexAnglePoolIndex++];
-        obj.vertex = vertex;
-        obj.angle = angle;
-        return obj;
-      }
-      const obj = { vertex, angle };
-      this._closestVertexAnglePool.push(obj);
-      this._closestVertexAnglePoolIndex++;
-      return obj;
     }
 
     getRendererObject(): PIXI.Mesh | null | PIXI.Container {
@@ -352,6 +461,7 @@ namespace gdjs {
         // @ts-ignore - replacing the read-only geometry
         this._light.geometry = geometry;
       }
+      this._meshLightVerticesVersion = -1;
     }
 
     updateRadius(): void {
@@ -505,8 +615,14 @@ namespace gdjs {
         this._light.geometry
           .getIndex()
           .update(LightRuntimeObjectPixiRenderer._defaultIndexBuffer);
+        this._meshLightVerticesVersion = -1;
         return;
       }
+      this._light.shader.uniforms.center = this._center;
+      if (this._meshLightVerticesVersion === this._lightVerticesVersion) {
+        return;
+      }
+      this._meshLightVerticesVersion = this._lightVerticesVersion;
       const verticesCount = vertices.length;
 
       // If the array buffer which is already allocated is at most
@@ -554,7 +670,6 @@ namespace gdjs {
           this._indexBuffer[i + 2] = 1;
         }
       }
-      this._light.shader.uniforms.center = this._center;
       if (!isSubArrayUsed) {
         this._light.geometry
           .getBuffer('aVertexPosition')
@@ -607,23 +722,17 @@ namespace gdjs {
 
       // Bail out early if there are no obstacles.
       if (lightObstacles.length === 0) {
+        this._lightVerticesInputsLength = -1;
         // @ts-ignore TODO the array should probably be pass as a parameter.
         return lightObstacles;
       }
 
-      // Synchronize light bounding polygon with the hitbox.
-      // Note: we suppose the hitbox is always a single rectangle.
-      const objectHitBox = this._object.getHitBoxes()[0];
-      for (let i = 0; i < 4; i++) {
-        this._lightBoundingPoly.vertices[i][0] = objectHitBox.vertices[i][0];
-        this._lightBoundingPoly.vertices[i][1] = objectHitBox.vertices[i][1];
-      }
-
       // Build the list of polygons, reusing the class-level array to avoid
-      // per-frame heap allocation.
+      // per-frame heap allocation (overwritten then truncated, rather than
+      // emptied then filled, to keep the memory of the array).
       const obstaclePolygons = this._obstaclePolygonsTemp;
-      obstaclePolygons.length = 0;
-      obstaclePolygons.push(this._lightBoundingPoly);
+      let obstaclePolygonsCount = 0;
+      obstaclePolygons[obstaclePolygonsCount++] = this._lightBoundingPoly;
       for (let i = 0; i < lightObstacles.length; i++) {
         const obstacleHitBoxes = lightObstacles[i].owner.getHitBoxesAround(
           searchAreaLeft,
@@ -631,10 +740,24 @@ namespace gdjs {
           searchAreaRight,
           searchAreaBottom
         );
-        for (const hitbox of obstacleHitBoxes) {
-          obstaclePolygons.push(hitbox);
+        if (Array.isArray(obstacleHitBoxes)) {
+          // Avoid allocating an iterator for the most common case.
+          for (let j = 0; j < obstacleHitBoxes.length; j++) {
+            obstaclePolygons[obstaclePolygonsCount++] = obstacleHitBoxes[j];
+          }
+        } else {
+          for (const hitbox of obstacleHitBoxes) {
+            obstaclePolygons[obstaclePolygonsCount++] = hitbox;
+          }
         }
       }
+      obstaclePolygons.length = obstaclePolygonsCount;
+      if (
+        !this._updateLightVerticesInputs(searchHalfExtent, obstaclePolygons)
+      ) {
+        return this._filteredVerticesTemp;
+      }
+      this._lightVerticesVersion++;
 
       // Seed the self-boundary ("wall" that unoccluded rays terminate on)
       // with the axis-aligned bounding box of the light's rotated square —
@@ -647,12 +770,12 @@ namespace gdjs {
       let minY = searchAreaTop;
       let maxY = searchAreaBottom;
       const flattenVertices = this._flattenVerticesTemp;
-      flattenVertices.length = 0;
+      let flattenVerticesCount = 0;
       for (let i = 1; i < obstaclePolygons.length; i++) {
         const vertices = obstaclePolygons[i].vertices;
         const verticesCount = vertices.length;
         for (let j = 0; j < verticesCount; j++) {
-          flattenVertices.push(vertices[j]);
+          flattenVertices[flattenVerticesCount++] = vertices[j];
           if (vertices[j][0] < minX) {
             minX = vertices[j][0];
           }
@@ -690,14 +813,209 @@ namespace gdjs {
         )
       );
 
-      // Pre-compute AABBs for all obstacle polygons (4 floats each: minX, minY, maxX, maxY).
-      // These are used in _computeClosestIntersectionPoint to quickly skip polygons
-      // whose bounding box doesn't overlap the ray segment, avoiding the full raycast.
+      this._updateObstaclePolygonsData(
+        obstaclePolygons,
+        boundingSquareHalfDiag
+      );
+
+      // Add the vertices of the light bounding polygon.
+      for (let i = 0; i < 4; i++) {
+        flattenVertices[flattenVerticesCount++] =
+          obstaclePolygons[0].vertices[i];
+      }
+      flattenVertices.length = flattenVerticesCount;
+      // Rays are cast toward each vertex, and 0.0001 radian on each side of
+      // it. The hit of a ray only depends on its angle: rays are cast once
+      // per angle, in the order of their angles.
+      if (this._vertexAngles.length < flattenVerticesCount) {
+        this._vertexAngles = new Float64Array(2 * flattenVerticesCount);
+      }
+      const vertexAngles = this._vertexAngles;
+      for (let i = 0; i < flattenVerticesCount; i++) {
+        const xdiff = flattenVertices[i][0] - this._object.x;
+        const ydiff = flattenVertices[i][1] - this._object.y;
+        vertexAngles[i] = Math.atan2(ydiff, xdiff);
+      }
+      this._updateAngularRanges(
+        obstaclePolygons,
+        vertexAngles,
+        boundingSquareHalfDiag
+      );
+      const sortedVertexAngles = vertexAngles
+        .subarray(0, flattenVerticesCount)
+        .sort();
+      // Overwritten then truncated, rather than emptied then filled, to
+      // keep the memory of the array.
+      const filteredVerticesResult = this._filteredVerticesTemp;
+      let filteredVerticesCount = 0;
+      this._closestPointsPoolIndex = 0;
+      const rangesCount = this._angularRangesCount;
+      const rangesStart = this._angularRangesStart;
+      const rangesEnd = this._angularRangesEnd;
+      const rangesPolygon = this._angularRangesPolygon;
+      const rangesByStart = this._angularRangesByStart;
+      let nextRangeIndex = 0;
+      let activeRangesCount = 0;
+      const activeRanges = this._activeAngularRanges;
+      const rayPolygons = this._rayPolygons;
+      const polygonsMinDistance = this._obstaclePolygonsMinDistance;
+      // Merge the angles of the rays toward the vertices and beside them
+      // (each sorted).
+      let lowerRayIndex = 0;
+      let vertexRayIndex = 0;
+      let upperRayIndex = 0;
+      let previousAngle = 0;
+      for (let i = 0; i < 3 * flattenVerticesCount; i++) {
+        const lowerRayAngle =
+          lowerRayIndex < flattenVerticesCount
+            ? sortedVertexAngles[lowerRayIndex] - 0.0001
+            : Infinity;
+        const vertexRayAngle =
+          vertexRayIndex < flattenVerticesCount
+            ? sortedVertexAngles[vertexRayIndex]
+            : Infinity;
+        const upperRayAngle =
+          upperRayIndex < flattenVerticesCount
+            ? sortedVertexAngles[upperRayIndex] + 0.0001
+            : Infinity;
+        let angle = 0;
+        if (lowerRayAngle <= vertexRayAngle && lowerRayAngle <= upperRayAngle) {
+          angle = lowerRayAngle;
+          lowerRayIndex++;
+        } else if (vertexRayAngle <= upperRayAngle) {
+          angle = vertexRayAngle;
+          vertexRayIndex++;
+        } else {
+          angle = upperRayAngle;
+          upperRayIndex++;
+        }
+        if (i > 0 && angle === previousAngle) {
+          continue;
+        }
+        previousAngle = angle;
+        // Rays are sorted by angle: add the ranges starting before this ray
+        // and remove the ones ending before it.
+        while (
+          nextRangeIndex < rangesCount &&
+          rangesStart[rangesByStart[nextRangeIndex]] <= angle
+        ) {
+          activeRanges[activeRangesCount++] = rangesByStart[nextRangeIndex++];
+        }
+        // The polygons are tested closest first, so that the ones farther
+        // than a hit are skipped. The light bounding polygon is tested last.
+        let rayPolygonsCount = 0;
+        let keptRangesCount = 0;
+        for (let k = 0; k < activeRangesCount; k++) {
+          const rangeIndex = activeRanges[k];
+          if (rangesEnd[rangeIndex] >= angle) {
+            activeRanges[keptRangesCount++] = rangeIndex;
+            const polygonIndex = rangesPolygon[rangeIndex];
+            const minDistance = polygonsMinDistance[polygonIndex];
+            let position = rayPolygonsCount++;
+            while (
+              position > 0 &&
+              polygonsMinDistance[rayPolygons[position - 1]] > minDistance
+            ) {
+              rayPolygons[position] = rayPolygons[position - 1];
+              position--;
+            }
+            rayPolygons[position] = polygonIndex;
+          }
+        }
+        activeRangesCount = keptRangesCount;
+        for (let k = this._polygonsWithoutAngularRangeCount - 1; k >= 0; k--) {
+          rayPolygons[rayPolygonsCount++] =
+            this._polygonsWithoutAngularRange[k];
+        }
+        this._rayPolygonsCount = rayPolygonsCount;
+
+        const closestVertex = this._computeClosestIntersectionPoint(
+          angle,
+          obstaclePolygons,
+          boundingSquareHalfDiag,
+          this._getNextPooledPoint()
+        );
+        if (closestVertex) {
+          filteredVerticesResult[filteredVerticesCount++] = closestVertex;
+        }
+      }
+      filteredVerticesResult.length = filteredVerticesCount;
+      return filteredVerticesResult;
+    }
+
+    /**
+     * Store what the light vertices depend on, and tell if it changed since
+     * the last time they were computed.
+     * @returns true if the light vertices must be computed.
+     */
+    _updateLightVerticesInputs(
+      searchHalfExtent: float,
+      obstaclePolygons: Array<gdjs.Polygon>
+    ): boolean {
+      let inputsLength = 4;
+      for (let i = 1; i < obstaclePolygons.length; i++) {
+        inputsLength += 1 + 2 * obstaclePolygons[i].vertices.length;
+      }
+      if (this._newLightVerticesInputs.length < inputsLength) {
+        this._newLightVerticesInputs = new Float64Array(2 * inputsLength);
+      }
+      const inputs = this._newLightVerticesInputs;
+      inputs[0] = this._object.x;
+      inputs[1] = this._object.y;
+      inputs[2] = searchHalfExtent;
+      inputs[3] = obstaclePolygons.length;
+      let index = 4;
+      for (let i = 1; i < obstaclePolygons.length; i++) {
+        const vertices = obstaclePolygons[i].vertices;
+        inputs[index++] = vertices.length;
+        for (let j = 0; j < vertices.length; j++) {
+          inputs[index++] = vertices[j][0];
+          inputs[index++] = vertices[j][1];
+        }
+      }
+
+      const previousInputs = this._lightVerticesInputs;
+      let hasChanged = this._lightVerticesInputsLength !== inputsLength;
+      for (let i = 0; i < inputsLength && !hasChanged; i++) {
+        hasChanged = inputs[i] !== previousInputs[i];
+      }
+      this._lightVerticesInputs = inputs;
+      this._newLightVerticesInputs = previousInputs;
+      this._lightVerticesInputsLength = inputsLength;
+      return hasChanged;
+    }
+
+    /**
+     * Compute, for each obstacle polygon, what the rays need to find their
+     * hits quickly: its bounding box, its edges, and its minimum distance
+     * from the light.
+     */
+    _updateObstaclePolygonsData(
+      obstaclePolygons: Array<gdjs.Polygon>,
+      boundingSquareHalfDiag: float
+    ) {
       const polyCount = obstaclePolygons.length;
+      let verticesCount = 0;
+      for (let i = 0; i < polyCount; i++) {
+        verticesCount += obstaclePolygons[i].vertices.length;
+      }
       if (this._obstaclePolygonsAABB.length < polyCount * 4) {
         this._obstaclePolygonsAABB = new Float32Array(polyCount * 4);
+        this._obstaclePolygonsMinDistance = new Float64Array(polyCount);
+        this._obstaclePolygonsMinSquaredDistance = new Float64Array(polyCount);
+        this._obstaclePolygonsFirstVertex = new Int32Array(polyCount + 1);
       }
+      if (this._obstaclePolygonsEdges.length < verticesCount * 4) {
+        this._obstaclePolygonsEdges = new Float64Array(verticesCount * 4);
+      }
+      const centerX = this._object.x;
+      const centerY = this._object.y;
+      const polygonsEdges = this._obstaclePolygonsEdges;
+      let vertexIndex = 0;
       for (let i = 0; i < polyCount; i++) {
+        // Pre-compute AABBs for all obstacle polygons (4 floats each: minX, minY, maxX, maxY).
+        // These are used in _computeClosestIntersectionPoint to quickly skip polygons
+        // whose bounding box doesn't overlap the ray segment, avoiding the full raycast.
         const verts = obstaclePolygons[i].vertices;
         let pMinX = verts[0][0];
         let pMaxX = verts[0][0];
@@ -714,86 +1032,142 @@ namespace gdjs {
         this._obstaclePolygonsAABB[base + 1] = pMinY;
         this._obstaclePolygonsAABB[base + 2] = pMaxX;
         this._obstaclePolygonsAABB[base + 3] = pMaxY;
-      }
 
-      // Add this._object.hitBoxes vertices.
-      for (let i = 0; i < 4; i++) {
-        flattenVertices.push(obstaclePolygons[0].vertices[i]);
-      }
-      const closestVertices = this._closestVerticesTemp;
-      closestVertices.length = 0;
-      this._closestPointsPoolIndex = 0;
-      this._closestVertexAnglePoolIndex = 0;
-      const flattenVerticesCount = flattenVertices.length;
-      for (let i = 0; i < flattenVerticesCount; i++) {
-        const xdiff = flattenVertices[i][0] - this._object.x;
-        const ydiff = flattenVertices[i][1] - this._object.y;
-        const angle = Math.atan2(ydiff, xdiff);
-        const closestVertex =
-          LightRuntimeObjectPixiRenderer._computeClosestIntersectionPoint(
-            this._object,
-            angle,
-            obstaclePolygons,
-            this._obstaclePolygonsAABB,
-            boundingSquareHalfDiag,
-            this._getNextPooledPoint()
+        // The distance from the light to the polygon bounding box (or to
+        // the border of the light bounding polygon, which contains the
+        // light) is lowered by a margin so that no hit can be closer:
+        // - gdjs.Polygon.raycastTest considers an edge to be along the ray
+        //   when its vertices are up to 0.0001 / (ray length) from the ray,
+        //   and puts the hit on the ray.
+        // - the rounding errors of the hits (much smaller).
+        let distance = 0;
+        if (i === 0) {
+          distance = Math.min(
+            centerX - pMinX,
+            pMaxX - centerX,
+            centerY - pMinY,
+            pMaxY - centerY
           );
-        if (closestVertex) {
-          closestVertices.push(
-            this._getNextPooledVertexAngle(closestVertex, angle)
-          );
+        } else {
+          const distanceX = Math.max(pMinX - centerX, 0, centerX - pMaxX);
+          const distanceY = Math.max(pMinY - centerY, 0, centerY - pMaxY);
+          distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
         }
+        const minDistance =
+          distance -
+          0.0002 / boundingSquareHalfDiag -
+          1e-5 * (1 + distance + Math.abs(centerX) + Math.abs(centerY));
+        this._obstaclePolygonsMinDistance[i] =
+          minDistance > 0 ? minDistance : 0;
+        this._obstaclePolygonsMinSquaredDistance[i] =
+          minDistance > 0 ? minDistance * minDistance : 0;
 
-        // TODO: Check whether we need to raycast these two extra rays or not.
-        const closestVertexOffsetLeft =
-          LightRuntimeObjectPixiRenderer._computeClosestIntersectionPoint(
-            this._object,
-            angle + 0.0001,
-            obstaclePolygons,
-            this._obstaclePolygonsAABB,
-            boundingSquareHalfDiag,
-            this._getNextPooledPoint()
-          );
-        if (closestVertexOffsetLeft) {
-          closestVertices.push(
-            this._getNextPooledVertexAngle(
-              closestVertexOffsetLeft,
-              angle + 0.0001
-            )
-          );
-        }
-        const closestVertexOffsetRight =
-          LightRuntimeObjectPixiRenderer._computeClosestIntersectionPoint(
-            this._object,
-            angle - 0.0001,
-            obstaclePolygons,
-            this._obstaclePolygonsAABB,
-            boundingSquareHalfDiag,
-            this._getNextPooledPoint()
-          );
-        if (closestVertexOffsetRight) {
-          closestVertices.push(
-            this._getNextPooledVertexAngle(
-              closestVertexOffsetRight,
-              angle - 0.0001
-            )
-          );
+        this._obstaclePolygonsFirstVertex[i] = vertexIndex;
+        for (let v = 0; v < verts.length; v++) {
+          const vertex = verts[v];
+          const nextVertex = v + 1 >= verts.length ? verts[0] : verts[v + 1];
+          const edgeBase = vertexIndex * 4;
+          polygonsEdges[edgeBase] = vertex[0];
+          polygonsEdges[edgeBase + 1] = vertex[1];
+          polygonsEdges[edgeBase + 2] = nextVertex[0] - vertex[0];
+          polygonsEdges[edgeBase + 3] = nextVertex[1] - vertex[1];
+          vertexIndex++;
         }
       }
-      closestVertices.sort(
-        LightRuntimeObjectPixiRenderer._verticesWithAngleComparator
-      );
-      const closestVerticesCount = closestVertices.length;
-      const filteredVerticesResult = this._filteredVerticesTemp;
-      filteredVerticesResult.length = 0;
-      if (closestVerticesCount === 0) return filteredVerticesResult;
-      filteredVerticesResult.push(closestVertices[0].vertex);
-      for (let i = 1; i < closestVerticesCount; i++) {
-        if (closestVertices[i].angle !== closestVertices[i - 1].angle) {
-          filteredVerticesResult.push(closestVertices[i].vertex);
+      this._obstaclePolygonsFirstVertex[polyCount] = vertexIndex;
+    }
+
+    /**
+     * Compute the angular range of each obstacle polygon seen from the
+     * light, so that rays only test the polygons they can hit.
+     * @param obstacleVertexAngles The angle of each vertex of the obstacles
+     * (polygons after the first one).
+     */
+    _updateAngularRanges(
+      obstaclePolygons: Array<gdjs.Polygon>,
+      obstacleVertexAngles: Float64Array,
+      boundingSquareHalfDiag: float
+    ) {
+      const polyCount = obstaclePolygons.length;
+      if (this._polygonsWithoutAngularRange.length < polyCount) {
+        this._polygonsWithoutAngularRange = new Int32Array(polyCount);
+        this._rayPolygons = new Int32Array(4 * polyCount);
+        this._activeAngularRanges = new Int32Array(3 * polyCount);
+        this._angularRangesStart = new Float64Array(3 * polyCount);
+        this._angularRangesEnd = new Float64Array(3 * polyCount);
+        this._angularRangesPolygon = new Int32Array(3 * polyCount);
+      }
+      // A ray can hit a polygon out of its range by these distances:
+      // - gdjs.Polygon.raycastTest considers an edge to be along the ray
+      //   when its vertices are up to 0.0001 / (ray length) from the ray.
+      // - the rounding errors of the hits (much smaller).
+      const centerX = this._object.x;
+      const centerY = this._object.y;
+      const maxDistanceToRay =
+        0.0002 / boundingSquareHalfDiag +
+        1e-9 *
+          (1 + Math.abs(centerX) + Math.abs(centerY) + boundingSquareHalfDiag);
+      const twoPi = 2 * Math.PI;
+      // Rays are cast toward vertices, and up to 0.0001 radians beside.
+      const minRayAngle = -Math.PI - 0.001;
+      const maxRayAngle = Math.PI + 0.001;
+      let polygonsWithoutAngularRangeCount = 0;
+      this._polygonsWithoutAngularRange[polygonsWithoutAngularRangeCount++] = 0;
+      let rangesCount = 0;
+      let vertexIndex = 0;
+      for (let i = 1; i < polyCount; i++) {
+        const verticesCount = obstaclePolygons[i].vertices.length;
+        const minDistance = this._obstaclePolygonsMinDistance[i];
+        const angleMargin =
+          minDistance > 0 ? (2 * maxDistanceToRay) / minDistance + 1e-9 : 1;
+        if (angleMargin > 0.01 || verticesCount === 0) {
+          this._polygonsWithoutAngularRange[
+            polygonsWithoutAngularRangeCount++
+          ] = i;
+          vertexIndex += verticesCount;
+          continue;
+        }
+        // The light is out of the polygon bounding box, so the polygon is
+        // seen within less than PI radians.
+        const referenceAngle = obstacleVertexAngles[vertexIndex];
+        let minAngleDifference = 0;
+        let maxAngleDifference = 0;
+        for (let v = 0; v < verticesCount; v++) {
+          let angleDifference =
+            obstacleVertexAngles[vertexIndex + v] - referenceAngle;
+          if (angleDifference > Math.PI) angleDifference -= twoPi;
+          else if (angleDifference < -Math.PI) angleDifference += twoPi;
+          if (angleDifference < minAngleDifference)
+            minAngleDifference = angleDifference;
+          if (angleDifference > maxAngleDifference)
+            maxAngleDifference = angleDifference;
+        }
+        vertexIndex += verticesCount;
+        const rangeStart = referenceAngle + minAngleDifference - angleMargin;
+        const rangeEnd = referenceAngle + maxAngleDifference + angleMargin;
+        for (let shift = -twoPi; shift <= twoPi; shift += twoPi) {
+          if (
+            rangeEnd + shift >= minRayAngle &&
+            rangeStart + shift <= maxRayAngle
+          ) {
+            this._angularRangesStart[rangesCount] = rangeStart + shift;
+            this._angularRangesEnd[rangesCount] = rangeEnd + shift;
+            this._angularRangesPolygon[rangesCount] = i;
+            rangesCount++;
+          }
         }
       }
-      return filteredVerticesResult;
+      this._polygonsWithoutAngularRangeCount = polygonsWithoutAngularRangeCount;
+      this._angularRangesCount = rangesCount;
+      if (this._angularRangesByStart.length < rangesCount) {
+        this._angularRangesByStart = new Int32Array(3 * polyCount);
+      }
+      for (let i = 0; i < rangesCount; i++) {
+        this._angularRangesByStart[i] = i;
+      }
+      this._angularRangesByStart
+        .subarray(0, rangesCount)
+        .sort(this._compareAngularRangesStart);
     }
 
     static _defaultIndexBuffer = new Uint16Array([0, 1, 2, 0, 2, 3]);

@@ -59,6 +59,35 @@ describe('Scene benchmarks', function () {
     ],
   });
 
+  const lightingLayerName = 'Lighting';
+
+  /**
+   * @param {string} name
+   * @param {string} texture The image resource of the light, or '' for a
+   * light drawn as a circle.
+   * @returns {gdjs.LightObjectData}
+   */
+  const createLightObjectData = (name, texture) => ({
+    name,
+    type: 'Lighting::LightObject',
+    variables: [],
+    behaviors: [],
+    effects: [],
+    content: { radius: 80, color: '255;200;120', texture, debugMode: false },
+  });
+
+  /**
+   * Lights placed at random in the scene, in the lighting layer.
+   * @param {string} name
+   * @param {number} count
+   * @param {() => number} random
+   * @returns {Array<InstanceData>}
+   */
+  const createRandomLightInstances = (name, count, random) =>
+    createRandomInstances(name, count, { width: 0, height: 0 }, random).map(
+      (instance) => ({ ...instance, layer: lightingLayerName })
+    );
+
   /**
    * @param {string} name
    * @returns {gdjs.TextObjectData}
@@ -194,6 +223,7 @@ describe('Scene benchmarks', function () {
    *   eventsBasedObjects?: Array<EventsBasedObjectData>,
    *   eventsFunction?: (runtimeScene: gdjs.RuntimeScene) => void,
    *   renderingType?: '' | '2d' | '3d' | '2d+3d',
+   *   hasLightingLayer?: boolean,
    *   warmupFrames?: number,
    *   frames?: number,
    * }} scene
@@ -206,6 +236,7 @@ describe('Scene benchmarks', function () {
     eventsBasedObjects,
     eventsFunction,
     renderingType,
+    hasLightingLayer,
     warmupFrames,
     frames,
   }) => {
@@ -245,6 +276,21 @@ describe('Scene benchmarks', function () {
               isLightingLayer: false,
               followBaseLayerCamera: false,
             },
+            ...(hasLightingLayer
+              ? [
+                  {
+                    name: lightingLayerName,
+                    visibility: true,
+                    cameras: [],
+                    effects: [],
+                    ambientLightColorR: 40,
+                    ambientLightColorG: 40,
+                    ambientLightColorB: 60,
+                    isLightingLayer: true,
+                    followBaseLayerCamera: true,
+                  },
+                ]
+              : []),
           ],
           variables: [],
           usedResources: [],
@@ -884,6 +930,64 @@ describe('Scene benchmarks', function () {
           tank3D.setX((tank3D.getX() + 1) % gameWidth);
           tank3D.setZ((tank3D.getZ() + 0.5) % 64);
           tank3D.getHitBoxes();
+        }
+      },
+    });
+  });
+
+  /**
+   * Lights, drawn as circles or with a texture, among sprites that are light
+   * obstacles: the lights cast rays toward every vertex of the obstacles
+   * around them each frame.
+   * @param {{name: string, eventsFunction?: (runtimeScene: gdjs.RuntimeScene) => void}} options
+   */
+  const runLightsSceneBenchmark = ({ name, eventsFunction }) => {
+    const random = makeSeededRandom(1);
+    return runSceneBenchmark({
+      name,
+      objects: [
+        createLightObjectData('Light', ''),
+        createLightObjectData('TexturedLight', imageResourceName),
+        createSpriteObjectData('Wall', [
+          { type: 'Lighting::LightObstacleBehavior', name: 'LightObstacle' },
+        ]),
+      ],
+      instances: [
+        ...createRandomInstances('Wall', 200, { width: 8, height: 8 }, random),
+        ...createRandomLightInstances('Light', 4, random),
+        ...createRandomLightInstances('TexturedLight', 4, random),
+      ],
+      hasLightingLayer: true,
+      eventsFunction,
+    });
+  };
+
+  it('benchmark 2D lights among static obstacles', async function () {
+    this.timeout(120000);
+    await runLightsSceneBenchmark({
+      name: '2D lights among static obstacles (8 lights, 200 obstacles)',
+    });
+  });
+
+  it('benchmark 2D lights among moving obstacles', async function () {
+    this.timeout(120000);
+    await runLightsSceneBenchmark({
+      name: '2D moving lights among moving obstacles (8 lights, 200 obstacles)',
+      eventsFunction: (runtimeScene) => {
+        const time = runtimeScene.getTimeManager().getTimeFromStart() / 1000;
+        for (const light of [
+          ...getObjects(runtimeScene, 'Light'),
+          ...getObjects(runtimeScene, 'TexturedLight'),
+        ]) {
+          light.setPosition(
+            light.getX() + Math.cos(time + light.id),
+            light.getY() + Math.sin(time + light.id)
+          );
+          light.setAngle(light.getAngle() + 1);
+        }
+        for (const wall of getObjects(runtimeScene, 'Wall')) {
+          if (wall.id % 2 === 0) wall.setAngle(wall.getAngle() + 2);
+          else wall.setX(wall.getX() + Math.cos(time * 2 + wall.id) * 0.5);
         }
       },
     });

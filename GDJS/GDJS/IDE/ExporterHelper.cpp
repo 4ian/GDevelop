@@ -1363,6 +1363,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
     // `InGameEditor` uses the `is3D` function.
     InsertUnique(includesFiles, "Extensions/3D/Base3DBehavior.js");
     InsertUnique(includesFiles, "Extensions/3D/HemisphereLight.js");
+    InsertUnique(includesFiles, "InGameEditor/InGameEditorCamera.js");
     InsertUnique(includesFiles, "InGameEditor/InGameEditor.js");
   }
   if (includeCaptureManager) {

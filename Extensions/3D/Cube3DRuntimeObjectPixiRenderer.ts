@@ -69,6 +69,11 @@ namespace gdjs {
   class Cube3DRuntimeObjectPixiRenderer extends gdjs.RuntimeObject3DRenderer {
     private _cube3DRuntimeObject: gdjs.Cube3DRuntimeObject;
     private _boxMesh: THREE.Mesh;
+    /**
+     * The index ranges of the 6 faces of the box geometry, before any
+     * material merging (see `_updateGeometryGroups`).
+     */
+    private _faceGroups: Array<{ start: integer; count: integer }> = [];
 
     constructor(
       runtimeObject: gdjs.Cube3DRuntimeObject,
@@ -86,6 +91,11 @@ namespace gdjs {
       super(runtimeObject, instanceContainer, boxMesh);
       this._boxMesh = boxMesh;
       this._cube3DRuntimeObject = runtimeObject;
+      this._faceGroups = geometry.groups.map(({ start, count }) => ({
+        start,
+        count,
+      }));
+      this._updateGeometryGroups();
 
       boxMesh.receiveShadow = this._cube3DRuntimeObject._isReceivingShadow;
       boxMesh.castShadow = this._cube3DRuntimeObject._isCastingShadow;
@@ -123,6 +133,55 @@ namespace gdjs {
         this._cube3DRuntimeObject._isReceivingShadow;
     }
 
+    /**
+     * Merge the geometry groups of the faces that use the same material.
+     *
+     * Three.js draws one call per material group, even when consecutive groups
+     * share the same material. Most cubes use the same texture (and so the same
+     * material) on all their faces, which would otherwise cost one draw call
+     * per face instead of one per cube.
+     */
+    private _updateGeometryGroups() {
+      const materials = this._boxMesh.material;
+      if (!Array.isArray(materials)) return;
+      const geometry = this._boxMesh.geometry;
+
+      const mergedGroups: Array<{
+        start: integer;
+        count: integer;
+        materialIndex: integer;
+        material: THREE.Material;
+      }> = [];
+      for (
+        let faceIndex = 0;
+        faceIndex < this._faceGroups.length;
+        faceIndex++
+      ) {
+        const faceGroup = this._faceGroups[faceIndex];
+        const material = materials[faceIndex];
+        const previousGroup = mergedGroups[mergedGroups.length - 1];
+        if (
+          previousGroup &&
+          previousGroup.material === material &&
+          previousGroup.start + previousGroup.count === faceGroup.start
+        ) {
+          previousGroup.count += faceGroup.count;
+        } else {
+          mergedGroups.push({
+            start: faceGroup.start,
+            count: faceGroup.count,
+            materialIndex: faceIndex,
+            material,
+          });
+        }
+      }
+
+      geometry.clearGroups();
+      for (const group of mergedGroups) {
+        geometry.addGroup(group.start, group.count, group.materialIndex);
+      }
+    }
+
     updateFace(faceIndex: integer) {
       const materialIndex = faceIndexToMaterialIndex[faceIndex];
       if (materialIndex === undefined) return;
@@ -134,6 +193,7 @@ namespace gdjs {
       if (this._cube3DRuntimeObject.isFaceAtIndexVisible(faceIndex)) {
         this.updateTextureUvMapping(faceIndex);
       }
+      this._updateGeometryGroups();
     }
 
     updateSize(): void {

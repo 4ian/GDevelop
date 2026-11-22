@@ -36,6 +36,17 @@ using namespace std;
 
 namespace gdjs {
 
+namespace {
+// Prefixed so that parameters named like a JavaScript keyword ("new", "class"...)
+// or like an identifier of the generated code ("runtimeScene", "gdjs"...) are
+// still valid and don't shadow anything.
+gd::String GetParameterIdentifier(const gd::String& parameterName) {
+  return "parameter_" +
+         EventsCodeNameMangler::GetMangledNameWithForbiddenUnderscore(
+             parameterName);
+}
+}  // namespace
+
 gd::String EventsCodeGenerator::GenerateEventsListCompleteFunctionCode(
     gdjs::EventsCodeGenerator& codeGenerator,
     gd::String fullyQualifiedFunctionName,
@@ -407,11 +418,10 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionParameterDeclarationsList(
       continue;
     }
 
-    gd::String parameterMangledName =
-        EventsCodeNameMangler::GetMangledName(parameter.GetName());
-
-    declaration += (declaration.empty() ? "" : ", ") +
-                   (parameter.GetName().empty() ? "_" : parameterMangledName);
+    declaration +=
+        (declaration.empty() ? "" : ", ") +
+        (parameter.GetName().empty() ? "_"
+                                     : GetParameterIdentifier(parameter.GetName()));
   }
   declaration += gd::String(declaration.empty() ? "" : ", ") +
                  "parentEventsFunctionContext";
@@ -575,8 +585,7 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
     const auto& parameter = *parameterPtr;
     if (parameter.GetName().empty()) continue;
 
-    gd::String parameterMangledName =
-        EventsCodeNameMangler::GetMangledName(parameter.GetName());
+    gd::String parameterIdentifier = GetParameterIdentifier(parameter.GetName());
 
     if (gd::ParameterMetadata::IsObject(parameter.GetType())) {
       if (parameter.GetName() == thisObjectName) {
@@ -588,9 +597,9 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
       gd::String comma = objectsGettersMap.empty() ? "" : ", ";
       objectsGettersMap += comma +
                            ConvertToStringExplicit(parameter.GetName()) + ": " +
-                           parameterMangledName + "\n";
+                           parameterIdentifier + "\n";
       objectArraysMap += comma + ConvertToStringExplicit(parameter.GetName()) +
-                         ": gdjs.objectsListsToArray(" + parameterMangledName +
+                         ": gdjs.objectsListsToArray(" + parameterIdentifier +
                          ")\n";
     } else if (gd::ParameterMetadata::IsBehavior(parameter.GetType())) {
       if (parameter.GetName() == thisBehaviorName) {
@@ -601,11 +610,11 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
       // function to the "real" behavior name from the caller.
       gd::String comma = behaviorNamesMap.empty() ? "" : ", ";
       behaviorNamesMap += comma + ConvertToStringExplicit(parameter.GetName()) +
-                          ": " + parameterMangledName + "\n";
+                          ": " + parameterIdentifier + "\n";
     } else {
       argumentsGetters +=
           "if (argName === " + ConvertToStringExplicit(parameter.GetName()) +
-          ") return " + parameterMangledName + ";\n";
+          ") return " + parameterIdentifier + ";\n";
     }
   }
 

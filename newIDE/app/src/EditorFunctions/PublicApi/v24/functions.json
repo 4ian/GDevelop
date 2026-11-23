@@ -1,5 +1,5 @@
 {
-  "toolsVersion": "v22",
+  "toolsVersion": "v24",
   "functions": [
     {
       "name": "create_or_replace_object",
@@ -136,6 +136,105 @@
           "scope",
           "object_type",
           "object_name"
+        ]
+      }
+    },
+    {
+      "name": "create_image_from_code",
+      "description": "Create a PNG image resource from SVG code, and optionally a 2D object using it: for a 2D visual the asset store does not have. The result gives the resource name, the image size, the object created and the SVG features that were removed (scripts, external references).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "scope": {
+            "type": "object",
+            "description": "Where the object is created. Set `type` and the name field(s) of that type.",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "scene",
+                  "custom_object_variant"
+                ],
+                "description": "`scene`: a scene (`scene_name`). `custom_object_variant`: the child objects, instances and layers of a variant of a custom object (`extension_name` + `custom_object_name` + `variant_name`, `\"\"` being the default variant that named variants inherit from)."
+              },
+              "scene_name": {
+                "type": "string",
+                "description": "The name of the scene (type `scene`)."
+              },
+              "extension_name": {
+                "type": "string",
+                "description": "The name of the extension (extension, custom_behavior, custom_object and custom_object_variant types)."
+              },
+              "custom_object_name": {
+                "type": "string",
+                "description": "The name of the custom object in the extension (custom_object and custom_object_variant types)."
+              },
+              "variant_name": {
+                "type": "string",
+                "description": "The name of the variant of the custom object (type `custom_object_variant`); \"\" is the default variant."
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "propertyOrdering": [
+              "type",
+              "scene_name",
+              "extension_name",
+              "custom_object_name",
+              "variant_name"
+            ]
+          },
+          "svg": {
+            "type": "string",
+            "description": "A standalone SVG. Its width and height, in pixels, are the size of the image (4096 at most)."
+          },
+          "object_name": {
+            "type": "string",
+            "description": "When given, an object using the image is created with this name."
+          },
+          "object_type": {
+            "type": "string",
+            "enum": [
+              "Sprite",
+              "TiledSpriteObject::TiledSprite",
+              "PanelSpriteObject::PanelSprite"
+            ],
+            "description": "The type of the object created (default `Sprite`). A tiled sprite or a panel sprite is sized to the image."
+          },
+          "replace_existing_object": {
+            "type": "boolean",
+            "description": "Replace an existing object of the same name. Otherwise the existing object is kept unchanged and the call fails."
+          }
+        },
+        "required": [
+          "scope",
+          "svg"
+        ]
+      }
+    },
+    {
+      "name": "copy_from_example",
+      "description": "Copy a scene of an example project into the project as a new scene, with everything it needs: its objects and the global objects it uses, their resources, the extensions they and the events use, layers and effects, variables, instances, events and the external events and layouts linked from the scene. Never changes or removes what the project has: on a name conflict (a global variable, an extension), the project keeps its own and the result says so. The result gives the new scene name and what was copied.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "example": {
+            "type": "string",
+            "description": "The slug of the example, exactly as given by `search`."
+          },
+          "scene": {
+            "type": "string",
+            "description": "The name of the scene of the example to copy."
+          },
+          "new_scene_name": {
+            "type": "string",
+            "description": "The name of the new scene (default: the name of the scene of the example, made unique)."
+          }
+        },
+        "required": [
+          "example",
+          "scene"
         ]
       }
     },
@@ -3647,6 +3746,75 @@
         },
         "required": [
           "names"
+        ]
+      }
+    },
+    {
+      "name": "search",
+      "description": "Search GDevelop for what the game needs: ready-made objects, behaviors, extensions and effects, single assets of the asset store, asset packs, example projects with scenes to copy, and recipes (how to structure something like levels or menus, read with `read_recipe`). Search before making an object, a mechanic, a HUD element or a level. Put everything needed for the task in ONE call: one query per thing. Each result ends with the exact call to make. Example: queries [\"health bar\", \"enemy waves\", \"medieval castle walls\", \"golden key\"].",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "queries": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 8,
+            "items": {
+              "type": "string"
+            },
+            "description": "One query per thing needed, each a few English words naming ONE thing (not a sentence), e.g. \"score counter\", \"checkpoint respawn\", \"golden key\"."
+          },
+          "kinds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "object",
+                "behavior",
+                "extension",
+                "effect",
+                "asset",
+                "asset_pack",
+                "example",
+                "example_scene",
+                "recipe"
+              ]
+            },
+            "description": "Optional: only return these kinds of results."
+          },
+          "dimension": {
+            "type": "string",
+            "enum": [
+              "2D",
+              "3D"
+            ],
+            "description": "Optional: only what is made for 2D or for 3D games (what works in both is always kept)."
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 8,
+            "description": "Optional: the maximum number of results per query (default 3 when there are several queries, 5 otherwise)."
+          }
+        },
+        "required": [
+          "queries"
+        ]
+      }
+    },
+    {
+      "name": "read_recipe",
+      "description": "Read a recipe given by `search` (`[recipe]` results): a short, verified how-to for structuring something in GDevelop with your tools (levels, menus...). Read it before building that structure, and follow it.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the recipe, exactly as given by `search` (e.g. \"levels-in-external-layouts\")."
+          }
+        },
+        "required": [
+          "name"
         ]
       }
     },

@@ -19,6 +19,13 @@ const STORE_SEARCH_TOOL_NAMES = new Set([
   'search_resource_store',
 ]);
 
+// The tools answering without the extensions of the opened project.
+const TOOL_NAMES_WITHOUT_PROJECT_EXTENSIONS = new Set([
+  ...STORE_SEARCH_TOOL_NAMES,
+  'search',
+  'read_recipe',
+]);
+
 // What the GDevelop AI knows from its prompts.
 const getDescription = (name: string, description: string): string =>
   name === 'search_object_asset_store'
@@ -41,7 +48,7 @@ export const makeLookupTools = (
       const output = await callLookupTool({
         name,
         args: toolArguments,
-        withProjectExtensions: !STORE_SEARCH_TOOL_NAMES.has(name),
+        withProjectExtensions: !TOOL_NAMES_WITHOUT_PROJECT_EXTENSIONS.has(name),
       });
       return { value: output, isError: !output.success };
     },

@@ -32,6 +32,8 @@ const AI_BACKEND_FUNCTION_NAMES = new Set([
   'search_docs',
   'search_object_asset_store',
   'search_resource_store',
+  'search',
+  'read_recipe',
   'create_or_update_plan',
   'report_fulfilment_problem',
   'run_edit_agent',

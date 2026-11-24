@@ -947,19 +947,21 @@ export const AssetStore: React.ComponentType<{
               ) : isOnSearchResultPage ? (
                 <AssetsList
                   noResultsPlaceHolder={noResultsPlaceholder}
+                  // null and not an empty array: with an empty array, the packs
+                  // owned by the user that are not sold anymore are still listed.
                   publicAssetPacks={
-                    hidePacks ? [] : publicAssetPacksSearchResults
+                    hidePacks ? null : publicAssetPacksSearchResults
                   }
                   privateAssetPackListingDatas={
-                    hidePacks ? [] : privateAssetPackListingDatasSearchResults
+                    hidePacks ? null : privateAssetPackListingDatasSearchResults
                   }
                   privateGameTemplateListingDatas={
                     hidePacks
-                      ? []
+                      ? null
                       : privateGameTemplateListingDatasSearchResults
                   }
                   bundleListingDatas={
-                    hidePacks ? [] : bundleListingDatasSearchResults
+                    hidePacks ? null : bundleListingDatasSearchResults
                   }
                   assetShortHeaders={displayedAssetShortHeaders}
                   ref={assetsList}

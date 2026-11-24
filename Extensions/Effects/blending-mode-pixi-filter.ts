@@ -17,7 +17,8 @@ namespace gdjs {
         value: number
       ) {
         const blendingModeFilter = filter as unknown as PIXI.AlphaFilter;
-        if (parameterName === 'alpha') {
+        // The property is "opacity". "alpha" is kept for the events setting it.
+        if (parameterName === 'opacity' || parameterName === 'alpha') {
           blendingModeFilter.alpha = value;
         } else if (parameterName === 'blendmode') {
           blendingModeFilter.blendMode = value;
@@ -25,7 +26,7 @@ namespace gdjs {
       }
       getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
         const blendingModeFilter = filter as unknown as PIXI.AlphaFilter;
-        if (parameterName === 'alpha') {
+        if (parameterName === 'opacity' || parameterName === 'alpha') {
           return blendingModeFilter.alpha;
         }
         if (parameterName === 'blendmode') {

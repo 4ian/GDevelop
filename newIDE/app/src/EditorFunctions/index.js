@@ -873,7 +873,20 @@ const resolveInstanceAnchor = ({
   if (anchor === 'origin') return { success: true, anchor };
 
   const isModelRead = !object || isModel3DObjectMeasured(object, project);
-  if (!size || !isModelRead || !getAnchorOffset(anchor, size, objectSizeInfo)) {
+  if (size && isModelRead && !getAnchorOffset(anchor, size, objectSizeInfo)) {
+    // The size is known (often given with `instances_size`), but not where
+    // the origin of the object is in its box: asking for a size again would
+    // not help.
+    return {
+      success: false,
+      failure: makeGenericFailure(
+        `\`brush_position_anchor: "${anchor}"\` needs the position of the origin of ${
+          objectName ? `"${objectName}"` : 'the object'
+        } in its box, which is unknown (\`instances_size\` does not give it). Place the instances by their \`origin\` (the default anchor): omit \`brush_position_anchor\`.`
+      ),
+    };
+  }
+  if (!size || !isModelRead) {
     const unknownBoxReason = isModelRead
       ? ''
       : object && isModel3DObjectWithoutModel(object)
@@ -7763,10 +7776,9 @@ const addSceneEvents: EditorFunction = {
       args,
       'event_batches'
     );
-    const extensionNamesList = extractRequiredString(
-      args,
-      'extension_names_list'
-    );
+    // Only a hint for the generation: a call without it is not refused.
+    const extensionNamesList =
+      SafeExtractor.extractStringProperty(args, 'extension_names_list') || '';
     const objectsListArgument = SafeExtractor.extractStringProperty(
       args,
       'objects_list'

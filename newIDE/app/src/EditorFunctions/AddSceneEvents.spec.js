@@ -134,6 +134,24 @@ describe('add_scene_events', () => {
     });
   });
 
+  it('generates the events when `extension_names_list` is omitted', async () => {
+    const generateEvents = jest.fn<Array<any>, any>(async () => ({
+      generationCompleted: false,
+      errorMessage: 'Stopped by the test.',
+    }));
+
+    await editorFunctions.add_scene_events.launchFunction({
+      ...makeFakeLaunchFunctionOptionsWithProject(project),
+      generateEvents,
+      args: makeArgs({ extension_names_list: undefined }),
+    });
+
+    expect(generateEvents).toHaveBeenCalledTimes(1);
+    expect(generateEvents.mock.calls[0][0]).toMatchObject({
+      extensionNamesList: '',
+    });
+  });
+
   it('fails when no events description (and no event batches) is provided', async () => {
     // $FlowFixMe[underconstrained-implicit-instantiation]
     const generateEvents = jest.fn();

@@ -684,6 +684,33 @@ describe('put_2d_instances (brush_position_anchor)', () => {
       expect(result.success).toBe(true);
       expect(getPlacedPosition()).toEqual([-60, -60]);
     });
+
+    it('does not ask for a size already given when its texture cannot be loaded', async () => {
+      const result = await editorFunctions.put_2d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        PixiResourcesLoader: {
+          ...PixiResourcesLoaderMock,
+          loadTextures: async () => {},
+          getPIXITexture: () => PixiResourcesLoaderMock.getInvalidPIXITexture(),
+        },
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Door',
+          layer_name: '',
+          brush_kind: 'point',
+          brush_position: '100,100',
+          brush_position_anchor: 'center',
+          instances_size: '320,320',
+        },
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining(
+          '`brush_position_anchor: "center"` needs the position of the origin of "Door" in its box, which is unknown (`instances_size` does not give it).'
+        )
+      );
+    });
   });
 
   it('refuses the anchors of 3D objects', async () => {

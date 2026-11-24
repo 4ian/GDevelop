@@ -264,6 +264,7 @@ export type PreferencesValues = {|
   disableNpmScriptConfirmation: boolean,
   showJsTypeError: boolean,
   canonicalEventSerialization: boolean,
+  showExtensionChangesToKeepOnUpdate: boolean,
 |};
 
 /**
@@ -402,6 +403,7 @@ export type Preferences = {|
   setUseBackgroundSerializerForSaving: (enabled: boolean) => void,
   setShowJsTypeError: (enabled: boolean) => void,
   setCanonicalEventSerialization: (enabled: boolean) => void,
+  setShowExtensionChangesToKeepOnUpdate: (enabled: boolean) => void,
 |};
 
 export const initialPreferences = {
@@ -476,6 +478,7 @@ export const initialPreferences = {
     disableNpmScriptConfirmation: false,
     showJsTypeError: false,
     canonicalEventSerialization: false,
+    showExtensionChangesToKeepOnUpdate: false,
   },
   setMultipleValues: () => {},
   setLanguage: () => {},
@@ -577,6 +580,7 @@ export const initialPreferences = {
   setUseBackgroundSerializerForSaving: (enabled: boolean) => {},
   setShowJsTypeError: (enabled: boolean) => {},
   setCanonicalEventSerialization: (enabled: boolean) => {},
+  setShowExtensionChangesToKeepOnUpdate: (enabled: boolean) => {},
 };
 
 const PreferencesContext: React.Context<Preferences> = React.createContext<Preferences>(

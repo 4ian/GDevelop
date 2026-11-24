@@ -73,6 +73,7 @@ import newNameGenerator from '../Utils/NewNameGenerator';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
 import {
   getObjectFolderOrObjectUnifiedName,
+  getSelectionTopLevelNodes,
   type ObjectFolderOrObjectWithContext,
 } from '../ObjectsList/EnumerateObjectFolderOrObject';
 import uniq from 'lodash/uniq';
@@ -280,7 +281,11 @@ type State = {|
   layerRemoved: ?string,
   editedLayer: ?gdLayer,
   editedLayerInitialTab: 'properties' | 'effects',
-  isAssetExporterDialogOpen: boolean,
+  exportedObjects: ?{|
+    packName: string,
+    objectFolderOrObjects: Array<gdObjectFolderOrObject>,
+    shouldSkipObjectsUnsupportedByTheAssetStore: boolean,
+  |},
   isAssetImporterDialogOpen: boolean,
   editedObjectWithContext: ?ObjectWithContext,
   editedObjectInitialTab: ?ObjectEditorTab,
@@ -344,7 +349,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       layerRemoved: null,
       editedLayer: null,
       editedLayerInitialTab: 'properties',
-      isAssetExporterDialogOpen: false,
+      exportedObjects: null,
       isAssetImporterDialogOpen: false,
       editedObjectWithContext: null,
       editedObjectInitialTab: 'properties',
@@ -1044,10 +1049,49 @@ export default class SceneEditor extends React.Component<Props, State> {
     return !!this.state.editedObjectWithContext;
   };
 
-  openObjectExporterDialog = (open: boolean = true) => {
+  /**
+   * Open the dialog to export objects as an asset pack.
+   * @param objectFolderOrObjectsWithContext The objects and folders to export,
+   * or null to export all the objects of the scene.
+   */
+  openObjectExporterDialog = (
+    objectFolderOrObjectsWithContext: Array<ObjectFolderOrObjectWithContext> | null
+  ) => {
+    const { layout } = this.props;
+    if (!objectFolderOrObjectsWithContext) {
+      if (!layout) return;
+      const rootFolder = layout.getObjects().getRootFolder();
+      this.setState({
+        exportedObjects: {
+          packName: layout.getName(),
+          objectFolderOrObjects: mapFor(0, rootFolder.getChildrenCount(), i =>
+            rootFolder.getChildAt(i)
+          ),
+          shouldSkipObjectsUnsupportedByTheAssetStore: true,
+        },
+      });
+      return;
+    }
+    const objectFolderOrObjects = getSelectionTopLevelNodes(
+      objectFolderOrObjectsWithContext
+    ).map(({ objectFolderOrObject }) => objectFolderOrObject);
+    if (objectFolderOrObjects.length === 0) return;
     this.setState({
-      isAssetExporterDialogOpen: open,
+      exportedObjects: {
+        packName:
+          objectFolderOrObjects.length === 1
+            ? getObjectFolderOrObjectUnifiedName(objectFolderOrObjects[0])
+            : layout
+            ? layout.getName()
+            : 'Objects',
+        objectFolderOrObjects,
+        shouldSkipObjectsUnsupportedByTheAssetStore: false,
+      },
     });
+  };
+
+  closeObjectExporterDialog = () => {
+    this.setState({ exportedObjects: null });
   };
 
   openObjectImporterDialog = (open: boolean = true) => {
@@ -3525,11 +3569,18 @@ export default class SceneEditor extends React.Component<Props, State> {
                       />
                     )}
                   </React.Fragment>
-                  {this.state.isAssetExporterDialogOpen && layout && (
+                  {this.state.exportedObjects && (
                     <ObjectExporterDialog
                       project={project}
-                      layout={layout}
-                      onClose={() => this.openObjectExporterDialog(false)}
+                      packName={this.state.exportedObjects.packName}
+                      objectFolderOrObjects={
+                        this.state.exportedObjects.objectFolderOrObjects
+                      }
+                      shouldSkipObjectsUnsupportedByTheAssetStore={
+                        this.state.exportedObjects
+                          .shouldSkipObjectsUnsupportedByTheAssetStore
+                      }
+                      onClose={this.closeObjectExporterDialog}
                     />
                   )}
                   {this.state.isAssetImporterDialogOpen && layout && (

@@ -21,6 +21,7 @@ import { type ExtensionDependency } from '../Utils/GDevelopServices/Extension';
 import semverGreaterThan from 'semver/functions/gt';
 import semverValid from 'semver/functions/valid';
 import { addSerializedExtensionsToProject } from '../AssetStore/ExtensionStore/InstallExtension';
+import ExtensionChangesToKeepContext from '../AssetStore/ExtensionStore/ExtensionChangesToKeep/ExtensionChangesToKeepContext';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { GenericRetryableProcessWithProgressDialog } from '../Utils/UseGenericRetryableProcessWithProgress';
 import AlertMessage from '../UI/AlertMessage';
@@ -493,6 +494,9 @@ const ObjectImporterDialog = ({
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
   );
+  const { chooseExtensionChangesToKeep } = React.useContext(
+    ExtensionChangesToKeepContext
+  );
 
   const { showAlert } = useAlertDialog();
   const [isLoading, setLoading] = React.useState(false);
@@ -909,13 +913,12 @@ const ObjectImporterDialog = ({
       const replacingVariantsByObjectType = new Map<string, Map<string, any>>();
       for (const [
         objectType,
-        { variantUpdates: conflictedVariants },
+        variantsUpdate,
       ] of conflictedVariantsByObjectType) {
-        const replacingVariants = new Map<string, any>();
-        for (const [variantName, { variant }] of conflictedVariants) {
-          replacingVariants.set(variantName, variant);
-        }
-        replacingVariantsByObjectType.set(objectType, replacingVariants);
+        replacingVariantsByObjectType.set(
+          objectType,
+          variantsUpdate.getAllSelectedVariants()
+        );
       }
       const replacingExtensionNames = conflictedExtensions
         .filter(({ isSelected }) => isSelected)
@@ -1029,6 +1032,18 @@ const ObjectImporterDialog = ({
           serializedExtensions.push(serializedExtension);
         }
         throwIfCancelRequested();
+        const chosenSerializedExtensions = await chooseExtensionChangesToKeep({
+          project,
+          serializedExtensions,
+        });
+        if (!chosenSerializedExtensions) {
+          throw new ImportCancelledError();
+        }
+        serializedExtensions.splice(
+          0,
+          serializedExtensions.length,
+          ...chosenSerializedExtensions
+        );
       } catch (error) {
         releasePendingResources();
         throw error;
@@ -1061,7 +1076,10 @@ const ObjectImporterDialog = ({
         eventsFunctionsExtensionsState,
         project,
         serializedExtensions,
-        []
+        {
+          fromStoreExtensionNames: [],
+          fromFileExtensionNames: installedExtensionNames,
+        }
       );
       onExtensionInstalled(installedExtensionNames);
 
@@ -1129,6 +1147,7 @@ const ObjectImporterDialog = ({
       assetPackBlob,
       archiveFilePaths,
       assetPackContent,
+      chooseExtensionChangesToKeep,
       eventsFunctionsExtensionsState,
       objectsContainer,
       onClose,

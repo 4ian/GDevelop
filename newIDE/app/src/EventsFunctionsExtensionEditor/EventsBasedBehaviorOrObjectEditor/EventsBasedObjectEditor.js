@@ -20,6 +20,7 @@ import { CompactToggleField } from '../../UI/CompactToggleField';
 import { CompactIconField } from '../OptionsEditorDialog/CompactIconField';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import ChildObjectForwardFunctionGenerationDialog from './ChildObjectForwardFunctionGenerationDialog';
+import { isDefaultVariantReplacedByUpdates } from '../../Utils/Extension/ExtensionOrigin';
 
 const gd: libGDevelop = global.gd;
 
@@ -238,8 +239,7 @@ export default function EventsBasedObjectEditor({
                   )
             }
           />
-          {eventsFunctionsExtension.getOriginName() ===
-          'gdevelop-extension-store' ? (
+          {isDefaultVariantReplacedByUpdates(eventsFunctionsExtension) ? (
             <AlertMessage
               kind="error"
               renderRightButton={() => (

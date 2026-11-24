@@ -21,6 +21,15 @@
   padding: 0 8px 0 4px;
 }
 
+/* Without an icon, the label is centered. */
+.chip.withoutIcon {
+  padding: 0 10px;
+}
+
+.chip.small.withoutIcon {
+  padding: 0 8px;
+}
+
 /* A box of a fixed size for the icon, so that an icon, a spinner or a dot all
 take the same room. */
 .iconSlot {

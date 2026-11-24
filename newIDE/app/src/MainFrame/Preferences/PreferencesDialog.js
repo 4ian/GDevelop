@@ -437,6 +437,7 @@ const PreferencesDialog = ({
     setIsAlwaysOnTopInPreview,
     setEventsSheetCancelInlineParameter,
     setShowExperimentalExtensions,
+    setShowExtensionChangesToKeepOnUpdate,
     setShowInAppTutorialDeveloperMode,
     setOpenDiagnosticReportAutomatically,
     setBlockPreviewAndExportOnDiagnosticErrors,
@@ -1286,6 +1287,17 @@ const PreferencesDialog = ({
                 renderToggle(
                   values.showExperimentalExtensions,
                   setShowExperimentalExtensions
+                ),
+            },
+            {
+              id: 'show-extension-changes-to-keep-on-update',
+              label: i18n._(
+                t`Let me keep some of my changes when updating or importing again an extension`
+              ),
+              renderControl: () =>
+                renderToggle(
+                  values.showExtensionChangesToKeepOnUpdate,
+                  setShowExtensionChangesToKeepOnUpdate
                 ),
             },
           ],

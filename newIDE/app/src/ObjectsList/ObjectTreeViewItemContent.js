@@ -74,6 +74,9 @@ export type ObjectTreeViewItemProps = {|
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
   swapObjectAsset: (objectWithContext: ObjectWithContext) => void,
+  onExportAssets: (
+    objectFolderOrObjectsWithContext: Array<ObjectFolderOrObjectWithContext>
+  ) => void,
   initialInstances?: gdInitialInstancesContainer,
   editName: (itemId: string) => void,
   onObjectModified: (shouldForceUpdateList: boolean) => void,
@@ -355,6 +358,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       onMovedObjectFolderOrObjectToAnotherFolderInSameContainer,
       onAddObjectInstance,
       swapObjectAsset,
+      onExportAssets,
       canSetAsGlobalObject,
       setAsGlobalObject,
       onOpenEventBasedObjectVariantEditor,
@@ -482,21 +486,6 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
           }),
         enabled: canSwapAssetOfObject(object),
       },
-      { type: 'separator' },
-      globalObjectsContainer && {
-        label: i18n._(t`Set as global object`),
-        enabled: !this._isGlobal && !isListLocked,
-        click: () => {
-          selectObjectFolderOrObjectWithContext(null);
-          const ownObjectFolderOrObject = this._getAliveObjectFolderOrObject();
-          if (!ownObjectFolderOrObject) return;
-          setAsGlobalObject({
-            i18n,
-            objectFolderOrObject: ownObjectFolderOrObject,
-          });
-        },
-        visible: canSetAsGlobalObject !== false,
-      },
       isListLocked
         ? {
             label: i18n._('Move to folder'),
@@ -546,6 +535,32 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
               },
             ],
           },
+      {
+        label: i18n._(t`More`),
+        submenu: [
+          globalObjectsContainer && {
+            label: i18n._(t`Set as global object`),
+            enabled: !this._isGlobal && !isListLocked,
+            click: () => {
+              selectObjectFolderOrObjectWithContext(null);
+              const ownObjectFolderOrObject = this._getAliveObjectFolderOrObject();
+              if (!ownObjectFolderOrObject) return;
+              setAsGlobalObject({
+                i18n,
+                objectFolderOrObject: ownObjectFolderOrObject,
+              });
+            },
+            visible: canSetAsGlobalObject !== false,
+          },
+          {
+            label: i18n._(t`Export as asset`),
+            click: () =>
+              onExportAssets([
+                { objectFolderOrObject, global: this._isGlobal },
+              ]),
+          },
+        ].filter(Boolean),
+      },
       { type: 'separator' },
       {
         label: i18n._(t`Add instance to the scene`),

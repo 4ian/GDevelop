@@ -67,6 +67,17 @@ FunctionFolderOrFunction::GetOrCreateChildFolder(const gd::String &name) {
   return InsertNewFolder(name, GetChildrenCount());
 }
 
+FunctionFolderOrFunction &FunctionFolderOrFunction::GetOrCreateFolderAtGroupPath(
+    const gd::String &groupPath) {
+  FunctionFolderOrFunction *folder = this;
+  for (const gd::String &folderName : groupPath.Split(U'/')) {
+    if (!folderName.empty()) {
+      folder = &folder->GetOrCreateChildFolder(folderName);
+    }
+  }
+  return *folder;
+}
+
 FunctionFolderOrFunction &
 FunctionFolderOrFunction::GetFunctionNamed(const gd::String &name) {
   if (function && function->GetName() == name) {

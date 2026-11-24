@@ -63,6 +63,7 @@ const StatusChip = ({
         [classes.chip]: true,
         [toneClasses[tone || 'neutral']]: true,
         [classes.small]: isSmall,
+        [classes.withoutIcon]: !loading && !icon,
       })}
     >
       {(loading || icon) && (

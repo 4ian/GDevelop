@@ -54,6 +54,9 @@ type Props = {|
   ) => void,
   onSetAsGlobalObject: (object: gdObject) => void,
   beforeSetAsGlobalObject: ?(objectName: string) => boolean,
+  onExportAssets: (
+    objectFolderOrObjectsWithContext: Array<ObjectFolderOrObjectWithContext>
+  ) => void,
   showDeleteConfirmation: ShowConfirmDeleteDialogOptions => Promise<boolean>,
   forceUpdateList: () => void,
   // Called after a new folder is created so the caller can expand the tree
@@ -83,6 +86,7 @@ function useBulkObjectOperations({
   onMovedObjectFolderOrObjectToAnotherFolderInSameContainer,
   onSetAsGlobalObject,
   beforeSetAsGlobalObject,
+  onExportAssets,
   showDeleteConfirmation,
   forceUpdateList,
   onNewFolderCreated,
@@ -530,13 +534,21 @@ function useBulkObjectOperations({
                 },
               ],
             },
-        canSetAllAsGlobal
-          ? {
+        {
+          label: i18n._(t`More`),
+          submenu: [
+            {
               label: i18n._(t`Set as global object`),
               enabled: !isListLocked,
               click: () => bulkSetAsGlobalObject(i18n),
-            }
-          : null,
+              visible: canSetAllAsGlobal,
+            },
+            {
+              label: i18n._(t`Export as assets`),
+              click: () => onExportAssets(topLevelSelectedItems),
+            },
+          ],
+        },
       ];
       return menuItems.filter(Boolean);
     },
@@ -555,6 +567,7 @@ function useBulkObjectOperations({
       bulkMoveToFolder,
       bulkMoveToNewFolder,
       bulkSetAsGlobalObject,
+      onExportAssets,
     ]
   );
 

@@ -5122,6 +5122,57 @@ namespace gdjs {
      * the run stays interruptible (see `_maybeYield`). The game is drawn
      * according to the rendering mode (see `setRenderingMode`).
      */
+    /** What precedes the test source in the function compiled from it. */
+    const TEST_SCRIPT_FUNCTION_HEADER = '"use strict"; return (async () => {\n';
+
+    /**
+     * The line of the test source where an error was thrown, read from its
+     * stack (the frames of a `new Function` are `<anonymous>:L:C` in Chrome,
+     * `> Function:L:C` in Firefox), or null when the stack does not tell.
+     */
+    const getTestSourceLineOfError = (
+      error: any,
+      source: string
+    ): string | null => {
+      const testScriptFramePattern = /(?:<anonymous>|> Function):(\d+):\d+/;
+      const readFrameLineNumber = (stack: any): number | null => {
+        const match = testScriptFramePattern.exec(String(stack || ''));
+        return match ? parseInt(match[1], 10) : null;
+      };
+      // The line of the first source line, as numbered by this engine.
+      let firstSourceLineNumber: number | null = null;
+      try {
+        new Function(
+          'harness',
+          'console',
+          TEST_SCRIPT_FUNCTION_HEADER.replace('async ', '') +
+            'throw new Error();\n})();'
+        )();
+      } catch (probeError) {
+        firstSourceLineNumber = readFrameLineNumber(probeError.stack);
+      }
+      const lineNumber = readFrameLineNumber(error && error.stack);
+      if (firstSourceLineNumber === null || lineNumber === null) return null;
+      const line = source.split('\n')[lineNumber - firstSourceLineNumber];
+      return line === undefined ? null : line.trim();
+    };
+
+    /**
+     * Explains a `TypeError` on an `undefined` or `null` value, which is
+     * almost always a lookup of the test that found nothing.
+     */
+    const getEmptyLookupHint = (error: any, source: string): string | null => {
+      if (!(error instanceof TypeError)) return null;
+      if (!/\b(undefined|null)\b/.test(error.message)) return null;
+      const sourceLine = getTestSourceLineOfError(error, source);
+      return (
+        (sourceLine ? `The test failed at: \`${sourceLine}\`. ` : '') +
+        'A lookup of the test probably found nothing: `harness.getObjects(name)` returns an empty array when the object has no instance, ' +
+        '`harness.getRuntimeObject(...)` returns null and `harness.getSceneVariable(path)`/`harness.getGlobalVariable(path)` return undefined when the variable does not exist. ' +
+        'Check the result (with `harness.assert`) before reading its properties.'
+      );
+    };
+
     export const runGameplayTest = async (
       runtimeGame: gdjs.RuntimeGame,
       payload: GameplayTestRunPayload,
@@ -5172,7 +5223,7 @@ namespace gdjs {
         scriptFunction = new Function(
           'harness',
           'console',
-          '"use strict"; return (async () => {\n' + source + '\n})();'
+          TEST_SCRIPT_FUNCTION_HEADER + source + '\n})();'
         );
       } catch (error) {
         currentlyRunningHarness = null;
@@ -5374,11 +5425,13 @@ namespace gdjs {
         } else if (error && error.isGameplayTestTimeoutError) {
           result = harness._makeResult('timeout', [String(error.message)]);
         } else {
+          const emptyLookupHint = getEmptyLookupHint(error, source);
           result = harness._makeResult('error', [
             (error && error.stack ? String(error.stack) : String(error)).slice(
               0,
               2000
             ),
+            ...(emptyLookupHint ? [emptyLookupHint] : []),
           ]);
         }
       } finally {

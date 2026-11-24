@@ -132,6 +132,24 @@ always:
 ```
 
 ```
+# in function TankConfiguration::Turret.MuzzleX   (an expression function of the 2D custom object Turret, whose child Cannon is a sprite)
+always:
+  SetReturnNumber(Object.ToParentX(Cannon.PointX("Muzzle"), Cannon.PointY("Muzzle")))   # returned positions are in the space CONTAINING the object, like Object.X(): the whole point of the inside is converted (3D: Object.ToParentX/Y/Z(x, y, z))
+```
+
+```
+# in function TankConfiguration::Tank.MuzzleX   (Tank contains Turret, which already returns positions in the space of Tank)
+always:
+  SetReturnNumber(Object.ToParentX(Turret.MuzzleX(), Turret.MuzzleY()))                   # converted again at each level: the scene just calls Tank.MuzzleX()
+```
+
+```
+# in function TankConfiguration::Tank.MuzzleAngle   (2D only: a 3D custom object returns a direction instead, with Object.ToParentDirectionX/Y/Z(dx, dy, dz))
+always:
+  SetReturnNumber(Object.ToParentAngle(Turret.MuzzleAngle()))                             # follows the angle, flips and scales of the object; Object.FromParentX/Y/Angle convert a value of the caller to the inside
+```
+
+```
 # in function TankConfiguration::ClampAngle   (a free expression function of the extension: `Angle` is its parameter)
 if BuiltinCommonInstructions::CompareNumbers(Angle, >=, 360):
   SetReturnNumber(Angle - 360)                      # SetReturnNumber(expr) / SetReturnString(expr) / SetReturnBoolean(yes) set the value returned by an expression/condition function

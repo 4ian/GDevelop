@@ -752,7 +752,7 @@ const injectObjectSizeInfo = (
   return output;
 };
 
-const INSTANCE_POSITION_SEMANTICS_MESSAGE =
+export const INSTANCE_POSITION_SEMANTICS_MESSAGE =
   'Instance x;y;z specify the origin position before rotation or flipping. ' +
   '`objectSizeInfo.originX/Y/Z` and `centerX/Y/Z` are offsets from the minimum corner of the unrotated, unflipped object box, at the default size. The center point is the rotation pivot and need not be the geometric midpoint. ' +
   'For a resized instance, scale each origin and center offset by instanceSize/defaultSize on that axis, when the default size is known and nonzero. In the formulas below, A.originX/Y/Z and B.originX/Y/Z mean these scaled offsets, and width/height/depth mean actual instance dimensions. ' +

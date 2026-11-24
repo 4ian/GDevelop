@@ -17,6 +17,7 @@ import {
   type McpCallLookupTool,
 } from './McpServerTools/LookupTools';
 import { getScriptApiDefinitionWithLocalFiles } from './McpServerTools/LocalFilesAsAttachments';
+import { INSTANCE_POSITION_SEMANTICS_MESSAGE } from '../EditorFunctions';
 
 // The real PixiResourcesLoader transitively imports ESM-only packages that
 // Jest cannot parse: replace it with the test mock.
@@ -358,6 +359,239 @@ describe('CliMcpServer', () => {
     );
     expect(getResult(toolResponse).content[0].text).toContain(
       'declare function inspect_variables('
+    );
+  });
+
+  describe('describe_instances', () => {
+    const makeInstance = (index: number, layer: string) => ({
+      name: index % 2 ? 'Coin' : 'Wall',
+      id: `instance-${index}`,
+      x: index + 0.6000000000000001,
+      y: 0.123456,
+      z: 0,
+      angle: 0,
+      layer,
+      customSize: false,
+      width: 32,
+      height: 32,
+      depth: 39.70189153231568,
+      zOrder: 1,
+      initialVariables: [{ name: 'Speed', value: 1.23456 }],
+    });
+    const makeDescribeInstancesHandlers = (
+      instances: Array<Object>
+    ): CliMcpServerHandlers => ({
+      ...makeFakeCliMcpServerHandlers(),
+      runEditorFunctionCalls: jest.fn(async functionCalls => ({
+        success: true,
+        didModifyProject: false,
+        results: functionCalls.map(functionCall => ({
+          ...functionCall,
+          success: true,
+          output: {
+            success: true,
+            instances,
+            instancesForSceneNamed: 'Level',
+            positionSemantics: INSTANCE_POSITION_SEMANTICS_MESSAGE,
+            objectSizeInfo: {
+              Wall: {
+                width: 32,
+                height: 32,
+                depth: null,
+                originX: 0,
+                originY: 0,
+                originZ: null,
+                centerX: 16.000000001,
+                centerY: 16,
+                centerZ: null,
+              },
+            },
+          },
+        })),
+        notRunCalls: [],
+      })),
+    });
+    const describeInstances = async (
+      handlers: CliMcpServerHandlers,
+      toolArguments: Object
+    ): Promise<Object> => {
+      const result = getResult(
+        await handleMcpMessage(
+          {
+            jsonrpc: '2.0',
+            id: 1,
+            method: 'tools/call',
+            params: { name: 'describe_instances', arguments: toolArguments },
+          },
+          handlers
+        )
+      );
+      expect(result.isError).toBe(false);
+      return JSON.parse(result.content[0].text);
+    };
+    const scope = { type: 'scene', scene_name: 'Level' };
+
+    it('documents the left out fields and the positions in its description', () => {
+      const tool = getMcpTools({ isReadOnly: false }).find(
+        tool => tool.name === 'describe_instances'
+      );
+      if (!tool) throw new Error('No describe_instances tool.');
+      expect(tool.description).toContain('no `layer` means the base layer');
+      expect(tool.description).toContain(INSTANCE_POSITION_SEMANTICS_MESSAGE);
+      expect(Object.keys(tool.inputSchema.properties)).toEqual(
+        expect.arrayContaining([
+          'filter_by_layer',
+          'limit',
+          'offset',
+          'summary',
+        ])
+      );
+    });
+
+    it('gives the instances rounded, without their default values', async () => {
+      const handlers = makeDescribeInstancesHandlers([
+        makeInstance(0, ''),
+        { ...makeInstance(1, 'UI'), angle: 90, z: 12.5, customSize: true },
+      ]);
+
+      const output = await describeInstances(handlers, { scope });
+
+      expect(handlers.runEditorFunctionCalls).toHaveBeenCalledWith(
+        [{ name: 'describe_instances', arguments: { scope } }],
+        { runScriptReadOnly: false }
+      );
+      expect(output).toEqual({
+        success: true,
+        instancesForSceneNamed: 'Level',
+        objectSizeInfo: {
+          Wall: {
+            width: 32,
+            height: 32,
+            originX: 0,
+            originY: 0,
+            centerX: 16,
+            centerY: 16,
+          },
+        },
+        instances: [
+          {
+            name: 'Wall',
+            id: 'instance-0',
+            x: 0.6,
+            y: 0.123,
+            width: 32,
+            height: 32,
+            depth: 39.7,
+            zOrder: 1,
+            initialVariables: [{ name: 'Speed', value: 1.23456 }],
+          },
+          {
+            name: 'Coin',
+            id: 'instance-1',
+            x: 1.6,
+            y: 0.123,
+            z: 12.5,
+            angle: 90,
+            layer: 'UI',
+            customSize: true,
+            width: 32,
+            height: 32,
+            depth: 39.7,
+            zOrder: 1,
+            initialVariables: [{ name: 'Speed', value: 1.23456 }],
+          },
+        ],
+      });
+    });
+
+    it('lists a limited number of instances, telling how to get the next ones', async () => {
+      const handlers = makeDescribeInstancesHandlers(
+        Array.from({ length: 250 }, (_, index) => makeInstance(index, ''))
+      );
+
+      const firstPage = await describeInstances(handlers, { scope });
+      expect(firstPage.instances).toHaveLength(100);
+      expect(firstPage.instancesCount).toBe(250);
+      expect(firstPage.moreInstances).toContain('`offset: 100`');
+
+      const lastPage = await describeInstances(handlers, {
+        scope,
+        offset: 200,
+        limit: 100,
+      });
+      expect(handlers.runEditorFunctionCalls).toHaveBeenLastCalledWith(
+        [{ name: 'describe_instances', arguments: { scope } }],
+        { runScriptReadOnly: false }
+      );
+      expect(lastPage.instances.map(instance => instance.id)).toEqual(
+        Array.from({ length: 50 }, (_, index) => `instance-${200 + index}`)
+      );
+      expect(lastPage.instancesCount).toBe(250);
+      expect(lastPage.moreInstances).toBeUndefined();
+    });
+
+    it('filters the instances by layer, or summarizes them', async () => {
+      const handlers = makeDescribeInstancesHandlers([
+        makeInstance(0, ''),
+        makeInstance(1, 'UI'),
+        makeInstance(2, ''),
+        makeInstance(3, 'UI'),
+        makeInstance(4, 'Background'),
+      ]);
+
+      const uiOutput = await describeInstances(handlers, {
+        scope,
+        filter_by_layer: ['UI', ''],
+      });
+      expect(uiOutput.instances.map(instance => instance.id)).toEqual([
+        'instance-0',
+        'instance-1',
+        'instance-2',
+        'instance-3',
+      ]);
+      expect(uiOutput.instancesOnlyOnLayersNamed).toBe('UI,');
+
+      const summaryOutput = await describeInstances(handlers, {
+        scope,
+        summary: true,
+      });
+      expect(summaryOutput.instances).toBeUndefined();
+      expect(summaryOutput.instancesCount).toBe(5);
+      expect(summaryOutput.instancesCountByObjectAndLayer).toEqual([
+        { objectName: 'Wall', layer: '', count: 2 },
+        { objectName: 'Coin', layer: 'UI', count: 2 },
+        { objectName: 'Wall', layer: 'Background', count: 1 },
+      ]);
+      expect(summaryOutput.positionsRange).toEqual({
+        x: [0.6, 4.6],
+        y: [0.123, 0.123],
+        z: [0, 0],
+      });
+    });
+  });
+
+  it('gives only the asked functions of the script API definition', async () => {
+    const response = await handleMcpMessage(
+      {
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'tools/call',
+        params: {
+          name: 'read_script_api_definition',
+          arguments: { functions: 'describe_instances, unknown_function' },
+        },
+      },
+      makeFakeCliMcpServerHandlers()
+    );
+
+    const text = getResult(response).content[0].text;
+    expect(text).toContain('type SimplifiedInstance = {');
+    expect(text).toContain('type DescribeInstancesResult = ');
+    expect(text).toContain('declare function describe_instances(');
+    expect(text).not.toContain('declare function create_scene(');
+    expect(text).toContain('No function named unknown_function.');
+    expect(text.length).toBeLessThan(
+      getScriptApiDefinitionWithLocalFiles().length / 10
     );
   });
 
@@ -722,6 +956,45 @@ describe('CliMcpServer', () => {
           template => template.slug
         )
       ).toEqual(['3d-racing']);
+    });
+
+    it('lists a limited number of game templates, telling how to get the next ones', async () => {
+      const handlers: CliMcpServerHandlers = {
+        ...makeFakeCliMcpServerHandlers(),
+        getOpenedProject: () => null,
+        serverTools: makeProjectCreationTools(makeProjectCreation()),
+      };
+      const listGameTemplates = async (toolArguments: Object) =>
+        JSON.parse(
+          getResult(
+            await handleMcpMessage(
+              {
+                jsonrpc: '2.0',
+                id: 1,
+                method: 'tools/call',
+                params: {
+                  name: 'list_game_templates',
+                  arguments: toolArguments,
+                },
+              },
+              handlers
+            )
+          ).content[0].text
+        );
+
+      const firstPage = await listGameTemplates({ limit: 1 });
+      expect(firstPage.templates.map(template => template.slug)).toEqual([
+        'platformer',
+      ]);
+      expect(firstPage.message).toBe(
+        '1 more templates: call again with `offset: 1`, or narrow the `search`.'
+      );
+
+      const lastPage = await listGameTemplates({ limit: 1, offset: 1 });
+      expect(lastPage.templates.map(template => template.slug)).toEqual([
+        '3d-racing',
+      ]);
+      expect(lastPage.message).toBeUndefined();
     });
 
     it('creates a project only when none is opened, then acts on it', async () => {

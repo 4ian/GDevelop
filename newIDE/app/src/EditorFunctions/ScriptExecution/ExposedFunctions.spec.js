@@ -153,6 +153,63 @@ describe('capScriptExecutionResult', () => {
     expect(capped.didModifyProject).toBe(true);
   });
 
+  it('gives an object size info or a hint only once to the model, but every time to the script', async () => {
+    const wallSizeInfo = { width: 16, height: 16, originX: 0, originY: 0 };
+    const noSizeHint = {
+      code: 'no-intrinsic-size',
+      message: 'Set the size.',
+      objectNames: ['Label'],
+    };
+    const editorFunctions = {
+      put_2d_instances: makeFakeEditorFunction({
+        modifiesProject: true,
+        launch: async ({ args }) => ({
+          success: true,
+          message: `Created 1 instance of ${args.object_name}.`,
+          objectSizeInfo:
+            args.object_name === 'Wall'
+              ? { Wall: wallSizeInfo }
+              : { Label: { width: null, height: null } },
+          ...(args.object_name === 'Label' ? { hints: [noSizeHint] } : {}),
+        }),
+      }),
+    };
+    const exposed = buildExposedScriptFunctions({
+      editorFunctions,
+      editorFunctionsWithoutProject: {},
+      launchOptions: asCollaborators({}),
+      project: asProject({}),
+    });
+    const result = await executeScript({
+      jsCode: [
+        `const sizes = [];`,
+        `for (const object_name of ['Wall', 'Wall', 'Label', 'Label']) {`,
+        `  const output = await put_2d_instances({ object_name });`,
+        `  sizes.push(Object.keys(output.objectSizeInfo).length + (output.hints || []).length);`,
+        `}`,
+        `return sizes;`,
+      ].join('\n'),
+      exposedFunctions: exposed,
+    });
+
+    const capped = capScriptExecutionResult(result);
+
+    expect(capped.returnValue).toEqual([1, 1, 2, 2]);
+    expect(capped.functionCallRecords.map(record => record.output)).toEqual([
+      {
+        message: 'Created 1 instance of Wall.',
+        objectSizeInfo: { Wall: wallSizeInfo },
+      },
+      { message: 'Created 1 instance of Wall.' },
+      {
+        message: 'Created 1 instance of Label.',
+        objectSizeInfo: { Label: { width: null, height: null } },
+        hints: [noSizeHint],
+      },
+      { message: 'Created 1 instance of Label.' },
+    ]);
+  });
+
   it('keeps only the size of raw JSON args, and the other args', async () => {
     const editorFunctions = {
       change_instances_raw_json: makeFakeEditorFunction({

@@ -10,7 +10,9 @@ import {
  * function_call_output payload before it is sent to the backend:
  * - read-only records (`inspect_*`/`describe_*`/`read_*`) keep only
  *   `{ message }` (their data must not re-enter the LLM context),
- * - project-modifying records keep their full output,
+ * - project-modifying records keep their full output, except an
+ *   `objectSizeInfo` entry or a hint already given unchanged by an earlier
+ *   record (a loop placing instances repeats them on every call),
  * - `args` are truncated (2000 chars each, 30000 total), `raw_json` args
  *   replaced by their size,
  * - `consoleLogs` are capped (100 lines / 8000 chars, with a dropped note).
@@ -75,6 +77,47 @@ const reduceReadOnlyOutput = (output: any): any => {
   return {};
 };
 
+/**
+ * Removes from the outputs the `objectSizeInfo` entries and the `hints` that an
+ * earlier record of the script already gave unchanged. Only the copy sent to
+ * the model is reduced: the script got the full outputs.
+ */
+const withoutRepeatedSizeInfoAndHints = (
+  records: Array<Object>
+): Array<Object> => {
+  const givenSizeInfoByObjectName = new Map<string, string>();
+  const givenHints = new Set<string>();
+  return records.map(record => {
+    const { output } = record;
+    if (!output || typeof output !== 'object' || Array.isArray(output))
+      return record;
+    const { objectSizeInfo, hints, ...otherOutputFields } = output;
+    const newSizeInfo: { [string]: any } = {};
+    let hasNewSizeInfo = false;
+    if (objectSizeInfo && typeof objectSizeInfo === 'object') {
+      Object.keys(objectSizeInfo).forEach(objectName => {
+        const serialized = JSON.stringify(objectSizeInfo[objectName]);
+        if (givenSizeInfoByObjectName.get(objectName) === serialized) return;
+        givenSizeInfoByObjectName.set(objectName, serialized);
+        newSizeInfo[objectName] = objectSizeInfo[objectName];
+        hasNewSizeInfo = true;
+      });
+    }
+    const newHints = Array.isArray(hints)
+      ? hints.filter((hint: Object) => {
+          const serialized = JSON.stringify(hint) || '';
+          if (givenHints.has(serialized)) return false;
+          givenHints.add(serialized);
+          return true;
+        })
+      : [];
+    const reducedOutput: { [string]: any } = { ...otherOutputFields };
+    if (hasNewSizeInfo) reducedOutput.objectSizeInfo = newSizeInfo;
+    if (newHints.length > 0) reducedOutput.hints = newHints;
+    return { ...record, output: reducedOutput };
+  });
+};
+
 export type CappedRunScriptOutput = {|
   success: boolean,
   functionCallRecords: Array<Object>,
@@ -91,7 +134,7 @@ export const capScriptExecutionResult = (
 ): CappedRunScriptOutput => {
   let totalArgChars = 0;
 
-  const functionCallRecords = result.functionCallRecords.map(
+  const cappedFunctionCallRecords = result.functionCallRecords.map(
     (record: ScriptFunctionCallRecord) => {
       // Truncate args (kept for the UI `renderForEditor`), per-record and total.
       let cappedArgs = record.args;
@@ -126,6 +169,10 @@ export const capScriptExecutionResult = (
         ...(record.didModifyProject ? { didModifyProject: true } : {}),
       };
     }
+  );
+
+  const functionCallRecords = withoutRepeatedSizeInfoAndHints(
+    cappedFunctionCallRecords
   );
 
   // Cap console logs to the first N lines / M chars, noting the drop.

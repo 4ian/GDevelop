@@ -2,6 +2,7 @@
 import { getPublicApi } from '../../EditorFunctions/PublicApi';
 import { type McpServerTool } from './McpServerTool';
 import { getScriptApiDefinitionWithLocalFiles } from './LocalFilesAsAttachments';
+import { getScriptApiDefinitionExcerpt } from './ScriptApiDefinitionExcerpt';
 
 export const SCRIPT_API_DEFINITION_URI = 'gdevelop://docs/script-api.d.ts';
 export const EVENT_SCRIPT_GUIDE_URI = 'gdevelop://docs/event-script-guide.md';
@@ -17,13 +18,25 @@ const readScriptApiDefinitionTool: McpServerTool = {
     description:
       'Read the TypeScript definition of the functions a `run_script` script can call, with their output types (also the resource ' +
       SCRIPT_API_DEFINITION_URI +
-      '). Read it before writing a script.',
-    inputSchema: { type: 'object', properties: {} },
+      '). Read it before writing a script. It is long (about 140 KB): give `functions` to read only the functions the script calls.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        functions: {
+          type: 'string',
+          description:
+            'Optional: the names of the functions to read, separated by commas (like "describe_instances, put_3d_instances"). Only their declarations are given, with the types they share. If not set, the whole definition is given.',
+        },
+      },
+    },
     annotations: { readOnlyHint: true },
   },
   isAvailable: () => true,
-  call: async () => ({
-    value: getScriptApiDefinitionWithLocalFiles(),
+  call: async toolArguments => ({
+    value: getScriptApiDefinitionExcerpt(
+      getScriptApiDefinitionWithLocalFiles(),
+      typeof toolArguments.functions === 'string' ? toolArguments.functions : ''
+    ),
     isError: false,
   }),
 };

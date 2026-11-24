@@ -15,6 +15,11 @@ import {
 } from './McpServerTools/LocalFilesAsAttachments';
 import { NON_SCRIPTABLE_FUNCTION_NAMES } from '../EditorFunctions/ScriptExecution/NonScriptableFunctionNames';
 import {
+  describeMcpDescribeInstances,
+  shapeDescribeInstancesResultForMcp,
+  withoutMcpOnlyDescribeInstancesArguments,
+} from './McpServerTools/McpDescribeInstances';
+import {
   describeProject,
   type McpOpenedProject,
   type McpServerTool,
@@ -167,7 +172,8 @@ export const getMcpTools = ({
         publicApiFunction.name === 'run_script'
       );
     })
-    .map(describeLocalFilesInsteadOfAttachments);
+    .map(describeLocalFilesInsteadOfAttachments)
+    .map(describeMcpDescribeInstances);
   const otherTools = [
     ...(isReadOnly ? [] : [saveProjectTool]),
     ...serverTools.map(serverTool => serverTool.definition),
@@ -234,7 +240,7 @@ export const getMcpInstructions = ({
       : []),
     'This server edits the GDevelop game project opened in the GDevelop editor, with the functions the GDevelop AI uses. Each tool is one of these functions.',
     'Explore before editing: `read_game_project_json` gives the scenes, objects, variables and events of the project; the `inspect_*` and `describe_instances` tools give details.',
-    'Prefer `run_script` for several related steps: it runs JavaScript calling the functions as async functions. Read `read_script_api_definition` first for their exact signatures and outputs.',
+    'Prefer `run_script` for several related steps: it runs JavaScript calling the functions as async functions. Read `read_script_api_definition` first for their exact signatures and outputs (give it `functions`: the names of the functions the script calls).',
     'Events (the game logic) are written with `generate_events`, giving an `event_script` for each batch: the "EventScript" syntax below. The script is compiled by the GDevelop backend; on compile errors nothing is applied and the errors are returned, fix the script and call again. Events cannot be written from a description.',
     'Search before making an object, a mechanic, a HUD element or a level: `search` finds the ready-made objects, behaviors, extensions and effects, the assets of the asset store, the example projects with scenes to copy (`copy_from_example`) and the recipes (`read_recipe`), each result ending with the call to make.',
     'Never guess the actions, conditions and expressions of events: `read_full_docs` gives the reference of extensions (the behaviors and objects are documented in their extension), with the exact names and parameters. `search_docs` finds the extensions and the pages of the GDevelop wiki about a feature or a how-to. `read_javascript_reference` documents the game engine, for the code of JavaScript events.',
@@ -425,8 +431,14 @@ const callTool = async (
   if (!tool) {
     return makeToolResult({ message: `Unknown tool: ${name}.` }, true);
   }
+  const isDescribeInstances = name === 'describe_instances';
   const report = await handlers.runEditorFunctionCalls(
-    parseCliEditorFunctionCalls({ name, arguments: toolArguments }),
+    parseCliEditorFunctionCalls({
+      name,
+      arguments: isDescribeInstances
+        ? withoutMcpOnlyDescribeInstancesArguments(toolArguments || {})
+        : toolArguments,
+    }),
     { runScriptReadOnly: handlers.isReadOnly }
   );
   // A tool call is a single function call, so it has a single result.
@@ -441,6 +453,8 @@ const callTool = async (
       success: result.success,
       ...(name === 'run_script'
         ? withoutSuccessfulCallsArguments(result.output)
+        : isDescribeInstances
+        ? shapeDescribeInstancesResultForMcp(result.output, toolArguments || {})
         : result.output),
     },
     !result.success && !isGameplayTestReport

@@ -19,7 +19,7 @@ export type McpProjectCreation = {|
   createProject: McpCreateProject,
 |};
 
-const MAX_LISTED_GAME_TEMPLATES = 60;
+const DEFAULT_LISTED_GAME_TEMPLATES_LIMIT = 20;
 
 const filterGameTemplates = (
   templates: Array<McpGameTemplate>,
@@ -38,6 +38,11 @@ const filterGameTemplates = (
   });
 };
 
+const getNonNegativeInteger = (value: any, defaultValue: number): number =>
+  typeof value === 'number' && Number.isFinite(value) && value >= 0
+    ? Math.floor(value)
+    : defaultValue;
+
 export const makeProjectCreationTools = (
   projectCreation: McpProjectCreation
 ): Array<McpServerTool> => [
@@ -54,6 +59,15 @@ export const makeProjectCreationTools = (
             description:
               'Optional: only list the templates whose name, description or tags contain all these words (separated by spaces), like "platformer" or "3d racing".',
           },
+          limit: {
+            type: 'integer',
+            description: `Optional: the maximum number of templates listed (${DEFAULT_LISTED_GAME_TEMPLATES_LIMIT} by default).`,
+          },
+          offset: {
+            type: 'integer',
+            description:
+              'Optional: the number of templates to skip, to list the next ones (0 by default).',
+          },
         },
       },
       annotations: { readOnlyHint: true },
@@ -64,20 +78,27 @@ export const makeProjectCreationTools = (
         await projectCreation.listGameTemplates(),
         typeof toolArguments.search === 'string' ? toolArguments.search : ''
       );
+      const offset = getNonNegativeInteger(toolArguments.offset, 0);
+      const limit = getNonNegativeInteger(
+        toolArguments.limit,
+        DEFAULT_LISTED_GAME_TEMPLATES_LIMIT
+      );
+      const listedTemplates = templates.slice(offset, offset + limit);
+      const remainingCount = templates.length - offset - listedTemplates.length;
       return {
         value: {
           // The tags (the features used by the template) are only searched.
-          templates: templates
-            .slice(0, MAX_LISTED_GAME_TEMPLATES)
-            .map(({ slug, name, shortDescription }) => ({
+          templates: listedTemplates.map(
+            ({ slug, name, shortDescription }) => ({
               slug,
               name,
               shortDescription,
-            })),
-          ...(templates.length > MAX_LISTED_GAME_TEMPLATES
+            })
+          ),
+          ...(remainingCount > 0
             ? {
-                message: `${templates.length -
-                  MAX_LISTED_GAME_TEMPLATES} more templates: use \`search\` to find others.`,
+                message: `${remainingCount} more templates: call again with \`offset: ${offset +
+                  listedTemplates.length}\`, or narrow the \`search\`.`,
               }
             : {}),
         },

@@ -10,9 +10,9 @@ import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import Text from '../../UI/Text';
 import { type Game } from '../../Utils/GDevelopServices/Game';
-import { SessionsChart } from '../GameAnalyticsCharts';
+import { PlayersChart } from '../GameAnalyticsCharts';
 import { type GameMetrics } from '../../Utils/GDevelopServices/Analytics';
-import { buildLastWeekChartData } from '../GameAnalyticsEvaluator';
+import { getGameAnalytics } from '../GameAnalyticsEvaluator';
 import RaisedButton from '../../UI/RaisedButton';
 import Coin from '../../Credits/Icons/Coin';
 import MarketingPlansDialog from '../../MarketingPlans/MarketingPlansDialog';
@@ -41,23 +41,14 @@ const AnalyticsWidget = ({
 }: Props): React.Node => {
   const hasNoSession = gameMetrics && gameMetrics.length === 0;
   const { isMobile } = useResponsiveWindowSize();
-  const oneWeekAgoIsoDate = new Date(
-    new Date().setHours(0, 0, 0, 0) - 7 * 24 * 3600 * 1000
-  ).toISOString();
   const [
     marketingPlansDialogOpen,
     setMarketingPlansDialogOpen,
   ] = React.useState<boolean>(false);
 
-  const chartData = React.useMemo(
-    () => {
-      const lastWeekGameMetrics = gameMetrics
-        ? gameMetrics.filter(metrics => metrics.date > oneWeekAgoIsoDate)
-        : null;
-
-      return buildLastWeekChartData(lastWeekGameMetrics);
-    },
-    [gameMetrics, oneWeekAgoIsoDate]
+  const gameAnalytics = React.useMemo(
+    () => getGameAnalytics(gameMetrics, 'week'),
+    [gameMetrics]
   );
 
   return (
@@ -125,7 +116,7 @@ const AnalyticsWidget = ({
                 <Column expand noMargin>
                   <Line alignItems="center" justifyContent="space-between">
                     <Text size="sub-title" noMargin>
-                      <Trans>Sessions</Trans>
+                      <Trans>Players, last 7 days</Trans>
                     </Text>
                     <RaisedButton
                       primary
@@ -134,11 +125,10 @@ const AnalyticsWidget = ({
                       onClick={() => setMarketingPlansDialogOpen(true)}
                     />
                   </Line>
-                  <SessionsChart
+                  <PlayersChart
                     i18n={i18n}
                     height={200}
-                    chartData={chartData}
-                    fontSize="small"
+                    overTime={gameAnalytics.overTime}
                   />
                 </Column>
               )}

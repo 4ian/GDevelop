@@ -16,6 +16,7 @@ import {
   makeLookupTools,
   type McpCallLookupTool,
 } from './McpServerTools/LookupTools';
+import { getScriptApiDefinitionWithLocalFiles } from './McpServerTools/LocalFilesAsAttachments';
 
 // The real PixiResourcesLoader transitively imports ESM-only packages that
 // Jest cannot parse: replace it with the test mock.
@@ -48,7 +49,6 @@ const getResult = (response: JsonRpcResponse | null): Object => {
   if (!response || !response.result) throw new Error('No result.');
   return response.result;
 };
-import { getScriptApiDefinitionWithLocalFiles } from './McpServerTools/LocalFilesAsAttachments';
 
 describe('CliMcpServer', () => {
   it('answers the initialization with the protocol version asked by the client and the instructions', async () => {

@@ -571,6 +571,7 @@ const GameDashboard = ({
                 gameFeaturings={gameFeaturings}
                 fetchGameFeaturings={fetchGameFeaturings}
                 recommendedMarketingPlan={recommendedMarketingPlan}
+                builds={builds}
               />
             ) : currentView === 'leaderboards' ? (
               <LeaderboardAdmin

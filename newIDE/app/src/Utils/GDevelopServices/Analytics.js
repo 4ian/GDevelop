@@ -47,6 +47,11 @@ export type GameMetrics = {
     /** Day 7 retained players (number of players who played this day, and were new players 7 days earlier). */
     d7RetainedPlayers: number,
   },
+  /** The number is not defined for the days before it was counted (2026-11). */
+  platforms?: ?{
+    /** Number of players for this day on a device with a touch screen (mostly phones and tablets). */
+    d0TouchPlayers?: ?number,
+  },
 };
 
 // $FlowFixMe[cannot-resolve-name]

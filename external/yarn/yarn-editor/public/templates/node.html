@@ -1,0 +1,11 @@
+<script type="text/html" id="node-template">
+
+	<div class="node" data-bind="nodeBind: true, style: { left: node.x() + 'px', top: node.y() + 'px' }">
+		<div class="title" data-bind="text: node.title"></div>
+		<div class="body" data-bind="html: node.clippedBody"></div>
+		<div class="tags" data-bind="html: node.clippedTags"></div>
+		<div class="icon edit" data-bind="click: function() { app.editNode(node); }"></div>
+		<div class="icon delete" data-bind="click:node.remove"></div>
+	</div>
+
+</script>

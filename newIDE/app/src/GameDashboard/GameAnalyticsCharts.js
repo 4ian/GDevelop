@@ -321,7 +321,6 @@ const RateOverTimeChart = ({
             />
           )}
         />
-        {/* Days without players have no value: the line is cut there. */}
         <RechartsLine
           name={name}
           type="monotone"
@@ -329,7 +328,6 @@ const RateOverTimeChart = ({
           stroke={gdevelopTheme.chart.dataColor1}
           strokeWidth={2}
           dot={styles.chartLineDot}
-          connectNulls={false}
           animationDuration={animationDuration}
         />
       </LineChart>

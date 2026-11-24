@@ -24,8 +24,8 @@ export type GameAnalyticsOverTimePoint = {|
   playersCount: number,
   newPlayersCount: number,
   returningPlayersCount: number,
-  bounceRatePercent: number | null,
-  playedDurationPerPlayerInMinutes: number | null,
+  bounceRatePercent: number,
+  playedDurationPerPlayerInMinutes: number,
   hasMarketingBoost: boolean,
   buildsCount: number,
 |};
@@ -398,7 +398,7 @@ export const getGameAnalytics = (
       (pointIndex + 1) * daysCountPerPoint
     );
     const pointDaysMetrics = sumDaysMetrics(gameMetricsByIsoDay, pointIsoDays);
-    // The period has enough players: each point shows its real rate, even with a few players.
+    // Each point shows its real rate, even with a few players. Without players, it shows 0.
     const pointSummary = getSummary(pointDaysMetrics, 1);
     const label = formatDay(pointIsoDays[0]);
     overTime.push({
@@ -410,11 +410,9 @@ export const getGameAnalytics = (
       playersCount: pointSummary.playersCount,
       newPlayersCount: pointSummary.newPlayersCount,
       returningPlayersCount: pointSummary.returningPlayersCount,
-      bounceRatePercent: pointSummary.bounceRatePercent,
+      bounceRatePercent: pointSummary.bounceRatePercent || 0,
       playedDurationPerPlayerInMinutes:
-        pointSummary.playedDurationPerPlayerInSeconds !== null
-          ? pointSummary.playedDurationPerPlayerInSeconds / 60
-          : null,
+        (pointSummary.playedDurationPerPlayerInSeconds || 0) / 60,
       hasMarketingBoost: pointIsoDays.some(isoDay =>
         isIsoDayInMarketingBoost(isoDay, gameFeaturings || [])
       ),

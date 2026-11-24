@@ -44,6 +44,10 @@ namespace gdjs {
       this._createElement();
     }
 
+    getRendererObject() {
+      return null;
+    }
+
     _createElement() {
       if (!!this._input)
         throw new Error('Tried to recreate an input while it already exists.');
@@ -384,10 +388,211 @@ namespace gdjs {
       this._input.focus();
     }
   }
+
+  class EditorTextInputRuntimeObjectPixiRenderer {
+    private _object: gdjs.TextInputRuntimeObject;
+    private _pixiGraphics: PIXI.Graphics;
+    private _pixiText: PIXI.Text;
+    private _pixiTextMask: PIXI.Graphics;
+    private _pixiObject: PIXI.Container;
+    private _finalTextColor: number = 0x0;
+
+    constructor(
+      runtimeObject: gdjs.TextInputRuntimeObject,
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ) {
+      this._object = runtimeObject;
+
+      this._pixiGraphics = new PIXI.Graphics();
+      this._pixiTextMask = new PIXI.Graphics();
+      this._pixiText = new PIXI.Text(' ', {
+        align: 'left',
+        fontSize: 20,
+      });
+      this._pixiText.mask = this._pixiTextMask;
+      this._pixiObject = new PIXI.Container();
+      this._pixiObject.addChild(this._pixiGraphics);
+      this._pixiObject.addChild(this._pixiText);
+      this._pixiObject.addChild(this._pixiTextMask);
+
+      this.updateString();
+      this.updateFont();
+
+      instanceContainer
+        .getLayer('')
+        .getRenderer()
+        .addRendererObject(this._pixiObject, runtimeObject.getZOrder());
+    }
+
+    getRendererObject() {
+      return this._pixiObject;
+    }
+
+    onScenePaused() {}
+
+    onSceneResumed() {}
+
+    onDestroy() {
+      this._pixiText.destroy(true);
+      this._pixiObject.destroy({ children: true });
+    }
+
+    updatePreRender() {
+      const fontSize = this._object.getFontSize();
+      if (this._pixiText.style.fontSize !== fontSize) {
+        this._pixiText.style.fontSize = fontSize;
+        this._pixiText.dirty = true;
+      }
+
+      // Position the object.
+      let width = this._object.getWidth();
+      let height = this._object.getHeight();
+
+      this._pixiObject.pivot.x = width / 2;
+      this._pixiObject.pivot.y = height / 2;
+      this._pixiObject.position.x = this._object.getX() + width / 2;
+      this._pixiObject.position.y = this._object.getY() + height / 2;
+      this._pixiObject.rotation = gdjs.toRad(this._object.getAngle());
+
+      const borderWidth = this._object.getBorderWidth();
+      const paddingX = this._object.getPaddingX();
+      const paddingY = this._object.getPaddingY();
+
+      // Draw the mask for the text.
+      const textOffsetX = borderWidth + paddingX;
+      // textOffsetY does not include the paddingY because browsers display the text, even if it is supposed to be cut off by vertical padding.
+      const textOffsetY = borderWidth;
+      this._pixiTextMask.clear();
+      this._pixiTextMask.beginFill(0xdddddd, 1);
+      this._pixiTextMask.drawRect(
+        textOffsetX,
+        textOffsetY,
+        width - 2 * textOffsetX,
+        height - 2 * textOffsetY
+      );
+      this._pixiTextMask.endFill();
+
+      const isTextArea = this._object.getInputType() === 'text area';
+      const textAlign = this._object.getTextAlign()
+        ? this._object.getTextAlign()
+        : 'left';
+
+      if (textAlign === 'left') this._pixiText.position.x = textOffsetX;
+      else if (textAlign === 'right')
+        this._pixiText.position.x =
+          0 + width - this._pixiText.width - textOffsetX;
+      else if (textAlign === 'center') {
+        this._pixiText.style.align = 'center';
+        this._pixiText.position.x = 0 + width / 2 - this._pixiText.width / 2;
+      }
+
+      this._pixiText.position.y = isTextArea
+        ? textOffsetY + paddingY
+        : height / 2 - this._pixiText.height / 2;
+
+      // Draw the background and border.
+      const fillColor = this._object.getFillColor();
+      const fillOpacity = this._object.getFillOpacity();
+      const borderColor = this._object.getBorderColor();
+      const borderOpacity = this._object.getBorderOpacity();
+
+      this._pixiGraphics.clear();
+      this._pixiGraphics.lineStyle(
+        borderWidth,
+        gdjs.rgbOrHexStringToNumber(borderColor),
+        borderOpacity / 255,
+        0
+      );
+      this._pixiGraphics.beginFill(
+        gdjs.rgbOrHexStringToNumber(fillColor),
+        fillOpacity / 255
+      );
+      this._pixiGraphics.drawRect(0, 0, width, height);
+      this._pixiGraphics.endFill();
+    }
+
+    updateString() {
+      this._updateContent();
+      this.updateTextColor();
+    }
+
+    updatePlaceholder() {
+      this._updateContent();
+    }
+
+    private _updateContent() {
+      const placeholder = this._object.getPlaceholder();
+      const initialValue = this._object.getString();
+      const hasInitialValue = initialValue !== '';
+      this._pixiText.text = hasInitialValue ? initialValue : placeholder;
+    }
+
+    updateTextColor() {
+      const hasInitialValue = this._object.getString() !== '';
+      const finalTextColor = hasInitialValue
+        ? gdjs.rgbOrHexStringToNumber(this._object.getTextColor())
+        : 0x888888;
+      if (this._finalTextColor !== finalTextColor) {
+        this._finalTextColor = finalTextColor;
+        this._pixiText.style.fill = finalTextColor;
+        this._pixiText.dirty = true;
+      }
+    }
+
+    updateFont() {
+      const fontManager = this._object
+        .getInstanceContainer()
+        .getGame()
+        .getFontManager();
+      const fontName =
+        '"' +
+        fontManager.getFontFamily(this._object.getFontResourceName()) +
+        '"';
+      this._pixiText.style.fontFamily = fontName;
+      this._pixiText.dirty = true;
+    }
+
+    updateOpacity() {
+      // Do not hide completely an object so it can still be manipulated
+      const alphaForDisplay = Math.max(this._object.getOpacity() / 255, 0.5);
+      this._pixiObject.alpha = alphaForDisplay;
+    }
+
+    updateInputType() {}
+
+    updateFillColorAndOpacity() {}
+
+    updateBorderColorAndOpacity() {}
+    updateBorderWidth() {}
+    updateDisabled() {}
+    updateReadOnly() {}
+
+    updateSpellCheck() {}
+
+    updateMaxLength() {}
+
+    updatePadding() {}
+
+    updateTextAlign() {}
+
+    isFocused() {
+      return false;
+    }
+
+    focus() {}
+  }
+
   /** @category Renderers > Text Input */
   export const TextInputRuntimeObjectRenderer =
     TextInputRuntimeObjectPixiRenderer;
   /** @category Renderers > Text Input */
   export type TextInputRuntimeObjectRenderer =
     TextInputRuntimeObjectPixiRenderer;
+
+  /** @category Renderers > Text Input */
+  export const EditorTextInputRuntimeObjectRenderer =
+    EditorTextInputRuntimeObjectPixiRenderer;
+  /** @category Renderers > Text Input */
+  export type EditorTextInputRuntimeObjectRenderer =
+    EditorTextInputRuntimeObjectPixiRenderer;
 }

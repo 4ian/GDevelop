@@ -28,6 +28,7 @@ const instancesEditorSettings: InstancesEditorSettings = {
   windowMask: false,
   selectedLayer: '',
   gameEditorMode: 'instances-editor',
+  editorMode: '2d-editor',
 };
 
 export default {

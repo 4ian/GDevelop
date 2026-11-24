@@ -4632,6 +4632,10 @@ interface PreviewExportOptions {
         double rotationAngle,
         double elevationAngle,
         double distance);
+    [Ref] PreviewExportOptions SetEditorCameraState2D(
+        double centerX,
+        double centerY,
+        double zoom);
     [Ref] PreviewExportOptions SetNonRuntimeScriptsCacheBurst(unsigned long value);
     [Ref] PreviewExportOptions SetElectronRemoteRequirePath([Const] DOMString electronRemoteRequirePath);
     [Ref] PreviewExportOptions SetGDevelopResourceToken([Const] DOMString gdevelopResourceToken);

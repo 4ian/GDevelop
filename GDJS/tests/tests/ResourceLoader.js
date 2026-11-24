@@ -53,6 +53,7 @@ describe('gdjs.ResourceLoader', () => {
         gridColor: 0,
         gridAlpha: 1,
         snap: false,
+        windowMask: false,
       },
     };
   };

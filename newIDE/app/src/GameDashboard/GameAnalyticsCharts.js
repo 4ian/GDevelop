@@ -14,7 +14,7 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
-  ReferenceArea,
+  Cell,
   ReferenceLine,
 } from 'recharts';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
@@ -40,7 +40,7 @@ const chartMargins = {
 const chartWidth = '99%';
 const barRadius = [3, 3, 0, 0];
 const returningPlayersOpacity = 0.45;
-const marketingBoostOpacity = 0.18;
+const animationDuration = 600;
 
 const getChartsStyleFromTheme = (gdevelopTheme: GDevelopTheme) => ({
   tooltipContent: {
@@ -110,30 +110,6 @@ const getFullLabel = (
     ? payload[0].payload.fullLabel
     : null;
 
-/**
- * @returns the label of the first and last point of each run of points with a Marketing Boost.
- */
-const getMarketingBoostLabelRanges = (
-  overTime: Array<GameAnalyticsOverTimePoint>
-): Array<[string, string]> => {
-  const labelRanges: Array<[string, string]> = [];
-  let firstLabel = null;
-  overTime.forEach((point, index) => {
-    if (point.hasMarketingBoost && firstLabel === null)
-      firstLabel = point.label;
-    const nextPoint = overTime[index + 1];
-    if (
-      firstLabel !== null &&
-      point.hasMarketingBoost &&
-      (!nextPoint || !nextPoint.hasMarketingBoost)
-    ) {
-      labelRanges.push([firstLabel, point.label]);
-      firstLabel = null;
-    }
-  });
-  return labelRanges;
-};
-
 const getPointNotes = (
   i18n: I18nType,
   payload: ?Array<{ payload?: GameAnalyticsOverTimePoint, ... }>
@@ -159,7 +135,17 @@ export const PlayersChart = ({
 }: OverTimeChartProps): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const styles = getChartsStyleFromTheme(gdevelopTheme);
-  const marketingBoostLabelRanges = getMarketingBoostLabelRanges(overTime);
+  // The bars of the days with a Marketing Boost stand out from the others.
+  const barCells = overTime.map(point => (
+    <Cell
+      key={point.label}
+      fill={
+        point.hasMarketingBoost
+          ? gdevelopTheme.statusIndicator.success
+          : gdevelopTheme.chart.dataColor1
+      }
+    />
+  ));
 
   return (
     <ResponsiveContainer width={chartWidth} height={height} debounce={1}>
@@ -194,24 +180,15 @@ export const PlayersChart = ({
             />
           )}
         />
-        {marketingBoostLabelRanges.map(([firstLabel, lastLabel]) => (
-          <ReferenceArea
-            key={firstLabel}
-            x1={firstLabel}
-            x2={lastLabel}
-            fill={gdevelopTheme.statusIndicator.success}
-            fillOpacity={marketingBoostOpacity}
-            strokeOpacity={0}
-            ifOverflow="visible"
-          />
-        ))}
         <Bar
           name={i18n._(t`New players`)}
           dataKey="newPlayersCount"
           stackId="players"
           fill={gdevelopTheme.chart.dataColor1}
-          isAnimationActive={false}
-        />
+          animationDuration={animationDuration}
+        >
+          {barCells}
+        </Bar>
         <Bar
           name={i18n._(t`Returning players`)}
           dataKey="returningPlayersCount"
@@ -219,8 +196,10 @@ export const PlayersChart = ({
           fill={gdevelopTheme.chart.dataColor1}
           fillOpacity={returningPlayersOpacity}
           radius={barRadius}
-          isAnimationActive={false}
-        />
+          animationDuration={animationDuration}
+        >
+          {barCells}
+        </Bar>
         {overTime
           .filter(point => point.buildsCount > 0)
           .map(point => (
@@ -228,7 +207,6 @@ export const PlayersChart = ({
               key={point.label}
               x={point.label}
               stroke={gdevelopTheme.chart.textColor}
-              strokeDasharray="4 3"
             />
           ))}
       </BarChart>
@@ -270,7 +248,6 @@ export const PlayersChartLegend = ({
             style={{
               ...squareStyle,
               backgroundColor: gdevelopTheme.statusIndicator.success,
-              opacity: marketingBoostOpacity * 2,
             }}
           />
           {i18n._(t`Marketing Boost`)}
@@ -283,7 +260,7 @@ export const PlayersChartLegend = ({
               display: 'inline-block',
               height: 10,
               marginRight: 6,
-              borderLeft: `2px dashed ${gdevelopTheme.chart.textColor}`,
+              borderLeft: `2px solid ${gdevelopTheme.chart.textColor}`,
             }}
           />
           {i18n._(t`New build`)}
@@ -353,7 +330,7 @@ const RateOverTimeChart = ({
           strokeWidth={2}
           dot={styles.chartLineDot}
           connectNulls={false}
-          isAnimationActive={false}
+          animationDuration={animationDuration}
         />
       </LineChart>
     </ResponsiveContainer>
@@ -435,7 +412,7 @@ const PercentBarsChart = ({
           dataKey="percent"
           fill={gdevelopTheme.chart.dataColor1}
           radius={barRadius}
-          isAnimationActive={false}
+          animationDuration={animationDuration}
         >
           <LabelList
             dataKey="percent"

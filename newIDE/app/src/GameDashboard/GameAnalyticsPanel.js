@@ -61,6 +61,9 @@ const formatDuration = (i18n: I18nType, durationInSeconds: number): string => {
     : i18n._(t`${seconds}s`);
 };
 
+const formatCount = (count: number): string =>
+  Math.round(count).toLocaleString();
+
 type SummaryChange = {|
   text: string,
   /** Null when nothing changed. */
@@ -84,18 +87,65 @@ const getCountChange = (
   };
 };
 
+const numberAnimationDurationInMs = 600;
+
+/**
+ * @returns the value, going progressively from the previous one each time it changes.
+ */
+const useAnimatedNumber = (value: number | null): number | null => {
+  const [displayedValue, setDisplayedValue] = React.useState<number | null>(
+    value !== null ? 0 : null
+  );
+  const displayedValueRef = React.useRef<number | null>(displayedValue);
+
+  React.useEffect(
+    () => {
+      const startValue = displayedValueRef.current;
+      if (value === null || startValue === null) {
+        displayedValueRef.current = value;
+        setDisplayedValue(value);
+        return;
+      }
+
+      const startTime = performance.now();
+      let animationFrameId: AnimationFrameID;
+      const step = (time: number) => {
+        const progress = Math.min(
+          1,
+          (time - startTime) / numberAnimationDurationInMs
+        );
+        // Slows down when getting close to the value.
+        const newDisplayedValue =
+          startValue + (value - startValue) * (1 - Math.pow(1 - progress, 3));
+        displayedValueRef.current = newDisplayedValue;
+        setDisplayedValue(newDisplayedValue);
+        if (progress < 1) animationFrameId = requestAnimationFrame(step);
+      };
+      animationFrameId = requestAnimationFrame(step);
+      return () => cancelAnimationFrame(animationFrameId);
+    },
+    [value]
+  );
+
+  return displayedValue;
+};
+
 const SummaryTile = ({
   title,
   value,
+  formatValue,
   change,
   caption,
 }: {|
   title: React.Node,
-  value: React.Node,
+  /** Null when there are too few players to show it. */
+  value: number | null,
+  formatValue: (value: number) => string,
   change: SummaryChange | null,
   caption?: React.Node,
 |}) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const animatedValue = useAnimatedNumber(value);
   return (
     <Paper background="medium" style={styles.tile}>
       <ColumnStackLayout noMargin>
@@ -103,7 +153,7 @@ const SummaryTile = ({
           {title}
         </Text>
         <Text noMargin size="title">
-          {value}
+          {animatedValue !== null ? formatValue(animatedValue) : '–'}
         </Text>
         {change ? (
           <Text noMargin size="body-small" color="secondary">
@@ -143,7 +193,7 @@ const ChartBlock = ({
 |}) => (
   <Paper background="medium" style={styles.chartPaper}>
     <ColumnStackLayout noMargin>
-      <Text noMargin size="sub-title">
+      <Text noMargin size="block-title">
         {title}
       </Text>
       <Text noMargin size="body-small" color="secondary">
@@ -313,84 +363,6 @@ export const GameAnalyticsPanel = ({
             </EmptyMessage>
           ) : (
             <Grid container spacing={2}>
-              <Grid item xs={6} md={3}>
-                <SummaryTile
-                  title={<Trans>Players</Trans>}
-                  value={playersCount.toLocaleString()}
-                  change={getCountChange(
-                    playersCount,
-                    previousSummary ? previousSummary.playersCount : null
-                  )}
-                  caption={<Trans>{sessionsCount} sessions</Trans>}
-                />
-              </Grid>
-              <Grid item xs={6} md={3}>
-                <SummaryTile
-                  title={<Trans>New players</Trans>}
-                  value={newPlayersCount.toLocaleString()}
-                  change={getCountChange(
-                    newPlayersCount,
-                    previousSummary ? previousSummary.newPlayersCount : null
-                  )}
-                />
-              </Grid>
-              <Grid item xs={6} md={3}>
-                <SummaryTile
-                  title={<Trans>Left in the first minute</Trans>}
-                  value={
-                    bounceRatePercent !== null
-                      ? `${Math.round(bounceRatePercent)}%`
-                      : '–'
-                  }
-                  change={
-                    bounceRateChangeInPoints !== null
-                      ? {
-                          text: `${getChangeArrow(
-                            bounceRateChangeInPoints
-                          )} ${Math.abs(bounceRateChangeInPoints)} pts`,
-                          isGood:
-                            bounceRateChangeInPoints === 0
-                              ? null
-                              : bounceRateChangeInPoints < 0,
-                        }
-                      : null
-                  }
-                  caption={
-                    bounceRatePercent === null ? notEnoughPlayersCaption : null
-                  }
-                />
-              </Grid>
-              <Grid item xs={6} md={3}>
-                <SummaryTile
-                  title={<Trans>Average play time</Trans>}
-                  value={
-                    playedDurationPerPlayerInSeconds !== null
-                      ? formatDuration(i18n, playedDurationPerPlayerInSeconds)
-                      : '–'
-                  }
-                  change={
-                    playedDurationChangeInSeconds !== null
-                      ? {
-                          text: `${getChangeArrow(
-                            playedDurationChangeInSeconds
-                          )} ${formatDuration(
-                            i18n,
-                            Math.abs(playedDurationChangeInSeconds)
-                          )}`,
-                          isGood:
-                            playedDurationChangeInSeconds === 0
-                              ? null
-                              : playedDurationChangeInSeconds > 0,
-                        }
-                      : null
-                  }
-                  caption={
-                    playedDurationPerPlayerInSeconds === null
-                      ? notEnoughPlayersCaption
-                      : null
-                  }
-                />
-              </Grid>
               <Grid
                 item
                 xs={12}
@@ -422,6 +394,86 @@ export const GameAnalyticsPanel = ({
                     />
                   </Grid>
                 )}
+              <Grid item xs={12}>
+                <Grid container spacing={1}>
+                  <Grid item xs={6} md={3}>
+                    <SummaryTile
+                      title={<Trans>Players</Trans>}
+                      value={playersCount}
+                      formatValue={formatCount}
+                      change={getCountChange(
+                        playersCount,
+                        previousSummary ? previousSummary.playersCount : null
+                      )}
+                      caption={<Trans>{sessionsCount} sessions</Trans>}
+                    />
+                  </Grid>
+                  <Grid item xs={6} md={3}>
+                    <SummaryTile
+                      title={<Trans>New players</Trans>}
+                      value={newPlayersCount}
+                      formatValue={formatCount}
+                      change={getCountChange(
+                        newPlayersCount,
+                        previousSummary ? previousSummary.newPlayersCount : null
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={6} md={3}>
+                    <SummaryTile
+                      title={<Trans>Left in the first minute</Trans>}
+                      value={bounceRatePercent}
+                      formatValue={value => `${Math.round(value)}%`}
+                      change={
+                        bounceRateChangeInPoints !== null
+                          ? {
+                              text: `${getChangeArrow(
+                                bounceRateChangeInPoints
+                              )} ${Math.abs(bounceRateChangeInPoints)} pts`,
+                              isGood:
+                                bounceRateChangeInPoints === 0
+                                  ? null
+                                  : bounceRateChangeInPoints < 0,
+                            }
+                          : null
+                      }
+                      caption={
+                        bounceRatePercent === null
+                          ? notEnoughPlayersCaption
+                          : null
+                      }
+                    />
+                  </Grid>
+                  <Grid item xs={6} md={3}>
+                    <SummaryTile
+                      title={<Trans>Average play time</Trans>}
+                      value={playedDurationPerPlayerInSeconds}
+                      formatValue={value => formatDuration(i18n, value)}
+                      change={
+                        playedDurationChangeInSeconds !== null
+                          ? {
+                              text: `${getChangeArrow(
+                                playedDurationChangeInSeconds
+                              )} ${formatDuration(
+                                i18n,
+                                Math.abs(playedDurationChangeInSeconds)
+                              )}`,
+                              isGood:
+                                playedDurationChangeInSeconds === 0
+                                  ? null
+                                  : playedDurationChangeInSeconds > 0,
+                            }
+                          : null
+                      }
+                      caption={
+                        playedDurationPerPlayerInSeconds === null
+                          ? notEnoughPlayersCaption
+                          : null
+                      }
+                    />
+                  </Grid>
+                </Grid>
+              </Grid>
               {retentionDays && d1RetentionDay && (
                 <Grid item xs={12} sm={6}>
                   <ChartBlock

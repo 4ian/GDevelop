@@ -22,7 +22,6 @@ const STORE_SEARCH_TOOL_NAMES = new Set([
 // The tools answering without the extensions of the opened project.
 const TOOL_NAMES_WITHOUT_PROJECT_EXTENSIONS = new Set([
   ...STORE_SEARCH_TOOL_NAMES,
-  'search',
   'read_recipe',
 ]);
 

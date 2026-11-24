@@ -1,0 +1,83 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 0;
+  padding: 2px 0;
+}
+
+.iconContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.textArea {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  outline: none;
+}
+
+.textAreaClickable {
+  cursor: pointer;
+}
+
+.textAreaClickable:hover {
+  opacity: 0.8;
+}
+
+.textAreaClickable:focus-visible {
+  outline: 2px solid;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.labelContainer {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Clamping with `-webkit-line-clamp` rather than `white-space: nowrap`: a
+   never-wrapping text would make the whole chat as wide as its longest line. */
+.labelContainerOnOneLine > * {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.secondaryLabel {
+  display: flex;
+  align-items: center;
+  height: 20px;
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+.chevron {
+  display: flex;
+  align-items: center;
+  height: 20px;
+  opacity: 0.6;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.details {
+  padding-left: 20px;
+  margin-top: 2px;
+  min-width: 0;
+}

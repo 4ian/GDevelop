@@ -116,11 +116,21 @@ gd::BehaviorMetadata &MetadataDeclarationHelper::DeclareBehaviorMetadata(
                   eventsBasedBehavior.GetName(), project,
                   PlatformExtension::GetBehaviorFullType(
                       extension.GetName(), eventsBasedBehavior.GetName())))
-          .SetObjectType(eventsBasedBehavior.GetObjectType())
-          .SetQuickCustomizationVisibility(eventsBasedBehavior.GetQuickCustomizationVisibility());
+          .SetObjectType(eventsBasedBehavior.GetObjectType());
 
   if (eventsBasedBehavior.IsPrivate())
     behaviorMetadata.SetPrivate();
+  if (!eventsBasedBehavior.IsSynchronizedOverNetworkByDefault())
+    behaviorMetadata.SetNotSynchronizedByDefault();
+
+  for (const auto &group :
+       GetPropertyGroups(eventsBasedBehavior.GetPropertyDescriptors())) {
+    behaviorMetadata.AddPropertyGroup(group);
+  }
+  for (const auto &group :
+       GetPropertyGroups(eventsBasedBehavior.GetSharedPropertyDescriptors())) {
+    behaviorMetadata.AddPropertyGroup(group);
+  }
 
   return behaviorMetadata;
 }
@@ -149,6 +159,10 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
           .SetAssetStoreTag(eventsBasedObject.GetAssetStoreTag())
           .AddDefaultBehavior("ResizableCapability::ResizableBehavior")
           .AddDefaultBehavior("FlippableCapability::FlippableBehavior");
+  for (const auto &group :
+       GetPropertyGroups(eventsBasedObject.GetPropertyDescriptors())) {
+    objectMetadata.AddPropertyGroup(group);
+  }
   if (!eventsBasedObject.IsInnerAreaFollowingParentSize()) {
     objectMetadata
           .AddDefaultBehavior("ScalableCapability::ScalableBehavior");
@@ -413,8 +427,7 @@ bool MetadataDeclarationHelper::IsBehaviorLifecycleEventsFunction(
  */
 bool MetadataDeclarationHelper::IsObjectLifecycleEventsFunction(
     const gd::String &functionName) {
-  return functionName == "onCreated" || functionName == "doStepPostEvents" ||
-         functionName == "onDestroy" || functionName == "onHotReloading";
+  return gd::EventsBasedObject::IsObjectLifecycleEventsFunction(functionName);
 }
 
 /**
@@ -542,7 +555,7 @@ MetadataDeclarationHelper::DeclareExpressionMetadata(
             GetFullName(eventsFunction),
         // An operator and an operand are inserted before user parameters.
         ShiftSentenceParamIndexes(GetFreeFunctionSentence(eventsFunction), 2),
-        eventsFunction.GetGroup(), iconURL);
+        GetFunctionGroup(eventsFunction), iconURL);
     // By convention, first parameter is always the Runtime Scene.
     expressionAndCondition.AddCodeOnlyParameter("currentScene", "");
     DeclareEventsFunctionParameters(freeEventsFunctions, eventsFunction,
@@ -560,13 +573,13 @@ MetadataDeclarationHelper::DeclareExpressionMetadata(
                   MetadataDeclarationHelper::GetFullName(eventsFunction),
                   eventsFunction.GetDescription() ||
                       GetFullName(eventsFunction),
-                  eventsFunction.GetGroup(), iconURL)
+                  GetFunctionGroup(eventsFunction), iconURL)
             : extension.AddStrExpression(
                   eventsFunction.GetName(),
                   MetadataDeclarationHelper::GetFullName(eventsFunction),
                   eventsFunction.GetDescription() ||
                       GetFullName(eventsFunction),
-                  eventsFunction.GetGroup(), iconURL);
+                  GetFunctionGroup(eventsFunction), iconURL);
     // By convention, first parameter is always the Runtime Scene.
     expression.AddCodeOnlyParameter("currentScene", "");
     DeclareEventsFunctionParameters(freeEventsFunctions, eventsFunction,
@@ -591,11 +604,11 @@ gd::InstructionMetadata &MetadataDeclarationHelper::DeclareInstructionMetadata(
   auto &freeEventsFunctions = eventsFunctionsExtension.GetEventsFunctions();
   if (functionType == gd::EventsFunction::Condition) {
     auto &condition = extension.AddCondition(
-        eventsFunction.GetName(),
-        GetFullName(eventsFunction),
-        GetTranslation(eventsFunction.GetDescription()) || GetFullName(eventsFunction),
-        GetFreeFunctionSentence(eventsFunction), eventsFunction.GetGroup(),
-        iconURL, iconURL);
+        eventsFunction.GetName(), GetFullName(eventsFunction),
+        GetTranslation(eventsFunction.GetDescription()) ||
+            GetFullName(eventsFunction),
+        GetFreeFunctionSentence(eventsFunction),
+        GetFunctionGroup(eventsFunction), iconURL, iconURL);
     // By convention, first parameter is always the Runtime Scene.
     condition.AddCodeOnlyParameter("currentScene", "");
     DeclareEventsFunctionParameters(freeEventsFunctions, eventsFunction,
@@ -617,7 +630,7 @@ gd::InstructionMetadata &MetadataDeclarationHelper::DeclareInstructionMetadata(
               (getterFunction.GetDescription() || GetFullName(getterFunction)),
           // An operator and an operand are inserted before user parameters.
           ShiftSentenceParamIndexes(GetFreeFunctionSentence(getterFunction), 2),
-          getterFunction.GetGroup(), iconURL, iconURL);
+          GetFunctionGroup(getterFunction), iconURL, iconURL);
       action
           .SetManipulatedType(gd::ValueTypeMetadata::GetPrimitiveValueType(
               getterFunction.GetExpressionType().GetName()))
@@ -651,11 +664,11 @@ gd::InstructionMetadata &MetadataDeclarationHelper::DeclareInstructionMetadata(
     }
   } else {
     auto &action = extension.AddAction(
-        eventsFunction.GetName(),
-        GetFullName(eventsFunction),
-        GetTranslation(eventsFunction.GetDescription()) || GetFullName(eventsFunction),
-        GetFreeFunctionSentence(eventsFunction), eventsFunction.GetGroup(),
-        iconURL, iconURL);
+        eventsFunction.GetName(), GetFullName(eventsFunction),
+        GetTranslation(eventsFunction.GetDescription()) ||
+            GetFullName(eventsFunction),
+        GetFreeFunctionSentence(eventsFunction),
+        GetFunctionGroup(eventsFunction), iconURL, iconURL);
     // By convention, first parameter is always the Runtime Scene.
     action.AddCodeOnlyParameter("currentScene", "");
     DeclareEventsFunctionParameters(freeEventsFunctions, eventsFunction,
@@ -745,14 +758,14 @@ MetadataDeclarationHelper::DeclareBehaviorExpressionMetadata(
     auto expressionAndCondition = behaviorMetadata.AddExpressionAndCondition(
         gd::ValueTypeMetadata::GetPrimitiveValueType(
             eventsFunction.GetExpressionType().GetName()),
-        eventsFunction.GetName(),
-        GetFullName(eventsFunction),
+        eventsFunction.GetName(), GetFullName(eventsFunction),
         RemoveTrailingDot(eventsFunction.GetDescription()) ||
             GetFullName(eventsFunction),
         // An operator and an operand are inserted before user parameters.
-        ShiftSentenceParamIndexes(GetBehaviorFunctionSentence(eventsFunction, true), 2),
-        eventsFunction.GetGroup() || eventsBasedBehavior.GetFullName() ||
-            eventsBasedBehavior.GetName(),
+        ShiftSentenceParamIndexes(
+            GetBehaviorFunctionSentence(eventsFunction, true), 2),
+        GetFunctionGroup(eventsFunction) ||
+            eventsBasedBehavior.GetFullName() || eventsBasedBehavior.GetName(),
         iconURL);
     DeclareEventsFunctionParameters(eventsBasedBehavior.GetEventsFunctions(),
                                     eventsFunction, expressionAndCondition, 2);
@@ -769,7 +782,7 @@ MetadataDeclarationHelper::DeclareBehaviorExpressionMetadata(
                   MetadataDeclarationHelper::GetFullName(eventsFunction),
                   eventsFunction.GetDescription() ||
                       GetFullName(eventsFunction),
-                  eventsFunction.GetGroup() ||
+                  GetFunctionGroup(eventsFunction) ||
                       eventsBasedBehavior.GetFullName() ||
                       eventsBasedBehavior.GetName(),
                   iconURL)
@@ -778,7 +791,7 @@ MetadataDeclarationHelper::DeclareBehaviorExpressionMetadata(
                   MetadataDeclarationHelper::GetFullName(eventsFunction),
                   eventsFunction.GetDescription() ||
                       GetFullName(eventsFunction),
-                  eventsFunction.GetGroup() ||
+                  GetFunctionGroup(eventsFunction) ||
                       eventsBasedBehavior.GetFullName() ||
                       eventsBasedBehavior.GetName(),
                   iconURL);
@@ -807,11 +820,10 @@ MetadataDeclarationHelper::DeclareBehaviorInstructionMetadata(
     // we want to prevent any conflict between free functions and
     // behaviors (that can totally have functions with the same name).
     auto &condition = behaviorMetadata.AddScopedCondition(
-        eventsFunction.GetName(),
-        GetFullName(eventsFunction),
+        eventsFunction.GetName(), GetFullName(eventsFunction),
         eventsFunction.GetDescription() || GetFullName(eventsFunction),
         GetBehaviorFunctionSentence(eventsFunction),
-        eventsFunction.GetGroup() || eventsBasedBehavior.GetFullName() ||
+        GetFunctionGroup(eventsFunction) || eventsBasedBehavior.GetFullName() ||
             eventsBasedBehavior.GetName(),
         iconURL, iconURL);
     DeclareEventsFunctionParameters(eventsBasedBehavior.GetEventsFunctions(),
@@ -834,7 +846,7 @@ MetadataDeclarationHelper::DeclareBehaviorInstructionMetadata(
                                                GetFullName(getterFunction)),
           // An operator and an operand are inserted before user parameters.
           ShiftSentenceParamIndexes(GetBehaviorFunctionSentence(getterFunction, true), 2),
-          getterFunction.GetGroup() || eventsBasedBehavior.GetFullName() ||
+          GetFunctionGroup(getterFunction) || eventsBasedBehavior.GetFullName() ||
               eventsBasedBehavior.GetName(),
           iconURL, iconURL);
       action
@@ -874,7 +886,7 @@ MetadataDeclarationHelper::DeclareBehaviorInstructionMetadata(
         GetFullName(eventsFunction),
         eventsFunction.GetDescription() || GetFullName(eventsFunction),
         GetBehaviorFunctionSentence(eventsFunction),
-        eventsFunction.GetGroup() || eventsBasedBehavior.GetFullName() ||
+        GetFunctionGroup(eventsFunction) || eventsBasedBehavior.GetFullName() ||
             eventsBasedBehavior.GetName(),
         iconURL, iconURL);
 
@@ -944,7 +956,7 @@ MetadataDeclarationHelper::DeclareObjectExpressionMetadata(
             GetFullName(eventsFunction),
         // An operator and an operand are inserted before user parameters.
         ShiftSentenceParamIndexes(GetObjectFunctionSentence(eventsFunction, true), 2),
-        eventsFunction.GetGroup() || eventsBasedObject.GetFullName() ||
+        GetFunctionGroup(eventsFunction) || eventsBasedObject.GetFullName() ||
             eventsBasedObject.GetName(),
         iconURL);
 
@@ -963,7 +975,7 @@ MetadataDeclarationHelper::DeclareObjectExpressionMetadata(
                   MetadataDeclarationHelper::GetFullName(eventsFunction),
                   eventsFunction.GetDescription() ||
                       GetFullName(eventsFunction),
-                  eventsFunction.GetGroup() ||
+                  GetFunctionGroup(eventsFunction) ||
                       eventsBasedObject.GetFullName() ||
                       eventsBasedObject.GetName(),
                   iconURL)
@@ -972,7 +984,7 @@ MetadataDeclarationHelper::DeclareObjectExpressionMetadata(
                   MetadataDeclarationHelper::GetFullName(eventsFunction),
                   eventsFunction.GetDescription() ||
                       GetFullName(eventsFunction),
-                  eventsFunction.GetGroup() ||
+                  GetFunctionGroup(eventsFunction) ||
                       eventsBasedObject.GetFullName() ||
                       eventsBasedObject.GetName(),
                   iconURL);
@@ -1006,7 +1018,7 @@ MetadataDeclarationHelper::DeclareObjectInstructionMetadata(
         GetFullName(eventsFunction),
         eventsFunction.GetDescription() || GetFullName(eventsFunction),
         GetObjectFunctionSentence(eventsFunction),
-        eventsFunction.GetGroup() || eventsBasedObject.GetFullName() ||
+        GetFunctionGroup(eventsFunction) || eventsBasedObject.GetFullName() ||
             eventsBasedObject.GetName(),
         iconURL, iconURL);
 
@@ -1029,7 +1041,7 @@ MetadataDeclarationHelper::DeclareObjectInstructionMetadata(
               (getterFunction.GetDescription() || GetFullName(getterFunction)),
           // An operator and an operand are inserted before user parameters.
           ShiftSentenceParamIndexes(GetObjectFunctionSentence(getterFunction, true), 2),
-          getterFunction.GetGroup() || eventsBasedObject.GetFullName() ||
+          GetFunctionGroup(getterFunction) || eventsBasedObject.GetFullName() ||
               eventsBasedObject.GetName(),
           iconURL, iconURL);
       action
@@ -1068,7 +1080,7 @@ MetadataDeclarationHelper::DeclareObjectInstructionMetadata(
         GetFullName(eventsFunction),
         eventsFunction.GetDescription() || GetFullName(eventsFunction),
         GetObjectFunctionSentence(eventsFunction),
-        eventsFunction.GetGroup() || eventsBasedObject.GetFullName() ||
+        GetFunctionGroup(eventsFunction) || eventsBasedObject.GetFullName() ||
             eventsBasedObject.GetName(),
         iconURL, iconURL);
 
@@ -1357,10 +1369,159 @@ void MetadataDeclarationHelper::
 }
 
 /**
- * Declare the instructions (actions/conditions) and expressions for the
- * properties of the given events based object.
- * This is akin to what would happen by manually declaring a JS extension
- * (see `JsExtension.js` files of extensions).
+ * The conversions crossing the boundary of a custom object, one object at a
+ * time: the children of a custom object have their own coordinates, which
+ * mean nothing outside of it. A 3D custom object takes and gives a Z and also
+ * converts directions, a 2D one also converts angles.
+ *
+ * They are private: only the events of the object itself know what is inside
+ * it. What they expose is converted, so that the scene (or the custom object
+ * containing it) never depends on how the object is made.
+ */
+void MetadataDeclarationHelper::DeclareObjectCoordinateConversions(
+    gd::ObjectMetadata &objectMetadata, const gd::String &objectType,
+    bool isRenderedIn3D) {
+  auto addPoint = [&isRenderedIn3D](gd::ExpressionMetadata &expression,
+                                    bool isGivenInside) {
+    if (isGivenInside) {
+      expression.AddParameter("number", _("X position, inside the object"))
+          .AddParameter("number", _("Y position, inside the object"));
+      if (isRenderedIn3D)
+        expression.AddParameter("number", _("Z position, inside the object"));
+    } else {
+      expression
+          .AddParameter("number",
+                        _("X position, in the space containing the object"))
+          .AddParameter("number",
+                        _("Y position, in the space containing the object"));
+      if (isRenderedIn3D)
+        expression.AddParameter(
+            "number", _("Z position, in the space containing the object"));
+    }
+  };
+
+  for (const auto &axis : std::vector<gd::String>{"X", "Y", "Z"}) {
+    if (axis == "Z" && !isRenderedIn3D) continue;
+
+    auto &toParent =
+        objectMetadata
+            .AddExpression(
+                "ToParent" + axis,
+                _("<axis> of a point inside the object, in its parent")
+                    .FindAndReplace("<axis>", axis),
+                _("Convert a point given inside the object (where its child "
+                  "objects are positioned) to the space containing the object "
+                  "(the scene, or the custom object containing it), and "
+                  "return its <axis> position. Use it to expose the position "
+                  "of a child object (or of a point of it) to the parent.")
+                    .FindAndReplace("<axis>", axis),
+                _("Position ❯ Coordinates"), "res/actions/position_black.png")
+            .AddParameter("object", _("Object"), objectType);
+    addPoint(toParent, true);
+    toParent.SetPrivate().SetFunctionName("toParent" + axis);
+
+    auto &fromParent =
+        objectMetadata
+            .AddExpression(
+                "FromParent" + axis,
+                _("<axis> of a point of the parent, inside the object")
+                    .FindAndReplace("<axis>", axis),
+                _("Convert a point given in the space containing the object "
+                  "(the scene, or the custom object containing it) to the "
+                  "inside of the object (where its child objects are "
+                  "positioned), and return its <axis> position. Use it to "
+                  "bring a position given by the parent (a target, the "
+                  "cursor...) to the child objects.")
+                    .FindAndReplace("<axis>", axis),
+                _("Position ❯ Coordinates"), "res/actions/position_black.png")
+            .AddParameter("object", _("Object"), objectType);
+    addPoint(fromParent, false);
+    fromParent.SetPrivate().SetFunctionName("fromParent" + axis);
+
+    if (!isRenderedIn3D) continue;
+
+    objectMetadata
+        .AddExpression(
+            "ToParentDirection" + axis,
+            _("<axis> of a direction inside the object, in its parent")
+                .FindAndReplace("<axis>", axis),
+            _("Convert a direction given inside the object (the forward "
+              "vector of a child object, for instance) to the space "
+              "containing the object (the scene, or the custom object "
+              "containing it), and return the <axis> of this direction as a "
+              "unit vector. The rotations, flips and scales of the object "
+              "are applied.")
+                .FindAndReplace("<axis>", axis),
+            _("Position ❯ Coordinates"), "res/actions/rotate_black.png")
+        .AddParameter("object", _("Object"), objectType)
+        .AddParameter("number", _("X of the direction, inside the object"))
+        .AddParameter("number", _("Y of the direction, inside the object"))
+        .AddParameter("number", _("Z of the direction, inside the object"))
+        .SetPrivate()
+        .SetFunctionName("toParentDirection" + axis);
+
+    objectMetadata
+        .AddExpression(
+            "FromParentDirection" + axis,
+            _("<axis> of a direction of the parent, inside the object")
+                .FindAndReplace("<axis>", axis),
+            _("Convert a direction given in the space containing the object "
+              "(where the camera looks, for instance) to the inside of the "
+              "object, and return the <axis> of this direction as a unit "
+              "vector.")
+                .FindAndReplace("<axis>", axis),
+            _("Position ❯ Coordinates"), "res/actions/rotate_black.png")
+        .AddParameter("object", _("Object"), objectType)
+        .AddParameter("number",
+                      _("X of the direction, in the space containing the "
+                        "object"))
+        .AddParameter("number",
+                      _("Y of the direction, in the space containing the "
+                        "object"))
+        .AddParameter("number",
+                      _("Z of the direction, in the space containing the "
+                        "object"))
+        .SetPrivate()
+        .SetFunctionName("fromParentDirection" + axis);
+  }
+
+  // An angle around Z is the whole orientation of a 2D object only: in 3D, a
+  // direction tilted by a rotation on X or Y keeps no meaning as an angle
+  // across a tilted object. Directions are converted as vectors there.
+  if (isRenderedIn3D) return;
+
+  objectMetadata
+      .AddExpression(
+          "ToParentAngle", _("Angle inside the object, in its parent"),
+          _("Convert an angle (a direction, in degrees) given inside the "
+            "object (where its child objects are positioned) to the space "
+            "containing the object (the scene, or the custom object containing "
+            "it). The angle, flips and scales of the object are applied. Use "
+            "it to expose the angle of a child object to the parent."),
+          _("Position ❯ Coordinates"), "res/actions/rotate_black.png")
+      .AddParameter("object", _("Object"), objectType)
+      .AddParameter("number", _("Angle, inside the object (in degrees)"))
+      .SetPrivate()
+      .SetFunctionName("toParentAngle");
+
+  objectMetadata
+      .AddExpression(
+          "FromParentAngle", _("Angle of the parent, inside the object"),
+          _("Convert an angle (a direction, in degrees) given in the space "
+            "containing the object (the scene, or the custom object "
+            "containing it) to the inside of the object (where its child "
+            "objects are positioned)."),
+          _("Position ❯ Coordinates"), "res/actions/rotate_black.png")
+      .AddParameter("object", _("Object"), objectType)
+      .AddParameter("number",
+                    _("Angle, in the space containing the object (in degrees)"))
+      .SetPrivate()
+      .SetFunctionName("fromParentAngle");
+}
+
+/**
+ * Declare the instructions (actions/conditions) and expressions that only
+ * the events of the given events based object can use.
  */
 void MetadataDeclarationHelper::DeclareObjectInternalInstructions(
     gd::PlatformExtension &extension, gd::ObjectMetadata &objectMetadata,
@@ -1385,6 +1546,8 @@ void MetadataDeclarationHelper::DeclareObjectInternalInstructions(
         .MarkAsAdvanced()
         .SetPrivate()
         .SetFunctionName("setRotationCenter3D");
+
+    DeclareObjectCoordinateConversions(objectMetadata, objectType, true);
   }
   else {
     objectMetadata
@@ -1401,6 +1564,8 @@ void MetadataDeclarationHelper::DeclareObjectInternalInstructions(
         .MarkAsAdvanced()
         .SetPrivate()
         .SetFunctionName("setRotationCenter");
+
+    DeclareObjectCoordinateConversions(objectMetadata, objectType, false);
   }
 }
 
@@ -1718,6 +1883,24 @@ gd::ObjectMetadata &MetadataDeclarationHelper::GenerateObjectMetadata(
   UpdateCustomObjectDefaultBehaviors(project, objectMetadata);
 
   return objectMetadata;
+}
+
+std::vector<gd::String> MetadataDeclarationHelper::GetPropertyGroups(
+    const gd::PropertiesContainer &properties) {
+  std::vector<gd::String> groups;
+  const auto &rootFolder = properties.GetRootFolder();
+  for (std::size_t i = 0; i < rootFolder.GetChildrenCount(); ++i) {
+    const auto &child = rootFolder.GetChildAt(i);
+    if (child.IsFolder()) {
+      groups.push_back(child.GetFolderName());
+    }
+  }
+  return groups;
+}
+
+gd::String MetadataDeclarationHelper::GetFunctionGroup(
+    const gd::EventsFunction &eventsFunction) {
+  return eventsFunction.GetGroup().FindAndReplace("/", " ❯ ");
 }
 
 class DefaultBehaviorUpdater : public gd::ArbitraryObjectsWorker {

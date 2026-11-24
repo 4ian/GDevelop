@@ -46,7 +46,7 @@ import { EducationCard } from '../LearnSection/EducationCard';
 import UserSVG from '../../../../UI/CustomSvgIcons/User';
 import { copyTextToClipboard } from '../../../../Utils/Clipboard';
 import ManageEducationAccountDialog from './ManageEducationAccountDialog';
-import TeamAvailableSeats from './TeamAvailableSeats';
+import StudentsAiToggle from './StudentsAiToggle';
 
 const PADDING = 16;
 
@@ -295,7 +295,7 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
           expand
           justifyContent="space-between"
         >
-          <TeamAvailableSeats />
+          <StudentsAiToggle />
           <RaisedButton
             primary
             label={

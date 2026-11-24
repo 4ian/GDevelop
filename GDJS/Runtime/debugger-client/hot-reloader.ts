@@ -61,6 +61,7 @@ namespace gdjs {
       onDone: (logs: HotReloaderLog[]) => void;
       options: HotReloadOptions;
     }> = [];
+    _onIdleCallbacks: Array<() => void> = [];
 
     /**
      * @param runtimeGame - The `gdjs.RuntimeGame` to be hot-reloaded.
@@ -116,6 +117,9 @@ namespace gdjs {
         if (
           // Don't reload Box2d as it would confuse and crash the asm.js library.
           endsWith(srcFilename, 'box2d.js') ||
+          // Don't reload the Recast navigation library as it would lose
+          // its initialized WebAssembly module.
+          endsWith(srcFilename, 'recast-navigation-generators.js') ||
           // Don't reload sha256.js library.
           endsWith(srcFilename, 'sha256.js') ||
           // Don't reload shopify-buy library.
@@ -179,6 +183,11 @@ namespace gdjs {
         }
         const reloadedScriptElement = document.createElement('script');
         reloadedScriptElement.src = srcFilename + '?timestamp=' + Date.now();
+        // Like the scripts of index.html: without it, a script from another
+        // origin (like the runtime of the browser previews) has an
+        // "about:blank" base URL, so its relative dynamic imports
+        // (like the Jolt physics library) can't be resolved.
+        reloadedScriptElement.crossOrigin = 'anonymous';
         reloadedScriptElement.onload = () => {
           resolve();
         };
@@ -198,6 +207,18 @@ namespace gdjs {
      * it's sub-optimal) and not miss any (one could for example be reloading libraries
      * or code, while other are just reloading resources).
      */
+    /**
+     * Call `callback` once the hot-reloads in progress or queued are done
+     * (right away if there are none).
+     */
+    onceIdle(callback: () => void): void {
+      if (!this._isHotReloadingSince && this._hotReloadsQueue.length === 0) {
+        callback();
+        return;
+      }
+      this._onIdleCallbacks.push(callback);
+    }
+
     async hotReload(options: HotReloadOptions): Promise<HotReloaderLog[]> {
       return new Promise((resolve) => {
         const hotReloadId = nextHotReloadId++;
@@ -313,13 +334,15 @@ namespace gdjs {
           const inGameEditor = this._runtimeGame.getInGameEditor();
           if (inGameEditor) {
             inGameEditor.onProjectDataChange(newProjectData);
+            // The status leaves out the fields that are not set: they are
+            // null for the in-game editor, as when the game starts.
             await inGameEditor.switchToSceneOrVariant(
               newRuntimeGameStatus.editorId || null,
               newRuntimeGameStatus.sceneName,
-              newRuntimeGameStatus.injectedExternalLayoutName,
-              newRuntimeGameStatus.eventsBasedObjectType,
-              newRuntimeGameStatus.eventsBasedObjectVariantName,
-              newRuntimeGameStatus.editorCamera3D || null
+              newRuntimeGameStatus.injectedExternalLayoutName || null,
+              newRuntimeGameStatus.eventsBasedObjectType || null,
+              newRuntimeGameStatus.eventsBasedObjectVariantName || null,
+              newRuntimeGameStatus.editorCamera || null
             );
           }
         } else {
@@ -379,6 +402,10 @@ namespace gdjs {
           `Still ${this._hotReloadsQueue.length} hot-reloads in queue. Starting the next one...`
         );
         this._processHotReloadsQueue();
+      } else {
+        const onIdleCallbacks = this._onIdleCallbacks;
+        this._onIdleCallbacks = [];
+        for (const onIdleCallback of onIdleCallbacks) onIdleCallback();
       }
     }
 
@@ -830,6 +857,7 @@ namespace gdjs {
         newLayoutData.v,
         newLayoutData.b
       );
+      runtimeScene.setRenderer3DWorldScale(newLayoutData.renderer3DWorldScale);
       if (oldLayoutData.title !== newLayoutData.title) {
         runtimeScene
           .getGame()
@@ -970,7 +998,8 @@ namespace gdjs {
       this._hotReloadRuntimeSceneObjects(
         oldObjectDataList,
         newObjectDataList,
-        runtimeInstanceContainer
+        runtimeInstanceContainer,
+        { shouldReplaceRegisteredObjectData: true }
       );
       this._hotReloadRuntimeSceneInstances(
         oldProjectData,
@@ -1127,10 +1156,21 @@ namespace gdjs {
       // runtimeInstanceContainer gives an access as a map.
       runtimeInstanceContainer: gdjs.RuntimeInstanceContainer
     ): void {
-      const oldObjects: Array<ObjectData | null> = updatedObjects.map(
-        (objectData) =>
-          runtimeInstanceContainer._objects.get(objectData.name) || null
-      );
+      // The registered object data are the ones from the ProjectData:
+      // they are registered when the scene is loaded and they are the ones
+      // updated below.
+      //
+      // In gdjs.CustomRuntimeObjectInstanceContainer.loadFrom, object can
+      // be registered with a different instance from the ProjectData. This
+      // is only done for children of a custom object with a children overriding.
+      // In the case of the editor, the fake custom object used for editing
+      // variants has no children overriding (see
+      // gdjs.RuntimeGame._createSceneWithCustomObject).
+      const projectObjectDataList: Array<ObjectData | null> =
+        updatedObjects.map(
+          (objectData) =>
+            runtimeInstanceContainer._objects.get(objectData.name) || null
+        );
 
       const projectData: ProjectData = this._runtimeGame._data;
       const newObjectDataList = HotReloader.resolveCustomObjectConfigurations(
@@ -1139,24 +1179,21 @@ namespace gdjs {
       );
 
       this._hotReloadRuntimeSceneObjects(
-        oldObjects,
+        projectObjectDataList,
         newObjectDataList,
-        runtimeInstanceContainer
+        runtimeInstanceContainer,
+        // Replacing them with a copy (`newObjectDataList`) would make the next
+        // hot-reload update the copy, and a scene loaded again from the
+        // ProjectData (when the editor switches back to it) would lose the
+        // changes.
+        { shouldReplaceRegisteredObjectData: false }
       );
-      // Update the GameData
       for (let index = 0; index < updatedObjects.length; index++) {
-        const oldObjectData = oldObjects[index];
+        const projectObjectData = projectObjectDataList[index];
         // When the object is new, the hot-reload call `registerObject`
         // so `_objects` is already updated.
-        if (oldObjectData) {
-          // In gdjs.CustomRuntimeObjectInstanceContainer.loadFrom, object can
-          // be registered with a different instance from the ProjectData. This
-          // is only done for children of a custom object with a children overriding.
-          // In the case of the editor, the fake custom object used for editing
-          // variants has no children overriding (see
-          // gdjs.RuntimeGame._createSceneWithCustomObject).
-          // Thus, the oldObjectData is always the one from the ProjectData.
-          HotReloader.assignOrDelete(oldObjectData, updatedObjects[index]);
+        if (projectObjectData) {
+          HotReloader.assignOrDelete(projectObjectData, updatedObjects[index]);
         } else {
           console.warn(
             `Can't update object data for "${updatedObjects[index].name}" because it doesn't exist.`
@@ -1168,7 +1205,8 @@ namespace gdjs {
     _hotReloadRuntimeSceneObjects(
       oldObjects: Array<ObjectData | null>,
       newObjects: ObjectData[],
-      runtimeInstanceContainer: gdjs.RuntimeInstanceContainer
+      runtimeInstanceContainer: gdjs.RuntimeInstanceContainer,
+      options: { shouldReplaceRegisteredObjectData: boolean }
     ): void {
       oldObjects.forEach((oldObjectData) => {
         if (!oldObjectData) {
@@ -1192,7 +1230,8 @@ namespace gdjs {
             this._hotReloadRuntimeSceneObject(
               oldObjectData,
               newObjectData,
-              runtimeInstanceContainer
+              runtimeInstanceContainer,
+              options
             );
           }
         }
@@ -1215,7 +1254,12 @@ namespace gdjs {
     _hotReloadRuntimeSceneObject(
       oldObjectData: ObjectData,
       newObjectData: ObjectData,
-      runtimeInstanceContainer: gdjs.RuntimeInstanceContainer
+      runtimeInstanceContainer: gdjs.RuntimeInstanceContainer,
+      {
+        shouldReplaceRegisteredObjectData,
+      }: {
+        shouldReplaceRegisteredObjectData: boolean;
+      }
     ): void {
       let hotReloadSucceeded = true;
       if (!HotReloader.deepEqual(oldObjectData, newObjectData)) {
@@ -1227,8 +1271,10 @@ namespace gdjs {
             '" was modified and is hot-reloaded.',
         });
 
-        // Register the updated object data, used for new instances.
-        runtimeInstanceContainer.updateObject(newObjectData);
+        if (shouldReplaceRegisteredObjectData) {
+          // Replace the registered object data, used for new instances.
+          runtimeInstanceContainer.updateObject(newObjectData);
+        }
 
         // Update existing instances
         const runtimeObjects = runtimeInstanceContainer.getObjects(
@@ -1628,6 +1674,9 @@ namespace gdjs {
           }
         }
       });
+      runtimeLayer.setEffectsOrder(
+        newEffectsData.map((effectData) => effectData.name)
+      );
     }
 
     _hotReloadRuntimeLayerEffect(
@@ -1857,6 +1906,15 @@ namespace gdjs {
         runtimeObject.setLayer(newInstance.layer);
         somethingChanged = true;
       }
+      if (
+        // Instances hidden at start are not hidden in the in-game editor:
+        // they must stay visible to be seen and manipulated.
+        !this._runtimeGame.isInGameEdition() &&
+        !oldInstance.hidden !== !newInstance.hidden
+      ) {
+        runtimeObject.hide(!!newInstance.hidden);
+        somethingChanged = true;
+      }
       if (gdjs.Base3DHandler && gdjs.Base3DHandler.is3D(runtimeObject)) {
         if (oldInstance.z !== newInstance.z) {
           runtimeObject.setZ(newInstance.z || 0);
@@ -1896,9 +1954,11 @@ namespace gdjs {
         }
       } else {
         if (!newInstance.customSize && oldInstance.customSize) {
-          // The custom size was removed. Just flag the size as changed
-          // and hope the object will handle this in
-          // `extraInitializationFromInitialInstance`.
+          // The custom size was removed: restore the original size, as objects
+          // don't reset it in `extraInitializationFromInitialInstance`.
+          runtimeObject.setWidth(runtimeObject.getOriginalWidth());
+          runtimeObject.setHeight(runtimeObject.getOriginalHeight());
+          somethingChanged = true;
           sizeChanged = true;
         }
       }
@@ -1915,12 +1975,22 @@ namespace gdjs {
           newInstance.depth === undefined &&
           oldInstance.depth !== undefined
         ) {
-          // The custom depth was removed. Just flag the depth as changed
-          // and hope the object will handle this in
-          // `extraInitializationFromInitialInstance`.
+          // The custom depth was removed: restore the original depth, as
+          // objects don't reset it in `extraInitializationFromInitialInstance`.
+          runtimeObject.setDepth(runtimeObject.getOriginalDepth());
+          somethingChanged = true;
           sizeChanged = true;
         }
       }
+      // Check if opacity or flipping changed. They are applied by the object in
+      // `extraInitializationFromInitialInstance`, so just flag them as changed.
+      const opacityOrFlipChanged =
+        (oldInstance.opacity === undefined ? 255 : oldInstance.opacity) !==
+          (newInstance.opacity === undefined ? 255 : newInstance.opacity) ||
+        !oldInstance.flippedX !== !newInstance.flippedX ||
+        !oldInstance.flippedY !== !newInstance.flippedY ||
+        !oldInstance.flippedZ !== !newInstance.flippedZ;
+
       if (runtimeObject instanceof gdjs.CustomRuntimeObject) {
         // The `objects` attribute is already resolved by `resolveCustomObjectConfigurations()`.
         const oldCustomObjectData = oldObjectData as ObjectData &
@@ -1979,8 +2049,16 @@ namespace gdjs {
           return !oldStringProperty || oldStringProperty.value !== value;
         }
       );
-      if (numberPropertiesChanged || stringPropertiesChanged || sizeChanged) {
+      if (
+        numberPropertiesChanged ||
+        stringPropertiesChanged ||
+        sizeChanged ||
+        opacityOrFlipChanged
+      ) {
         runtimeObject.extraInitializationFromInitialInstance(newInstance);
+        if (this._runtimeGame.isInGameEdition()) {
+          gdjs.RuntimeObject.applyInGameEditorMinimumOpacity(runtimeObject);
+        }
         somethingChanged = true;
       }
       if (somethingChanged) {

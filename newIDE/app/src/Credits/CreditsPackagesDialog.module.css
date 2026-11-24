@@ -1,0 +1,303 @@
+.container {
+  /* Themes that don't define the premium accent still get a sensible one, so
+     the dialog never falls back to an invalid (dropped) color. */
+  --credits-dialog-teal: var(--theme-premium-teal, #3bf7f4);
+  --credits-dialog-orange: var(--theme-premium-orange, #ffbc57);
+  --credits-dialog-accent-text: var(
+    --theme-premium-accent-text-color,
+    #ffa929
+  );
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.headerTexts {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.headerBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+  flex-shrink: 0;
+  font-size: 26px;
+  border: 1px solid
+    color-mix(in srgb, var(--credits-dialog-orange) 40%, transparent);
+  background-color: color-mix(
+    in srgb,
+    var(--credits-dialog-orange) 14%,
+    transparent
+  );
+  color: var(--theme-text-default-color);
+}
+
+.overline {
+  font-family: var(--gdevelop-modern-font-family);
+  font-size: 11px;
+  font-weight: bold;
+  line-height: 1.2;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--credits-dialog-accent-text);
+}
+
+/* The current balance, at the end of the header line: the starting point of the
+   purchase, so it stays visible without being the subject of the dialog. */
+.balanceChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  margin-left: auto;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 16px;
+  border: 1px solid
+    color-mix(in srgb, var(--credits-dialog-orange) 40%, transparent);
+  background-color: color-mix(
+    in srgb,
+    var(--credits-dialog-orange) 12%,
+    transparent
+  );
+  color: var(--theme-text-default-color);
+}
+
+/* What credits unlock: a single row on wide dialogs, and a single column on a
+   phone (rather than a two column grid leaving a hole under the third one). */
+.usages {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+  min-width: 0;
+}
+
+.usage {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 10px;
+  min-width: 0;
+  /* The canvas background, not the alternate one: the alternate background is
+     the dialog's own background in every theme, which would make the tile
+     invisible (its faint border alone had to carry it, and did not on the light
+     theme). */
+  border: 1px solid var(--theme-dialog-separator-color);
+  background-color: var(--theme-surface-canvas-background-color);
+}
+
+.usageTexts {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.usageIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  font-size: 17px;
+  background-color: color-mix(
+    in srgb,
+    var(--theme-primary-light) 22%,
+    transparent
+  );
+  color: var(--theme-text-default-color);
+}
+
+/* The packages: as many per row as fit, so the same markup works on a phone, a
+   tablet and a wide desktop dialog. */
+.packages {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(158px, 1fr));
+  justify-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.package {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* The app has no global border-box rule, and the card has its own padding and
+     border: without this, `width: 100%` would overflow the grid column. */
+  box-sizing: border-box;
+  width: 100%;
+  /* So a shop selling only one or two packages doesn't show absurdly wide
+     cards: they stay at a card's size, centered in the space they have. */
+  max-width: 300px;
+  gap: 7px;
+  position: relative;
+  padding: 16px 10px 10px 10px;
+  border-radius: 12px;
+  min-width: 0;
+  /* See `.usage` for why the canvas background (and the dialog separator
+     color) are used rather than the alternate canvas one. */
+  border: 1px solid var(--theme-dialog-separator-color);
+  background-color: var(--theme-surface-canvas-background-color);
+  transition: border-color 150ms ease, transform 150ms ease;
+}
+
+.package:hover {
+  border-color: color-mix(in srgb, var(--theme-primary-light) 60%, transparent);
+}
+
+/* The recommended (or best value) package, pulled forward with the premium
+   accent so the eye lands on it first. */
+.highlightedPackage {
+  border-color: color-mix(
+    in srgb,
+    var(--credits-dialog-orange) 60%,
+    transparent
+  );
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--credits-dialog-orange) 10%, transparent) 0%,
+    transparent 65%
+  );
+}
+
+.packageBadge {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-family: var(--gdevelop-modern-font-family);
+  font-size: 11px;
+  font-weight: bold;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: linear-gradient(
+    90deg,
+    var(--credits-dialog-teal) 0%,
+    var(--credits-dialog-orange) 100%
+  );
+  color: var(--theme-premium-text-contrast-color, #1d1d26);
+}
+
+.packageIconContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 34px;
+}
+
+.packageAmount {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  min-width: 0;
+}
+
+/* The number of credits is what the user compares packages on: it is the
+   biggest thing in the card. */
+.packageAmountNumber {
+  font-family: var(--gdevelop-modern-font-family);
+  font-size: 26px;
+  font-weight: bold;
+  line-height: 1.1;
+  color: var(--theme-text-default-color);
+}
+
+.packagePrice {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+  min-width: 0;
+}
+
+/* How much cheaper each credit is than in the smallest package. */
+.savingsChip {
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-family: var(--gdevelop-modern-font-family);
+  font-size: 11px;
+  font-weight: bold;
+  line-height: 1.6;
+  white-space: nowrap;
+  background-color: var(--theme-success-color);
+  color: var(--theme-success-text-contrast-color);
+}
+
+.packageValue {
+  /* Pushes the purchase button to the bottom, so all the buttons of a row are
+     aligned even when the value sentences wrap differently. */
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  text-align: center;
+  min-width: 0;
+  padding-bottom: 4px;
+}
+
+/* Between a wide desktop dialog and a phone, four columns would leave the last
+   of the five packages sold alone on its own row: use three, then two. The
+   column counts are set here (rather than left to `auto-fit`) so the packages
+   always split into rows that look deliberate. */
+@media (max-width: 950px) {
+  .packages {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 620px) {
+  .packages {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* On a phone the dialog is fullscreen and the packages are stacked two by two:
+   keep each card short enough that a few of them are visible at once. */
+@media (max-width: 620px) {
+  .container {
+    gap: 12px;
+  }
+
+  .packageIconContainer {
+    height: 26px;
+  }
+
+  .packageIconContainer > * {
+    width: 26px;
+    height: 26px;
+  }
+
+  .packageAmountNumber {
+    font-size: 23px;
+  }
+
+  .headerBadge {
+    width: 38px;
+    height: 38px;
+    font-size: 22px;
+  }
+}

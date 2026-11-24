@@ -1,12 +1,41 @@
 // @flow
 import optionalRequire from '../../Utils/OptionalRequire';
 import { getUID } from '../../Utils/LocalUserInfo';
+import Window from '../../Utils/Window';
 import { isURL } from '../../ResourcesList/ResourceUtils';
+import { decodePercentEncodedFileName } from '../../Utils/PercentEncodedFileName';
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
 const os = optionalRequire('os');
+const process = optionalRequire('process');
 
 const gd: libGDevelop = global.gd;
+
+/**
+ * The folder of the temporary files (previews, exports). An editor running a
+ * command of the CLI (or the stdio MCP server) has its own, so that several
+ * can run at the same time (like gameplay tests, each exporting its preview).
+ */
+export const getLocalTempDir = (): string => {
+  const appArguments = Window.getArguments();
+  const isCli = !!appArguments['run-command'] || !!appArguments['mcp'];
+  return path.join(
+    os.tmpdir(),
+    `GDTMP-${getUID()}${isCli && process ? `-cli-${process.pid}` : ''}`
+  );
+};
+
+/** To be called when an editor running a command of the CLI exits. */
+export const removeLocalTempDirOfCli = () => {
+  if (!fs || !path || !os) return;
+  const tempDir = getLocalTempDir();
+  if (!tempDir.includes('-cli-')) return;
+  try {
+    fs.removeSync(tempDir);
+  } catch (error) {
+    console.warn('[CLI] Unable to remove the temporary folder:', error);
+  }
+};
 
 export type UrlFileDescriptor = {|
   filePath: string,
@@ -97,11 +126,20 @@ class LocalFileSystem {
     }
   };
   getTempDir = (): any => {
-    return path.join(os.tmpdir(), `GDTMP-${getUID()}`);
+    return getLocalTempDir();
   };
   fileNameFrom = (fullPath: string): any => {
     // If URLs are not downloaded, then filenames are not changed.
     if (!this._downloadUrlsToLocalFiles && isURL(fullPath)) return fullPath;
+
+    // For URLs that are downloaded (like resources of cloud projects), decode
+    // the percent-encoded file name, so that the file is stored on disk with
+    // its decoded name (required for the file to be found when the game runs -
+    // notably in a mobile app, where the WebView decodes the requested URL path
+    // before looking up the file).
+    if (isURL(fullPath)) {
+      return decodePercentEncodedFileName(path.basename(fullPath));
+    }
 
     return path.basename(fullPath);
   };

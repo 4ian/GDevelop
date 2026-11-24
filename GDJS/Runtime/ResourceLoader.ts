@@ -29,6 +29,29 @@ namespace gdjs {
     );
   };
 
+  const isUrlWithScheme = (urlOrFilename: string): boolean =>
+    /^(https?|ftp|file|data|blob):/i.test(urlOrFilename);
+
+  /**
+   * Percent-encode the characters of a local file path that have a special
+   * meaning in a URL ("%", "#" and "?"), so that a file named for example
+   * "Track #3.wav" is requested as "Track %233.wav" instead of being truncated
+   * to "Track " by the browser (as "#" starts the URL fragment).
+   * Other characters (like spaces) are left untouched as browsers encode them
+   * automatically. URLs are left untouched as they are already encoded.
+   *
+   * Duplicated in the editor (`encodeLocalFileNameForUrl` in
+   * newIDE/app/src/Utils/PercentEncodedFileName.js): keep both in sync.
+   */
+  export const encodeLocalFileNameForUrl = (urlOrFilename: string): string => {
+    if (isUrlWithScheme(urlOrFilename)) return urlOrFilename;
+
+    return urlOrFilename
+      .replace(/%/g, '%25')
+      .replace(/#/g, '%23')
+      .replace(/\?/g, '%3F');
+  };
+
   /**
    * A task of pre-loading resources used by a scene.
    *
@@ -617,6 +640,7 @@ namespace gdjs {
      * the resource (this can be for example a token needed to access the resource).
      */
     getFullUrl(url: string) {
+      url = encodeLocalFileNameForUrl(url);
       if (this._runtimeGame.isInGameEdition()) {
         // Avoid adding cache burst to URLs which are assumed to be immutable files,
         // to avoid costly useless requests each time the game is hot-reloaded.

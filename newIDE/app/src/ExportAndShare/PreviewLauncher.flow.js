@@ -8,6 +8,8 @@ export type LaunchCaptureOptions = {|
   screenshots: Array<{|
     delayTimeInSeconds: number,
   |}>,
+  // A video recorded automatically, or by the user with a toolbar shown in the preview.
+  previewVideo: 'automatic' | 'recorded-by-user' | null,
 |};
 
 export type LaunchPreviewOptions = {
@@ -27,7 +29,7 @@ export type LaunchPreviewOptions = {
     forcedExternalLayoutName: string | null,
     eventsBasedObjectType: string | null,
     eventsBasedObjectVariantName: string | null,
-    editorCameraState3D: EditorCameraState | null,
+    editorCameraState: EditorCameraState | null,
   |},
   launchCaptureOptions?: LaunchCaptureOptions,
 };
@@ -37,6 +39,11 @@ export type CaptureOptions = {|
     delayTimeInSeconds: number,
     publicUrl: string,
   |}>,
+  previewVideo: {|
+    signedUrl: string,
+    publicUrl: string,
+    isRecordedByUser: boolean,
+  |} | null,
 |};
 
 export type PreviewOptions = {|
@@ -60,6 +67,7 @@ export type PreviewOptions = {|
     playerToken: string,
   },
   isForInGameEdition: boolean,
+  isForGameplayTest: boolean,
   editorId: string,
   getIsMenuBarHiddenInPreview: () => boolean,
   getIsAlwaysOnTopInPreview: () => boolean,
@@ -67,7 +75,7 @@ export type PreviewOptions = {|
   onCaptureFinished: CaptureOptions => Promise<void>,
   inAppTutorialMessageInPreview: string,
   inAppTutorialMessagePositionInPreview: string,
-  editorCameraState3D: EditorCameraState | null,
+  editorCameraState: EditorCameraState | null,
   inGameEditorSettings: InGameEditorSettings | null,
   numberOfWindows: number,
 
@@ -85,8 +93,6 @@ export type PreparePreviewWindowsOptions = {|
 /** The props that PreviewLauncher must support */
 export type PreviewLauncherProps = {|
   crashReportUploadLevel: string,
-  previewContext: string,
-  sourceGameId: string,
   getIncludeFileHashs: () => { [string]: number },
   onExport: () => void,
   onCaptureFinished: CaptureOptions => Promise<void>,
@@ -133,15 +139,26 @@ export type ServerAddress = {
 /** Interface to run a debugger server for previews. */
 export interface PreviewDebuggerServer {
   startServer({ origin?: string }): Promise<void>;
-  getServerState(): 'started' | 'stopped';
+  getServerState(): 'started' | 'starting' | 'stopped';
   getExistingDebuggerIds(): Array<DebuggerId>;
   getExistingEmbeddedGameFrameDebuggerIds(): Array<DebuggerId>;
   getExistingPreviewDebuggerIds(): Array<DebuggerId>;
   sendMessage(id: DebuggerId, message: Object): void;
-  sendMessageWithResponse(message: Object): Promise<Object>;
+  sendMessageWithResponse(
+    message: Object,
+    options?: {| timeoutMs?: number |}
+  ): Promise<Object>;
   registerCallbacks(callbacks: PreviewDebuggerServerCallbacks): () => void;
   registerEmbeddedGameFrame(window: WindowProxy): void;
+  /**
+   * Tell whether a game is actually running in the embedded game frame (and so can be
+   * hot-reloaded). The frame having a location loaded is not enough: the game inside it
+   * must have announced itself.
+   */
+  setEmbeddedGameFrameReady(isReady: boolean): void;
   unregisterEmbeddedGameFrame(window: WindowProxy): void;
+  registerGameplayTestFrame(window: WindowProxy): void;
+  unregisterGameplayTestFrame(window: WindowProxy): void;
   closeAllConnections(): void;
 }
 

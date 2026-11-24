@@ -20,8 +20,8 @@ import {
 import Tooltip from '@material-ui/core/Tooltip';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import VisibilityOffIcon from '../../UI/CustomSvgIcons/VisibilityOff';
-import { renderQuickCustomizationMenuItems } from '../../QuickCustomization/QuickCustomizationMenuItems';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
+import { buildMoveToMenu } from './EventsBasedEntityPropertyFolderTreeViewItemContent';
 
 const gd: libGDevelop = global.gd;
 
@@ -102,7 +102,24 @@ export const pasteProperties = async (
     index++;
     const groupName = property.getGroup();
     unserializeFromJSObject(property, serializedProperty);
-    property.setGroup(groupName);
+    // Try to rebuild the folder structure when several properties are paste at once.
+    if (
+      propertyContents.length > 1 &&
+      parentFolder === properties.getRootFolder() &&
+      property.getGroup()
+    ) {
+      const root = properties.getRootFolder();
+      const folder = root.getOrCreateChildFolder(property.getGroup());
+      properties
+        .getRootFolder()
+        .movePropertyFolderOrPropertyToAnotherFolder(
+          root.getPropertyChild(property.getName()),
+          folder,
+          folder.getChildrenCount()
+        );
+    } else {
+      property.setGroup(groupName);
+    }
     if (!firstAddedPropertyName) {
       firstAddedPropertyName = name;
     }
@@ -158,6 +175,14 @@ export type EventsBasedEntityPropertyTreeViewItemProps = {|
   ) => Promise<boolean>,
   onPropertiesUpdated: () => void,
   onEventsFunctionsAdded: () => void,
+  addFolder: (
+    items: Array<gdPropertyFolderOrProperty>,
+    isSharedProperties: boolean
+  ) => void,
+  onMovedPropertyFolderOrPropertyToAnotherFolderInSameContainer: (
+    propertyFolderOrProperty: gdPropertyFolderOrProperty,
+    isSharedProperties: boolean
+  ) => void,
 |};
 
 export const getEventsBasedEntityPropertyTreeViewItemId = (
@@ -285,6 +310,12 @@ export class EventsBasedEntityPropertyTreeViewItemContent
   }
 
   buildMenuTemplate(i18n: I18nType, index: number): any {
+    const {
+      properties,
+      isSharedProperties,
+      addFolder,
+      onMovedPropertyFolderOrPropertyToAnotherFolderInSameContainer,
+    } = this.props;
     const property = this.property.getProperty();
     return [
       {
@@ -297,6 +328,14 @@ export class EventsBasedEntityPropertyTreeViewItemContent
         click: () => this.delete(),
         accelerator: 'Backspace',
       },
+      buildMoveToMenu({
+        propertyFolderOrProperty: this.property,
+        i18n,
+        properties,
+        addFolder,
+        onMovedPropertyFolderOrPropertyToAnotherFolderInSameContainer,
+        isSharedProperties,
+      }),
       {
         type: 'separator',
       },
@@ -357,15 +396,6 @@ export class EventsBasedEntityPropertyTreeViewItemContent
           property
         ),
       },
-      ...renderQuickCustomizationMenuItems({
-        i18n,
-        visibility: property.getQuickCustomizationVisibility(),
-        onChangeVisibility: visibility => {
-          property.setQuickCustomizationVisibility(visibility);
-          this.props.forceUpdate();
-          this.props.onPropertiesUpdated();
-        },
-      }),
     ];
   }
 

@@ -20,6 +20,7 @@ describe('gdjs.SceneStack', () => {
       behaviorsSharedData: [],
       stopSoundsOnStartup: false,
       title: '',
+      renderer3DWorldScale: 100,
       variables: [],
       usedResources,
       uiSettings: {
@@ -35,6 +36,7 @@ describe('gdjs.SceneStack', () => {
         gridColor: 0,
         gridAlpha: 1,
         snap: false,
+        windowMask: false,
       },
     };
   };

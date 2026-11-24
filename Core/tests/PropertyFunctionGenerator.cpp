@@ -6,7 +6,7 @@
 /**
  * @file Tests covering common features of GDevelop Core.
  */
-#include "GDCore/IDE/PropertyFunctionGenerator.h"
+#include "GDCore/IDE/ExtensionEditor/PropertyFunctionGenerator.h"
 #include "DummyPlatform.h"
 #include "GDCore/Events/Builtin/StandardEvent.h"
 #include "GDCore/Extensions/Metadata/ValueTypeMetadata.h"

@@ -13,21 +13,27 @@ import {
   type EventsGenerationResult,
   type EventBatch,
 } from '../EditorFunctions';
+import { type ToolScope } from '../EditorFunctions/Scope';
 import { makeSimplifiedProjectBuilder } from '../EditorFunctions/SimplifiedProject/SimplifiedProject';
+import { type FunctionAuthoringScope } from '../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { prepareAiUserContent } from './PrepareAiUserContent';
 
 const gd: libGDevelop = global.gd;
+
+export const notLoggedInErrorMessage =
+  'Not logged in to GDevelop: this uses the GDevelop online services, ask the user to log in to their GDevelop account in the editor.';
 
 type UseGenerateEventsReturnType = {
   generateEvents: ({
     eventsDescription: string | null,
     eventBatches: Array<EventBatch> | null,
-    existingEventsAsText: string,
     existingEventsJson: string | null,
     extensionNamesList: string,
     objectsList: string,
     placementHint: string | null,
-    relatedAiRequestId: string,
+    relatedAiRequestId: string | null,
+    scope: ToolScope,
+    functionName: string | null,
     sceneName: string,
     estimatedComplexity: number | null,
   }) => Promise<EventsGenerationResult>,
@@ -43,37 +49,51 @@ export const useGenerateEvents = ({
 
   const generateEvents = React.useCallback(
     async ({
+      scope,
+      functionName,
       sceneName,
       eventsDescription,
       eventBatches,
       extensionNamesList,
       objectsList,
-      existingEventsAsText,
       existingEventsJson,
       placementHint,
       relatedAiRequestId,
       estimatedComplexity,
     }: {|
+      scope: ToolScope,
+      functionName: string | null,
       sceneName: string,
       eventsDescription: string | null,
       eventBatches: Array<EventBatch> | null,
       extensionNamesList: string,
       objectsList: string,
-      existingEventsAsText: string,
       existingEventsJson: string | null,
       placementHint: string | null,
-      relatedAiRequestId: string,
+      relatedAiRequestId: string | null,
       estimatedComplexity: number | null,
     |}): Promise<EventsGenerationResult> => {
       if (!project) throw new Error('No project is opened.');
-      if (!profile) throw new Error('User should be authenticated.');
+      if (!profile) throw new Error(notLoggedInErrorMessage);
 
       const simplifiedProjectBuilder = makeSimplifiedProjectBuilder(gd);
       const simplifiedProjectJson = JSON.stringify(
         simplifiedProjectBuilder.getSimplifiedProject(project, {})
       );
+      // Events written inside a function of an extension can call the private
+      // members reachable from where this function is authored: describe them.
+      const authoringScope: FunctionAuthoringScope | null =
+        functionName && scope.extension_name
+          ? {
+              extensionName: scope.extension_name,
+              customBehaviorName: scope.custom_behavior_name || null,
+              customObjectName: scope.custom_object_name || null,
+            }
+          : null;
       const projectSpecificExtensionsSummaryJson = JSON.stringify(
-        simplifiedProjectBuilder.getProjectSpecificExtensionsSummary(project)
+        simplifiedProjectBuilder.getProjectSpecificExtensionsSummary(project, {
+          authoringScope,
+        })
       );
 
       try {
@@ -100,12 +120,13 @@ export const useGenerateEvents = ({
               existingEventsJsonUserRelativeKey:
                 preparedAiUserContent.eventsJsonUserRelativeKey,
               existingEventsJson: preparedAiUserContent.eventsJson,
+              scope,
+              functionName,
               sceneName,
               eventsDescription,
               eventBatches,
               extensionNamesList,
               objectsList,
-              existingEventsAsText,
               placementHint,
               relatedAiRequestId,
               estimatedComplexity,
@@ -121,7 +142,7 @@ export const useGenerateEvents = ({
 
         // Poll with exponential backoff (fast initially, capped), bounded by a
         // total time budget rather than a fixed attempt count.
-        const maxTotalWaitMs = 60000;
+        const maxTotalWaitMs = 180000;
         const maxPollIntervalMs = 5000;
         const startTime = Date.now();
         let pollIntervalMs = 1000;

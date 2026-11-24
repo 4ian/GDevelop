@@ -25,6 +25,15 @@ export const getChipColorFromEnglishLevel = (englishLevel: string): string => {
 };
 
 const styles = {
+  // Wrap on narrow cards rather than overflowing them.
+  levelAndPriceLine: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    gap: 8,
+    margin: '8px 0',
+  },
   cardTextContainer: {
     flex: 1,
     display: 'flex',
@@ -241,7 +250,7 @@ const CourseCard = ({
                     </Text>
                   </ColumnStackLayout>
                   <div style={{ color: gdevelopTheme.text.color.secondary }}>
-                    <Line justifyContent="space-between" alignItems="flex-end">
+                    <div style={styles.levelAndPriceLine}>
                       <Chip
                         style={{
                           ...styles.chip,
@@ -263,7 +272,7 @@ const CourseCard = ({
                         owned: !course.isLocked,
                         discountedPrice,
                       })}
-                    </Line>
+                    </div>
                   </div>
                 </ColumnStackLayout>
               </div>

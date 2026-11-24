@@ -27,8 +27,6 @@ type Props = {|
   object: gdObject,
   resourceManagementProps: ResourceManagementProps,
   onClose: ({ swappingDone: boolean }) => void,
-  // Use minimal UI to hide filters & the details page (useful for Quick Customization)
-  minimalUI?: boolean,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
@@ -41,7 +39,6 @@ function AssetSwappingDialog({
   object,
   resourceManagementProps,
   onClose,
-  minimalUI,
   onWillInstallExtension,
   onExtensionInstalled,
 }: Props) {
@@ -133,31 +130,18 @@ function AssetSwappingDialog({
     ]
   );
 
-  const mainAction =
-    openedAssetShortHeader && !minimalUI ? (
-      <RaisedButton
-        key="add-asset"
-        primary
-        label={
-          isAssetBeingInstalled ? <Trans>Adding...</Trans> : <Trans>Swap</Trans>
-        }
-        onClick={installOpenedAsset}
-        disabled={isAssetBeingInstalled}
-        id="swap-asset-button"
-      />
-    ) : null;
-
-  // Try to install the asset as soon as selected, if in minimal UI mode.
-  React.useEffect(
-    () => {
-      if (openedAssetShortHeader && !isAssetBeingInstalled && minimalUI) {
-        installOpenedAsset();
+  const mainAction = openedAssetShortHeader ? (
+    <RaisedButton
+      key="add-asset"
+      primary
+      label={
+        isAssetBeingInstalled ? <Trans>Adding...</Trans> : <Trans>Swap</Trans>
       }
-    },
-    // Only run when the asset is selected and not already being installed.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isAssetBeingInstalled, openedAssetShortHeader]
-  );
+      onClick={installOpenedAsset}
+      disabled={isAssetBeingInstalled}
+      id="swap-asset-button"
+    />
+  ) : null;
 
   const assetStore = React.useRef<?AssetStoreInterface>(null);
   const handleClose = React.useCallback(
@@ -185,7 +169,7 @@ function AssetSwappingDialog({
                 primary
               />,
             ]}
-            onApply={minimalUI ? undefined : installOpenedAsset}
+            onApply={installOpenedAsset}
             onRequestClose={handleClose}
             open
             flexBody
@@ -197,7 +181,6 @@ function AssetSwappingDialog({
               ref={assetStore}
               onlyShowAssets
               assetSwappedObject={object}
-              minimalUI={minimalUI}
             />
           </Dialog>
           {isAssetBeingInstalled && <LoaderModal showImmediately />}

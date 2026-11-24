@@ -8,8 +8,13 @@ import {
   type ObjectGroupsOutsideEditorChanges,
   type ProjectItemRenamedOutsideEditorChanges,
   type WillDeleteSceneChanges,
+  type WillDeleteGameplayTestChanges,
   type WillDeleteObjectChanges,
+  type ExtensionsOutsideEditorChanges,
+  type WillDeleteExtensionItemChanges,
 } from '../EditorFunctions/OutsideEditorChanges';
+import { makeCoalescedOutsideEditorChanges } from '../EditorFunctions/CoalescedOutsideEditorChanges';
+import { type EventsFunctionsExtensionsState } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import {
   getAiRequest,
   getAiRequestSuggestions,
@@ -34,16 +39,11 @@ import {
   getPendingSubAgentFunctionCalls,
   getLastMessagesFromAiRequestOutput,
   getLatestActivePlan,
+  getSubAgentKind,
 } from './AiRequestUtils';
-import { useEnsureExtensionInstalled } from './UseEnsureExtensionInstalled';
-import { useGenerateEvents } from './UseGenerateEvents';
-import { useSearchAndInstallAsset } from './UseSearchAndInstallAsset';
-import { useSearchAndInstallResource } from './UseSearchAndInstallResource';
+import { useEditorFunctionsServices } from './UseEditorFunctionsServices';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { AiRequestContext } from './AiRequestContext';
-import { ObjectStoreContext } from '../AssetStore/ObjectStoreContext';
-import { ExtensionStoreContext } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
-import { enumerateObjectTypes } from '../ObjectsList/EnumerateObjects';
 
 import { delay } from '../Utils/Delay';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
@@ -97,9 +97,10 @@ export const useRefreshLimits = (
   return { isRefreshingLimits, refreshLimits };
 };
 
-// All requests are made in orchestrator mode, and sub-agents (explorer, edit)
-// are created server-side with the same tools version as the orchestrator.
-export const AI_ORCHESTRATOR_TOOLS_VERSION = 'v7';
+// The tools of the orchestrator AND of the sub-agents it creates server-side.
+// Only bump it once the matching prompts and generation-api are deployed;
+// reverting it is the flip-back (every past version stays served).
+export const AI_ORCHESTRATOR_TOOLS_VERSION: string = 'v24';
 
 /**
  * A pending request for the user to approve (or refuse) a project-modifying
@@ -128,7 +129,17 @@ const doesFunctionCallModifyProject = (
     editorFunctions[functionCall.name] ||
     editorFunctionsWithoutProject[functionCall.name] ||
     null;
-  return !!(editorFunctionDef && editorFunctionDef.modifiesProject);
+  if (!editorFunctionDef) return false;
+  if (editorFunctionDef.getModifiesProject) {
+    try {
+      return editorFunctionDef.getModifiesProject(
+        JSON.parse(functionCall.arguments)
+      );
+    } catch (error) {
+      return !!editorFunctionDef.modifiesProject;
+    }
+  }
+  return !!editorFunctionDef.modifiesProject;
 };
 
 /**
@@ -216,6 +227,7 @@ const getEditApprovalLabel = ({
 export const useProcessFunctionCalls = ({
   i18n,
   project,
+  fileMetadata,
   resourceManagementProps,
   editorCallbacks,
   aiRequestsToProcess,
@@ -225,19 +237,26 @@ export const useProcessFunctionCalls = ({
   onSceneEventsModifiedOutsideEditor,
   onInstancesModifiedOutsideEditor,
   onObjectsModifiedOutsideEditor,
+  onEffectsModifiedOutsideEditor,
   onObjectGroupsModifiedOutsideEditor,
   onProjectItemRenamedOutsideEditor,
   onWillDeleteScene,
+  onWillDeleteGameplayTest,
   onWillDeleteObject,
+  eventsFunctionsExtensionsState,
+  onExtensionsModifiedOutsideEditor,
+  onWillDeleteExtensionItem,
   onWillInstallExtension,
   onExtensionInstalled,
   isReadyToProcessFunctionCalls,
   getIsAutoEditEnabled,
   suspendAiRequest,
   requestEditApproval,
+  onSaveProjectAsWithStorageProvider,
 }: {|
   i18n: I18nType,
   project: ?gdProject,
+  fileMetadata: ?FileMetadata,
   resourceManagementProps: ResourceManagementProps,
   editorCallbacks: EditorCallbacks,
   aiRequestsToProcess: Array<AiRequest>,
@@ -246,6 +265,7 @@ export const useProcessFunctionCalls = ({
     editorFunctionCallResults: Array<EditorFunctionCallResult>,
     options: {|
       createdSceneNames?: Array<string>,
+      createdExternalLayoutNames?: Array<string>,
       createdProject?: ?gdProject,
     |}
   ) => Promise<void>,
@@ -263,6 +283,7 @@ export const useProcessFunctionCalls = ({
   onObjectsModifiedOutsideEditor: (
     changes: ObjectsOutsideEditorChanges
   ) => void,
+  onEffectsModifiedOutsideEditor: () => void,
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
   ) => void,
@@ -270,13 +291,34 @@ export const useProcessFunctionCalls = ({
     changes: ProjectItemRenamedOutsideEditorChanges
   ) => void,
   onWillDeleteScene: (changes: WillDeleteSceneChanges) => Promise<void>,
+  onWillDeleteGameplayTest: (
+    changes: WillDeleteGameplayTestChanges
+  ) => Promise<void>,
   onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
+  // Used to regenerate the extensions changed by the AI (see
+  // `makeCoalescedOutsideEditorChanges`).
+  eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
+  onExtensionsModifiedOutsideEditor: (
+    changes: ExtensionsOutsideEditorChanges
+  ) => void,
+  onWillDeleteExtensionItem: (
+    changes: WillDeleteExtensionItemChanges
+  ) => Promise<void>,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   isReadyToProcessFunctionCalls: boolean,
   getIsAutoEditEnabled: () => boolean,
   suspendAiRequest: (aiRequestId: string) => Promise<void>,
   requestEditApproval: (request: EditApprovalRequest) => Promise<boolean>,
+  // Absent where the project can't be saved: the files attached by the user
+  // can then only be kept in memory.
+  onSaveProjectAsWithStorageProvider?: (
+    options: ?{|
+      requestedStorageProvider?: StorageProvider,
+      forcedSavedAsLocation?: SaveAsLocation,
+      createdProject?: gdProject,
+    |}
+  ) => Promise<?FileMetadata>,
 |}): {
   onProcessFunctionCalls: (
     aiRequest: AiRequest,
@@ -284,26 +326,25 @@ export const useProcessFunctionCalls = ({
   ) => Promise<void>,
   clearApprovedEditBatches: () => void,
 } => {
-  const { ensureExtensionInstalled } = useEnsureExtensionInstalled({
+  const {
+    ensureExtensionInstalled,
+    searchAndInstallAsset,
+    searchAndInstallEffectAsset,
+    searchAndInstallResources,
+    attachmentsForResources,
+    generateEvents,
+    getAssetStoreTagForNewObject,
+    prefetchStores,
+  } = useEditorFunctionsServices({
     project,
     i18n,
-  });
-  const { searchAndInstallAsset } = useSearchAndInstallAsset({
-    project,
+    fileMetadata,
     resourceManagementProps,
     onWillInstallExtension,
     onExtensionInstalled,
+    onSaveProjectAsWithStorageProvider,
   });
-  const { searchAndInstallResources } = useSearchAndInstallResource({
-    project,
-    resourceManagementProps,
-  });
-  const { generateEvents } = useGenerateEvents({ project });
-
-  const { translatedObjectShortHeadersByType, fetchObjects } = React.useContext(
-    ObjectStoreContext
-  );
-  const { fetchExtensionsAndFilters } = React.useContext(ExtensionStoreContext);
+  const { triggerUnsavedChanges } = React.useContext(UnsavedChangesContext);
 
   // Latest map of all AI requests, kept in a ref so the (heavily-memoized)
   // onProcessFunctionCalls callback can look up a sub-agent's parent at edit
@@ -314,30 +355,10 @@ export const useProcessFunctionCalls = ({
 
   React.useEffect(
     () => {
-      fetchObjects();
-      // Warm the extension registry so AI-triggered installs don't fail.
-      fetchExtensionsAndFilters();
+      // Warm the stores so AI-triggered installs don't fail.
+      prefetchStores();
     },
-    [fetchObjects, fetchExtensionsAndFilters]
-  );
-  const getAssetStoreTagForNewObject = React.useCallback(
-    (objectType: string): string | null => {
-      // Prefer the installed object metadata (same source as the
-      // "New object" dialog in the editor).
-      const installedObjectMetadata = project
-        ? enumerateObjectTypes(project, null).find(
-            enumeratedObjectMetadata =>
-              enumeratedObjectMetadata.type === objectType
-          )
-        : null;
-      if (installedObjectMetadata && installedObjectMetadata.assetStoreTag) {
-        return installedObjectMetadata.assetStoreTag;
-      }
-
-      const header = translatedObjectShortHeadersByType[objectType];
-      return (header && header.assetStoreTag) || null;
-    },
-    [project, translatedObjectShortHeadersByType]
+    [prefetchStores]
   );
 
   // In-memory guard against duplicate processing of the same function call.
@@ -396,6 +417,15 @@ export const useProcessFunctionCalls = ({
         );
       });
 
+      // An explorer sub-agent's script is read-only (see below: it is exposed
+      // only non-mutating functions). Knowing this lets us both skip its edit
+      // approval and restrict the functions its `run_script` can call.
+      const subAgentKind = getSubAgentKind({
+        aiRequest,
+        aiRequests: aiRequestsRef.current,
+      });
+      const isReadOnlyScriptContext = subAgentKind === 'explorer';
+
       // Gate project-modifying calls behind a user confirmation when auto-edit
       // is off. Read-only calls (exploration, inspection) always run. The first
       // time an edit agent (or a direct modifying call) is about to change the
@@ -420,6 +450,10 @@ export const useProcessFunctionCalls = ({
         const modifyingFunctionCalls = functionCallsToProcess.filter(
           functionCall =>
             doesFunctionCallModifyProject(functionCall) &&
+            // An explorer sub-agent's `run_script` is read-only (exposed only
+            // non-mutating functions), so it never needs an edit approval even
+            // though `run_script` is declared as project-modifying.
+            !(isReadOnlyScriptContext && functionCall.name === 'run_script') &&
             !isCallApproved(functionCall)
         );
 
@@ -485,48 +519,40 @@ export const useProcessFunctionCalls = ({
         }))
       );
 
-      // The "modified outside editor" callbacks each refresh the editor and can
-      // trigger an in-game editor hot reload. Firing them once per function
-      // call would, for a batch of modifying calls (e.g. a sub-agent adding 20
-      // objects), hot reload the editor 20 times. Instead, accumulate the
-      // changes per scene while the batch is processed, then flush a single
-      // coalesced notification per change type once it is done.
-      const accumulatedSceneEventsChanges: Map<
-        gdLayout,
-        Set<string>
-      > = new Map();
-      const accumulatedInstancesScenes: Set<gdLayout> = new Set();
-      const accumulatedObjectsChanges: Map<gdLayout, boolean> = new Map();
-      const accumulatedObjectGroupsScenes: Set<gdLayout> = new Set();
-      const flushAccumulatedOutsideEditorChanges = () => {
-        accumulatedSceneEventsChanges.forEach((eventIds, scene) =>
-          onSceneEventsModifiedOutsideEditor({
-            scene,
-            newOrChangedAiGeneratedEventIds: eventIds,
-          })
-        );
-        accumulatedInstancesScenes.forEach(scene =>
-          onInstancesModifiedOutsideEditor({ scene })
-        );
-        accumulatedObjectsChanges.forEach((isNewObjectTypeUsed, scene) =>
-          onObjectsModifiedOutsideEditor({ scene, isNewObjectTypeUsed })
-        );
-        accumulatedObjectGroupsScenes.forEach(scene =>
-          onObjectGroupsModifiedOutsideEditor({ scene })
-        );
-      };
+      // Coalesced per target for the whole batch (one editor refresh and hot
+      // reload instead of one per call), and the extensions regenerated once.
+      const coalescedOutsideEditorChanges = makeCoalescedOutsideEditorChanges({
+        project,
+        eventsFunctionsExtensionsState,
+        notifications: {
+          onSceneEventsModifiedOutsideEditor,
+          onInstancesModifiedOutsideEditor,
+          onObjectsModifiedOutsideEditor,
+          onEffectsModifiedOutsideEditor,
+          onObjectGroupsModifiedOutsideEditor,
+          onExtensionsModifiedOutsideEditor,
+        },
+        onExtensionsRegenerated: triggerUnsavedChanges,
+      });
 
       try {
         const {
           results,
           createdSceneNames,
+          createdExternalLayoutNames,
           createdProject,
         } = await processEditorFunctionCalls({
           project,
           editorCallbacks,
           // $FlowFixMe[incompatible-type]
           toolOptions: aiRequest.toolOptions || null,
+          // Threaded so functions can gate version-dependent behavior (e.g. a
+          // no-op counts as success from v12 — see isNoOpConsideredSuccess).
+          toolsVersion: aiRequest.toolsVersion || null,
           i18n,
+          // Explorer sub-agent scripts are read-only: restrict their
+          // `run_script` to non-mutating functions (defense in depth).
+          runScriptReadOnly: isReadOnlyScriptContext,
           functionCalls: functionCallsToProcess.map(functionCall => ({
             name: functionCall.name,
             arguments: functionCall.arguments,
@@ -536,49 +562,46 @@ export const useProcessFunctionCalls = ({
           getRelatedAiRequestLastMessages: () =>
             getLastMessagesFromAiRequestOutput(aiRequest.output || []),
           generateEvents,
-          onSceneEventsModifiedOutsideEditor: changes => {
-            const existingEventIds = accumulatedSceneEventsChanges.get(
-              changes.scene
-            );
-            if (existingEventIds) {
-              changes.newOrChangedAiGeneratedEventIds.forEach(eventId =>
-                existingEventIds.add(eventId)
-              );
-            } else {
-              accumulatedSceneEventsChanges.set(
-                changes.scene,
-                new Set(changes.newOrChangedAiGeneratedEventIds)
-              );
-            }
-          },
-          onInstancesModifiedOutsideEditor: changes => {
-            accumulatedInstancesScenes.add(changes.scene);
-          },
-          onObjectsModifiedOutsideEditor: changes => {
-            accumulatedObjectsChanges.set(
-              changes.scene,
-              accumulatedObjectsChanges.get(changes.scene) ||
-                false ||
-                changes.isNewObjectTypeUsed
-            );
-          },
-          onObjectGroupsModifiedOutsideEditor: changes => {
-            accumulatedObjectGroupsScenes.add(changes.scene);
-          },
+          onSceneEventsModifiedOutsideEditor:
+            coalescedOutsideEditorChanges.onSceneEventsModifiedOutsideEditor,
+          onInstancesModifiedOutsideEditor:
+            coalescedOutsideEditorChanges.onInstancesModifiedOutsideEditor,
+          onObjectsModifiedOutsideEditor:
+            coalescedOutsideEditorChanges.onObjectsModifiedOutsideEditor,
+          onEffectsModifiedOutsideEditor:
+            coalescedOutsideEditorChanges.onEffectsModifiedOutsideEditor,
+          onObjectGroupsModifiedOutsideEditor:
+            coalescedOutsideEditorChanges.onObjectGroupsModifiedOutsideEditor,
           // Not coalesced: the tab rename must track the model rename, else the
           // open scene editor briefly looks up a now-missing layout name.
           onProjectItemRenamedOutsideEditor,
           // Not coalesced: must run before the scene is actually deleted so
           // the tab can be closed while the gdLayout is still valid.
           onWillDeleteScene,
+          onWillDeleteGameplayTest,
           // Not coalesced: must run before the object is actually deleted so
           // editors can safely read it to close a dialog/panel referring to it.
           onWillDeleteObject,
+          // For the functions needing the game shown by the editor to have
+          // the changes made so far in the batch (to find surfaces in it).
+          sendChangesToEditor: coalescedOutsideEditorChanges.flush,
+          onExtensionsModifiedOutsideEditor:
+            coalescedOutsideEditorChanges.onExtensionsModifiedOutsideEditor,
+          ensureExtensionsUpToDate:
+            coalescedOutsideEditorChanges.ensureExtensionsUpToDate,
+          reloadExtensionMetadata:
+            coalescedOutsideEditorChanges.reloadExtensionMetadata,
+          // Not coalesced: must run before the extension (or one of its items)
+          // is actually deleted so the tabs and selections bound to it are
+          // released while it's still valid.
+          onWillDeleteExtensionItem,
           ensureExtensionInstalled,
           onWillInstallExtension,
           onExtensionInstalled,
           searchAndInstallAsset,
+          searchAndInstallEffectAsset,
           searchAndInstallResources,
+          attachmentsForResources,
           getAssetStoreTagForNewObject,
         });
 
@@ -596,6 +619,7 @@ export const useProcessFunctionCalls = ({
 
         await onSendEditorFunctionCallResults(aiRequest.id, newResults, {
           createdSceneNames,
+          createdExternalLayoutNames,
           createdProject,
         });
       } finally {
@@ -603,7 +627,18 @@ export const useProcessFunctionCalls = ({
         // this batch (one hot reload instead of one per call). In `finally` so
         // the editor is still refreshed for whatever was modified even if the
         // batch was aborted or threw, matching the previous inline behavior.
-        flushAccumulatedOutsideEditorChanges();
+        coalescedOutsideEditorChanges.flush();
+
+        // Regenerate the extensions left dirty by the batch, so the project
+        // summary sent with the next message describes them as they are now.
+        try {
+          await coalescedOutsideEditorChanges.ensureExtensionsUpToDate();
+        } catch (error) {
+          console.error(
+            'Error while reloading the extensions modified by the AI:',
+            error
+          );
+        }
 
         // Release the lock so these calls can be retried if needed
         // (e.g. after an error or a suspension).
@@ -623,15 +658,23 @@ export const useProcessFunctionCalls = ({
       onSceneEventsModifiedOutsideEditor,
       onInstancesModifiedOutsideEditor,
       onObjectsModifiedOutsideEditor,
+      onEffectsModifiedOutsideEditor,
       onObjectGroupsModifiedOutsideEditor,
       onProjectItemRenamedOutsideEditor,
       onWillDeleteScene,
+      onWillDeleteGameplayTest,
       onWillDeleteObject,
+      eventsFunctionsExtensionsState,
+      onExtensionsModifiedOutsideEditor,
+      onWillDeleteExtensionItem,
+      triggerUnsavedChanges,
       ensureExtensionInstalled,
       onWillInstallExtension,
       onExtensionInstalled,
       searchAndInstallAsset,
+      searchAndInstallEffectAsset,
       searchAndInstallResources,
+      attachmentsForResources,
       getAssetStoreTagForNewObject,
       generateEvents,
       onSendEditorFunctionCallResults,
@@ -1381,10 +1424,15 @@ export type OpenAskAiOptions = {|
   aiRequestId?: string | null, // If null, a new request will be created.
   paneIdentifier?: 'left' | 'center' | 'right',
   continueProcessingFunctionCallsOnMount?: boolean,
+  // When set, a new chat is started with this text pre-filled in the input.
+  prefilledUserRequest?: string,
+  // Pre-fill the chat being shown (if any) instead of starting a new one.
+  prefillInCurrentChat?: boolean,
 |};
 
 export type NewAiRequestOptions = {|
   mode: 'chat' | 'agent' | 'orchestrator',
   userRequest: string,
+  attachmentIds: Array<string>,
   aiConfigurationPresetId: string,
 |};

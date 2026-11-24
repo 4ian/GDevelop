@@ -17,12 +17,12 @@ export const Default = (): React.Node => (
   <DragAndDropContextProvider>
     <div style={{ height: 200 }}>
       <ValueStateHolder
-        initialValue={null}
+        initialValue={[]}
         render={(value, onChange) => (
           <ResourcesList
-            onSelectResource={onChange}
-            selectedResource={value}
-            onDeleteResource={action('onDeleteResource')}
+            onSelectResources={onChange}
+            selectedResources={value}
+            onDeleteResources={action('onDeleteResources')}
             onRenameResource={action('onRenameResource')}
             project={testProject.project}
             onRemoveUnusedResources={action('onRemoveUnusedResources')}

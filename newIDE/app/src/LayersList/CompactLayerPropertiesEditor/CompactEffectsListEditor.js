@@ -17,16 +17,14 @@ import {
   getEnumeratedEffectMetadata,
   useManageEffects,
 } from '../../EffectsList';
-import CompactSelectField from '../../UI/CompactSelectField';
-import SelectOption from '../../UI/SelectOption';
+import NewEffectDialog from '../../EffectsList/NewEffectDialog';
 import { getHelpLink } from '../../Utils/HelpLink';
 import Window from '../../Utils/Window';
 import Link from '../../UI/Link';
 import { CompactPropertiesEditorByVisibility } from '../../CompactPropertiesEditor/CompactPropertiesEditorByVisibility';
-import {
-  TopLevelCollapsibleSection,
-  CollapsibleSubPanel,
-} from '../../ObjectEditor/CompactObjectPropertiesEditor';
+import { CollapsibleSubPanel } from '../../ObjectEditor/CompactObjectPropertiesEditor';
+import { TopLevelCollapsibleSection } from '../../CompactPropertiesEditor/TopLevelCollapsibleSection';
+import { usePersistedCollapsedSection } from '../../Utils/UsePersistedCollapsedSection';
 
 export const styles = {
   icon: {
@@ -68,6 +66,7 @@ type Props = {|
   onEffectAdded: () => void,
   layerRenderingType: '2d' | '3d',
   target: 'object' | 'layer',
+  persistedPanelStateId: string,
 |};
 
 export const CompactEffectsListEditor = ({
@@ -82,18 +81,30 @@ export const CompactEffectsListEditor = ({
   onEffectAdded,
   layerRenderingType,
   target,
+  persistedPanelStateId,
 }: Props): React.Node => {
   const forceUpdate = useForceUpdate();
-  const [isEffectsFolded, setEffectsFolded] = React.useState(false);
+
+  const {
+    isSectionFolded,
+    toggleSectionFolded,
+    setSectionFolded,
+  } = usePersistedCollapsedSection({
+    project,
+    persistedPanelStateId: persistedPanelStateId,
+    persistedPanelStateType: 'layer',
+  });
+
+  const [isNewEffectDialogOpen, setIsNewEffectDialogOpen] = React.useState(
+    false
+  );
 
   // Effects:
   const {
     allEffectMetadata,
-    all2DEffectMetadata,
-    all3DEffectMetadata,
     addEffect,
+    onEffectAddedFromStore,
     removeEffect,
-    chooseEffectType,
   } = useManageEffects({
     effectsContainer,
     project,
@@ -106,99 +117,106 @@ export const CompactEffectsListEditor = ({
     target,
   });
 
-  const filteredEffectMetadata =
-    layerRenderingType === '3d' ? all3DEffectMetadata : all2DEffectMetadata;
+  const effects = mapFor(
+    0,
+    effectsContainer.getEffectsCount(),
+    (index: number) => {
+      const effect: gdEffect = effectsContainer.getEffectAt(index);
+      const effectType = effect.getEffectType();
+      const effectMetadata = getEnumeratedEffectMetadata(
+        allEffectMetadata,
+        effectType
+      );
+      return { effect, effectMetadata };
+    }
+  ).filter(
+    ({ effectMetadata }) =>
+      !effectMetadata ||
+      (layerRenderingType !== '3d' &&
+        !effectMetadata.isMarkedAsOnlyWorkingFor3D) ||
+      (layerRenderingType !== '2d' &&
+        !effectMetadata.isMarkedAsOnlyWorkingFor2D)
+  );
 
   return (
-    <TopLevelCollapsibleSection
-      title={
-        target === 'object' ? (
-          <Trans>Effects</Trans>
-        ) : layerRenderingType === '3d' ? (
-          <Trans>3D effects</Trans>
-        ) : (
-          <Trans>2D effects</Trans>
-        )
-      }
-      isFolded={isEffectsFolded}
-      toggleFolded={() => setEffectsFolded(!isEffectsFolded)}
-      onOpenFullEditor={onOpenFullEditor}
-      onAdd={() => addEffect(layerRenderingType === '3d')}
-      renderContent={() => (
-        <ColumnStackLayout noMargin>
-          {effectsContainer.getEffectsCount() === 0 && (
-            <Text size="body2" align="center" color="secondary">
-              {target === 'object' ? (
-                <Trans>
-                  There are no{' '}
-                  <Link
-                    href={objectEffectsHelpLink}
-                    onClick={() =>
-                      Window.openExternalURL(objectEffectsHelpLink)
-                    }
-                  >
-                    effects
-                  </Link>{' '}
-                  on this object.
-                </Trans>
-              ) : layerRenderingType === '3d' ? (
-                <Trans>
-                  There are no{' '}
-                  <Link
-                    href={layerEffectsHelpLink}
-                    onClick={() => Window.openExternalURL(layerEffectsHelpLink)}
-                  >
-                    3D effects
-                  </Link>{' '}
-                  on this layer.
-                </Trans>
-              ) : (
-                <Trans>
-                  There are no{' '}
-                  <Link
-                    href={layerEffectsHelpLink}
-                    onClick={() => Window.openExternalURL(layerEffectsHelpLink)}
-                  >
-                    2D effects
-                  </Link>{' '}
-                  on this layer.
-                </Trans>
-              )}
-            </Text>
-          )}
-          {mapFor(0, effectsContainer.getEffectsCount(), (index: number) => {
-            const effect: gdEffect = effectsContainer.getEffectAt(index);
-            const effectType = effect.getEffectType();
-            const effectMetadata = getEnumeratedEffectMetadata(
-              allEffectMetadata,
-              effectType
-            );
-
-            return !effectMetadata ||
-              (layerRenderingType !== '3d' &&
-                !effectMetadata.isMarkedAsOnlyWorkingFor3D) ||
-              (layerRenderingType !== '2d' &&
-                !effectMetadata.isMarkedAsOnlyWorkingFor2D) ? (
+    <>
+      <TopLevelCollapsibleSection
+        title={
+          target === 'object' ? (
+            <Trans>Effects</Trans>
+          ) : layerRenderingType === '3d' ? (
+            <Trans>3D effects</Trans>
+          ) : (
+            <Trans>2D effects</Trans>
+          )
+        }
+        isFolded={isSectionFolded(layerRenderingType + '-effects')}
+        toggleFolded={() =>
+          toggleSectionFolded(layerRenderingType + '-effects')
+        }
+        onOpenFullEditor={onOpenFullEditor}
+        onAdd={() => setIsNewEffectDialogOpen(true)}
+        renderContent={() => (
+          <ColumnStackLayout noMargin>
+            {effects.length === 0 && (
+              <Text size="body2" align="center" color="secondary">
+                {target === 'object' ? (
+                  <Trans>
+                    There are no{' '}
+                    <Link
+                      href={objectEffectsHelpLink}
+                      onClick={() =>
+                        Window.openExternalURL(objectEffectsHelpLink)
+                      }
+                    >
+                      effects
+                    </Link>{' '}
+                    on this object.
+                  </Trans>
+                ) : layerRenderingType === '3d' ? (
+                  <Trans>
+                    There are no{' '}
+                    <Link
+                      href={layerEffectsHelpLink}
+                      onClick={() =>
+                        Window.openExternalURL(layerEffectsHelpLink)
+                      }
+                    >
+                      3D effects
+                    </Link>{' '}
+                    on this layer.
+                  </Trans>
+                ) : (
+                  <Trans>
+                    There are no{' '}
+                    <Link
+                      href={layerEffectsHelpLink}
+                      onClick={() =>
+                        Window.openExternalURL(layerEffectsHelpLink)
+                      }
+                    >
+                      2D effects
+                    </Link>{' '}
+                    on this layer.
+                  </Trans>
+                )}
+              </Text>
+            )}
+            {effects.map(({ effect, effectMetadata }) => (
               <CollapsibleSubPanel
                 key={effect.ptr}
                 renderContent={() => (
                   <ColumnStackLayout noMargin expand noOverflowParent>
-                    <CompactSelectField
-                      value={effectType}
-                      onChange={type => chooseEffectType(effect, type)}
+                    <Text
+                      size="body2"
+                      color="secondary"
+                      noMargin
+                      allowBrowserAutoTranslate={false}
                     >
-                      {filteredEffectMetadata.map(effectMetadata => (
-                        <SelectOption
-                          key={effectMetadata.type}
-                          value={effectMetadata.type}
-                          label={effectMetadata.fullName}
-                          disabled={
-                            target === 'object' &&
-                            effectMetadata.isMarkedAsNotWorkingForObjects
-                          }
-                        />
-                      ))}
-                    </CompactSelectField>
+                      {effectMetadata
+                        ? effectMetadata.fullName
+                        : effect.getEffectType()}
+                    </Text>
                     {effectMetadata && (
                       <CompactPropertiesEditorByVisibility
                         project={project}
@@ -244,10 +262,30 @@ export const CompactEffectsListEditor = ({
                   },
                 ]}
               />
-            ) : null;
-          })}
-        </ColumnStackLayout>
+            ))}
+          </ColumnStackLayout>
+        )}
+      />
+      {isNewEffectDialogOpen && (
+        <NewEffectDialog
+          project={project}
+          effectsContainer={effectsContainer}
+          target={target}
+          layerRenderingType={layerRenderingType}
+          resourceManagementProps={resourceManagementProps}
+          onClose={() => setIsNewEffectDialogOpen(false)}
+          onChooseEffectType={effectType => {
+            setIsNewEffectDialogOpen(false);
+            addEffect(effectType);
+            setSectionFolded(layerRenderingType + '-effects', false);
+          }}
+          onEffectAddedFromStore={effect => {
+            setIsNewEffectDialogOpen(false);
+            onEffectAddedFromStore(effect);
+            setSectionFolded(layerRenderingType + '-effects', false);
+          }}
+        />
       )}
-    />
+    </>
   );
 };

@@ -25,6 +25,7 @@ import ConditionsActionsColumns from '../ConditionsActionsColumns';
 import { Trans } from '@lingui/macro';
 import { shouldActivate } from '../../../UI/KeyboardShortcuts/InteractionKeys';
 import { ProjectScopedContainersAccessor } from '../../../InstructionOrExpression/EventsScope';
+import ParameterRenderingService from '../../ParameterRenderingService';
 
 const gd: libGDevelop = global.gd;
 
@@ -459,6 +460,7 @@ export default class ForEachChildVariableEvent extends React.Component<
             onRequestClose={this.cancelEditing}
             onApply={this.applyEditing}
             ref={iteratorField => (this._valueIteratorField = iteratorField)}
+            parameterRenderingService={ParameterRenderingService}
           />
         </InlinePopover>
         <InlinePopover
@@ -484,6 +486,7 @@ export default class ForEachChildVariableEvent extends React.Component<
             onRequestClose={this.cancelEditing}
             onApply={this.applyEditing}
             ref={iteratorField => (this._keyIteratorField = iteratorField)}
+            parameterRenderingService={ParameterRenderingService}
           />
         </InlinePopover>
         <InlinePopover
@@ -509,6 +512,8 @@ export default class ForEachChildVariableEvent extends React.Component<
             onRequestClose={this.cancelEditing}
             onApply={this.applyEditing}
             ref={iterableField => (this._iterableField = iterableField)}
+            parameterRenderingService={ParameterRenderingService}
+            expressionTypeExtraInfo={'collection'}
           />
         </InlinePopover>
       </div>

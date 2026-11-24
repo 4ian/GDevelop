@@ -6,17 +6,24 @@ import AddIcon from '../UI/CustomSvgIcons/Add';
 import ChatBubblesIcon from '../UI/CustomSvgIcons/ChatBubbles';
 import IconButton from '../UI/IconButton';
 import RaisedButton from '../UI/RaisedButton';
+import FadeIn from '../UI/FadeIn';
 
 type Props = {|
+  isHistoryOpen: boolean,
+  onToggleHistory: () => void,
   onStartNewChat: () => void,
   canStartNewChat: boolean,
-  onOpenHistory: () => void,
+  // The "New chat" button is always visible: in the list of chats when it's
+  // shown next to the chat, in the toolbar otherwise.
+  showNewChatButton: boolean,
 |};
 
 export const Toolbar = ({
+  isHistoryOpen,
+  onToggleHistory,
   onStartNewChat,
   canStartNewChat,
-  onOpenHistory,
+  showNewChatButton,
 }: Props): React.Node => {
   return (
     <>
@@ -24,23 +31,29 @@ export const Toolbar = ({
         <IconButton
           size="small"
           color="default"
-          tooltip={t`View history`}
-          onClick={onOpenHistory}
+          tooltip={isHistoryOpen ? t`Hide the chats` : t`Show the chats`}
+          onClick={onToggleHistory}
+          selected={isHistoryOpen}
+          id="ask-ai-toggle-history-button"
         >
           <ChatBubblesIcon />
         </IconButton>
       </ToolbarGroup>
       <ToolbarGroup lastChild>
-        <RaisedButton
-          primary
-          onClick={onStartNewChat}
-          icon={<AddIcon />}
-          label={<Trans>New chat</Trans>}
-          disabled={!canStartNewChat}
-          style={{
-            flexShrink: 0,
-          }}
-        />
+        {showNewChatButton && (
+          <FadeIn>
+            <RaisedButton
+              primary
+              onClick={onStartNewChat}
+              icon={<AddIcon />}
+              label={<Trans>New chat</Trans>}
+              disabled={!canStartNewChat}
+              style={{
+                flexShrink: 0,
+              }}
+            />
+          </FadeIn>
+        )}
       </ToolbarGroup>
     </>
   );

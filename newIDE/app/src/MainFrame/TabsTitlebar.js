@@ -21,6 +21,7 @@ import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import Window from '../Utils/Window';
 import { isMacLike } from '../Utils/Platform';
 import { AiRequestContext } from '../AiGeneration/AiRequestContext';
+import ConnectedAgentsIndicator from '../LiveMcpServer/ConnectedAgentsIndicator';
 
 const WINDOW_DRAGGABLE_PART_CLASS_NAME = 'title-bar-draggable-part';
 const WINDOW_NON_DRAGGABLE_PART_CLASS_NAME = 'title-bar-non-draggable-part';
@@ -39,6 +40,11 @@ const styles = {
     // with the project manager icon.
     width: 34,
     height: 34,
+  },
+  connectedAgentsContainer: {
+    // Vertically centered with the Ask AI button.
+    marginBottom: 8,
+    marginLeft: 4,
   },
   askAiContainer: {
     zIndex: 0, // Create a stacking context to avoid the AI icon z-indexed element to display above other panes or UI elements.
@@ -269,6 +275,14 @@ export default function TabsTitlebar({
         </IconButton>
       )}
       {renderTabs(onEditorTabHovered, onEditorTabClosing)}
+      {isRightMostPane && (
+        <div
+          style={styles.connectedAgentsContainer}
+          className={WINDOW_NON_DRAGGABLE_PART_CLASS_NAME}
+        >
+          <ConnectedAgentsIndicator />
+        </div>
+      )}
       {shouldDisplayAskAi ? (
         <div
           style={styles.askAiContainer}

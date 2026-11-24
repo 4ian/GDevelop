@@ -1,0 +1,20 @@
+{
+  "name": "gdevelop-visual-tests",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "description": "Visual monkey tests: they manipulate the GDevelop editor in a real browser (Storybook) and in the real packaged app, and check that nothing is broken.",
+  "main": "run.js",
+  "scripts": {
+    "list": "node run.js --list",
+    "test": "node run.js --suite=all",
+    "test-storybook": "node run.js --suite=storybook",
+    "test-editor": "node run.js --suite=editor"
+  },
+  "dependencies": {
+    "adm-zip": "^0.5.10",
+    "minimist": "1.2.5",
+    "puppeteer": "^24.15.0",
+    "serve-handler": "6.1.6"
+  }
+}

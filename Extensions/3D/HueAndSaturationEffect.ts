@@ -19,7 +19,9 @@ namespace gdjs {
 
           constructor() {
             this.shaderPass = new THREE_ADDONS.ShaderPass(
-              THREE_ADDONS.HueSaturationShader
+              gdjs.PixiFiltersTools.clampThreeShaderOutput(
+                THREE_ADDONS.HueSaturationShader
+              )
             );
             this._isEnabled = false;
           }
@@ -41,7 +43,9 @@ namespace gdjs {
             if (!(target instanceof gdjs.Layer)) {
               return false;
             }
-            target.getRenderer().addPostProcessingPass(this.shaderPass);
+            target
+              .getRenderer()
+              .addPostProcessingPass(this.shaderPass, effectData.name);
             this._isEnabled = true;
             return true;
           }

@@ -1,12 +1,12 @@
 const electron = require('electron');
 const path = require('path');
+const fs = require('fs');
 const child_process = require('child_process');
 const app = electron.app; // Module to control application life.
 const BrowserWindow = electron.BrowserWindow; // Module to create native browser window.
 const Menu = electron.Menu;
 const Notification = electron.Notification;
 const protocol = electron.protocol;
-const parseArgs = require('minimist');
 const isDev = require('electron-is-dev');
 const ipcMain = electron.ipcMain;
 const autoUpdater = require('electron-updater').autoUpdater;
@@ -26,6 +26,12 @@ const {
 } = require('./MainMenu');
 const { loadExternalEditorWindow } = require('./LocalExternalEditorWindow');
 const { load, registerGdideProtocol } = require('./Utils/UrlLoader');
+const { setupMcpStdioPipe } = require('./CliMcpServerPipe');
+const { waitForPreviousCliInstance } = require('./CliInstanceLock');
+const {
+  createLiveMcpServer,
+  makeLiveMcpServerSettingsStore,
+} = require('./LiveMcpServer');
 const throttle = require('lodash.throttle');
 const { findLocalIp } = require('./Utils/LocalNetworkIpFinder');
 const setUpDiscordRichPresence = require('./DiscordRichPresence');
@@ -46,9 +52,45 @@ const {
 } = require('./LocalGDJSDevelopmentWatcher');
 const { setupWatcher, disableWatcher } = require('./LocalFilesystemWatcher');
 const { installCliInPath } = require('./InstallCliInPath');
+const { setupClipboardTextCache } = require('./ClipboardTextCache');
+const {
+  setWindowFileIdentifier,
+  clearWindowFileIdentifier,
+} = require('./OpenProjectsRegistry');
+const {
+  parseGDevelopArgs,
+  parseSecondInstanceArgs,
+  isCliProjectAlreadyOpenElsewhere,
+  routeCliCommandToLiveEditor,
+} = require('./CliCommandHandoff');
 
 // Initialize `@electron/remote` module
 require('@electron/remote/main').initialize();
+
+// @electron/remote 2.1.2 walks `module.parent` to the root and requires from
+// there. On Electron 45 that root is the Electron bootstrap, which cannot see
+// app/node_modules. Resolve from this file instead.
+app.on('remote-require', (event, _webContents, moduleName) => {
+  event.returnValue = require(moduleName);
+});
+
+const args = parseGDevelopArgs(process.argv.slice(isDev ? 2 : 1));
+// `--mcp`: serve the editor functions of the project on stdin/stdout, in its
+// own (headless) process, until the MCP client closes stdin.
+if (args['mcp']) args['run-command'] = 'SERVE_MCP';
+// With `--mcp` or `--json`, stdout only holds the output of the command: the
+// logs of the main process (including electron-log's) go to stderr.
+if (args['mcp'] || args['json']) {
+  const writeToStderr = (...values) =>
+    process.stderr.write(require('util').format(...values) + '\n');
+  console.log = writeToStderr;
+  console.info = writeToStderr;
+  console.debug = writeToStderr;
+  const stderrLogTransport = message => writeToStderr(...message.data);
+  stderrLogTransport.level = 'info';
+  log.transports.console.level = false;
+  log.transports.stderr = stderrLogTransport;
+}
 
 log.info('GDevelop Electron app starting...');
 
@@ -65,19 +107,25 @@ autoUpdater.autoDownload = false;
 let mainWindows = new Set();
 let mainWindow = null; // Primary window reference for backwards compatibility
 let windowCounter = 0; // Counter for creating unique session partitions
-
-// Parse arguments (knowing that in dev, we run electron with an argument,
-// so have to ignore one more).
-const argsParserOptions = {
-  boolean: ['dev-tools', 'disable-update-check', 'keep-open'],
-  string: ['_', 'run-command', 'cmd-args'],
-};
-const args = parseArgs(process.argv.slice(isDev ? 2 : 1), argsParserOptions);
+// The window an agent connecting to the live MCP server is bound to.
+let lastFocusedMainWindow = null;
+let liveMcpServer = null;
 
 const devTools = !!args['dev-tools'];
 
 // See registerGdideProtocol (used for HTML modules support)
-protocol.registerSchemesAsPrivileged([{ scheme: 'gdide' }]);
+protocol.registerSchemesAsPrivileged([
+  { scheme: 'gdide', privileges: { corsEnabled: true } },
+]);
+
+// On computers having an integrated and a discrete graphics card (most gaming
+// laptops), Chromium uses the integrated one by default: the 3D editor and the
+// previews would run a lot slower than they could. Must be set before the app is ready.
+app.commandLine.appendSwitch('force_high_performance_gpu');
+
+// Chromium no longer falls back to software rendering for WebGL by itself:
+// without this, there is no 3D on computers without a usable GPU (virtual machines, blocklisted drivers).
+app.commandLine.appendSwitch('enable-unsafe-swiftshader');
 
 // Notifications on Microsoft Windows platforms show the app user model id.
 // If not set, defaults to `electron.app.{app.name}`.
@@ -87,25 +135,29 @@ if (process.platform === 'win32') {
 
 // Single instance lock - prevents multiple Electron processes
 // This solves Firebase IndexedDB locking issues while still allowing multiple windows.
-//
-// When invoked via `--run-command` (CLI / CI scenarios), we deliberately
-// SKIP the single-instance lock so each CLI invocation runs in its own
-// process. This lets the launching shell wait for completion and observe
-// the exit code, instead of being immediately backgrounded by the existing
-// instance taking over via the second-instance handler.
+// CLI: skip the lock unless the target project is a known open window (registry hit);
+// a stale registry entry falls back to running headless in this process.
 const isCliRunCommand = !!args['run-command'];
-const gotTheLock = isCliRunCommand ? true : app.requestSingleInstanceLock();
+const gotTheLock =
+  isCliRunCommand &&
+  (args['mcp'] || !isCliProjectAlreadyOpenElsewhere(args))
+    ? true
+    : app.requestSingleInstanceLock({ args });
 
 if (!gotTheLock) {
   // Second instance attempted - quit immediately
   app.quit();
-} else if (!isCliRunCommand) {
-  // First instance - handle second-instance events by creating new windows
-  app.on('second-instance', (event, commandLine, workingDirectory) => {
-    const secondInstanceArgs = parseArgs(
-      commandLine.slice(isDev ? 2 : 1),
-      argsParserOptions
-    );
+} else {
+  app.on('second-instance', (event, commandLine, workingDirectory, additionalData) => {
+    const secondInstanceArgs = parseSecondInstanceArgs({
+      commandLine,
+      additionalData,
+      isDev,
+    });
+
+    if (routeCliCommandToLiveEditor({ parsedArgs: secondInstanceArgs, mainWindows })) {
+      return;
+    }
 
     // Update the global args so the new window's renderer (which reads them
     // via remote.getGlobal('args')) picks up the second-instance CLI flags
@@ -145,6 +197,8 @@ const windowTargetIdToBrowserWindowIds = new Map();
 // Function to create a new GDevelop window
 function createNewWindow(windowArgs = args) {
   const isIntegrated = windowArgs.mode === 'integrated';
+  // windowArgs: a GUI primary process can still open a CLI window (second-instance fallback).
+  const isCliWindow = !!windowArgs['run-command'];
 
   if (isIntegrated && app.dock) {
     app.dock.hide();
@@ -167,7 +221,15 @@ function createNewWindow(windowArgs = args) {
       // Allow Node.js API access in renderer process, as long
       // as we've not removed dependency on it and on "@electron/remote".
       nodeIntegration: true,
+      sandbox: false,
       contextIsolation: false,
+      // Keep timers and `requestAnimationFrame` running at full speed when
+      // the window is minimized or covered by another window (Chromium
+      // otherwise throttles timers to once a minute and stops animation
+      // frames entirely). The editor keeps working in the background: the
+      // AI agent keeps running its turns, and gameplay tests - which need
+      // animation frames to step the game - keep progressing.
+      backgroundThrottling: false,
     },
     enableLargerThanScreen: true,
     backgroundColor: '#000',
@@ -202,13 +264,14 @@ function createNewWindow(windowArgs = args) {
     options.show = false;
   }
 
-  if (isCliRunCommand && !windowArgs['keep-open']) {
+  // `--show`: watch an agent working on the project through the MCP server.
+  if (isCliWindow && !windowArgs['keep-open'] && !windowArgs['show']) {
     options.show = false;
     options.skipTaskbar = true;
   }
 
   const newWindow = new BrowserWindow(options);
-  if (!isIntegrated && !isCliRunCommand) newWindow.maximize();
+  if (!isIntegrated && !isCliWindow) newWindow.maximize();
 
   // Capture window ID and whether this is the primary window before it can be destroyed
   const windowId = newWindow.id;
@@ -228,16 +291,35 @@ function createNewWindow(windowArgs = args) {
   // Enable `@electron/remote` module for renderer process
   require('@electron/remote/main').enable(newWindow.webContents);
 
+  // The app is loaded from file://, so no Referer is sent: YouTube embeds then fail with "Error 153".
+  newWindow.webContents.session.webRequest.onBeforeSendHeaders(
+    {
+      urls: ['https://www.youtube.com/*', 'https://www.youtube-nocookie.com/*'],
+    },
+    (details, callback) => {
+      callback({
+        requestHeaders: {
+          ...details.requestHeaders,
+          Referer: 'https://editor.gdevelop.io/',
+        },
+      });
+    }
+  );
+
   // Uses process.stdout/stderr directly (not electron-log) to avoid
   // re-entering the renderer console and causing an infinite loop.
-  if (isCliRunCommand) {
-    newWindow.webContents.on('console-message', (_event, level, message) => {
-      if (level < 1) return;
+  if (isCliWindow) {
+    newWindow.webContents.on('console-message', ({ level, message }) => {
+      if (level === 'debug') return;
       if (message.startsWith('%c')) return;
       if (message.includes('[renderer:')) return; // break recursion
-      const tag = ['verbose', 'info', 'warning', 'error'][level] || 'log';
-      const stream = level >= 2 ? process.stderr : process.stdout;
-      stream.write(`[renderer:${tag}] ${message}\n`);
+      const isWarningOrError = level === 'warning' || level === 'error';
+      // With --json, stdout only holds the result of the command.
+      const stream =
+        isWarningOrError || windowArgs['json'] || windowArgs['mcp']
+          ? process.stderr
+          : process.stdout;
+      stream.write(`[renderer:${level}] ${message}\n`);
     });
   }
 
@@ -256,7 +338,7 @@ function createNewWindow(windowArgs = args) {
   });
 
   if (isDev)
-    newWindow.webContents.session.loadExtension(
+    newWindow.webContents.session.extensions.loadExtension(
       path.join(__dirname, 'extensions/ReactDeveloperTools/4.24.3_0/')
     );
 
@@ -271,6 +353,9 @@ function createNewWindow(windowArgs = args) {
   newWindow.on('closed', function() {
     // Remove from tracked windows
     mainWindows.delete(newWindow);
+    clearWindowFileIdentifier(windowId);
+    if (lastFocusedMainWindow === newWindow) lastFocusedMainWindow = null;
+    if (liveMcpServer) liveMcpServer.onWindowClosed(windowId);
 
     // If this was the primary window, set a new primary
     if (isPrimaryWindow) {
@@ -329,6 +414,7 @@ function createNewWindow(windowArgs = args) {
             // nodeIntegration: true,
             // contextIsolation: false,
             webSecurity: false,
+            sandbox: false,
           },
         },
       };
@@ -378,9 +464,80 @@ function createNewWindow(windowArgs = args) {
   return newWindow;
 }
 
+const setupLiveMcpServer = () => {
+  const settingsStore = makeLiveMcpServerSettingsStore(app.getPath('userData'));
+  let lastError = null;
+  liveMcpServer = createLiveMcpServer({
+    getTargetWindow: () =>
+      lastFocusedMainWindow && !lastFocusedMainWindow.isDestroyed()
+        ? lastFocusedMainWindow
+        : mainWindow,
+    log,
+  });
+
+  app.on('browser-window-focus', (_event, window) => {
+    if (mainWindows.has(window)) lastFocusedMainWindow = window;
+  });
+
+  const getStatus = () => {
+    const settings = settingsStore.read();
+    const port = liveMcpServer.getPort();
+    return {
+      enabled: settings.enabled,
+      port,
+      url: port ? `http://127.0.0.1:${port}/mcp` : null,
+      token: settings.token,
+      error: lastError,
+    };
+  };
+
+  const applySettings = async () => {
+    const settings = settingsStore.read();
+    lastError = null;
+    if (!settings.enabled) {
+      await liveMcpServer.stop();
+      return;
+    }
+    try {
+      await liveMcpServer.start({ port: settings.port, token: settings.token });
+    } catch (error) {
+      lastError = error.message;
+      log.error('[MCP] Could not start the live editor server:', error);
+    }
+  };
+
+  ipcMain.on('mcp-live-send', (_event, payload) =>
+    liveMcpServer.onWindowResponse(payload)
+  );
+  ipcMain.handle('mcp-live-server-get-status', () => getStatus());
+  ipcMain.handle('mcp-live-server-set-enabled', async (_event, enabled) => {
+    settingsStore.write({ ...settingsStore.read(), enabled: !!enabled });
+    await applySettings();
+    return getStatus();
+  });
+  ipcMain.handle('mcp-live-server-reset-token', async () => {
+    settingsStore.write({ ...settingsStore.read(), token: null });
+    await applySettings();
+    return getStatus();
+  });
+
+  applySettings();
+};
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
-app.on('ready', function() {
+app.on('ready', async function() {
+  // Handoff calls app.quit() but 'ready' still runs; without the lock, do not create a window.
+  if (!gotTheLock) {
+    return;
+  }
+
+  // A CLI/MCP instance started while the previous one exits would run logged
+  // out (see CliInstanceLock.js): wait for it.
+  if (isCliRunCommand) {
+    await waitForPreviousCliInstance({ app, log, timeoutMs: 10000 });
+  }
+
   registerGdideProtocol({ isDev });
 
   // Create the first window
@@ -418,9 +575,45 @@ app.on('ready', function() {
     ]);
   }
 
+  setupClipboardTextCache();
+
   ipcMain.on('app-exit', (_event, exitCode) => {
     app.exit(typeof exitCode === 'number' ? exitCode : 0);
   });
+
+  if (args['mcp']) setupMcpStdioPipe({ ipcMain, app });
+
+  // The result of a CLI command (with --json): resolved once written, so the
+  // app does not exit before stdout is flushed.
+  ipcMain.handle(
+    'cli-write-stdout',
+    (_event, text) =>
+      new Promise(resolve => process.stdout.write(String(text), () => resolve()))
+  );
+
+  // The input of a CLI command given as "-" (e.g. calls piped to GDevelop).
+  let cliStdinPromise = null;
+  ipcMain.handle('cli-read-stdin', () => {
+    if (!cliStdinPromise) {
+      cliStdinPromise = new Promise((resolve, reject) => {
+        const chunks = [];
+        process.stdin.on('data', chunk => chunks.push(chunk));
+        process.stdin.on('end', () =>
+          resolve(Buffer.concat(chunks).toString('utf8'))
+        );
+        process.stdin.on('error', reject);
+      });
+    }
+    return cliStdinPromise;
+  });
+
+  ipcMain.on('set-window-project-path', (event, fileIdentifier) => {
+    const window = BrowserWindow.fromWebContents(event.sender);
+    if (window) setWindowFileIdentifier(window.id, fileIdentifier);
+  });
+
+  // Not in a CLI process (like `--mcp`): it has no editor the user works in.
+  if (!isCliRunCommand) setupLiveMcpServer();
 
   ipcMain.handle('install-cli-in-path', async () => {
     // Inside an AppImage, process.execPath points into a transient mount that

@@ -37,6 +37,9 @@ export type TeamState = {|
     newPassword: string
   ) => Promise<void>,
   onEditUser: (editedUserId: string, changes: EditUserChanges) => Promise<void>,
+  onUpdateTeam: (attributes: {|
+    classrooms: {| hideAskAi: boolean |},
+  |}) => Promise<void>,
 |};
 
 export const initialTeamState = {
@@ -61,6 +64,7 @@ export const initialTeamState = {
   onSetMember: async () => {},
   onChangeMemberPassword: async () => {},
   onEditUser: async () => {},
+  onUpdateTeam: async () => {},
 };
 
 const TeamContext: React.Context<TeamState> = React.createContext<TeamState>(

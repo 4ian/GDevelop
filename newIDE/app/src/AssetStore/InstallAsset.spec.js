@@ -1,6 +1,7 @@
 // @flow
 import {
   addAssetToProject,
+  installEffectAsset,
   getRequiredExtensionsFromAsset,
   installPublicAsset,
   checkRequiredExtensionsUpdateForAssets,
@@ -9,6 +10,7 @@ import {
   addSerializedExtensionsToProject,
   installRequiredExtensions,
   checkRequiredExtensionsUpdate,
+  type RequiredExtensionInstallation,
 } from './ExtensionStore/InstallExtension';
 import { makeTestProject } from '../fixtures/TestProject';
 import { type EventsFunctionsExtensionsState } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
@@ -21,6 +23,7 @@ import {
   incompatibleFlashExtensionShortHeader,
   fireBulletExtensionShortHeader,
   fakeAssetWithCustomObject,
+  fakeSkyboxAsset,
   buttonV1ExtensionShortHeader,
   buttonV2ExtensionShortHeader,
   breakingButtonV3ExtensionShortHeader,
@@ -34,6 +37,7 @@ import {
   type SerializedExtension,
 } from '../Utils/GDevelopServices/Extension';
 import * as Asset from '../Utils/GDevelopServices/Asset';
+import { isDefaultVariantReplacedByUpdates } from '../Utils/Extension/ExtensionOrigin';
 
 const gd: libGDevelop = global.gd;
 
@@ -46,6 +50,122 @@ Asset.getPublicAsset = jest.fn();
 const mockFn = (fn: Function): JestMockFn<any, any> => fn;
 
 describe('InstallAsset', () => {
+  describe('installEffectAsset', () => {
+    it('marks a skybox without a top as legacy and keeps the top of the others', () => {
+      const { project } = makeTestProject(gd);
+      const effectsContainer = project
+        .insertNewLayout('MyTestLayout', 0)
+        .getLayers()
+        .getLayer('')
+        .getEffects();
+      const effectAsset = (fakeSkyboxAsset.effectAssets || [])[0];
+
+      const legacyEffect = installEffectAsset({
+        project,
+        effectsContainer,
+        asset: fakeSkyboxAsset,
+        effectName: 'LegacySky',
+      });
+      const standardEffect = installEffectAsset({
+        project,
+        effectsContainer,
+        asset: {
+          ...fakeSkyboxAsset,
+          effectAssets: [
+            {
+              ...effectAsset,
+              effect: {
+                ...effectAsset.effect,
+                stringParameters: {
+                  ...effectAsset.effect.stringParameters,
+                  top: 'Z+',
+                },
+              },
+            },
+          ],
+        },
+        effectName: 'StandardSky',
+      });
+
+      expect(legacyEffect.getStringParameter('top')).toBe('Legacy');
+      expect(standardEffect.getStringParameter('top')).toBe('Z+');
+    });
+
+    it('installs a skybox as an effect showing its images', () => {
+      const { project } = makeTestProject(gd);
+      const layout = project.insertNewLayout('MyTestLayout', 0);
+      const effectsContainer = layout
+        .getLayers()
+        .getLayer('')
+        .getEffects();
+
+      const effect = installEffectAsset({
+        project,
+        effectsContainer,
+        asset: fakeSkyboxAsset,
+        effectName: 'Sky',
+      });
+
+      expect(effect.getName()).toBe('Sky');
+      expect(effect.getEffectType()).toBe('Scene3D::Skybox');
+      expect(effectsContainer.getEffectsCount()).toBe(1);
+      expect(effect.getStringParameter('topFaceResourceName')).toBe(
+        'Sunny Day_Top.png'
+      );
+      const resourcesManager = project.getResourcesManager();
+      expect(resourcesManager.hasResource('Sunny Day_Top.png')).toBe(true);
+      expect(resourcesManager.getResource('Sunny Day_Top.png').getFile()).toBe(
+        fakeSkyboxAsset.effectAssets
+          ? fakeSkyboxAsset.effectAssets[0].resources[4].file
+          : ''
+      );
+    });
+
+    it('replaces the images of an existing effect instead of adding one', () => {
+      const { project } = makeTestProject(gd);
+      const layout = project.insertNewLayout('MyTestLayout', 0);
+      const effectsContainer = layout
+        .getLayers()
+        .getLayer('')
+        .getEffects();
+      effectsContainer
+        .insertNewEffect('Sky', 0)
+        .setEffectType('Scene3D::Skybox');
+      project.getResourcesManager().addResource(
+        (() => {
+          const resource = new gd.ImageResource();
+          resource.setName('Sunny Day_Top.png');
+          resource.setFile('somewhere/else.png');
+          return resource;
+        })()
+      );
+
+      const effect = installEffectAsset({
+        project,
+        effectsContainer,
+        asset: fakeSkyboxAsset,
+        effectName: 'Sky',
+      });
+
+      expect(effectsContainer.getEffectsCount()).toBe(1);
+      // The project already had a resource with that name: the installed one is renamed.
+      const topFaceResourceName = effect.getStringParameter(
+        'topFaceResourceName'
+      );
+      expect(topFaceResourceName).not.toBe('Sunny Day_Top.png');
+      expect(
+        project
+          .getResourcesManager()
+          .getResource(topFaceResourceName)
+          .getFile()
+      ).toBe(
+        fakeSkyboxAsset.effectAssets
+          ? fakeSkyboxAsset.effectAssets[0].resources[4].file
+          : ''
+      );
+    });
+  });
+
   describe('addAssetToProject', () => {
     it('installs an object asset in the project, without renaming it if not needed', async () => {
       const { project } = makeTestProject(gd);
@@ -431,6 +551,7 @@ describe('InstallAsset', () => {
         breakingChangesExtensionShortHeaders: [],
         incompatibleWithIdeExtensionShortHeaders: [],
         safeToUpdateExtensions: [],
+        unknownExtensionDependencies: [],
         isGDevelopUpdateNeeded: false,
       });
     });
@@ -463,6 +584,7 @@ describe('InstallAsset', () => {
         breakingChangesExtensionShortHeaders: [],
         incompatibleWithIdeExtensionShortHeaders: [],
         safeToUpdateExtensions: [],
+        unknownExtensionDependencies: [],
         isGDevelopUpdateNeeded: false,
       });
     });
@@ -495,6 +617,7 @@ describe('InstallAsset', () => {
         breakingChangesExtensionShortHeaders: [],
         incompatibleWithIdeExtensionShortHeaders: [],
         safeToUpdateExtensions: [buttonV2ExtensionShortHeader],
+        unknownExtensionDependencies: [],
         isGDevelopUpdateNeeded: false,
       });
     });
@@ -529,6 +652,7 @@ describe('InstallAsset', () => {
         ],
         incompatibleWithIdeExtensionShortHeaders: [],
         safeToUpdateExtensions: [],
+        unknownExtensionDependencies: [],
         isGDevelopUpdateNeeded: false,
       });
     });
@@ -568,6 +692,7 @@ describe('InstallAsset', () => {
           incompatibleButtonV4ExtensionShortHeader,
         ],
         safeToUpdateExtensions: [],
+        unknownExtensionDependencies: [],
         isGDevelopUpdateNeeded: false,
       });
     });
@@ -602,6 +727,7 @@ describe('InstallAsset', () => {
           incompatibleFlashExtensionShortHeader,
         ],
         safeToUpdateExtensions: [],
+        unknownExtensionDependencies: [],
         isGDevelopUpdateNeeded: true,
       });
     });
@@ -665,6 +791,7 @@ describe('InstallAsset', () => {
         breakingChangesExtensionShortHeaders: [],
         incompatibleWithIdeExtensionShortHeaders: [],
         safeToUpdateExtensions: [],
+        unknownExtensionDependencies: [],
         isGDevelopUpdateNeeded: false,
       });
     });
@@ -700,6 +827,7 @@ describe('InstallAsset', () => {
         breakingChangesExtensionShortHeaders: [],
         incompatibleWithIdeExtensionShortHeaders: [],
         safeToUpdateExtensions: [],
+        unknownExtensionDependencies: [],
         isGDevelopUpdateNeeded: false,
       });
     });
@@ -735,6 +863,7 @@ describe('InstallAsset', () => {
         breakingChangesExtensionShortHeaders: [],
         incompatibleWithIdeExtensionShortHeaders: [],
         safeToUpdateExtensions: [buttonV2ExtensionShortHeader],
+        unknownExtensionDependencies: [],
         isGDevelopUpdateNeeded: false,
       });
     });
@@ -772,6 +901,7 @@ describe('InstallAsset', () => {
         ],
         incompatibleWithIdeExtensionShortHeaders: [],
         safeToUpdateExtensions: [],
+        unknownExtensionDependencies: [],
         isGDevelopUpdateNeeded: false,
       });
     });
@@ -813,6 +943,7 @@ describe('InstallAsset', () => {
           incompatibleButtonV4ExtensionShortHeader,
         ],
         safeToUpdateExtensions: [],
+        unknownExtensionDependencies: [],
         isGDevelopUpdateNeeded: true,
       });
     });
@@ -851,6 +982,7 @@ describe('InstallAsset', () => {
           incompatibleFlashExtensionShortHeader,
         ],
         safeToUpdateExtensions: [],
+        unknownExtensionDependencies: [],
         isGDevelopUpdateNeeded: true,
       });
     });
@@ -899,7 +1031,10 @@ describe('InstallAsset', () => {
         mockEventsFunctionsExtensionsState,
         project,
         [serializedExtension],
-        [serializedExtension.name]
+        {
+          fromStoreExtensionNames: [serializedExtension.name],
+          fromFileExtensionNames: [],
+        }
       );
 
       expect(
@@ -924,7 +1059,7 @@ describe('InstallAsset', () => {
         mockEventsFunctionsExtensionsState,
         project,
         [serializedExtension],
-        []
+        { fromStoreExtensionNames: [], fromFileExtensionNames: [] }
       );
 
       expect(
@@ -940,6 +1075,56 @@ describe('InstallAsset', () => {
           .getEventsFunctionsExtension(serializedExtension.name)
           .getOriginIdentifier()
       ).toEqual('');
+    });
+
+    it('adds an extension with origin set if it comes from a file', () => {
+      makeTestExtensions(gd);
+      const { project } = makeTestProject(gd);
+      addSerializedExtensionsToProject(
+        mockEventsFunctionsExtensionsState,
+        project,
+        [serializedExtension],
+        {
+          fromStoreExtensionNames: [],
+          fromFileExtensionNames: [serializedExtension.name],
+        }
+      );
+
+      const eventsFunctionsExtension = project.getEventsFunctionsExtension(
+        serializedExtension.name
+      );
+      expect(eventsFunctionsExtension.getOriginName()).toEqual('imported-file');
+      expect(isDefaultVariantReplacedByUpdates(eventsFunctionsExtension)).toBe(
+        true
+      );
+    });
+
+    it('keeps the origin written in the file of an imported extension', () => {
+      makeTestExtensions(gd);
+      const { project } = makeTestProject(gd);
+      addSerializedExtensionsToProject(
+        mockEventsFunctionsExtensionsState,
+        project,
+        [
+          {
+            ...serializedExtension,
+            origin: {
+              name: 'gdevelop-extension-store',
+              identifier: serializedExtension.name,
+            },
+          },
+        ],
+        {
+          fromStoreExtensionNames: [],
+          fromFileExtensionNames: [serializedExtension.name],
+        }
+      );
+
+      expect(
+        project
+          .getEventsFunctionsExtension(serializedExtension.name)
+          .getOriginName()
+      ).toEqual('gdevelop-extension-store');
     });
   });
 
@@ -1001,6 +1186,7 @@ describe('InstallAsset', () => {
             breakingChangesExtensionShortHeaders: [],
             incompatibleWithIdeExtensionShortHeaders: [],
             safeToUpdateExtensions: [],
+            unknownExtensionDependencies: [],
             isGDevelopUpdateNeeded: false,
           },
           shouldUpdateExtension: true,
@@ -1039,6 +1225,7 @@ describe('InstallAsset', () => {
             breakingChangesExtensionShortHeaders: [],
             incompatibleWithIdeExtensionShortHeaders: [],
             safeToUpdateExtensions: [],
+            unknownExtensionDependencies: [],
             isGDevelopUpdateNeeded: false,
           },
           shouldUpdateExtension: true,
@@ -1053,6 +1240,69 @@ describe('InstallAsset', () => {
       });
 
       expect(getExtension).toHaveBeenCalledTimes(1);
+    });
+
+    const noRequiredExtensionInstallation: RequiredExtensionInstallation = {
+      requiredExtensionShortHeaders: [],
+      missingExtensionShortHeaders: [],
+      outOfDateExtensionShortHeaders: [],
+      breakingChangesExtensionShortHeaders: [],
+      incompatibleWithIdeExtensionShortHeaders: [],
+      safeToUpdateExtensions: [],
+      unknownExtensionDependencies: [],
+      isGDevelopUpdateNeeded: false,
+    };
+
+    it('installs the extensions with the changes kept by users', async () => {
+      makeTestExtensions(gd);
+      const { project } = makeTestProject(gd);
+
+      const isInstalled = await installRequiredExtensions({
+        requiredExtensionInstallation: noRequiredExtensionInstallation,
+        shouldUpdateExtension: true,
+        eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
+        project,
+        onWillInstallExtension: () => {},
+        onExtensionInstalled: () => {},
+        importedSerializedExtensions: [
+          { name: 'ImportedExtension', version: '1.1.0' },
+        ],
+        chooseExtensionChangesToKeep: async ({ serializedExtensions }) =>
+          serializedExtensions.map(serializedExtension => ({
+            ...serializedExtension,
+            description: 'Kept description',
+          })),
+      });
+
+      expect(isInstalled).toBe(true);
+      expect(
+        project
+          .getEventsFunctionsExtension('ImportedExtension')
+          .getDescription()
+      ).toBe('Kept description');
+    });
+
+    it('installs nothing when users cancel the choice of the changes to keep', async () => {
+      makeTestExtensions(gd);
+      const { project } = makeTestProject(gd);
+
+      const isInstalled = await installRequiredExtensions({
+        requiredExtensionInstallation: noRequiredExtensionInstallation,
+        shouldUpdateExtension: true,
+        eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
+        project,
+        onWillInstallExtension: () => {},
+        onExtensionInstalled: () => {},
+        importedSerializedExtensions: [
+          { name: 'ImportedExtension', version: '1.1.0' },
+        ],
+        chooseExtensionChangesToKeep: async () => null,
+      });
+
+      expect(isInstalled).toBe(false);
+      expect(
+        project.hasEventsFunctionsExtensionNamed('ImportedExtension')
+      ).toBe(false);
     });
 
     // TODO EBO Add a test for a custom object that contains another custom objet.
@@ -1082,6 +1332,7 @@ describe('InstallAsset', () => {
           breakingChangesExtensionShortHeaders: [],
           incompatibleWithIdeExtensionShortHeaders: [],
           safeToUpdateExtensions: [],
+          unknownExtensionDependencies: [],
           isGDevelopUpdateNeeded: false,
         },
         shouldUpdateExtension: true,

@@ -25,6 +25,9 @@ export type CompactTextAreaFieldWithControlsProps = {|
   maxRows?: number,
   maxLength?: number,
   controls: React.Node,
+  // Shown above the text, inside the field.
+  header?: React.Node,
+  onPasteFiles?: (files: Array<File>) => void,
   neonCorner?: boolean,
   hasAnimatedNeonCorner?: boolean,
 |};
@@ -55,6 +58,8 @@ export const CompactTextAreaFieldWithControls: React.ComponentType<{
       onSubmit,
       onNavigateHistory,
       controls,
+      header,
+      onPasteFiles,
       neonCorner,
       hasAnimatedNeonCorner,
     }: CompactTextAreaFieldWithControlsProps,
@@ -178,10 +183,26 @@ export const CompactTextAreaFieldWithControls: React.ComponentType<{
       [onSubmit, onNavigateHistory, setCursorPosition, value, onChange]
     );
 
+    const handlePaste = React.useCallback(
+      (e: SyntheticClipboardEvent<HTMLTextAreaElement>) => {
+        if (!onPasteFiles) return;
+        // Text copied from some apps (a spreadsheet...) also comes as an
+        // image: paste it as text.
+        if (Array.from(e.clipboardData.types).includes('text/plain')) return;
+        const files = Array.from(e.clipboardData.files);
+        if (!files.length) return;
+        e.preventDefault();
+        onPasteFiles(files);
+      },
+      [onPasteFiles]
+    );
+
     return (
       <I18n>
         {({ i18n }) => (
           <label
+            // Explicit, as the header can contain buttons.
+            htmlFor={idToUse.current}
             className={classNames({
               [classes.container]: true,
               [classes.disabled]: disabled,
@@ -196,6 +217,7 @@ export const CompactTextAreaFieldWithControls: React.ComponentType<{
                   !!neonCorner && hasAnimatedNeonCorner,
               })}
             >
+              {header}
               <textarea
                 ref={textareaRef}
                 id={idToUse.current}
@@ -205,6 +227,7 @@ export const CompactTextAreaFieldWithControls: React.ComponentType<{
                 onChange={e => onChange(e.currentTarget.value)}
                 placeholder={i18n._(placeholder)}
                 onKeyDown={handleKeyDown}
+                onPaste={handlePaste}
                 rows={rows || 3}
                 maxLength={maxLength}
               />

@@ -137,7 +137,10 @@ const CompactSemiControlledNumberField = ({
 
         if (
           newValueAfterCalculation !== null &&
-          (reason === 'blur' || !commitOnBlur)
+          (reason === 'blur' || !commitOnBlur) &&
+          // Avoid a useless commit (which can trigger expensive updates) when
+          // the field loses focus with a value that was already committed.
+          !(reason === 'blur' && newValueAfterCalculation === value)
         ) {
           onChange(newValueAfterCalculation);
         }
@@ -148,7 +151,7 @@ const CompactSemiControlledNumberField = ({
         );
       }
     },
-    [commitOnBlur, onChange]
+    [commitOnBlur, onChange, value]
   );
 
   const stringValue = getDisplayedValueFromValue

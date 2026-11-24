@@ -13,13 +13,22 @@ on:
       - "**"
     tags-ignore:
       - "**" # Don't run on new tags
+  # Comment the links to the Storybook on new pull requests (without rebuilding it),
+  # as a branch pushed before its pull request is opened would get no comment until the next push.
+  pull_request:
+    types: [opened, reopened]
   # Allows to run this workflow manually from the Actions tab,
   # to publish on Chromatic (not done by default).
   workflow_dispatch:
 
 jobs:
   build-storybook:
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # To comment the links to the Storybook on the pull request.
+      pull-requests: write
     steps:
       - uses: actions/checkout@v3
         with:
@@ -60,6 +69,16 @@ jobs:
           echo "Find the latest Storybook for this branch on https://gdevelop-storybook.s3.amazonaws.com/$(git rev-parse --abbrev-ref HEAD)/latest/index.html"
           echo "Find the Storybook for this commit on https://gdevelop-storybook.s3.amazonaws.com/$(git rev-parse --abbrev-ref HEAD)/commit/$(git rev-parse HEAD)/index.html"
 
+      # Give direct access to the Storybook (and the stories added or modified)
+      # from the pull request of the branch, if any.
+      - name: Comment the links to the Storybook on the pull request
+        # Don't fail the build if commenting is not possible.
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/comment-storybook-links-on-pull-request.js "$(git rev-parse --abbrev-ref HEAD)" "$(git rev-parse HEAD)"
+        working-directory: newIDE/app
+
       # Publish on Chromatic, only when manually launched (too costly to run on every commit).
       - name: Publish Storybook to Chromatic
         if: github.event_name == 'workflow_dispatch'
@@ -69,3 +88,30 @@ jobs:
           storybookBuildDir: "build-storybook"
           token: ${{ secrets.GITHUB_TOKEN }}
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+
+  comment-storybook-links:
+    # Storybooks are only published for branches of this repository.
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      # Only the dependency of the script is installed, not the whole editor.
+      - name: Install script dependencies
+        run: npm install --prefix ${{ runner.temp }}/script-deps @storybook/csf@0.1.13
+
+      - name: Comment the links to the Storybook on the pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NODE_PATH: ${{ runner.temp }}/script-deps/node_modules
+        run: node scripts/comment-storybook-links-on-pull-request.js "${{ github.event.pull_request.head.ref }}" "${{ github.event.pull_request.head.sha }}"
+        working-directory: newIDE/app

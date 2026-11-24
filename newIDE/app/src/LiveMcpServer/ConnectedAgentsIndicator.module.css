@@ -1,0 +1,21 @@
+.trigger {
+  display: inline-flex;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+}
+
+.trigger:focus-visible {
+  outline: 2px solid var(--theme-success-color);
+  outline-offset: 2px;
+}
+
+.connectedDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: currentColor;
+}

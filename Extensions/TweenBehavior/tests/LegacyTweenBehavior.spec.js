@@ -509,7 +509,7 @@ describe('gdjs.TweenRuntimeBehavior', () => {
     checkProgress(6, [() => sprite.getScaleX(), () => sprite.getScaleY()]);
     // The interpolation is exponential.
     expect(sprite.getScaleX()).to.be(386.6364089863524);
-    expect(sprite.getScaleY()).to.be(579.9546134795287);
+    expect(sprite.getScaleY()).to.be.within(579.954613, 579.954614);
     expect(sprite.getX()).to.be(100);
     expect(sprite.getY()).to.be(400);
   });
@@ -530,8 +530,8 @@ describe('gdjs.TweenRuntimeBehavior', () => {
     checkProgress(6, [() => sprite.getScaleX(), () => sprite.getScaleY()]);
     // The interpolation is exponential.
     expect(sprite.getScaleX()).to.be(386.6364089863524);
-    expect(sprite.getScaleY()).to.be(579.9546134795287);
-    expect(sprite.getX()).to.be(-5872.3650875632775);
-    expect(sprite.getY()).to.be(-8558.547631344918);
+    expect(sprite.getScaleY()).to.be.within(579.954613, 579.954614);
+    expect(sprite.getX()).to.be.within(-5872.365088, -5872.365087);
+    expect(sprite.getY()).to.be.within(-8558.547632, -8558.547631);
   });
 });

@@ -243,6 +243,8 @@ BaseObjectExtension::BaseObjectExtension() {
       "gdjs.evtTools.object.raycastObjectToPosition");
   GetAllConditions()["Distance"].SetFunctionName(
       "gdjs.evtTools.object.distanceTest");
+  GetAllConditions()["Distance3D"].SetFunctionName(
+      "gdjs.evtTools.object.distanceTest3D");
   GetAllConditions()["IsTotalForceAngleTowardObject"].SetFunctionName(
       "gdjs.evtTools.object.movesTowardTest");
   // Compatibility with GD <= 5.6.251
@@ -253,6 +255,8 @@ BaseObjectExtension::BaseObjectExtension() {
       "gdjs.evtTools.object.turnedTowardTest");
   GetAllConditions()["IsTurnedTowardObject"].SetFunctionName(
       "gdjs.evtTools.object.isTurnedTowardObject");
+  GetAllConditions()["IsTurnedTowardObject3D"].SetFunctionName(
+      "gdjs.evtTools.object.isTurnedTowardObject3D");
   GetAllConditions()["IsCursorOnObject"].SetFunctionName(
       "gdjs.evtTools.input.cursorOnObject");
   // Compatibility with GD <= 5.6.251

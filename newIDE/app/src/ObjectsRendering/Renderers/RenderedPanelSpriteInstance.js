@@ -28,6 +28,12 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
   _rightMargin: number;
   _bottomMargin: number;
 
+  /**
+   * Rebuilding the bitmap cache costs more than rendering the sprites
+   * directly, so instances that change at every frame are never cached.
+   */
+  _wasUpdatedSinceLastFrame: boolean = true;
+
   constructor(
     project: gdProject,
     instance: gdInitialInstance,
@@ -93,6 +99,46 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
     // Do not hide completely an object so it can still be manipulated
     const alphaForDisplay = Math.max(this._instance.getOpacity() / 255, 0.5);
     this._pixiObject.alpha = alphaForDisplay;
+
+    // Cache the rendered sprites as a bitmap to speed up rendering when lots of
+    // panel sprites are in the scene: a tiled panel sprite is made of sprites
+    // that PixiJS can't batch, so each one of them breaks the rendering in
+    // pieces. The cache is only used when the instance is fully opaque, because
+    // PixiJS bakes the inherited `worldAlpha` into the cached texture
+    // (see https://github.com/pixijs/pixijs/issues/10757), and when the instance
+    // didn't change since the last frame, as rebuilding the cache costs more
+    // than rendering the sprites directly.
+    this._pixiObject.cacheAsBitmap =
+      this._pixiObject.worldAlpha >= 1 && !this._wasUpdatedSinceLastFrame;
+    this._wasUpdatedSinceLastFrame = false;
+  }
+
+  /**
+   * PixiJS always builds the `cacheAsBitmap` texture with the default scale mode
+   * (LINEAR) and gives no option to change it, which would blur panel sprites
+   * using a non smoothed image. The cached sprite is only created lazily, during
+   * a render, so the scale mode is applied by hooking into its creation: this
+   * keeps the cache pixel perfect even on the very first frame it's displayed.
+   */
+  _keepCachedBitmapScaleMode() {
+    const pixiObject = this._pixiObject;
+    // The canvas method is used when the renderer falls back to canvas.
+    for (const methodName of [
+      '_initCachedDisplayObject',
+      '_initCachedDisplayObjectCanvas',
+    ]) {
+      const initCachedDisplayObject = pixiObject[methodName];
+      // $FlowFixMe[missing-local-annot]
+      pixiObject[methodName] = renderer => {
+        initCachedDisplayObject.call(pixiObject, renderer);
+        const cachedSprite = pixiObject._cacheData
+          ? pixiObject._cacheData.sprite
+          : null;
+        if (cachedSprite) {
+          cachedSprite.texture.baseTexture.scaleMode = this._centerSprite.texture.baseTexture.scaleMode;
+        }
+      };
+    }
   }
 
   makeObjectsAndUpdateTextures() {
@@ -106,6 +152,7 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
 
     if (!this._pixiObject) {
       this._pixiObject = new PIXI.Container();
+      this._keepCachedBitmapScaleMode();
       this._pixiContainer.addChild(this._pixiObject);
     }
 
@@ -227,6 +274,7 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
     this._borderSprites[7].width = rightMargin;
     this._borderSprites[7].height = bottomMargin;
 
+    this._wasUpdatedSinceLastFrame = true;
     this._pixiObject.cacheAsBitmap = false;
 
     const leftBorder = leftMargin;

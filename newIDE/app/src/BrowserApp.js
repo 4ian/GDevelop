@@ -109,7 +109,6 @@ export const create = (authentication: Authentication): React.Node => {
                   gamesList={props.gamesList}
                 />
               )}
-              quickPublishOnlineWebExporter={browserOnlineWebExporter}
               storageProviders={storageProviders}
               resourceMover={BrowserResourceMover}
               resourceFetcher={BrowserResourceFetcher}

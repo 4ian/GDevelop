@@ -1,0 +1,89 @@
+# GitHub Action to run the benchmarks of the game engine (GDJS/tests/benchmarks)
+# on the changes made by a pull request, compared to its base branch.
+# On master, each change is compared to the previous commit, so the results
+# (in the summary of the runs, and as artifacts) track the evolution over time.
+
+name: Benchmarks
+
+on:
+  pull_request:
+    paths:
+      - "GDJS/**"
+      - "Extensions/**"
+  push:
+    branches:
+      - master
+    paths:
+      - "GDJS/**"
+      - "Extensions/**"
+  workflow_dispatch:
+
+concurrency:
+  group: benchmarks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  compare-benchmarks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      # To comment the results on the pull request.
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The base version is built from the history.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+          cache-dependency-path: |
+            GDJS/package-lock.json
+            GDJS/tests/package-lock.json
+
+      - name: Install GDJS dependencies
+        run: npm ci
+        working-directory: GDJS
+
+      - name: Install GDJS tests dependencies
+        run: npm ci
+        working-directory: GDJS/tests
+
+      - name: Compare the benchmarks with the base version
+        run: npm run benchmark:compare -- --base-ref="$BASE_REF" --markdown=benchmark-results.md --json=benchmark-results.json
+        working-directory: GDJS/tests
+        env:
+          BASE_REF: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref) || 'HEAD^' }}
+
+      - name: Show the results in the summary
+        run: cat benchmark-results.md >> "$GITHUB_STEP_SUMMARY"
+        working-directory: GDJS/tests
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results-${{ github.sha }}
+          path: GDJS/tests/benchmark-results.json
+          retention-days: 90
+
+      # Pull requests from forks have no permission to comment: their results
+      # are in the summary of the run.
+      - name: Comment the results on the pull request
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        # Don't fail the build if commenting is not possible.
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number }}
+        working-directory: GDJS/tests
+        # Update the previous comment (found with the marker starting the
+        # report) rather than adding a new one at each push.
+        run: |
+          COMMENT_ID=$(gh api "repos/$GITHUB_REPOSITORY/issues/$PULL_REQUEST_NUMBER/comments" --paginate --jq '.[] | select(.body | startswith("<!-- benchmark-results -->")) | .id' | head -n 1)
+          if [ -n "$COMMENT_ID" ]; then
+            gh api --method PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$COMMENT_ID" -F body=@benchmark-results.md
+          else
+            gh pr comment "$PULL_REQUEST_NUMBER" --body-file benchmark-results.md
+          fi

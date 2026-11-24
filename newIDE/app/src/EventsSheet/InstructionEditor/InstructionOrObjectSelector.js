@@ -55,6 +55,7 @@ import {
 } from './TreeViewItems';
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
 import useForceUpdate from '../../Utils/UseForceUpdate';
+import { useOnResource3DPreviewRendered } from '../../ResourcesList/ResourcePreview/Resource3DPreviewContext';
 import type { MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import {
   createFreeInstructionTreeViewItem,
@@ -367,6 +368,7 @@ const InstructionOrObjectSelector: React.ComponentType<{
     ]);
 
     const forceUpdate = useForceUpdate();
+    useOnResource3DPreviewRendered(forceUpdate);
 
     React.useEffect(
       () => {
@@ -716,22 +718,19 @@ const InstructionOrObjectSelector: React.ComponentType<{
           : null,
       ].filter(Boolean);
 
-    const hasResults = React.useMemo(
+    const [hasDisplayedItems, setHasDisplayedItems] = React.useState(true);
+    // The tree view filters its items when rendering: read the result after it.
+    React.useLayoutEffect(
       () => {
-        if (!isSearching) return true;
-        if (displayedInstructionsList.length > 0) return true;
         const treeView = treeViewRef.current;
-        if (!treeView) return true;
-        // TODO An empty panel is displayed the first time there is no result
-        // and the placeholder only shows when the user add another character
-        // because this value is outdated.
-        return treeView.getDisplayedItemsCount() > 0;
+        if (treeView)
+          setHasDisplayedItems(treeView.getDisplayedItemsCount() > 0);
       },
-      [displayedInstructionsList, isSearching]
+      [searchText, searchResults]
     );
 
     const displayEmptyMessage = !isSearching && !allObjectsList.length;
-    const searchHasNoResults = isSearching && !hasResults;
+    const searchHasNoResults = isSearching && !hasDisplayedItems;
 
     return (
       <div
@@ -921,6 +920,7 @@ const InstructionOrObjectSelector: React.ComponentType<{
                 }}
                 searchText={searchText}
                 multiSelect={false}
+                enableStickyAncestors
               />
             )}
           </AutoSizer>
@@ -983,6 +983,7 @@ const InstructionOrObjectSelector: React.ComponentType<{
                   }
                 }}
                 multiSelect={false}
+                enableStickyAncestors
               />
             )}
           </AutoSizer>

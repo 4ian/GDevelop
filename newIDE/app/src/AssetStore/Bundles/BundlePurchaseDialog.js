@@ -29,6 +29,7 @@ import PasswordPromptDialog from '../PasswordPromptDialog';
 import { getUserUUID } from '../../Utils/Analytics/UserUUID';
 import { getNewestRedemptionCodeForBundle } from '../../Utils/GDevelopServices/Usage';
 import ActivateSubscriptionPromptDialog from '../../Profile/ActivateSubscriptionPromptDialog';
+import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 
 type Props = {|
   bundleListingData: BundleListingData,
@@ -56,6 +57,7 @@ const BundlePurchaseDialog = ({
     onRefreshBundlePurchases,
     bundlePurchases,
   } = React.useContext(AuthenticatedUserContext);
+  const preferences = React.useContext(PreferencesContext);
   const { openRedeemCodeDialog } = React.useContext(SubscriptionContext);
   const [isPurchasing, setIsPurchasing] = React.useState(false);
   const [
@@ -143,6 +145,7 @@ const BundlePurchaseDialog = ({
         priceName: price.name,
         userId: profile.id,
         userEmail: profile.email,
+        language: preferences.values.language,
         password: password || undefined,
       });
       Window.openExternalURL(checkoutUrl);

@@ -12,7 +12,6 @@ import {
   registerGame,
   type Game,
 } from '../../../../Utils/GDevelopServices/Game';
-import { type QuickCustomizationRecommendation } from '../../../../Utils/GDevelopServices/User';
 import PlaceholderError from '../../../../UI/PlaceholderError';
 import { Column, LargeSpacer, Line } from '../../../../UI/Grid';
 import { ColumnStackLayout } from '../../../../UI/Layout';
@@ -31,13 +30,11 @@ import { type ResourceManagementProps } from '../../../../ResourcesList/Resource
 import Text from '../../../../UI/Text';
 import Grid from '@material-ui/core/Grid';
 import WalletWidget from '../../../../GameDashboard/Wallet/WalletWidget';
-import { QuickCustomizationGameTiles } from '../../../../QuickCustomization/QuickCustomizationGameTiles';
 import {
   type NewProjectSetup,
   type ExampleProjectSetup,
 } from '../../../../ProjectCreation/NewProjectSetupDialog';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
-import UrlStorageProvider from '../../../../ProjectsStorage/UrlStorageProvider';
 import {
   type WindowSizeType,
   useResponsiveWindowSize,
@@ -50,6 +47,9 @@ import {
   checkIfHasTooManyCloudProjects,
   MaxProjectCountAlertMessage,
 } from './MaxProjectCountAlertMessage';
+import { RestoreProjectsAlertMessage } from './RestoreProjectsAlertMessage';
+import { type GamesListFilter } from '../../../../GameDashboard/GamesListFilterSelector';
+import { hasValidSubscriptionPlan } from '../../../../Utils/GDevelopServices/Usage';
 import { useProjectsListFor } from './utils';
 import {
   deleteCloudProject,
@@ -171,7 +171,7 @@ const CreateSection = ({
   const {
     profile,
     getAuthorizationHeader,
-    recommendations,
+    subscription,
     limits,
   } = authenticatedUser;
   const {
@@ -185,17 +185,6 @@ const CreateSection = ({
   );
   const { routeArguments, removeRouteArguments } = React.useContext(
     RouterContext
-  );
-  // $FlowIgnore
-  const quickCustomizationRecommendation: ?QuickCustomizationRecommendation = React.useMemo(
-    () => {
-      return recommendations
-        ? recommendations.find(
-            recommendation => recommendation.type === 'quick-customization'
-          )
-        : null;
-    },
-    [recommendations]
   );
   const { windowSize, isMobile, isLandscape } = useResponsiveWindowSize();
   const isMobileOrMediumWidth =
@@ -233,7 +222,17 @@ const CreateSection = ({
 
   const [currentPage, setCurrentPage] = React.useState(1);
   const [searchText, setSearchText] = React.useState<string>('');
+  const [gamesListFilter, setGamesListFilter] = React.useState<GamesListFilter>(
+    'active'
+  );
   const [infoBarMessage, setInfoBarMessage] = React.useState<?React.Node>(null);
+
+  const shouldDisplayRestoreProjectsBanner =
+    gamesListFilter === 'deleted' &&
+    !!profile &&
+    !hasValidSubscriptionPlan(subscription);
+  const shouldDisplayMaxProjectCountBanner =
+    !shouldDisplayRestoreProjectsBanner && hasTooManyCloudProjects;
 
   const onUnregisterGame = React.useCallback(
     async (
@@ -344,8 +343,7 @@ const CreateSection = ({
     options?: { skipConfirmation: boolean }
   ) => {
     if (storageProviderName !== 'Cloud') return;
-    const projectName = fileMetadata.name;
-    if (!projectName) return; // Only cloud projects can be deleted, and all cloud projects have names.
+    const projectName = fileMetadata.name || i18n._(t`Unknown game`);
 
     const isCurrentProjectOpened =
       !!project &&
@@ -538,11 +536,20 @@ const CreateSection = ({
         <SectionContainer
           flexBody
           renderFooter={
-            !isMobile && hasTooManyCloudProjects
+            shouldDisplayRestoreProjectsBanner ||
+            shouldDisplayMaxProjectCountBanner
               ? () => (
                   <Line>
                     <Column expand>
-                      <MaxProjectCountAlertMessage />
+                      {shouldDisplayRestoreProjectsBanner ? (
+                        <RestoreProjectsAlertMessage
+                          margin={isMobile ? 'dense' : undefined}
+                        />
+                      ) : (
+                        <MaxProjectCountAlertMessage
+                          margin={isMobile ? 'dense' : undefined}
+                        />
+                      )}
                     </Column>
                   </Line>
                 )
@@ -642,76 +649,43 @@ const CreateSection = ({
                   setCurrentPage={setCurrentPage}
                   searchText={searchText}
                   setSearchText={setSearchText}
+                  filter={gamesListFilter}
+                  setFilter={setGamesListFilter}
                 />
               )}
-              {isMobile && hasTooManyCloudProjects && (
-                <MaxProjectCountAlertMessage margin="dense" />
-              )}
-              {quickCustomizationRecommendation && (
-                <ColumnStackLayout noMargin>
-                  <Line noMargin>
-                    <Text size="block-title">
-                      <Trans>Remix a game in 2 minutes</Trans>
-                    </Text>
-                  </Line>
-                  <QuickCustomizationGameTiles
-                    onSelectExampleShortHeader={async exampleShortHeader => {
-                      const projectIsClosed = await askToCloseProject();
-                      if (!projectIsClosed) {
-                        return;
+              {gamesListFilter !== 'deleted' &&
+                !hasAProjectOpenedNowOrRecentlyOrGameSaved && (
+                  <ColumnStackLayout noMargin>
+                    <Line noMargin justifyContent="space-between">
+                      <Text size="block-title" noMargin>
+                        <Trans>Start from a template</Trans>
+                      </Text>
+                      <FlatButton
+                        onClick={onOpenNewProjectSetupDialog}
+                        label={
+                          isMobile ? (
+                            <Trans>Browse</Trans>
+                          ) : (
+                            <Trans>Browse all templates</Trans>
+                          )
+                        }
+                        leftIcon={<ChevronArrowRight fontSize="small" />}
+                        disabled={isLoading}
+                      />
+                    </Line>
+                    <ExampleStore
+                      onSelectExampleShortHeader={onSelectExampleShortHeader}
+                      onSelectPrivateGameTemplateListingData={
+                        onSelectPrivateGameTemplateListingData
                       }
-
-                      const newProjectSetup: NewProjectSetup = {
-                        storageProvider: UrlStorageProvider,
-                        saveAsLocation: null,
-                        openQuickCustomizationDialog: true,
-                        creationSource: 'quick-customization',
-                      };
-                      onCreateProjectFromExample({
-                        exampleShortHeader,
-                        newProjectSetup,
-                        i18n,
-                      });
-                    }}
-                    quickCustomizationRecommendation={
-                      quickCustomizationRecommendation
-                    }
-                    disabled={isLoading}
-                  />
-                </ColumnStackLayout>
-              )}
-              {!hasAProjectOpenedNowOrRecentlyOrGameSaved && (
-                <ColumnStackLayout noMargin>
-                  <Line noMargin justifyContent="space-between">
-                    <Text size="block-title" noMargin>
-                      <Trans>Start from a template</Trans>
-                    </Text>
-                    <FlatButton
-                      onClick={onOpenNewProjectSetupDialog}
-                      label={
-                        isMobile ? (
-                          <Trans>Browse</Trans>
-                        ) : (
-                          <Trans>Browse all templates</Trans>
-                        )
-                      }
-                      leftIcon={<ChevronArrowRight fontSize="small" />}
+                      i18n={i18n}
+                      getColumnsFromWindowSize={getExampleItemsColumns}
+                      hideSearch
+                      onlyShowGames
                       disabled={isLoading}
                     />
-                  </Line>
-                  <ExampleStore
-                    onSelectExampleShortHeader={onSelectExampleShortHeader}
-                    onSelectPrivateGameTemplateListingData={
-                      onSelectPrivateGameTemplateListingData
-                    }
-                    i18n={i18n}
-                    getColumnsFromWindowSize={getExampleItemsColumns}
-                    hideSearch
-                    onlyShowGames
-                    disabled={isLoading}
-                  />
-                </ColumnStackLayout>
-              )}
+                  </ColumnStackLayout>
+                )}
             </ColumnStackLayout>
           </SectionRow>
           <InfoBar

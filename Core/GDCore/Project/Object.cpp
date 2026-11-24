@@ -13,12 +13,13 @@
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/PropertyDescriptor.h"
-#include "GDCore/Project/QuickCustomization.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/Log.h"
 #include "GDCore/Tools/UUID/UUID.h"
 
 namespace gd {
+
+std::size_t Object::nameGeneration = 0;
 
 Object::~Object() {}
 
@@ -47,7 +48,7 @@ void Object::Init(const gd::Object& object) {
 
 void Object::CopyWithoutConfiguration(const gd::Object& object) {
   persistentUuid = object.persistentUuid;
-  name = object.name;
+  SetName(object.name);
   assetStoreId = object.assetStoreId;
   objectVariables = object.objectVariables;
   effectsContainer = object.effectsContainer;
@@ -95,7 +96,7 @@ void Object::UnserializeFrom(gd::Project& project,
 
   SetType(element.GetStringAttribute("type"));
   assetStoreId = element.GetStringAttribute("assetStoreId");
-  name = element.GetStringAttribute("name", name, "nom");
+  SetName(element.GetStringAttribute("name", name, "nom"));
   resourcesPreloading = element.GetStringAttribute("resourcesPreloading", "with-scene");
 
   objectVariables.UnserializeFrom(

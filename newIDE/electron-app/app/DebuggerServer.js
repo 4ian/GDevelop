@@ -112,8 +112,11 @@ module.exports = {
     const serverData = serversByWindow.get(windowId);
     if (!serverData) return;
 
+    // The object is emptied rather than replaced: the connection handler of
+    // the server keeps adding the next connections to this same object.
     Object.keys(serverData.webSockets).forEach(id => {
       const webSocket = serverData.webSockets[id];
+      delete serverData.webSockets[id];
       if (!webSocket) return;
 
       try {
@@ -125,8 +128,6 @@ module.exports = {
         );
       }
     });
-
-    serverData.webSockets = {};
   },
 
   sendMessage: (windowId, { id, message }, cb) => {

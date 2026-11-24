@@ -101,7 +101,7 @@ function ConfirmDeleteDialog(props: Props): React.Node {
           fullscreen="never-even-on-mobile"
         >
           {props.header}
-          <Text size="body" allowSelection>
+          <Text size="body" allowSelection displayAsBlockContainer>
             <MarkdownText translatableSource={props.message} allowParagraphs />
           </Text>
           {props.confirmText && props.fieldMessage && (

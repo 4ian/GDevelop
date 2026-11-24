@@ -495,6 +495,7 @@ const useCourses = (): {
       if (currentCreditsAmount < creditsAmount) {
         openCreditsPackageDialog({
           missingCredits: creditsAmount - currentCreditsAmount,
+          placementId: 'asset-store',
         });
         return;
       }

@@ -29,8 +29,13 @@ namespace gd {
  * converted to a JavaScript object.
  *
  * \note Children are stored with their order preserved, but this also
- * means that their access/removal is O(number of children). This class
- * is not appropriated for a use in game where fast access is required.
+ * means that their access by name/removal is O(number of children). Access by
+ * index is O(1) when all the children have the same name (which is the case for
+ * the children of an array). Otherwise, the first access is O(number of
+ * children), and the next ones are O(1) as long as neither the children nor the
+ * searched name change.
+ * This class is not appropriated for a use in game where fast access is
+ * required.
  *
  * \see gd::Serializer
  */
@@ -60,7 +65,9 @@ class GD_CORE_API SerializerElement {
     return *this;
   }
 
-  virtual ~SerializerElement();
+  // Not virtual: no class derives from SerializerElement, and a pointer to a
+  // virtual table would make each element bigger.
+  ~SerializerElement();
 
   /** \name Value
    * Methods related to the value of the element, if any.
@@ -330,6 +337,11 @@ class GD_CORE_API SerializerElement {
   bool HasAttribute(const gd::String &name) const;
 
   /**
+   * \brief Return true if the element has at least one attribute.
+   */
+  bool HasAttributes() const { return attributes && !attributes->empty(); };
+
+  /**
    * \brief Remove the attribute with the specified name
    * \param name The name of the attribute to remove.
    */
@@ -337,9 +349,13 @@ class GD_CORE_API SerializerElement {
 
   /**
    * \brief Return all the attributes of the element.
+   *
+   * \note The attributes are allocated if the element has none, because the
+   * returned map must belong to the element (GDevelop.js can modify it).
+   * Check HasAttributes first when only reading them, to avoid it.
    */
   const std::map<gd::String, SerializerValue> &GetAllAttributes() const {
-    return attributes;
+    return GetOrCreateAttributes();
   };
   ///@}
 
@@ -477,16 +493,94 @@ class GD_CORE_API SerializerElement {
    */
   void Init(const gd::SerializerElement &other);
 
-  bool valueUndefined = true;  ///< If true, the element does not have a value.
-  SerializerValue elementValue;
+  /**
+   * \brief Check if a child with the given name is found when searching for
+   * the children with the given name (or deprecated name). Unnamed children
+   * are also found if the element is considered as an array.
+   */
+  bool IsMatchingChildName(const gd::String &childName,
+                           const gd::String &name,
+                           const gd::String &deprecatedName) const {
+    return childName == name || (isArray && childName.empty()) ||
+           (!deprecatedName.empty() && childName == deprecatedName);
+  }
 
-  std::map<gd::String, SerializerValue> attributes;
+  /**
+   * \brief Return the child at the given index among the children matching
+   * the given name (see IsMatchingChildName), or nullptr if there is none.
+   */
+  SerializerElement *GetMatchingChild(const gd::String &name,
+                                      const gd::String &deprecatedName,
+                                      std::size_t index) const;
+
+  /**
+   * \brief Return the number of children matching the given name (see
+   * IsMatchingChildName).
+   */
+  std::size_t GetMatchingChildrenCount(const gd::String &name,
+                                       const gd::String &deprecatedName) const;
+
+  /**
+   * \brief Return the indices, in `children`, of the children matching the
+   * given name (see IsMatchingChildName).
+   *
+   * Only used when the children don't all have the same name. The indices are
+   * kept until the children change, so that iterating on the children with an
+   * index is O(number of children) instead of O(number of children^2).
+   */
+  const std::vector<std::size_t> &GetMatchingChildrenIndices(
+      const gd::String &name, const gd::String &deprecatedName) const;
+
+  /**
+   * \brief The indices of the children matching a name, with the search they
+   * were computed for.
+   */
+  struct MatchingChildrenIndices {
+    gd::String name;
+    gd::String deprecatedName;
+    bool includeUnnamedChildren = false;
+    std::vector<std::size_t> indices;
+  };
+
+  /**
+   * \brief Return the attributes, allocating them if the element has none:
+   * most elements never have attributes.
+   */
+  std::map<gd::String, SerializerValue> &GetOrCreateAttributes() const;
+
+  // Members are ordered from the largest alignment to the smallest, to avoid
+  // padding: a project being loaded can have millions of elements.
+  SerializerValue elementValue;
   std::vector<std::pair<gd::String, std::shared_ptr<SerializerElement> > >
       children;
-  mutable bool isArray = false;  ///< true if element is considered as an array
   mutable gd::String arrayOf;  ///< The name of the children (was useful for XML
                                ///< parsed elements).
   mutable gd::String deprecatedArrayOf;  ///< Alternate name for children
+
+  /**
+   * The attributes, allocated only when an attribute is set or when they are
+   * returned by GetAllAttributes (GDevelop.js can modify the returned map, so
+   * it must belong to this element).
+   */
+  mutable std::unique_ptr<std::map<gd::String, SerializerValue> > attributes;
+
+  /**
+   * The indices of the children matching the last search done with an index,
+   * when the children don't all have the same name. Allocated only when needed
+   * and destroyed when the children change (see GetMatchingChildrenIndices).
+   */
+  mutable std::unique_ptr<MatchingChildrenIndices> matchingChildrenIndices;
+
+  bool valueUndefined = true;  ///< If true, the element does not have a value.
+
+  /**
+   * True only if all the children have the same name (or if there are no
+   * children): a search then matches all the children or none of them, so a
+   * child is accessed from its index without iterating on the children.
+   * Only adding a child can make the names different, removing can't.
+   */
+  bool allChildrenHaveSameName = true;
+  mutable bool isArray = false;  ///< true if element is considered as an array
 };
 
 }  // namespace gd

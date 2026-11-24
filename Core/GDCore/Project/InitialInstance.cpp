@@ -68,6 +68,7 @@ void InitialInstance::UnserializeFrom(gd::Project &project,
   SetLocked(element.GetBoolAttribute("locked", false));
   SetSealed(element.GetBoolAttribute("sealed", false));
   SetShouldKeepRatio(element.GetBoolAttribute("keepRatio", false));
+  SetHidden(element.GetBoolAttribute("hidden", false));
 
   persistentUuid = element.GetStringAttribute("persistentUuid");
   if (persistentUuid.empty()) ResetPersistentUuid();
@@ -154,6 +155,7 @@ void InitialInstance::SerializeTo(SerializerElement& element) const {
   if (IsLocked()) element.SetAttribute("locked", IsLocked());
   if (IsSealed()) element.SetAttribute("sealed", IsSealed());
   if (ShouldKeepRatio()) element.SetAttribute("keepRatio", ShouldKeepRatio());
+  if (IsHidden()) element.SetAttribute("hidden", IsHidden());
 
   if (persistentUuid.empty()) persistentUuid = UUID::MakeUuid4();
   element.SetStringAttribute("persistentUuid", persistentUuid);

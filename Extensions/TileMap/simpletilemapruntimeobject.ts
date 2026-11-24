@@ -33,19 +33,16 @@ namespace gdjs {
   export type SimpleTileMapNetworkSyncData = ObjectNetworkSyncData &
     SimpleTileMapNetworkSyncDataType;
 
+  const hitBoxTag: string = 'collision';
+
   /**
    * Displays a SimpleTileMap object.
    * @category Objects > Tile Map
    */
   export class SimpleTileMapRuntimeObject
-    extends gdjs.RuntimeObject
+    extends gdjs.AbstractTileMapRuntimeObject
     implements gdjs.Resizable, gdjs.Scalable, gdjs.OpacityHandler
   {
-    /**
-     * A reusable Point to avoid allocations.
-     */
-    private static readonly workingPoint: FloatPoint = [0, 0];
-
     _opacity: float = 255;
     _atlasImage: string;
     _tileMapManager: gdjs.TileMap.TileMapRuntimeManager;
@@ -54,18 +51,10 @@ namespace gdjs {
     readonly _rowCount: number;
     readonly _columnCount: number;
     readonly _tileSize: number;
-    _displayMode = 'all';
-    _layerIndex = 0;
     _initialTileMapAsJsObject: TileMapHelper.EditableTileMapAsJsObject;
     readonly _initialTilesWithHitBox: number[];
     _isTileMapDirty: boolean = false;
-    _sceneToTileMapTransformation: gdjs.AffineTransformation =
-      new gdjs.AffineTransformation();
-    _tileMapToSceneTransformation: gdjs.AffineTransformation =
-      new gdjs.AffineTransformation();
     _collisionTileMap: gdjs.TileMap.TransformedCollisionTileMap | null = null;
-    _hitBoxTag: string = 'collision';
-    private _transformationIsUpToDate: boolean = false;
 
     // TODO: Add a debug mode like for TileMapCollisionMaskRuntimeObject to draw?
 
@@ -101,12 +90,15 @@ namespace gdjs {
 
       this._loadTileMap(
         this._initialTileMapAsJsObject,
-        (tileMap: TileMapHelper.EditableTileMap) => {
+        (tileMap: TileMapHelper.EditableTileMap | null) => {
           this._renderer.updatePosition();
 
+          if (!tileMap) {
+            return;
+          }
           this._collisionTileMap = new gdjs.TileMap.TransformedCollisionTileMap(
             tileMap,
-            this._hitBoxTag
+            hitBoxTag
           );
 
           this.updateTransformation();
@@ -117,20 +109,13 @@ namespace gdjs {
       this.onCreated();
     }
 
-    getRendererObject() {
+    override getRendererObject() {
       return this._renderer.getRendererObject();
     }
 
     updateTileMap(forceUpdate: boolean): void {
       this._tileMapManager.getOrLoadSimpleTileMapTextureCache(
-        (textureName) => {
-          return this.getInstanceContainer()
-            .getGame()
-            .getImageManager()
-            .getPIXITexture(
-              textureName
-            ) as unknown as PIXI.BaseTexture<PIXI.Resource>;
-        },
+        (textureName) => this.getTexture(textureName),
         this._atlasImage,
         this._tileSize,
         this._columnCount,
@@ -138,6 +123,7 @@ namespace gdjs {
         (textureCache: TileMapHelper.TileTextureCache | null) => {
           if (!textureCache) {
             // getOrLoadTextureCache already log warns and errors.
+            this._renderer.showErrorTexture();
             return;
           }
           this._renderer.refreshPixiTileMap(textureCache, forceUpdate);
@@ -147,18 +133,21 @@ namespace gdjs {
             `Could not load texture cache for atlas ${this._atlasImage} during prerender. The tilemap might be badly configured or an issues happened with the loaded atlas image:`,
             error
           );
+          this._renderer.showErrorTexture();
         }
       );
     }
 
-    updatePreRender(instanceContainer: gdjs.RuntimeInstanceContainer): void {
+    override updatePreRender(
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ): void {
       if (!this.isHidden()) {
         this.updateTileMap(this._isTileMapDirty);
         this._isTileMapDirty = false;
       }
     }
 
-    updateFromObjectData(
+    override updateFromObjectData(
       oldObjectData: SimpleTileMapObjectData,
       newObjectData: SimpleTileMapObjectData
     ): boolean {
@@ -172,7 +161,7 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(
+    override getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
     ): SimpleTileMapNetworkSyncData {
       const syncData: SimpleTileMapNetworkSyncData = {
@@ -187,7 +176,7 @@ namespace gdjs {
       return syncData;
     }
 
-    updateFromNetworkSyncData(
+    override updateFromNetworkSyncData(
       networkSyncData: SimpleTileMapNetworkSyncData,
       options: UpdateFromNetworkSyncDataOptions
     ): void {
@@ -196,7 +185,10 @@ namespace gdjs {
       if (networkSyncData.tm !== undefined) {
         this._loadTileMap(
           networkSyncData.tm,
-          (tileMap: TileMapHelper.EditableTileMap) => {
+          (tileMap: TileMapHelper.EditableTileMap | null) => {
+            if (!tileMap) {
+              return;
+            }
             if (networkSyncData.w !== undefined) {
               this.setWidth(networkSyncData.w);
             }
@@ -217,7 +209,7 @@ namespace gdjs {
               this._collisionTileMap =
                 new gdjs.TileMap.TransformedCollisionTileMap(
                   tileMap,
-                  this._hitBoxTag
+                  hitBoxTag
                 );
             }
 
@@ -227,7 +219,7 @@ namespace gdjs {
       }
     }
 
-    extraInitializationFromInitialInstance(
+    override extraInitializationFromInitialInstance(
       initialInstanceData: InstanceData
     ): void {
       // 1. load the tilemap from the instance.
@@ -241,7 +233,7 @@ namespace gdjs {
       // (used for width and position calculations).
       this._loadTileMap(
         this._initialTileMapAsJsObject,
-        (tileMap: TileMapHelper.EditableTileMap) => {
+        (tileMap: TileMapHelper.EditableTileMap | null) => {
           // 3. Set custom dimensions & opacity if applicable.
           if (initialInstanceData.customSize) {
             this.setWidth(initialInstanceData.width);
@@ -256,6 +248,10 @@ namespace gdjs {
           // 4. Update position (calculations based on renderer's dimensions).
           this._renderer.updatePosition();
 
+          if (!tileMap) {
+            return;
+          }
+
           if (this._collisionTileMap) {
             // If collision tile map is already defined, there's a good chance it means
             // extraInitializationFromInitialInstance is called when hot reloading the
@@ -263,13 +259,10 @@ namespace gdjs {
             this._collisionTileMap.updateFromTileMap(tileMap);
           } else {
             this._collisionTileMap =
-              new gdjs.TileMap.TransformedCollisionTileMap(
-                tileMap,
-                this._hitBoxTag
-              );
+              new gdjs.TileMap.TransformedCollisionTileMap(tileMap, hitBoxTag);
           }
 
-          this._transformationIsUpToDate = false;
+          this.invalidateTransformation();
           this.updateTransformation();
           this.invalidateHitboxes();
         }
@@ -278,12 +271,16 @@ namespace gdjs {
 
     private _loadTileMap(
       tileMapAsJsObject: TileMapHelper.EditableTileMapAsJsObject,
-      tileMapLoadingCallback: (tileMap: TileMapHelper.EditableTileMap) => void
+      tileMapLoadingCallback: (
+        tileMap: TileMapHelper.EditableTileMap | null
+      ) => void
     ): void {
       if (this._columnCount <= 0 || this._rowCount <= 0) {
         console.error(
           `Tilemap object ${this.name} is not configured properly.`
         );
+        this._renderer.showErrorTexture();
+        tileMapLoadingCallback(null);
         return;
       }
 
@@ -303,7 +300,7 @@ namespace gdjs {
               return;
             }
             tileDefinition.addHitBox(
-              this._hitBoxTag,
+              hitBoxTag,
               [
                 [0, 0],
                 [0, tileMap.getTileHeight()],
@@ -315,14 +312,7 @@ namespace gdjs {
           });
 
           this._tileMapManager.getOrLoadSimpleTileMapTextureCache(
-            (textureName) => {
-              return this.getInstanceContainer()
-                .getGame()
-                .getImageManager()
-                .getPIXITexture(
-                  textureName
-                ) as unknown as PIXI.BaseTexture<PIXI.Resource>;
-            },
+            (textureName) => this.getTexture(textureName),
             this._atlasImage,
             this._tileSize,
             this._columnCount,
@@ -330,6 +320,8 @@ namespace gdjs {
             (textureCache: TileMapHelper.TileTextureCache | null) => {
               if (!textureCache) {
                 // getOrLoadTextureCache already log warns and errors.
+                this._renderer.showErrorTexture();
+                tileMapLoadingCallback(null);
                 return;
               }
               this._tileMap = tileMap;
@@ -341,29 +333,42 @@ namespace gdjs {
                 `Could not load texture cache for atlas ${this._atlasImage} during initial loading. The tilemap might be badly configured or an issues happened with the loaded atlas image:`,
                 error
               );
+              this._renderer.showErrorTexture();
+              tileMapLoadingCallback(null);
             }
           );
         }
       );
     }
 
-    onDestroyed(): void {
+    private getTexture(textureName: string) {
+      const imageManager = this.getInstanceContainer()
+        .getGame()
+        .getImageManager();
+      const texture = imageManager.getPIXITexture(textureName);
+      if (texture === imageManager.getInvalidPIXITexture()) {
+        this._renderer.showErrorTexture();
+      }
+      return texture as unknown as PIXI.BaseTexture<PIXI.Resource>;
+    }
+
+    override onDestroyed(): void {
       super.onDestroyed();
       this._renderer.destroy();
     }
 
-    setWidth(width: float): void {
+    override setWidth(width: float): void {
       if (this.getWidth() === width) return;
 
-      this._transformationIsUpToDate = false;
+      this.invalidateTransformation();
       this._renderer.setWidth(width);
       this.invalidateHitboxes();
     }
 
-    setHeight(height: float): void {
+    override setHeight(height: float): void {
       if (this.getHeight() === height) return;
 
-      this._transformationIsUpToDate = false;
+      this.invalidateTransformation();
       this._renderer.setHeight(height);
       this.invalidateHitboxes();
     }
@@ -371,7 +376,6 @@ namespace gdjs {
     setSize(newWidth: float, newHeight: float): void {
       this.setWidth(newWidth);
       this.setHeight(newHeight);
-      this._transformationIsUpToDate = false;
     }
 
     /**
@@ -393,7 +397,6 @@ namespace gdjs {
     setScale(scale: float): void {
       this.setScaleX(scale);
       this.setScaleY(scale);
-      this._transformationIsUpToDate = false;
     }
 
     /**
@@ -409,7 +412,7 @@ namespace gdjs {
 
       this._renderer.setScaleX(scaleX);
       this.invalidateHitboxes();
-      this._transformationIsUpToDate = false;
+      this.invalidateTransformation();
     }
 
     /**
@@ -425,25 +428,25 @@ namespace gdjs {
 
       this._renderer.setScaleY(scaleY);
       this.invalidateHitboxes();
-      this._transformationIsUpToDate = false;
+      this.invalidateTransformation();
     }
 
-    setX(x: float): void {
+    override setX(x: float): void {
       super.setX(x);
       this._renderer.updatePosition();
-      this._transformationIsUpToDate = false;
+      this.invalidateTransformation();
     }
 
-    setY(y: float): void {
+    override setY(y: float): void {
       super.setY(y);
       this._renderer.updatePosition();
-      this._transformationIsUpToDate = false;
+      this.invalidateTransformation();
     }
 
-    setAngle(angle: float): void {
+    override setAngle(angle: float): void {
       super.setAngle(angle);
       this._renderer.updateAngle();
-      this._transformationIsUpToDate = false;
+      this.invalidateTransformation();
     }
 
     setOpacity(opacity: float): void {
@@ -456,433 +459,37 @@ namespace gdjs {
       return this._opacity;
     }
 
-    getWidth(): float {
+    override getWidth(): float {
       return this._renderer.getWidth();
     }
 
-    getHeight(): float {
+    override getHeight(): float {
       return this._renderer.getHeight();
     }
 
     override getOriginalWidth(): float {
-      return this.getTileMapWidth();
+      const tileMap = this._tileMap;
+      return tileMap ? tileMap.getWidth() : 192;
     }
 
     override getOriginalHeight(): float {
-      return this.getTileMapHeight();
+      const tileMap = this._tileMap;
+      return tileMap ? tileMap.getHeight() : 192;
     }
 
-    getScaleX(): float {
+    override getScaleX(): float {
       return this._renderer.getScaleX();
     }
 
-    getScaleY(): float {
+    override getScaleY(): float {
       return this._renderer.getScaleY();
     }
 
-    /**
-     * This method is expensive and should not be called.
-     * Prefer using {@link getHitBoxesAround} rather than getHitBoxes.
-     */
-    override getHitBoxes(): gdjs.Polygon[] {
-      return super.getHitBoxes();
-    }
-
-    override updateHitBoxes(): void {
-      this.updateTransformation();
-      if (!this._collisionTileMap) return;
-      this.hitBoxes = Array.from(
-        this._collisionTileMap.getAllHitboxes(this._hitBoxTag)
-      );
-      this.hitBoxesDirty = false;
-      this.updateAABB();
-    }
-
-    // This implementation doesn't use updateHitBoxes.
-    // It's important for good performances.
-    override getAABB(): AABB {
-      // It's fine to compute it every time because tile maps are rarely rotated.
-      // It avoids calling updateHitBoxes to rely on hitBoxesDirty to know when
-      // to update.
-      this.updateAABB();
-      return this.aabb;
-    }
-
-    // This implementation doesn't use updateHitBoxes.
-    // It's important for good performances.
-    override updateAABB(): void {
-      if (this.getAngle() === 0) {
-        // Fast computation of AABB for non rotated object
-        this.aabb.min[0] = this.x;
-        this.aabb.min[1] = this.y;
-        this.aabb.max[0] = this.aabb.min[0] + this.getWidth();
-        this.aabb.max[1] = this.aabb.min[1] + this.getHeight();
-      } else {
-        if (!this._collisionTileMap) return;
-        const affineTransformation = this._collisionTileMap.getTransformation();
-
-        const left = 0;
-        const right = this._collisionTileMap.getWidth();
-        const top = 0;
-        const bottom = this._collisionTileMap.getHeight();
-
-        const workingPoint = this.aabb.min;
-
-        workingPoint[0] = left;
-        workingPoint[1] = top;
-        affineTransformation.transform(workingPoint, workingPoint);
-        const topLeftX = workingPoint[0];
-        const topLeftY = workingPoint[1];
-
-        workingPoint[0] = right;
-        workingPoint[1] = top;
-        affineTransformation.transform(workingPoint, workingPoint);
-        const topRightX = workingPoint[0];
-        const topRightY = workingPoint[1];
-
-        workingPoint[0] = right;
-        workingPoint[1] = bottom;
-        affineTransformation.transform(workingPoint, workingPoint);
-        const bottomRightX = workingPoint[0];
-        const bottomRightY = workingPoint[1];
-
-        workingPoint[0] = left;
-        workingPoint[1] = bottom;
-        affineTransformation.transform(workingPoint, workingPoint);
-        const bottomLeftX = workingPoint[0];
-        const bottomLeftY = workingPoint[1];
-
-        this.aabb.min[0] = Math.min(
-          topLeftX,
-          topRightX,
-          bottomRightX,
-          bottomLeftX
-        );
-        this.aabb.max[0] = Math.max(
-          topLeftX,
-          topRightX,
-          bottomRightX,
-          bottomLeftX
-        );
-        this.aabb.min[1] = Math.min(
-          topLeftY,
-          topRightY,
-          bottomRightY,
-          bottomLeftY
-        );
-        this.aabb.max[1] = Math.max(
-          topLeftY,
-          topRightY,
-          bottomRightY,
-          bottomLeftY
-        );
-      }
-    }
-
-    getHitBoxesAround(
-      left: float,
-      top: float,
-      right: float,
-      bottom: float
-    ): Iterable<gdjs.Polygon> {
-      // This implementation doesn't call updateHitBoxes.
-      // It's important for good performances because there is no need to
-      // update the whole collision mask where only a few hitboxes must be
-      // checked.
-      this.updateTransformation();
-      if (!this._collisionTileMap) return [];
-      return this._collisionTileMap.getHitboxesAround(
-        this._hitBoxTag,
-        left,
-        top,
-        right,
-        bottom
-      );
-    }
-
-    override isSpatiallyIndexed(): boolean {
-      return true;
-    }
-
-    updateTransformation() {
-      if (this._transformationIsUpToDate) {
-        return;
-      }
-      const absScaleX = Math.abs(this._renderer.getScaleX());
-      const absScaleY = Math.abs(this._renderer.getScaleY());
-
-      this._tileMapToSceneTransformation.setToIdentity();
-
-      // Translation
-      this._tileMapToSceneTransformation.translate(this.getX(), this.getY());
-
-      // Rotation
-      const angleInRadians = (this.getAngle() * Math.PI) / 180;
-      this._tileMapToSceneTransformation.rotateAround(
-        angleInRadians,
-        this.getCenterX(),
-        this.getCenterY()
-      );
-
-      // Scale
-      this._tileMapToSceneTransformation.scale(absScaleX, absScaleY);
-      if (this._collisionTileMap) {
-        const collisionTileMapTransformation =
-          this._collisionTileMap.getTransformation();
-        collisionTileMapTransformation.copyFrom(
-          this._tileMapToSceneTransformation
-        );
-        this._collisionTileMap.setTransformation(
-          collisionTileMapTransformation
-        );
-      }
-      this._sceneToTileMapTransformation.copyFrom(
-        this._tileMapToSceneTransformation
-      );
-      this._sceneToTileMapTransformation.invert();
-      this._transformationIsUpToDate = true;
-    }
-
-    getSceneXCoordinateOfTileCenter(
-      columnIndex: integer,
-      rowIndex: integer
-    ): float {
-      const sceneCoordinates: FloatPoint =
-        SimpleTileMapRuntimeObject.workingPoint;
-      this._tileMapToSceneTransformation.transform(
-        [
-          (columnIndex + 0.5) * this._tileSize,
-          (rowIndex + 0.5) * this._tileSize,
-        ],
-        sceneCoordinates
-      );
-      return sceneCoordinates[0];
-    }
-
-    getSceneYCoordinateOfTileCenter(
-      columnIndex: integer,
-      rowIndex: integer
-    ): float {
-      const sceneCoordinates: FloatPoint =
-        SimpleTileMapRuntimeObject.workingPoint;
-      this._tileMapToSceneTransformation.transform(
-        [
-          (columnIndex + 0.5) * this._tileSize,
-          (rowIndex + 0.5) * this._tileSize,
-        ],
-        sceneCoordinates
-      );
-      return sceneCoordinates[1];
-    }
-
-    getGridCoordinatesFromSceneCoordinates(
-      x: float,
-      y: float
-    ): [integer, integer] {
-      this.updateTransformation();
-
-      const gridCoordinates: FloatPoint =
-        SimpleTileMapRuntimeObject.workingPoint;
-      this._sceneToTileMapTransformation.transform([x, y], gridCoordinates);
-
-      const columnIndex = Math.floor(gridCoordinates[0] / this._tileSize);
-      const rowIndex = Math.floor(gridCoordinates[1] / this._tileSize);
-
-      return [columnIndex, rowIndex];
-    }
-
-    getColumnIndexAtPosition(x: float, y: float): integer {
-      return this.getGridCoordinatesFromSceneCoordinates(x, y)[0];
-    }
-
-    getRowIndexAtPosition(x: float, y: float): integer {
-      return this.getGridCoordinatesFromSceneCoordinates(x, y)[1];
-    }
-
-    getTileAtPosition(x: float, y: float): integer {
-      const [columnIndex, rowIndex] =
-        this.getGridCoordinatesFromSceneCoordinates(x, y);
-      return this.getTileAtGridCoordinates(columnIndex, rowIndex);
-    }
-
-    getTileAtGridCoordinates(columnIndex: integer, rowIndex: integer): integer {
-      return this.getTileId(columnIndex, rowIndex, 0);
-    }
-
-    setTileAtPosition(tileId: number, x: float, y: float) {
-      const [columnIndex, rowIndex] =
-        this.getGridCoordinatesFromSceneCoordinates(x, y);
-      this.setTileAtGridCoordinates(tileId, columnIndex, rowIndex);
-    }
-
-    setTileAtGridCoordinates(
-      tileId: number,
-      columnIndex: integer,
-      rowIndex: integer
-    ) {
-      if (!this._tileMap) {
-        return;
-      }
-      const layer = this._tileMap.getTileLayer(this._layerIndex);
-      if (!layer) {
-        return;
-      }
-      const oldTileId = layer.getTileId(columnIndex, rowIndex);
-      if (tileId === oldTileId) {
-        return;
-      }
-      layer.setTile(columnIndex, rowIndex, tileId);
-
-      if (this._collisionTileMap) {
-        const oldTileDefinition =
-          oldTileId !== undefined && this._tileMap.getTileDefinition(oldTileId);
-        const newTileDefinition = this._tileMap.getTileDefinition(tileId);
-        const hadFullHitBox =
-          !!oldTileDefinition &&
-          oldTileDefinition.hasFullHitBox(this._hitBoxTag);
-        const haveFullHitBox =
-          !!newTileDefinition &&
-          newTileDefinition.hasFullHitBox(this._hitBoxTag);
-        if (hadFullHitBox !== haveFullHitBox) {
-          this._collisionTileMap.invalidateTile(
-            this._layerIndex,
-            columnIndex,
-            rowIndex
-          );
-        }
-      }
-      this._isTileMapDirty = true;
-    }
-
-    flipTileOnYAtPosition(x: float, y: float, flip: boolean) {
-      const [columnIndex, rowIndex] =
-        this.getGridCoordinatesFromSceneCoordinates(x, y);
-      this.flipTileOnYAtGridCoordinates(columnIndex, rowIndex, flip);
-    }
-
-    flipTileOnXAtPosition(x: float, y: float, flip: boolean) {
-      const [columnIndex, rowIndex] =
-        this.getGridCoordinatesFromSceneCoordinates(x, y);
-      this.flipTileOnXAtGridCoordinates(columnIndex, rowIndex, flip);
-    }
-
-    flipTileOnYAtGridCoordinates(
-      columnIndex: integer,
-      rowIndex: integer,
-      flip: boolean
-    ) {
-      this.flipTileOnY(columnIndex, rowIndex, 0, flip);
-      this._isTileMapDirty = true;
-      // No need to invalidate hit boxes since at the moment, collision mask
-      // cannot be configured on each tile.
-    }
-
-    flipTileOnXAtGridCoordinates(
-      columnIndex: integer,
-      rowIndex: integer,
-      flip: boolean
-    ) {
-      this.flipTileOnX(columnIndex, rowIndex, 0, flip);
-      this._isTileMapDirty = true;
-      // No need to invalidate hit boxes since at the moment, collision mask
-      // cannot be configured on each tile.
-    }
-
-    isTileFlippedOnXAtPosition(x: float, y: float) {
-      const [columnIndex, rowIndex] =
-        this.getGridCoordinatesFromSceneCoordinates(x, y);
-
-      return this.isTileFlippedOnX(columnIndex, rowIndex, 0);
-    }
-
-    isTileFlippedOnXAtGridCoordinates(columnIndex: integer, rowIndex: integer) {
-      return this.isTileFlippedOnX(columnIndex, rowIndex, 0);
-    }
-
-    isTileFlippedOnYAtPosition(x: float, y: float) {
-      const [columnIndex, rowIndex] =
-        this.getGridCoordinatesFromSceneCoordinates(x, y);
-
-      return this.isTileFlippedOnY(columnIndex, rowIndex, 0);
-    }
-
-    isTileFlippedOnYAtGridCoordinates(columnIndex: integer, rowIndex: integer) {
-      return this.isTileFlippedOnY(columnIndex, rowIndex, 0);
-    }
-
-    removeTileAtPosition(x: float, y: float) {
-      const [columnIndex, rowIndex] =
-        this.getGridCoordinatesFromSceneCoordinates(x, y);
-      this.removeTileAtGridCoordinates(columnIndex, rowIndex);
-    }
-
-    removeTileAtGridCoordinates(columnIndex: integer, rowIndex: integer) {
-      if (!this._tileMap) {
-        return;
-      }
-      const layer = this._tileMap.getTileLayer(this._layerIndex);
-      if (!layer) {
-        return;
-      }
-      const oldTileId = layer.getTileId(columnIndex, rowIndex);
-      if (oldTileId === undefined) {
-        return;
-      }
-      layer.removeTile(columnIndex, rowIndex);
-      if (this._collisionTileMap) {
-        const oldTileDefinition =
-          oldTileId !== undefined && this._tileMap.getTileDefinition(oldTileId);
-        const hadFullHitBox =
-          !!oldTileDefinition &&
-          oldTileDefinition.hasFullHitBox(this._hitBoxTag);
-        if (hadFullHitBox) {
-          this._collisionTileMap.invalidateTile(
-            this._layerIndex,
-            columnIndex,
-            rowIndex
-          );
-        }
-      }
-      this._isTileMapDirty = true;
-    }
-
-    setGridRowCount(targetRowCount: integer) {
-      if (targetRowCount <= 0) return;
-      if (!this._tileMap) return;
-      this._tileMap.setDimensionY(targetRowCount);
-      if (this._collisionTileMap) {
-        this._collisionTileMap.updateDimensions();
-      }
-      this._isTileMapDirty = true;
-      this.invalidateHitboxes();
-    }
-
-    setGridColumnCount(targetColumnCount: integer) {
-      if (targetColumnCount <= 0) return;
-      if (!this._tileMap) return;
-      this._tileMap.setDimensionX(targetColumnCount);
-      if (this._collisionTileMap) {
-        this._collisionTileMap.updateDimensions();
-      }
-      this._isTileMapDirty = true;
-      this.invalidateHitboxes();
-    }
-
-    getGridRowCount(): integer {
-      if (!this._tileMap) return 0;
-      return this._tileMap.getDimensionY();
-    }
-
-    getGridColumnCount(): integer {
-      if (!this._tileMap) return 0;
-      return this._tileMap.getDimensionX();
-    }
-
-    getTilesetColumnCount(): integer {
+    getTileSetColumnCount(): integer {
       return this._columnCount;
     }
 
-    getTilesetRowCount(): integer {
+    getTileSetRowCount(): integer {
       return this._rowCount;
     }
 
@@ -890,67 +497,32 @@ namespace gdjs {
       return this._tileMap;
     }
 
-    getTileMapWidth() {
-      const tileMap = this._tileMap;
-      return tileMap ? tileMap.getWidth() : 20;
+    getTileMapForEdition(): TileMapHelper.EditableTileMap | null {
+      return this._tileMap;
     }
 
-    getTileMapHeight() {
-      const tileMap = this._tileMap;
-      return tileMap ? tileMap.getHeight() : 20;
+    getCollisionTileMap(): gdjs.TileMap.TransformedCollisionTileMap | null {
+      return this._collisionTileMap;
     }
 
-    /**
-     * @param x The layer column.
-     * @param y The layer row.
-     * @param layerIndex The layer index.
-     * @returns The tile's id.
-     */
-    getTileId(x: integer, y: integer, layerIndex: integer): integer {
-      if (!this._tileMap) return -1;
-      return this._tileMap.getTileId(x, y, layerIndex);
+    getDisplayMode(): string {
+      return 'all';
     }
 
-    /**
-     * @param x The layer column.
-     * @param y The layer row.
-     * @param layerIndex The layer index.
-     * @param flip true if the tile should be flipped.
-     */
-    flipTileOnY(x: integer, y: integer, layerIndex: integer, flip: boolean) {
-      if (!this._tileMap) return;
-      this._tileMap.flipTileOnY(x, y, layerIndex, flip);
+    getDisplayedLayerIndex(): integer {
+      return 0;
     }
 
-    /**
-     * @param x The layer column.
-     * @param y The layer row.
-     * @param layerIndex The layer index.
-     * @param flip true if the tile should be flipped.
-     */
-    flipTileOnX(x: integer, y: integer, layerIndex: integer, flip: boolean) {
-      if (!this._tileMap) return;
-      this._tileMap.flipTileOnX(x, y, layerIndex, flip);
+    getEditedLayerIndex(): integer {
+      return 0;
     }
 
-    /**
-     * @param x The layer column.
-     * @param y The layer row.
-     * @param layerIndex The layer index.
-     */
-    isTileFlippedOnX(x: integer, y: integer, layerIndex: integer): boolean {
-      if (!this._tileMap) return false;
-      return this._tileMap.isTileFlippedOnX(x, y, layerIndex);
+    getCollisionMaskTag(): string {
+      return hitBoxTag;
     }
 
-    /**
-     * @param x The layer column.
-     * @param y The layer row.
-     * @param layerIndex The layer index.
-     */
-    isTileFlippedOnY(x: integer, y: integer, layerIndex: integer): boolean {
-      if (!this._tileMap) return false;
-      return this._tileMap.isTileFlippedOnY(x, y, layerIndex);
+    invalidateTileMap(): void {
+      this._isTileMapDirty = true;
     }
   }
   gdjs.registerObject(

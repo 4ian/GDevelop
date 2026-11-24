@@ -4,7 +4,7 @@ declare class gdObjectRefactorer {
   static fillAnyVariableBetweenObjects(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectGroup: gdObjectGroup): void;
   static applyChangesToVariants(eventsBasedObject: gdEventsBasedObject, objectName: string, changeset: gdVariablesChangeset): void;
   static fillMissingGroupVariablesToObject(obj: gdObject, groupVariablesContainer: gdVariablesContainer): void;
-  static fillMissingGroupBehaviorToObject(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, obj: gdObject, objectGroup: gdObjectGroup, behaviorName: string): void;
+  static fillMissingGroupBehaviorToObject(platform: gdPlatform, globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, obj: gdObject, objectGroup: gdObjectGroup, behaviorName: string): void;
   delete(): void;
   ptr: number;
 };

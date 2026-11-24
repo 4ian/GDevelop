@@ -50,7 +50,7 @@ void ObjectGroupsContainer::UnserializeFrom(const SerializerElement& element) {
   for (std::size_t i = 0; i < element.GetChildrenCount(); ++i) {
     const SerializerElement& groupElement = element.GetChild(i);
     gd::ObjectGroup& objectGroup =
-        InsertNew(element.GetStringAttribute("name", "", "nom"), -1);
+        InsertNew(groupElement.GetStringAttribute("name", "", "nom"), -1);
     objectGroup.UnserializeFrom(groupElement);
   }
 }

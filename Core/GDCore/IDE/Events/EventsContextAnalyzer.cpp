@@ -15,7 +15,6 @@
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Metadata/ParameterMetadataTools.h"
-#include "GDCore/IDE/Events/ExpressionValidator.h"
 #include "GDCore/IDE/Events/ExpressionTypeFinder.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"

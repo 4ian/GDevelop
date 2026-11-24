@@ -14,6 +14,7 @@ import {
 } from '../../../fixtures/GDevelopServicesTestData';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import GamesList from '../../../GameDashboard/GamesList';
+import { type GamesListFilter } from '../../../GameDashboard/GamesListFilterSelector';
 import CloudStorageProvider from '../../../ProjectsStorage/CloudStorageProvider';
 import PreferencesContext, {
   initialPreferences,
@@ -46,6 +47,7 @@ export const NoGamesOrProjects = (): React.Node => {
 
   const [currentPage, setCurrentPage] = React.useState(1);
   const [searchText, setSearchText] = React.useState('');
+  const [filter, setFilter] = React.useState<GamesListFilter>('active');
 
   return (
     <PreferencesContext.Provider value={preferences}>
@@ -74,6 +76,8 @@ export const NoGamesOrProjects = (): React.Node => {
           setCurrentPage={setCurrentPage}
           searchText={searchText}
           setSearchText={setSearchText}
+          filter={filter}
+          setFilter={setFilter}
         />
       </AuthenticatedUserContext.Provider>
     </PreferencesContext.Provider>
@@ -106,6 +110,7 @@ export const WithOnlyGames = (): React.Node => {
 
   const [currentPage, setCurrentPage] = React.useState(1);
   const [searchText, setSearchText] = React.useState('');
+  const [filter, setFilter] = React.useState<GamesListFilter>('active');
 
   return (
     <PreferencesContext.Provider value={preferences}>
@@ -134,6 +139,8 @@ export const WithOnlyGames = (): React.Node => {
           setCurrentPage={setCurrentPage}
           searchText={searchText}
           setSearchText={setSearchText}
+          filter={filter}
+          setFilter={setFilter}
         />
       </AuthenticatedUserContext.Provider>
     </PreferencesContext.Provider>
@@ -159,6 +166,7 @@ export const WithOnlyProjects = (): React.Node => {
 
   const [currentPage, setCurrentPage] = React.useState(1);
   const [searchText, setSearchText] = React.useState('');
+  const [filter, setFilter] = React.useState<GamesListFilter>('active');
 
   return (
     <PreferencesContext.Provider value={preferences}>
@@ -187,6 +195,8 @@ export const WithOnlyProjects = (): React.Node => {
           setCurrentPage={setCurrentPage}
           searchText={searchText}
           setSearchText={setSearchText}
+          filter={filter}
+          setFilter={setFilter}
         />
       </AuthenticatedUserContext.Provider>
     </PreferencesContext.Provider>
@@ -221,6 +231,7 @@ export const WithGamesAndProjects = (): React.Node => {
 
   const [currentPage, setCurrentPage] = React.useState(1);
   const [searchText, setSearchText] = React.useState('');
+  const [filter, setFilter] = React.useState<GamesListFilter>('active');
 
   return (
     <PreferencesContext.Provider value={preferences}>
@@ -249,6 +260,8 @@ export const WithGamesAndProjects = (): React.Node => {
           setCurrentPage={setCurrentPage}
           searchText={searchText}
           setSearchText={setSearchText}
+          filter={filter}
+          setFilter={setFilter}
         />
       </AuthenticatedUserContext.Provider>
     </PreferencesContext.Provider>

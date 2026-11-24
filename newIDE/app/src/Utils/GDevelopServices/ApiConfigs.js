@@ -108,10 +108,19 @@ export const GDevelopProjectApi = {
     : 'https://api.gdevelop.io/project'): string),
 };
 
+// In development, the GDevelop AI backend can be a local one (`generation-api`
+// run with serverless offline): `--generation-api-url http://localhost:3013`.
+const getDevelopmentGenerationApiUrl = (): string | null => {
+  if (!isDev) return null;
+  const url = Window.getArguments()['generation-api-url'];
+  return typeof url === 'string' && url ? url : null;
+};
+
 export const GDevelopGenerationApi = {
-  baseUrl: ((isDev
-    ? 'https://api-dev.gdevelop.io/generation'
-    : 'https://api.gdevelop.io/generation'): string),
+  baseUrl: (getDevelopmentGenerationApiUrl() ||
+    (isDev
+      ? 'https://api-dev.gdevelop.io/generation'
+      : 'https://api.gdevelop.io/generation'): string),
 };
 
 export const GDevelopAiCdn = {

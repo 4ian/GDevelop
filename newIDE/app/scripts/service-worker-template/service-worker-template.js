@@ -232,6 +232,12 @@ self.addEventListener('install', event => {
   self.skipWaiting();
 });
 
+// Caches of earlier versions, which kept opaque responses: browsers count
+// each of them as several megabytes of storage (to hide their real size), so
+// a few hundred filled the whole quota of the site - and then nothing could
+// be stored anymore, not even the files of a game preview.
+const OUTDATED_CACHE_NAMES = ['gdevelop-resources-cache', 'images'];
+
 self.addEventListener('activate', event => {
   console.log('[ServiceWorker] Activating new service worker...');
 
@@ -240,7 +246,12 @@ self.addEventListener('activate', event => {
   // This means that our service worker should stay backward compatible.
   // But this is safer to avoid an old version of the service worker to stay
   // used despite having a new version of the app served.
-  event.waitUntil(self.clients.claim());
+  event.waitUntil(
+    Promise.all([
+      self.clients.claim(),
+      ...OUTDATED_CACHE_NAMES.map(cacheName => caches.delete(cacheName)),
+    ])
+  );
 });
 
 // ============================================================================
@@ -288,11 +299,15 @@ if (workbox) {
   });
 
   // Cache resources from GDevelop cloudfront server (CORS enabled).
+  // Only readable responses are cached: a resource requested without CORS
+  // (an image displayed by an <img> without `crossOrigin`...) gets an opaque
+  // response, counted by browsers as several megabytes of storage.
   workbox.routing.registerRoute(
     /https:\/\/resources\.gdevelop-app\.com\/.*$/,
     workbox.strategies.networkFirst({
-      cacheName: 'gdevelop-resources-cache',
+      cacheName: 'gdevelop-resources-cache-v2',
       plugins: [
+        new workbox.cacheableResponse.Plugin({ statuses: [200] }),
         new workbox.expiration.Plugin({
           maxEntries: 500,
         }),
@@ -304,8 +319,9 @@ if (workbox) {
   workbox.routing.registerRoute(
     /\.(?:png|gif|jpg|jpeg)$/,
     workbox.strategies.networkFirst({
-      cacheName: 'images',
+      cacheName: 'images-v2',
       plugins: [
+        new workbox.cacheableResponse.Plugin({ statuses: [200] }),
         new workbox.expiration.Plugin({
           maxEntries: 150,
         }),

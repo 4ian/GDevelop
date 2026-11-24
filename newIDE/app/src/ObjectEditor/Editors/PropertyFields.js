@@ -33,6 +33,10 @@ export const PropertyField = ({
 
   const updateProperty = React.useCallback(
     (value: string) => {
+      // The user is probably still typing (a sign or a dot): the value is
+      // reverted if they leave the field.
+      if (isNaN(parseFloat(value))) return;
+
       const oldValue = objectConfiguration
         .getProperties()
         .get(propertyName)
@@ -69,6 +73,7 @@ export const PropertyField = ({
         floatingLabelText={property.getLabel()}
         onChange={updateProperty}
         value={property.getValue()}
+        type="number"
         endAdornment={
           <Tooltip title={endAdornment.tooltipContent}>
             <InputAdornment position="end">{endAdornment.label}</InputAdornment>

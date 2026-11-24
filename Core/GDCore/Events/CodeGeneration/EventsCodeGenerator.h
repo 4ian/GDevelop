@@ -450,6 +450,16 @@ class GD_CORE_API EventsCodeGenerator {
   };
 
   /**
+   * \brief Generate the code of an "easing" parameter from the code of its
+   * string, so that a platform can resolve named easings in scope.
+   *
+   * Default implementation returns the string code unchanged.
+   */
+  virtual gd::String GenerateEasingCode(const gd::String& easingStringCode) {
+    return easingStringCode;
+  };
+
+  /**
    * \brief Get the namespace to be used to store code generated
    * objects/values/functions, with the extra "dot" at the end to be used to
    * access to a property/member.
@@ -533,7 +543,7 @@ class GD_CORE_API EventsCodeGenerator {
    * - object : Object name -> string
    * - expression : Mathematical expression -> number (double)
    * - string : %Text expression -> string
-   * - layer, color, file, stringWithSelector : Same as string
+   * - layer, color, file, stringWithSelector, easing : Same as string
    * - relationalOperator : Used to make a comparison between the function
   return value and value of the parameter preceding the relationOperator
   parameter -> string

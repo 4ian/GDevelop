@@ -24,7 +24,6 @@
 #include "GDCore/Project/ObjectGroup.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
 #include "GDCore/Project/Project.h"
-#include "GDCore/Project/QuickCustomization.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/Log.h"
@@ -252,6 +251,7 @@ void Layout::SerializeTo(SerializerElement& element) const {
     element.SetAttribute("resourcesUnloading", resourcesUnloading);
   element.SetAttribute("disableInputWhenNotFocused",
                        disableInputWhenNotFocused);
+  element.SetAttribute("renderer3DWorldScale", renderer3DWorldScale);
 
   editorSettings.SerializeTo(element.AddChild("uiSettings"));
 
@@ -282,22 +282,11 @@ void Layout::SerializeTo(SerializerElement& element) const {
     dataElement.SetAttribute("type", sharedData.GetTypeName());
     dataElement.SetAttribute("name", sharedData.GetName());
 
-    // Handle Quick Customization info.
+    // Compatibility with projects saved with the removed Quick Customization:
+    // the content can contain its former visibilities, remove them.
     dataElement.RemoveChild("propertiesQuickCustomizationVisibilities");
-    const QuickCustomizationVisibilitiesContainer&
-        propertiesQuickCustomizationVisibilities =
-            sharedData.GetPropertiesQuickCustomizationVisibilities();
-    if (!propertiesQuickCustomizationVisibilities.IsEmpty()) {
-      propertiesQuickCustomizationVisibilities.SerializeTo(
-          dataElement.AddChild("propertiesQuickCustomizationVisibilities"));
-    }
-    const QuickCustomization::Visibility visibility =
-        sharedData.GetQuickCustomizationVisibility();
-    if (visibility != QuickCustomization::Visibility::Default) {
-      dataElement.SetAttribute(
-          "quickCustomizationVisibility",
-          QuickCustomization::VisibilityAsString(visibility));
-    }
+    dataElement.RemoveAttribute("quickCustomizationVisibility");
+    // end of compatibility code
   }
 }
 
@@ -316,6 +305,8 @@ void Layout::UnserializeFrom(gd::Project& project,
       element.GetStringAttribute("resourcesUnloading", "inherit");
   disableInputWhenNotFocused =
       element.GetBoolAttribute("disableInputWhenNotFocused");
+  renderer3DWorldScale =
+      element.GetDoubleAttribute("renderer3DWorldScale", 100);
 
   editorSettings.UnserializeFrom(
       element.GetChild("uiSettings", 0, "UISettings"));
@@ -374,20 +365,6 @@ void Layout::UnserializeFrom(gd::Project& project,
         sharedData->UnserializeFrom(sharedDataElement);
       }
 
-      // Handle Quick Customization info.
-      if (sharedDataElement.HasChild(
-              "propertiesQuickCustomizationVisibilities")) {
-        sharedData->GetPropertiesQuickCustomizationVisibilities()
-            .UnserializeFrom(sharedDataElement.GetChild(
-                "propertiesQuickCustomizationVisibilities"));
-      }
-      if (sharedDataElement.HasChild("quickCustomizationVisibility")) {
-        sharedData->SetQuickCustomizationVisibility(
-            QuickCustomization::StringAsVisibility(
-                sharedDataElement.GetStringAttribute(
-                    "quickCustomizationVisibility")));
-      }
-
       behaviorsSharedData[name] = std::move(sharedData);
     }
   }
@@ -404,6 +381,7 @@ void Layout::Init(const Layout& other) {
   resourcesPreloading = other.resourcesPreloading;
   resourcesUnloading = other.resourcesUnloading;
   disableInputWhenNotFocused = other.disableInputWhenNotFocused;
+  renderer3DWorldScale = other.renderer3DWorldScale;
   initialInstances = other.initialInstances;
   layers = other.layers;
   variables = other.GetVariables();
@@ -448,58 +426,30 @@ gd::String GD_CORE_API GetTypeOfObject(const gd::ObjectsContainer& project,
   // objects. Search "groups is the intersection of its objects" in the
   // codebase.
   else if (searchInGroups) {
-    for (std::size_t i = 0; i < layout.GetObjectGroups().size(); ++i) {
-      if (layout.GetObjectGroups()[i].GetName() == name) {
-        // A group has the name searched
-        // Verifying now that all objects have the same type.
-
-        vector<gd::String> groupsObjects =
-            layout.GetObjectGroups()[i].GetAllObjectsNames();
-        gd::String previousType =
-            groupsObjects.empty()
-                ? ""
-                : GetTypeOfObject(project, layout, groupsObjects[0], false);
-
-        for (std::size_t j = 0; j < groupsObjects.size(); ++j) {
-          if (GetTypeOfObject(project, layout, groupsObjects[j], false) !=
-              previousType)
-            return "";  // The group has more than one type.
-        }
-
-        if (!type.empty() && previousType != type)
-          return "";  // The group has objects of different type, so the group
-                      // has not any type.
-
-        type = previousType;
-      }
+    // A group of the layout shadows a global group with the same name: only
+    // the most local group is considered (as done for objects, and by
+    // gd::ObjectsContainersList::ExpandObjectName when generating code).
+    const gd::ObjectsContainer* container = nullptr;
+    if (layout.GetObjectGroups().Has(name)) {
+      container = &layout;
+    } else if (project.GetObjectGroups().Has(name)) {
+      container = &project;
     }
-    for (std::size_t i = 0; i < project.GetObjectGroups().size(); ++i) {
-      if (project.GetObjectGroups()[i].GetName() == name) {
-        // A group has the name searched
-        // Verifying now that all objects have the same type.
-
-        vector<gd::String> groupsObjects =
-            project.GetObjectGroups()[i].GetAllObjectsNames();
-        gd::String previousType =
-            groupsObjects.empty()
-                ? ""
-                : GetTypeOfObject(project, layout, groupsObjects[0], false);
-
-        for (std::size_t j = 0; j < groupsObjects.size(); ++j) {
-          if (GetTypeOfObject(project, layout, groupsObjects[j], false) !=
-              previousType)
-            return "";  // The group has more than one type.
-        }
-
-        if (!type.empty() && previousType != type)
-          return "";  // The group has objects of different type, so the group
-                      // has not any type.
-
-        type = previousType;
+    if (container) {
+      // Verifying now that all objects have the same type.
+      const vector<gd::String>& groupsObjects =
+          container->GetObjectGroups().Get(name).GetAllObjectsNames();
+      // Empty groups don't have any type.
+      if (groupsObjects.empty()) {
+        return "";
+      }
+      type = GetTypeOfObject(project, layout, groupsObjects[0], false);
+      for (std::size_t j = 1; j < groupsObjects.size(); ++j) {
+        if (GetTypeOfObject(project, layout, groupsObjects[j], false) != type)
+          return "";  // The group has more than one type.
       }
     }
   }
-
   return type;
 }
 
@@ -566,10 +516,21 @@ GetBehaviorNamesInObjectOrGroup(const gd::ObjectsContainer& project,
   }
 
   // Compute the intersection of the behaviors of all objects.
-  auto behaviorNames = GetBehaviorNamesInObjectOrGroup(
-      project, layout, groupsObjects[0], behaviorType, false);
-  for (size_t i = 1; i < groupsObjects.size(); i++) {
-    auto& objectName = groupsObjects[i];
+  std::vector<gd::String> behaviorNames;
+  size_t objectIndex = 0;
+  // Look for a first that object exists
+  for (; objectIndex < groupsObjects.size(); objectIndex++) {
+    auto &objectName = groupsObjects[objectIndex];
+    if (layout.HasObjectNamed(objectName) ||
+        project.HasObjectNamed(objectName)) {
+      behaviorNames = GetBehaviorNamesInObjectOrGroup(
+          project, layout, groupsObjects[objectIndex], behaviorType, false);
+      objectIndex++;
+      break;
+    }
+  }
+  for (; objectIndex < groupsObjects.size(); objectIndex++) {
+    auto& objectName = groupsObjects[objectIndex];
 
     if (layout.HasObjectNamed(objectName)) {
       auto& object = layout.GetObject(objectName);
@@ -626,16 +587,20 @@ bool GD_CORE_API HasBehaviorInObjectOrGroup(const gd::ObjectsContainer& project,
   }
 
   // Check that all objects have the behavior.
-  for (auto&& object : groupsObjects) {
+  for (auto&& objectName : groupsObjects) {
+    if (!layout.HasObjectNamed(objectName) &&
+        !project.HasObjectNamed(objectName)) {
+      continue;
+    }
     if (!HasBehaviorInObjectOrGroup(
-            project, layout, object, behaviorName, false)) {
+            project, layout, objectName, behaviorName, false)) {
       return false;
     }
   }
   return true;
 }
 
-bool GD_CORE_API IsDefaultBehavior(const gd::ObjectsContainer& project,
+bool GD_CORE_API HasDefaultBehavior(const gd::ObjectsContainer& project,
                                    const gd::ObjectsContainer& layout,
                                    gd::String objectOrGroupName,
                                    gd::String behaviorName,
@@ -677,8 +642,12 @@ bool GD_CORE_API IsDefaultBehavior(const gd::ObjectsContainer& project,
   }
 
   // Check that all objects have the same type.
-  for (auto&& object : groupsObjects) {
-    if (!IsDefaultBehavior(project, layout, object, behaviorName, false)) {
+  for (auto&& objectName : groupsObjects) {
+    if (!layout.HasObjectNamed(objectName) &&
+        !project.HasObjectNamed(objectName)) {
+      continue;
+    }
+    if (!HasDefaultBehavior(project, layout, objectName, behaviorName, false)) {
       return false;
     }
   }
@@ -730,11 +699,27 @@ GetTypeOfBehaviorInObjectOrGroup(const gd::ObjectsContainer& project,
   }
 
   // Check that all objects have the behavior with the same type.
-  auto behaviorType = GetTypeOfBehaviorInObjectOrGroup(
-      project, layout, groupsObjects[0], behaviorName, false);
-  for (auto&& object : groupsObjects) {
-    if (GetTypeOfBehaviorInObjectOrGroup(
-            project, layout, object, behaviorName, false) != behaviorType) {
+  size_t objectIndex = 0;
+  gd::String behaviorType = "";
+  // Look for a first that object exists
+  for (; objectIndex < groupsObjects.size(); objectIndex++) {
+    auto &objectName = groupsObjects[objectIndex];
+    if (layout.HasObjectNamed(objectName) ||
+        project.HasObjectNamed(objectName)) {
+      behaviorType = GetTypeOfBehaviorInObjectOrGroup(
+          project, layout, groupsObjects[objectIndex], behaviorName, false);
+      objectIndex++;
+      break;
+    }
+  }
+  for (; objectIndex < groupsObjects.size(); objectIndex++) {
+    auto &objectName = groupsObjects[objectIndex];
+    if (!layout.HasObjectNamed(objectName) &&
+        !project.HasObjectNamed(objectName)) {
+      continue;
+    }
+    if (GetTypeOfBehaviorInObjectOrGroup(project, layout, objectName,
+                                         behaviorName, false) != behaviorType) {
       return "";
     }
   }
@@ -793,58 +778,41 @@ GetBehaviorsOfObject(const gd::ObjectsContainer& project,
   // Currently, a group is considered as the "intersection" of all of its
   // objects. Search "groups is the intersection of its objects" in the
   // codebase.
-  if (searchInGroups) {
-    for (std::size_t i = 0; i < layout.GetObjectGroups().size(); ++i) {
-      if (layout.GetObjectGroups()[i].GetName() == name) {
-        // A group has the name searched
-        // Verifying now that all objects have common behaviors.
-
-        vector<gd::String> groupsObjects =
-            layout.GetObjectGroups()[i].GetAllObjectsNames();
-        for (std::size_t j = 0; j < groupsObjects.size(); ++j) {
-          // Get behaviors of the object of the group and delete behavior which
-          // are not in commons.
-          vector<gd::String> objectBehaviors =
-              GetBehaviorsOfObject(project, layout, groupsObjects[j], false);
-          if (!behaviorsAlreadyInserted) {
-            behaviorsAlreadyInserted = true;
-            behaviors = objectBehaviors;
-          } else {
-            for (std::size_t a = 0; a < behaviors.size(); ++a) {
-              if (find(objectBehaviors.begin(),
-                       objectBehaviors.end(),
-                       behaviors[a]) == objectBehaviors.end()) {
-                behaviors.erase(behaviors.begin() + a);
-                --a;
-              }
-            }
-          }
-        }
-      }
+  if (!behaviorsAlreadyInserted && searchInGroups) {
+    // A group of the layout shadows a global group with the same name: only
+    // the most local group is considered (as done for objects, and by
+    // gd::ObjectsContainersList::ExpandObjectName when generating code).
+    const gd::ObjectsContainer* container = nullptr;
+    if (layout.GetObjectGroups().Has(name)) {
+      container = &layout;
+    } else if (project.GetObjectGroups().Has(name)) {
+      container = &project;
     }
-    for (std::size_t i = 0; i < project.GetObjectGroups().size(); ++i) {
-      if (project.GetObjectGroups()[i].GetName() == name) {
-        // A group has the name searched
-        // Verifying now that all objects have common behaviors.
-
-        vector<gd::String> groupsObjects =
-            project.GetObjectGroups()[i].GetAllObjectsNames();
-        for (std::size_t j = 0; j < groupsObjects.size(); ++j) {
-          // Get behaviors of the object of the group and delete behavior which
-          // are not in commons.
-          vector<gd::String> objectBehaviors =
-              GetBehaviorsOfObject(project, layout, groupsObjects[j], false);
-          if (!behaviorsAlreadyInserted) {
-            behaviorsAlreadyInserted = true;
-            behaviors = objectBehaviors;
-          } else {
-            for (std::size_t a = 0; a < behaviors.size(); ++a) {
-              if (find(objectBehaviors.begin(),
-                       objectBehaviors.end(),
-                       behaviors[a]) == objectBehaviors.end()) {
-                behaviors.erase(behaviors.begin() + a);
-                --a;
-              }
+    if (container) {
+      // Verifying now that all objects have common behaviors.
+      const vector<gd::String>& groupsObjects =
+          container->GetObjectGroups().Get(name).GetAllObjectsNames();
+      for (std::size_t objectIndex = 0; objectIndex < groupsObjects.size();
+           ++objectIndex) {
+        auto& objectName = groupsObjects[objectIndex];
+        if (!layout.HasObjectNamed(objectName) &&
+            !project.HasObjectNamed(objectName)) {
+          continue;
+        }
+        // Get behaviors of the object of the group and delete behavior which
+        // are not in commons.
+        vector<gd::String> objectBehaviors =
+            GetBehaviorsOfObject(project, layout, objectName, false);
+        if (!behaviorsAlreadyInserted) {
+          behaviorsAlreadyInserted = true;
+          behaviors = objectBehaviors;
+        } else {
+          for (std::size_t a = 0; a < behaviors.size(); ++a) {
+            if (find(objectBehaviors.begin(),
+                     objectBehaviors.end(),
+                     behaviors[a]) == objectBehaviors.end()) {
+              behaviors.erase(behaviors.begin() + a);
+              --a;
             }
           }
         }

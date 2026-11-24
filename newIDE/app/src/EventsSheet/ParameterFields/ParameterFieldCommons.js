@@ -20,12 +20,13 @@ type CommonProps = {|
   value: string,
 
   // Context
-  project?: gdProject,
+  project: gdProject,
   scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   isInline?: boolean,
+  shouldHideExpressionListButton?: boolean,
   onRequestClose?: () => void,
   onApply?: () => void,
   resourceManagementProps?: ResourceManagementProps,
@@ -57,8 +58,11 @@ export type ParameterFieldProps = {|
   // The index of the parameter in the instruction or expression.
   parameterIndex?: number,
   onInstructionTypeChanged?: () => void,
-  editEventsFunctionParameter?: VariableDialogOpeningProps => void,
-  openEventsBasedEntityPropertyEditorDialog?: VariableDialogOpeningProps => void,
+  editEventsFunctionParameter?: (VariableDialogOpeningProps => void) | null,
+  openEventsBasedEntityPropertyEditorDialog?:
+    | (VariableDialogOpeningProps => void)
+    | null,
+  expressionTypeExtraInfo?: string,
 |};
 
 export type FieldFocusFunction = (
@@ -71,6 +75,18 @@ export type FieldFocusFunction = (
 export type ParameterFieldInterface = {|
   focus: FieldFocusFunction,
 |};
+
+/** The parameter long description, followed by the extra helper text, if any. */
+export const getParameterHelperMarkdownText = (
+  parameterMetadata: ?gdParameterMetadata,
+  extraHelperMarkdownText: ?string
+): ?string => {
+  const parts = [
+    parameterMetadata ? parameterMetadata.getLongDescription() : null,
+    extraHelperMarkdownText,
+  ].filter(Boolean);
+  return parts.length > 0 ? parts.join('  \n') : null;
+};
 
 export const getParameterValueOrDefault = (
   value: string,

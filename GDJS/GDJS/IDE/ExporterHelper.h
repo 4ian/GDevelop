@@ -251,7 +251,7 @@ struct PreviewExportOptions {
   }
 
   /**
-   * \brief Set the camera state to use in the in-game editor.
+   * \brief Set the 3D camera state to use in the in-game editor.
    */
   PreviewExportOptions &
   SetEditorCameraState3D(const gd::String &cameraMode, double positionX,
@@ -265,6 +265,17 @@ struct PreviewExportOptions {
     editorCamera3DRotationAngle = rotationAngle;
     editorCamera3DElevationAngle = elevationAngle;
     editorCamera3DDistance = distance;
+    return *this;
+  }
+
+  /**
+   * \brief Set the 2D camera state to use in the in-game editor.
+   */
+  PreviewExportOptions &SetEditorCameraState2D(double centerX, double centerY,
+                                               double zoom) {
+    editorCamera2DCenterX = centerX;
+    editorCamera2DCenterY = centerY;
+    editorCamera2DZoom = zoom;
     return *this;
   }
 
@@ -350,14 +361,6 @@ struct PreviewExportOptions {
   }
 
   /**
-   * \brief Set the source game id that was used to create the project.
-   */
-  PreviewExportOptions &SetSourceGameId(const gd::String &sourceGameId_) {
-    sourceGameId = sourceGameId_;
-    return *this;
-  }
-
-  /**
    * \brief Set the capture options to be used for taking screenshots or videos
    * of the preview.
    */
@@ -369,6 +372,18 @@ struct PreviewExportOptions {
     screenshot.SetSignedUrl(signedUrl);
     screenshot.SetPublicUrl(publicUrl);
     captureOptions.AddScreenshot(screenshot);
+    return *this;
+  }
+
+  /**
+   * \brief Set where to upload the short gameplay video recorded during the
+   * preview, either automatically or by the user with a toolbar shown in the
+   * preview.
+   */
+  PreviewExportOptions &SetPreviewVideoCapture(const gd::String &signedUrl,
+                                               const gd::String &publicUrl,
+                                               bool isRecordedByUser) {
+    captureOptions.SetPreviewVideo(signedUrl, publicUrl, isRecordedByUser);
     return *this;
   }
 
@@ -407,6 +422,9 @@ struct PreviewExportOptions {
   double editorCamera3DRotationAngle = 0;
   double editorCamera3DElevationAngle = 0;
   double editorCamera3DDistance = 0;
+  double editorCamera2DCenterX = 0;
+  double editorCamera2DCenterY = 0;
+  double editorCamera2DZoom = 1;
   unsigned int nonRuntimeScriptsCacheBurst;
   gd::String electronRemoteRequirePath;
   gd::String gdevelopResourceToken;
@@ -415,7 +433,6 @@ struct PreviewExportOptions {
   gd::String previewContext;
   gd::String gdevelopVersionWithHash;
   gd::String projectTemplateSlug;
-  gd::String sourceGameId;
   gd::CaptureOptions captureOptions;
 };
 
@@ -483,6 +500,7 @@ class ExporterHelper {
    * \brief Export a project without its events and options to 2 JS variables
    *
    * \param fs The abstract file system to use to write the file
+   * \param gdjsRoot The root directory of GDJS, used to copy runtime files.
    * \param project The project to be exported.
    * \param filename The filename where export the project
    * \param runtimeGameOptions The content of the extra configuration to store
@@ -491,25 +509,41 @@ class ExporterHelper {
    * \return Empty string if everything is ok,
    * description of the error otherwise.
    */
-  static gd::String ExportProjectData(
-      gd::AbstractFileSystem &fs, gd::Project &project, gd::String filename,
-      const gd::SerializerElement &runtimeGameOptions, bool isInGameEdition,
-      const std::vector<gd::InGameEditorResourceMetadata> &inGameEditorResources);
+  static gd::String
+  ExportProjectData(gd::AbstractFileSystem &fs, const gd::String &gdjsRoot,
+                    gd::Project &project, gd::String filename,
+                    const gd::SerializerElement &runtimeGameOptions,
+                    bool isInGameEdition);
 
   /**
    * \brief Serialize a project without its events to JSON
    *
    * \param fs The abstract file system to use to write the file
+   * \param gdjsRoot The root directory of GDJS, used to copy runtime files.
    * \param project The project to be exported.
    * \param options The content of the extra configuration
    * \param projectDataElement The element where the project data is serialized
    * \param inGameEditorResources The list of in-game editor resources to be used.
    */
   static void SerializeProjectData(gd::AbstractFileSystem &fs,
+                                   const gd::String &gdjsRoot,
                                    const gd::Project &project,
                                    const PreviewExportOptions &options,
-                                   gd::SerializerElement &projectDataElement,
-                                   const std::vector<gd::InGameEditorResourceMetadata> &inGameEditorResources);
+                                   gd::SerializerElement &projectDataElement);
+
+  /**
+   * List all the in-game editor resources, so they can be later included in the
+   * exported project resources.
+   * \param fs The abstract file system to use to write the file
+   * \param gdjsRoot The root directory of GDJS, used to copy runtime files.
+   * \param project The project to be exported.
+   * \param inGameEditorResources The resources list where the in-game editor
+   * resources are added
+   */
+  static void AddAllInGameEditorResources(
+      gd::AbstractFileSystem &fs, const gd::String &gdjsRoot,
+      const gd::Project &project,
+      std::vector<gd::InGameEditorResourceMetadata> &inGameEditorResources);
 
   /**
    * \brief Serialize the content of the extra configuration to store
@@ -544,7 +578,9 @@ class ExporterHelper {
                               gd::String exportDir);
 
   /**
-   * \brief Add libraries files to the list of includes.
+   * \brief Add libraries files to the list of includes, and the files they
+   * need at runtime to the list of resources files (these are copied next to
+   * the game, but not included with a script tag).
    */
   void AddLibsInclude(bool pixiRenderers,
                       bool pixiInThreeRenderers,
@@ -555,7 +591,8 @@ class ExporterHelper {
                       bool includeCaptureManager,
                       bool includeInAppTutorialMessage,
                       gd::String gdevelopLogoStyle,
-                      std::vector<gd::String> &includesFiles);
+                      std::vector<gd::String> &includesFiles,
+                      std::vector<gd::String> &resourcesFiles);
 
   /**
    * \brief Remove include files that are Pixi renderers.
@@ -726,6 +763,19 @@ class ExporterHelper {
   static gd::String GetExportedIncludeFilename(
       gd::AbstractFileSystem &fs, const gd::String &gdjsRoot,
       const gd::String &include, unsigned int nonRuntimeScriptsCacheBurst = 0);
+
+  /**
+   * \brief Returns the base URL (or relative path) from which the game engine
+   * files are served in the exported game or preview.
+   *
+   * Most of the time, they are copied next to the game index.html (in which
+   * case this is "./"), but some previews serve them from a server.
+   *
+   * \param fs The abstract file system to use
+   * \param gdjsRoot The root directory of GDJS, used to copy runtime files.
+   */
+  static gd::String GetExportedRuntimeFilesBaseUrl(
+      gd::AbstractFileSystem &fs, const gd::String &gdjsRoot);
 
   /**
    * \brief Change the directory where code files are generated.

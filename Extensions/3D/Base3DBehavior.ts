@@ -186,20 +186,6 @@ namespace gdjs {
     content: Object3DDataContent;
   }
 
-  /** @category Objects > 3D Objects */
-  export namespace Base3DHandler {
-    export const is3D = (
-      object: gdjs.RuntimeObject
-    ): object is gdjs.RuntimeObject &
-      gdjs.Base3DHandler &
-      gdjs.Resizable &
-      gdjs.Scalable &
-      gdjs.Flippable => {
-      //@ts-ignore We are checking if the methods are present.
-      return object.getZ && object.setZ;
-    };
-  }
-
   /**
    * A behavior that forwards the Base3D interface to its object.
    * @category Core Engine > Behavior
@@ -246,6 +232,32 @@ namespace gdjs {
 
     setCenterZInScene(z: number): void {
       this.object.setCenterZInScene(z);
+    }
+
+    /**
+     * The distance between the center of the object and a position, on the
+     * X, Y and Z axes.
+     */
+    getDistanceToPosition3D(x: float, y: float, z: float): float {
+      const deltaX = this.object.getCenterXInScene() - x;
+      const deltaY = this.object.getCenterYInScene() - y;
+      const deltaZ = this.object.getCenterZInScene() - z;
+      return Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
+    }
+
+    /**
+     * The distance between the centers of the object and another one, on the
+     * X, Y and Z axes (a 2D object is at a Z of 0).
+     */
+    getDistanceToObject3D(otherObject: gdjs.RuntimeObject | null): float {
+      if (!otherObject) return 0;
+      return this.getDistanceToPosition3D(
+        otherObject.getCenterXInScene(),
+        otherObject.getCenterYInScene(),
+        gdjs.Base3DHandler.is3D(otherObject)
+          ? otherObject.getCenterZInScene()
+          : 0
+      );
     }
 
     setRotationX(angle: float): void {

@@ -97,6 +97,7 @@ gdjs.getPixiRuntimeGameWithAssets = (props = null) => {
         behaviorsSharedData: [],
         stopSoundsOnStartup: false,
         title: '',
+      renderer3DWorldScale: 100,
         variables: [],
         usedResources: [],
         uiSettings: {
@@ -111,6 +112,7 @@ gdjs.getPixiRuntimeGameWithAssets = (props = null) => {
           gridColor: 0,
           gridAlpha: 1,
           snap: false,
+        windowMask: false,
         },
       },
     ],

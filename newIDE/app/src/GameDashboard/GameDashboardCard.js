@@ -255,13 +255,14 @@ const GameDashboardCard = ({
     () => (game ? getGameMainImageUrl(game) : null),
     [game]
   );
-  const gameName = game
+  const untrimmedGameName = game
     ? game.gameName
     : projectFileMetadataAndStorageProviderName
     ? projectFileMetadataAndStorageProviderName.fileMetadata.name
     : deletedCloudProject
     ? deletedCloudProject.name
     : null;
+  const gameName = untrimmedGameName ? untrimmedGameName.trim() : null;
 
   const { isMobile, windowSize, isLandscape } = useResponsiveWindowSize();
   const isSmallOrMediumScreen =
@@ -668,7 +669,7 @@ const GameDashboardCard = ({
                     This action is irreversible. Do you want to continue?`;
 
                 const answer = await showDeleteConfirmation({
-                  title: t`Delete ${gameName}`,
+                  title: gameName ? t`Delete ${gameName}` : t`Delete project`,
                   header: renderThumbnail(),
                   message: message,
 

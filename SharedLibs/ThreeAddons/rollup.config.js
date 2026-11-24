@@ -1,6 +1,7 @@
 //import pkg from "./package.json";
 import resolve from '@rollup/plugin-node-resolve';
 import terser from '@rollup/plugin-terser';
+import json from '@rollup/plugin-json';
 
 export default [
   {
@@ -13,13 +14,13 @@ export default [
     output: [
       {
         name: 'THREE',
-        format: 'iife',
+        format: 'umd',
         file: './dist/three.js',
         sourcemap: true,
       },
       {
         name: 'THREE',
-        format: 'iife',
+        format: 'umd',
         file: '../../GDJS/Runtime/pixi-renderers/three.js',
         sourcemap: false,
       },
@@ -29,6 +30,7 @@ export default [
         extensions: ['.js'],
       }),
       terser(),
+      json(),
     ],
   },
   {
@@ -44,6 +46,16 @@ export default [
           'three': 'THREE',
         },
       },
+      {
+        name: 'THREE_ADDONS',
+        format: 'umd',
+        file: '../../GDJS/Runtime/pixi-renderers/ThreeAddons.js',
+        sourcemap: false,
+        plugins: [],
+        globals: {
+          'three': 'THREE',
+        },
+      },
     ],
   	external: ['three'],
     plugins: [
@@ -51,6 +63,7 @@ export default [
           extensions: ['.js'],
       }),
 			terser(),
+      json(),
     ],
   },
 ];

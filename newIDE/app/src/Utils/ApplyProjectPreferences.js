@@ -26,6 +26,7 @@ const allowedPreferenceKeys: $ReadOnlyArray<
   'autoOpenMostRecentProject',
   'hasProjectOpened',
   'newObjectDialogDefaultTab',
+  'newEffectDialogDefaultTab',
   'shareDialogDefaultTab',
   'isMenuBarHiddenInPreview',
   'isAlwaysOnTopInPreview',
@@ -49,6 +50,7 @@ const allowedPreferenceKeys: $ReadOnlyArray<
   'showAiAskButtonInTitleBar',
   'automaticallyUseCreditsForAiRequests',
   'canonicalEventSerialization',
+  'showExtensionChangesToKeepOnUpdate',
 ];
 
 const allowedPreferences: Set<string> = new Set(allowedPreferenceKeys);

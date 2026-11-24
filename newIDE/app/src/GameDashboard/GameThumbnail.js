@@ -35,10 +35,20 @@ const styles = {
     width: '100%',
     height: 'auto',
   },
+  hoverVideo: {
+    position: 'absolute',
+    inset: 0,
+    width: '100%',
+    height: '100%',
+    objectFit: 'scale-down', // Match the image.
+    transition: 'opacity 0.2s ease',
+  },
 };
 
 type Props = {|
   thumbnailUrl?: ?string,
+  /** Played over the thumbnail while it's hovered. */
+  videoUrl?: ?string,
   gameName: string,
   background?: 'light' | 'medium' | 'dark',
   gameId?: string,
@@ -54,6 +64,7 @@ export const GameThumbnail = ({
   disabled,
   canUpdateThumbnail,
   thumbnailUrl,
+  videoUrl,
   gameName,
   gameId,
   onGameUpdated,
@@ -67,6 +78,8 @@ export const GameThumbnail = ({
     AuthenticatedUserContext
   );
   const [isLoading, setIsLoading] = React.useState(false);
+  const [isHovered, setIsHovered] = React.useState(false);
+  const [isVideoPlaying, setIsVideoPlaying] = React.useState(false);
   const { showAlert } = useAlertDialog();
   const gamesPlatformThumbnailFileInputRef = React.useRef<HTMLInputElement | null>(
     null
@@ -164,37 +177,62 @@ export const GameThumbnail = ({
 
   return (
     <ColumnStackLayout noMargin alignItems="center">
-      <Paper
-        style={{
-          width: thumbnailWidth,
-          height: thumbnailHeight,
-          ...(isMobile && !isLandscape && fullWidthOnMobile
-            ? styles.fullWidthContainer
-            : undefined),
-          overflow: 'hidden', // Keep the radius effect.
-          whiteSpace: 'normal',
-          display: 'flex',
+      <div
+        style={
+          isMobile && !isLandscape && fullWidthOnMobile
+            ? { width: '100%' }
+            : undefined
+        }
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => {
+          setIsHovered(false);
+          setIsVideoPlaying(false);
         }}
-        background={background}
       >
-        {thumbnailUrl ? (
-          <CorsAwareImage
-            src={thumbnailUrl}
-            style={{
-              ...styles.image,
-              width: thumbnailWidth,
-              ...(isMobile && !isLandscape && fullWidthOnMobile
-                ? styles.fullWidthThumbnail
-                : {}),
-            }}
-            alt={gameName}
-          />
-        ) : (
-          <EmptyMessage>
-            <Trans>No thumbnail</Trans>
-          </EmptyMessage>
-        )}
-      </Paper>
+        <Paper
+          style={{
+            width: thumbnailWidth,
+            height: thumbnailHeight,
+            ...(isMobile && !isLandscape && fullWidthOnMobile
+              ? styles.fullWidthContainer
+              : undefined),
+            overflow: 'hidden', // Keep the radius effect.
+            whiteSpace: 'normal',
+            display: 'flex',
+            position: 'relative',
+          }}
+          background={background}
+        >
+          {thumbnailUrl ? (
+            <CorsAwareImage
+              src={thumbnailUrl}
+              style={{
+                ...styles.image,
+                width: thumbnailWidth,
+                ...(isMobile && !isLandscape && fullWidthOnMobile
+                  ? styles.fullWidthThumbnail
+                  : {}),
+              }}
+              alt={gameName}
+            />
+          ) : (
+            <EmptyMessage>
+              <Trans>No thumbnail</Trans>
+            </EmptyMessage>
+          )}
+          {videoUrl && isHovered && (
+            <video
+              src={videoUrl}
+              muted
+              loop
+              autoPlay
+              playsInline
+              onPlaying={() => setIsVideoPlaying(true)}
+              style={{ ...styles.hoverVideo, opacity: isVideoPlaying ? 1 : 0 }}
+            />
+          )}
+        </Paper>
+      </div>
       {canUpdateThumbnail && gameId && (
         <RaisedButton
           primary

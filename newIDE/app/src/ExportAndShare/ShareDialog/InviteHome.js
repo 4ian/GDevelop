@@ -470,7 +470,7 @@ const InviteHome = ({ cloudProjectId }: Props): React.Node | React.Node => {
                   setCollaboratorLevel(newCollaboratorLevel)
                 }
                 fullWidth
-                translatableHintText={t`Choose the effect to apply`}
+                translatableHintText={t`Choose a role`}
                 disabled={actionInProgress}
               >
                 {['reader', 'writer'].map(level => (

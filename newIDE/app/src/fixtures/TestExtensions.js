@@ -2,6 +2,208 @@
 // $FlowFixMe[underconstrained-implicit-instantiation]
 let testExtensionsAdded = new WeakSet();
 
+/** A fake behavior implementation with no property. */
+const makeFakeBehaviorWithoutProperty = (
+  gd: libGDevelop
+): gdBehaviorJsImplementation => {
+  const fakeBehavior = new gd.BehaviorJsImplementation();
+  // $FlowFixMe[incompatible-type] - ignore Flow warning as we're creating a behavior
+  // $FlowFixMe[cannot-write]
+  fakeBehavior.updateProperty = function(
+    behaviorContent,
+    propertyName,
+    newValue
+  ) {
+    return false;
+  };
+  // $FlowFixMe[incompatible-type] - ignore Flow warning as we're creating a behavior
+  // $FlowFixMe[cannot-write]
+  fakeBehavior.getProperties = function(behaviorContent) {
+    return new gd.MapStringPropertyDescriptor();
+  };
+  // $FlowFixMe[incompatible-type] - ignore Flow warning as we're creating a behavior
+  // $FlowFixMe[cannot-write]
+  fakeBehavior.initializeContent = function(behaviorContent) {};
+  return fakeBehavior;
+};
+
+/**
+ * A fake behavior implementation requiring another behavior on its object: a
+ * property of type "Behavior" holding the name of a behavior of the given
+ * type, like the real physics behaviors do for the 3D capability.
+ */
+const makeFakeBehaviorRequiring = (
+  gd: libGDevelop,
+  requiredBehaviorType: string,
+  label: string
+): gdBehaviorJsImplementation => {
+  const fakeBehavior = new gd.BehaviorJsImplementation();
+  // $FlowFixMe[incompatible-type] - ignore Flow warning as we're creating a behavior
+  // $FlowFixMe[cannot-write]
+  fakeBehavior.updateProperty = function(
+    behaviorContent,
+    propertyName,
+    newValue
+  ) {
+    if (propertyName === 'requiredBehavior') {
+      behaviorContent.setStringAttribute('requiredBehavior', newValue);
+      return true;
+    }
+    return false;
+  };
+  // $FlowFixMe[incompatible-type] - ignore Flow warning as we're creating a behavior
+  // $FlowFixMe[cannot-write]
+  fakeBehavior.getProperties = function(behaviorContent) {
+    const behaviorProperties = new gd.MapStringPropertyDescriptor();
+    behaviorProperties
+      .getOrCreate('requiredBehavior')
+      .setValue(behaviorContent.getStringAttribute('requiredBehavior'))
+      .setType('Behavior')
+      .setLabel(label)
+      .addExtraInfo(requiredBehaviorType);
+    return behaviorProperties;
+  };
+  // $FlowFixMe[incompatible-type] - ignore Flow warning as we're creating a behavior
+  // $FlowFixMe[cannot-write]
+  fakeBehavior.initializeContent = function(behaviorContent) {
+    behaviorContent.setStringAttribute('requiredBehavior', '');
+  };
+  return fakeBehavior;
+};
+
+/**
+ * Declare the fake effects used by the tests and the stories in the given
+ * "Effects" extension.
+ */
+export const declareFakeEffects = (extension: gdPlatformExtension) => {
+  const sepiaEffect = extension
+    .addEffect('FakeSepia')
+    .setFullName('Fake Sepia Effect')
+    .setDescription('A fake sepia effect')
+    .markAsOnlyWorkingFor2D()
+    .addIncludeFile('Extensions/Effects/fake-sepia.js');
+  const sepiaProperties = sepiaEffect.getProperties();
+  sepiaProperties
+    .getOrCreate('opacity')
+    .setValue('1')
+    .setLabel('Opacity (between 0 and 1)')
+    .setType('number');
+
+  const layerOnlySepiaEffect = extension
+    .addEffect('FakeSepiaThatWouldWorkOnlyForLayers')
+    .setFullName('Fake Sepia Effect only for layers')
+    .setDescription('A fake sepia effect only for layers')
+    .addIncludeFile('Extensions/Effects/fake-sepia-only-for-layers.js')
+    .markAsOnlyWorkingFor2D()
+    .markAsNotWorkingForObjects();
+  const layerOnlySepiaProperties = layerOnlySepiaEffect.getProperties();
+  layerOnlySepiaProperties
+    .getOrCreate('opacity')
+    .setValue('1')
+    .setLabel('Opacity (between 0 and 1)')
+    .setType('number');
+
+  const nightEffect = extension
+    .addEffect('FakeNight')
+    .setFullName('Fake Night Effect')
+    .setDescription('A fake night effect')
+    .markAsOnlyWorkingFor2D()
+    .addIncludeFile('Extensions/Effects/fake-night.js');
+  const nightProperties = nightEffect.getProperties();
+  nightProperties
+    .getOrCreate('intensity')
+    .setValue('1')
+    .setLabel('Intensity (between 0 and 1)')
+    .setType('number');
+  nightProperties
+    .getOrCreate('opacity')
+    .setValue('1')
+    .setLabel('Opacity (between 0 and 1)')
+    .setType('number');
+
+  const variousParametersEffect = extension
+    .addEffect('FakeEffectWithVariousParameters')
+    .setFullName('Fake Effect With Various Parameters')
+    .setDescription('A fake effect using different parameters')
+    .markAsOnlyWorkingFor2D()
+    .addIncludeFile(
+      'Extensions/Effects/fake-effect-with-various-parameters.js'
+    );
+  const variousParametersEffectProperties = variousParametersEffect.getProperties();
+  variousParametersEffectProperties
+    .getOrCreate('intensity')
+    .setValue('1')
+    .setLabel('Intensity (between 0 and 1)')
+    .setType('number')
+    .setDescription(
+      'Some interesting description about this intensity parameter that can be used by the effect.'
+    );
+  variousParametersEffectProperties
+    .getOrCreate('someColor')
+    .setValue('1')
+    .setLabel('Some color')
+    .setType('color')
+    .setDescription(
+      'Some interesting description about this color parameter that can be used by the effect.'
+    );
+  variousParametersEffectProperties
+    .getOrCreate('image')
+    .setValue('')
+    .setLabel('An image resource')
+    .setType('resource')
+    .addExtraInfo('image')
+    .setDescription(
+      'Some interesting description about this image resource that can be used by the effect.'
+    );
+  variousParametersEffectProperties
+    .getOrCreate('someBoolean')
+    .setValue('true')
+    .setLabel('Some setting to enable or not for the effect')
+    .setType('boolean')
+    .setDescription('And some *optional* description.');
+  {
+    const effect3D = extension
+      .addEffect('FakeDirectionalLight')
+      .setFullName('Fake directional light')
+      .setDescription('An effect for 3D layers')
+      .markAsNotWorkingForObjects()
+      .markAsOnlyWorkingFor3D()
+      .addIncludeFile('Extensions/3D/fake-DirectionalLight.js');
+    const properties = effect3D.getProperties();
+    properties
+      .getOrCreate('color')
+      .setValue('255;255;255')
+      .setLabel('Light color')
+      .setType('color');
+    properties
+      .getOrCreate('intensity')
+      .setValue('0.5')
+      .setLabel('Intensity')
+      .setType('number');
+    properties
+      .getOrCreate('top')
+      .setValue('Y-')
+      .setLabel('3D world top')
+      .setType('choice')
+      .addChoice('Y-', 'Y-')
+      .addChoice('Z+', 'Z+')
+      .setGroup('Orientation');
+    properties
+      .getOrCreate('elevation')
+      .setValue('45')
+      .setLabel('Elevation (in degrees)')
+      .setType('number')
+      .setGroup('Orientation')
+      .setDescription('Maximal elevation is reached at 90°.');
+    properties
+      .getOrCreate('rotation')
+      .setValue('0')
+      .setLabel('Rotation (in degrees)')
+      .setType('number')
+      .setGroup('Orientation');
+  }
+};
+
 /**
  * Create dummy extensions into gd.JsPlatform
  * @param gd The GD instance to use to create the extensions and find the platform.
@@ -24,132 +226,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       'MIT'
     );
 
-    const sepiaEffect = extension
-      .addEffect('FakeSepia')
-      .setFullName('Fake Sepia Effect')
-      .setDescription('A fake sepia effect')
-      .markAsOnlyWorkingFor2D()
-      .addIncludeFile('Extensions/Effects/fake-sepia.js');
-    const sepiaProperties = sepiaEffect.getProperties();
-    sepiaProperties
-      .getOrCreate('opacity')
-      .setValue('1')
-      .setLabel('Opacity (between 0 and 1)')
-      .setType('number');
-
-    const layerOnlySepiaEffect = extension
-      .addEffect('FakeSepiaThatWouldWorkOnlyForLayers')
-      .setFullName('Fake Sepia Effect only for layers')
-      .setDescription('A fake sepia effect only for layers')
-      .addIncludeFile('Extensions/Effects/fake-sepia-only-for-layers.js')
-      .markAsOnlyWorkingFor2D()
-      .markAsNotWorkingForObjects();
-    const layerOnlySepiaProperties = layerOnlySepiaEffect.getProperties();
-    layerOnlySepiaProperties
-      .getOrCreate('opacity')
-      .setValue('1')
-      .setLabel('Opacity (between 0 and 1)')
-      .setType('number');
-
-    const nightEffect = extension
-      .addEffect('FakeNight')
-      .setFullName('Fake Night Effect')
-      .setDescription('A fake night effect')
-      .markAsOnlyWorkingFor2D()
-      .addIncludeFile('Extensions/Effects/fake-night.js');
-    const nightProperties = nightEffect.getProperties();
-    nightProperties
-      .getOrCreate('intensity')
-      .setValue('1')
-      .setLabel('Intensity (between 0 and 1)')
-      .setType('number');
-    nightProperties
-      .getOrCreate('opacity')
-      .setValue('1')
-      .setLabel('Opacity (between 0 and 1)')
-      .setType('number');
-
-    const variousParametersEffect = extension
-      .addEffect('FakeEffectWithVariousParameters')
-      .setFullName('Fake Effect With Various Parameters')
-      .setDescription('A fake effect using different parameters')
-      .markAsOnlyWorkingFor2D()
-      .addIncludeFile(
-        'Extensions/Effects/fake-effect-with-various-parameters.js'
-      );
-    const variousParametersEffectProperties = variousParametersEffect.getProperties();
-    variousParametersEffectProperties
-      .getOrCreate('intensity')
-      .setValue('1')
-      .setLabel('Intensity (between 0 and 1)')
-      .setType('number')
-      .setDescription(
-        'Some interesting description about this intensity parameter that can be used by the effect.'
-      );
-    variousParametersEffectProperties
-      .getOrCreate('someColor')
-      .setValue('1')
-      .setLabel('Some color')
-      .setType('color')
-      .setDescription(
-        'Some interesting description about this color parameter that can be used by the effect.'
-      );
-    variousParametersEffectProperties
-      .getOrCreate('image')
-      .setValue('')
-      .setLabel('An image resource')
-      .setType('resource')
-      .addExtraInfo('image')
-      .setDescription(
-        'Some interesting description about this image resource that can be used by the effect.'
-      );
-    variousParametersEffectProperties
-      .getOrCreate('someBoolean')
-      .setValue('true')
-      .setLabel('Some setting to enable or not for the effect')
-      .setType('boolean')
-      .setDescription('And some *optional* description.');
-    {
-      const effect3D = extension
-        .addEffect('FakeDirectionalLight')
-        .setFullName('Fake directional light')
-        .setDescription('An effect for 3D layers')
-        .markAsNotWorkingForObjects()
-        .markAsOnlyWorkingFor3D()
-        .addIncludeFile('Extensions/3D/fake-DirectionalLight.js');
-      const properties = effect3D.getProperties();
-      properties
-        .getOrCreate('color')
-        .setValue('255;255;255')
-        .setLabel('Light color')
-        .setType('color');
-      properties
-        .getOrCreate('intensity')
-        .setValue('0.5')
-        .setLabel('Intensity')
-        .setType('number');
-      properties
-        .getOrCreate('top')
-        .setValue('Y-')
-        .setLabel('3D world top')
-        .setType('choice')
-        .addChoice('Y-', 'Y-')
-        .addChoice('Z+', 'Z+')
-        .setGroup('Orientation');
-      properties
-        .getOrCreate('elevation')
-        .setValue('45')
-        .setLabel('Elevation (in degrees)')
-        .setType('number')
-        .setGroup('Orientation')
-        .setDescription('Maximal elevation is reached at 90°.');
-      properties
-        .getOrCreate('rotation')
-        .setValue('0')
-        .setLabel('Rotation (in degrees)')
-        .setType('number')
-        .setGroup('Orientation');
-    }
+    declareFakeEffects(extension);
     platform.addNewExtension(extension);
     extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
   }
@@ -407,6 +484,132 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       )
       .setCategory('General')
       .markAsRenderedIn3D();
+
+    // The 3D capability every 3D object has by default (hidden, like the real
+    // `Scene3D::Base3DBehavior`), and a 3D model object having it.
+    extension
+      .addBehavior(
+        'Base3DBehavior',
+        '3D capability',
+        'Object3D',
+        'Fake 3D capability of 3D objects.',
+        '',
+        'res/conditions/3d_box.svg',
+        'Base3DBehavior', // Class name is the name, actually unused
+        makeFakeBehaviorWithoutProperty(gd),
+        new gd.BehaviorsSharedData()
+      )
+      .setHidden();
+
+    const Model3DObject = new gd.ObjectJsImplementation();
+    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[cannot-write]
+    // $FlowFixMe[missing-this-annot]
+    Model3DObject.updateProperty = function(propertyName, newValue) {
+      if (propertyName !== 'modelResourceName') return false;
+      this.content.modelResourceName = newValue;
+      return true;
+    };
+    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[cannot-write]
+    // $FlowFixMe[missing-this-annot]
+    Model3DObject.getProperties = function() {
+      const objectProperties = new gd.MapStringPropertyDescriptor();
+      objectProperties
+        .getOrCreate('modelResourceName')
+        .setValue(this.content.modelResourceName)
+        .setType('resource')
+        .setLabel('3D model');
+      return objectProperties;
+    };
+    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[prop-missing]
+    Model3DObject.content = {
+      modelResourceName: '',
+    };
+    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[cannot-write]
+    Model3DObject.getInitialInstanceProperties = function(
+      content,
+      instance,
+      project,
+      layout
+    ) {
+      const instanceProperties = new gd.MapStringPropertyDescriptor();
+      return instanceProperties;
+    };
+    extension
+      .addObject(
+        'Model3DObject',
+        '3D Model',
+        'A 3D model',
+        'JsPlatform/Extensions/3d_model.svg',
+        Model3DObject
+      )
+      .setCategory('General')
+      .markAsRenderedIn3D()
+      .addDefaultBehavior('FakeScene3D::Base3DBehavior');
+    platform.addNewExtension(extension);
+    extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
+  }
+  {
+    // Behaviors requiring a capability of their object (a property of type
+    // "Behavior" declares it): the 3D one, that only 3D objects have, and the
+    // animatable one, that a Sprite has but not a 3D model.
+    const extension = new gd.PlatformExtension();
+    extension.setExtensionInformation(
+      'FakePhysics3D',
+      'Fake 3D physics',
+      'A fake behavior requiring the 3D capability of its object.',
+      '',
+      'MIT'
+    );
+    extension
+      .addBehavior(
+        'Physics3DBehavior',
+        'Fake 3D physics',
+        'Physics3D',
+        'A fake 3D physics behavior, for 3D objects only.',
+        '',
+        'res/functions/extension_black.svg',
+        'Physics3DBehavior', // Class name is the name, actually unused
+        makeFakeBehaviorRequiring(
+          gd,
+          'FakeScene3D::Base3DBehavior',
+          '3D capability'
+        ),
+        new gd.BehaviorsSharedData()
+      )
+      // Like the real physics engines: not offered on the children of a
+      // custom object.
+      .markAsIrrelevantForChildObjects();
+    platform.addNewExtension(extension);
+    extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
+  }
+  {
+    const extension = new gd.PlatformExtension();
+    extension.setExtensionInformation(
+      'FakeAnimatedBehavior',
+      'Fake animated behavior',
+      'A fake behavior requiring the animatable capability of its object.',
+      '',
+      'MIT'
+    );
+    extension.addBehavior(
+      'AnimatedBehavior',
+      'Fake animated behavior',
+      'Animated',
+      'A fake behavior playing animations, for animatable objects only.',
+      '',
+      'res/functions/extension_black.svg',
+      'AnimatedBehavior', // Class name is the name, actually unused
+      makeFakeBehaviorRequiring(
+        gd,
+        'AnimatableCapability::AnimatableBehavior',
+        'Animatable capability'
+      ),
+      new gd.BehaviorsSharedData()
+    );
     platform.addNewExtension(extension);
     extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
   }
@@ -488,6 +691,68 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       )
       .setCategory('User interface');
 
+    platform.addNewExtension(extension);
+    extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
+  }
+  {
+    // Same type and data as the simple tile map of the TileMap extension: its
+    // settings are in the object, its painted tiles on each instance.
+    const extension = new gd.PlatformExtension();
+    extension.setExtensionInformation(
+      'TileMap',
+      'Fake tile map',
+      'A fake grid-based map built from reusable tiles.',
+      '',
+      'MIT'
+    );
+    const simpleTileMapObject = new gd.ObjectJsImplementation();
+    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[cannot-write]
+    simpleTileMapObject.getProperties = function() {
+      const objectProperties = new gd.MapStringPropertyDescriptor();
+      return objectProperties;
+    };
+    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[prop-missing]
+    simpleTileMapObject.content = {
+      atlasImage: '',
+      rowCount: 1,
+      columnCount: 1,
+      tileSize: 8,
+      tilesWithHitBox: '',
+    };
+    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[cannot-write]
+    simpleTileMapObject.getInitialInstanceProperties = function(instance) {
+      const instanceProperties = new gd.MapStringPropertyDescriptor();
+      instanceProperties
+        .getOrCreate('tilemap')
+        .setValue(instance.getRawStringProperty('tilemap'))
+        .setType('string')
+        .setLabel('Tilemap')
+        .setHidden(true);
+      return instanceProperties;
+    };
+    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[cannot-write]
+    simpleTileMapObject.updateInitialInstanceProperty = function(
+      instance,
+      propertyName,
+      newValue
+    ) {
+      if (propertyName === 'tilemap') {
+        instance.setRawStringProperty('tilemap', newValue);
+        return true;
+      }
+      return false;
+    };
+    extension.addObject(
+      'SimpleTileMap',
+      'Tile map',
+      'Grid-based map built from reusable tiles.',
+      'JsPlatform/Extensions/tile_map.svg',
+      simpleTileMapObject
+    );
     platform.addNewExtension(extension);
     extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
   }

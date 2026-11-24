@@ -150,7 +150,11 @@ const getAssetShortHeaderSearchTerms = (assetShortHeader: AssetShortHeader) => {
 };
 
 const getPublicAssetPackSearchTerms = (assetPack: PublicAssetPack) =>
-  assetPack.name + '\n' + assetPack.tag;
+  assetPack.name +
+  '\n' +
+  assetPack.tag +
+  '\n' +
+  assetPack.authors.map(author => author.name).join(', ');
 
 const getPrivateAssetPackListingDataSearchTerms = (
   privateAssetPack: PrivateAssetPackListingData
@@ -165,9 +169,19 @@ export const AssetStoreStateProvider = ({
   const [assetShortHeadersById, setAssetShortHeadersById] = React.useState<?{
     [string]: AssetShortHeader,
   }>(null);
+  // The id can be shortened to its first characters (the AI is given 10 of
+  // them): it must then be the start of exactly one id.
   const getAssetShortHeaderFromId = React.useCallback(
-    (id: string): AssetShortHeader | null =>
-      (assetShortHeadersById && assetShortHeadersById[id]) || null,
+    (id: string): AssetShortHeader | null => {
+      if (!assetShortHeadersById) return null;
+      if (assetShortHeadersById[id]) return assetShortHeadersById[id];
+      const matchingIds = Object.keys(assetShortHeadersById).filter(fullId =>
+        fullId.startsWith(id)
+      );
+      return matchingIds.length === 1
+        ? assetShortHeadersById[matchingIds[0]]
+        : null;
+    },
     [assetShortHeadersById]
   );
   const [
@@ -280,9 +294,14 @@ export const AssetStoreStateProvider = ({
     !!limits.capabilities.classrooms &&
     limits.capabilities.classrooms.hidePremiumProducts;
 
+  // Only the last fetch is applied: switching the environment while a fetch is
+  // running must not let the previous environment's assets come last.
+  const lastFetchIndex = React.useRef<number>(0);
   const fetchAssetsAndFilters = React.useCallback(
     () => {
       (async () => {
+        lastFetchIndex.current++;
+        const fetchIndex = lastFetchIndex.current;
         setError(null);
 
         try {
@@ -294,6 +313,7 @@ export const AssetStoreStateProvider = ({
           const fetchedAuthors = await listAllAuthors({ environment });
           const fetchedLicenses = await listAllLicenses({ environment });
           const fetchedPrivateAssetPackListingDatas = await listListedPrivateAssetPacks();
+          if (fetchIndex !== lastFetchIndex.current) return;
 
           console.info(
             `Loaded ${
@@ -309,6 +329,7 @@ export const AssetStoreStateProvider = ({
           setLicenses(fetchedLicenses);
           setPrivateAssetPackListingDatas(fetchedPrivateAssetPackListingDatas);
         } catch (error) {
+          if (fetchIndex !== lastFetchIndex.current) return;
           console.error(
             `Unable to load the assets from the asset store:`,
             error
@@ -471,9 +492,42 @@ export const AssetStoreStateProvider = ({
 
   const currentPage = shopNavigationState.getCurrentPage();
   const { chosenCategory, chosenFilters } = currentPage.filtersState;
+
+  // Map each public asset pack tag to its authors' names. The author is not
+  // stored on the asset short header itself, but assets inherit the authors of
+  // their pack (identified by the asset's first tag), so this lets assets be
+  // searched by their author's name.
+  const authorNamesByAssetPackTag = React.useMemo<{ [string]: string }>(
+    () => {
+      const authorNamesByTag: { [string]: string } = {};
+      if (publicAssetPacks) {
+        publicAssetPacks.starterPacks.forEach(assetPack => {
+          if (assetPack.authors.length > 0) {
+            authorNamesByTag[assetPack.tag] = assetPack.authors
+              .map(author => author.name)
+              .join(', ');
+          }
+        });
+      }
+      return authorNamesByTag;
+    },
+    [publicAssetPacks]
+  );
+  const getAssetShortHeaderSearchTermsWithAuthors = React.useCallback(
+    (assetShortHeader: AssetShortHeader) => {
+      const searchTerms = getAssetShortHeaderSearchTerms(assetShortHeader);
+      const assetPackTag = assetShortHeader.tags[0];
+      const authorNames = assetPackTag
+        ? authorNamesByAssetPackTag[assetPackTag]
+        : null;
+      return authorNames ? searchTerms + '\n' + authorNames : searchTerms;
+    },
+    [authorNamesByAssetPackTag]
+  );
+
   const assetShortHeadersSearchResults: ?Array<AssetShortHeader> = useSearchItem(
     assetShortHeadersById,
-    getAssetShortHeaderSearchTerms,
+    getAssetShortHeaderSearchTermsWithAuthors,
     searchText,
     chosenCategory,
     chosenFilters,
@@ -597,7 +651,7 @@ export const AssetStoreStateProvider = ({
       ) =>
         useSearchItem(
           assetShortHeadersById,
-          getAssetShortHeaderSearchTerms,
+          getAssetShortHeaderSearchTermsWithAuthors,
           searchText,
           chosenCategory,
           chosenFilters,
@@ -625,6 +679,7 @@ export const AssetStoreStateProvider = ({
       clearAllFilters,
       getAssetShortHeaderFromId,
       assetShortHeadersById,
+      getAssetShortHeaderSearchTermsWithAuthors,
     ]
   );
 

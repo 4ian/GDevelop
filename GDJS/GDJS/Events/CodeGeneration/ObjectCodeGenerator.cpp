@@ -212,8 +212,10 @@ CODE_NAMESPACE.RUNTIME_OBJECT_CLASSNAME = class RUNTIME_OBJECT_CLASSNAME extends
     INITIALIZE_PROPERTIES_CODE
     INITIALIZE_ANIMATABLE_CODE
 
-    // It calls the onCreated super implementation at the end.
-    this.onCreated();
+    if (!objectData.isFakeObjectForVariantEditor) {
+      // It calls the onCreated super implementation at the end.
+      this.onCreated();
+    }
   }
 
   // Hot-reload:

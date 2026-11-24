@@ -9,7 +9,7 @@ import {
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 
-let debuggerServerState: 'started' | 'stopped' = 'stopped';
+let debuggerServerState: 'started' | 'starting' | 'stopped' = 'stopped';
 let debuggerServerAddress: ?ServerAddress = null;
 const callbacksList: Array<PreviewDebuggerServerCallbacks> = [];
 const debuggerIds: Array<DebuggerId> = [];
@@ -17,15 +17,34 @@ const responseCallbacks = new Map<number, (value: Object) => void>();
 let nextMessageWithResponseId = 1;
 
 let embeddedGameFrameWindow: WindowProxy | null = null;
+let isEmbeddedGameFrameReady = false;
+let gameplayTestFrameWindow: WindowProxy | null = null;
 let isWindowMessageListenerRegistered = false;
+
+const setDebuggerServerState = (
+  newState: 'started' | 'starting' | 'stopped'
+) => {
+  if (debuggerServerState === newState) return;
+
+  debuggerServerState = newState;
+  callbacksList.forEach(({ onServerStateChanged }) => onServerStateChanged());
+};
 
 const getExistingDebuggerIds = (): Array<DebuggerId> => [
   ...getExistingEmbeddedGameFrameDebuggerIds(),
+  ...getExistingGameplayTestFrameDebuggerIds(),
   ...getExistingPreviewDebuggerIds(),
 ];
 
+// A frame that has a location loaded but no game running in it yet (or a game that
+// failed to start) can't be hot-reloaded: messages sent to it are silently lost.
 const getExistingEmbeddedGameFrameDebuggerIds = (): Array<DebuggerId> =>
-  embeddedGameFrameWindow ? ['embedded-game-frame'] : [];
+  embeddedGameFrameWindow && isEmbeddedGameFrameReady
+    ? ['embedded-game-frame']
+    : [];
+
+const getExistingGameplayTestFrameDebuggerIds = (): Array<DebuggerId> =>
+  gameplayTestFrameWindow ? ['gameplay-test-frame'] : [];
 
 const getExistingPreviewDebuggerIds = (): Array<DebuggerId> => debuggerIds;
 
@@ -87,31 +106,38 @@ class LocalPreviewDebuggerServer {
 
     if (!isWindowMessageListenerRegistered) {
       window.addEventListener('message', event => {
-        if (!embeddedGameFrameWindow) return;
-        if (event.source !== embeddedGameFrameWindow) return;
+        const id =
+          embeddedGameFrameWindow && event.source === embeddedGameFrameWindow
+            ? 'embedded-game-frame'
+            : gameplayTestFrameWindow &&
+              event.source === gameplayTestFrameWindow
+            ? 'gameplay-test-frame'
+            : null;
+        if (!id) return;
 
         let parsedMessage = null;
         try {
           parsedMessage = JSON.parse(event.data);
         } catch (error) {
           console.warn(
-            'Error while parsing a message received from the embedded game frame:',
+            'Error while parsing a message received from an embedded frame:',
             error
           );
         }
 
-        handleParsedMessage('embedded-game-frame', parsedMessage);
+        handleParsedMessage(id, parsedMessage);
       });
       isWindowMessageListenerRegistered = true;
     }
 
     const serverStartPromise = new Promise((resolve, reject) => {
       let serverStartPromiseCompleted = false;
-      debuggerServerState = 'stopped';
       debuggerServerAddress = null;
       removeServerListeners();
+      setDebuggerServerState('starting');
 
       ipcRenderer.on('debugger-error-received', (event, err) => {
+        setDebuggerServerState('stopped');
         if (!serverStartPromiseCompleted) {
           reject(err);
           serverStartPromiseCompleted = true;
@@ -151,16 +177,12 @@ class LocalPreviewDebuggerServer {
 
       ipcRenderer.on('debugger-start-server-done', (event, { address }) => {
         console.info('Local preview debugger started');
-        debuggerServerState = 'started';
         debuggerServerAddress = address;
+        setDebuggerServerState('started');
         if (!serverStartPromiseCompleted) {
           resolve();
           serverStartPromiseCompleted = true;
         }
-
-        callbacksList.forEach(({ onServerStateChanged }) =>
-          onServerStateChanged()
-        );
       });
 
       ipcRenderer.on('debugger-message-received', (event, { id, message }) => {
@@ -183,6 +205,10 @@ class LocalPreviewDebuggerServer {
     // after 5s.
     const serverStartTimeoutPromise = new Promise((resolve, reject) => {
       setTimeout(() => {
+        // The server can still be started later (the listeners are kept), but
+        // don't leave the debugger waiting for it indefinitely.
+        if (debuggerServerState === 'starting')
+          setDebuggerServerState('stopped');
         reject(
           new Error(
             'Debugger server not started or errored after 5s - aborting.'
@@ -194,20 +220,39 @@ class LocalPreviewDebuggerServer {
   }
   sendMessage(id: DebuggerId, message: Object) {
     if (id === 'embedded-game-frame') {
-      if (!embeddedGameFrameWindow) {
+      const theEmbeddedGameFrameWindow = embeddedGameFrameWindow;
+      if (!theEmbeddedGameFrameWindow) {
         console.error(
           'Cannot send message to the embedded game frame as it is not registered.'
         );
         return;
       }
 
-      embeddedGameFrameWindow.postMessage(message, '*');
+      if (message.command === 'hardReload') {
+        // The game is about to navigate away: it can't be considered as running - and
+        // so can't be hot-reloaded or have its files re-exported - until it announces
+        // itself again.
+        this.setEmbeddedGameFrameReady(false);
+      }
+
+      theEmbeddedGameFrameWindow.postMessage(message, '*');
+      return;
+    }
+    if (id === 'gameplay-test-frame') {
+      if (!gameplayTestFrameWindow) {
+        console.error(
+          'Cannot send message to the gameplay test frame as it is not registered.'
+        );
+        return;
+      }
+
+      gameplayTestFrameWindow.postMessage(message, '*');
       return;
     }
 
     if (!ipcRenderer) return;
-    if (debuggerServerState === 'stopped') {
-      console.error('Cannot send message when debugger server is stopped.');
+    if (debuggerServerState !== 'started') {
+      console.error('Cannot send message when debugger server is not started.');
       return;
     }
 
@@ -216,14 +261,17 @@ class LocalPreviewDebuggerServer {
       message: JSON.stringify(message),
     });
   }
-  sendMessageWithResponse(message: Object): Promise<Object> {
+  sendMessageWithResponse(
+    message: Object,
+    options?: {| timeoutMs?: number |}
+  ): Promise<Object> {
     const messageId = nextMessageWithResponseId;
     nextMessageWithResponseId++;
     for (const id of getExistingDebuggerIds()) {
       this.sendMessage(id, { ...message, messageId });
     }
 
-    const timeout = 1000;
+    const timeout = (options && options.timeoutMs) || 1000;
     const promise = new Promise<Object>((resolve, reject) => {
       responseCallbacks.set(messageId, resolve);
       setTimeout(() => {
@@ -237,7 +285,7 @@ class LocalPreviewDebuggerServer {
     });
     return promise;
   }
-  getServerState(): 'started' | 'stopped' {
+  getServerState(): 'started' | 'starting' | 'stopped' {
     return debuggerServerState;
   }
   getExistingDebuggerIds(): Array<DebuggerId> {
@@ -267,12 +315,21 @@ class LocalPreviewDebuggerServer {
     }
 
     embeddedGameFrameWindow = embeddedWindow;
-    callbacksList.forEach(({ onConnectionOpened }) =>
-      onConnectionOpened({
-        id: 'embedded-game-frame',
-        debuggerIds: getExistingDebuggerIds(),
-      })
-    );
+  }
+  setEmbeddedGameFrameReady(isReady: boolean) {
+    if (isEmbeddedGameFrameReady === isReady) return;
+
+    isEmbeddedGameFrameReady = isReady;
+    if (isReady) {
+      callbacksList.forEach(({ onConnectionOpened }) =>
+        onConnectionOpened({
+          id: 'embedded-game-frame',
+          debuggerIds: getExistingDebuggerIds(),
+        })
+      );
+    } else {
+      notifyConnectionClosed('embedded-game-frame');
+    }
   }
   unregisterEmbeddedGameFrame(embeddedWindow: WindowProxy) {
     if (embeddedGameFrameWindow !== embeddedWindow) {
@@ -285,7 +342,38 @@ class LocalPreviewDebuggerServer {
     }
 
     embeddedGameFrameWindow = null;
+    isEmbeddedGameFrameReady = false;
     notifyConnectionClosed('embedded-game-frame');
+  }
+  registerGameplayTestFrame(embeddedWindow: WindowProxy) {
+    if (embeddedWindow === gameplayTestFrameWindow) return;
+
+    if (gameplayTestFrameWindow) {
+      console.warn(
+        'A gameplay test frame window was already registered. It will be replaced by the new one.'
+      );
+    }
+
+    gameplayTestFrameWindow = embeddedWindow;
+    callbacksList.forEach(({ onConnectionOpened }) =>
+      onConnectionOpened({
+        id: 'gameplay-test-frame',
+        debuggerIds: getExistingDebuggerIds(),
+      })
+    );
+  }
+  unregisterGameplayTestFrame(embeddedWindow: WindowProxy) {
+    if (gameplayTestFrameWindow !== embeddedWindow) {
+      if (!!gameplayTestFrameWindow) {
+        console.warn(
+          'The gameplay test frame window to unregister is not the same as the one registered. Ignoring the unregistration.'
+        );
+      }
+      return;
+    }
+
+    gameplayTestFrameWindow = null;
+    notifyConnectionClosed('gameplay-test-frame');
   }
   closeAllConnections() {
     const previousDebuggerIds = [...debuggerIds];
@@ -303,7 +391,13 @@ class LocalPreviewDebuggerServer {
 
     if (embeddedGameFrameWindow) {
       embeddedGameFrameWindow = null;
+      isEmbeddedGameFrameReady = false;
       notifyConnectionClosed('embedded-game-frame');
+    }
+
+    if (gameplayTestFrameWindow) {
+      gameplayTestFrameWindow = null;
+      notifyConnectionClosed('gameplay-test-frame');
     }
   }
 }

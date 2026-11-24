@@ -23,6 +23,7 @@ import CheckCircle from '../UI/CustomSvgIcons/CheckCircle';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 
 const styles = {
+  ownedLabel: { display: 'flex', alignItems: 'center', gap: 4 },
   icon: {
     width: 13,
     height: 13,
@@ -192,7 +193,7 @@ type ProductPriceOrOwnedProps = {|
 export const OwnedLabel = (): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
-    <LineStackLayout noMargin alignItems="center">
+    <div style={styles.ownedLabel}>
       <CheckCircle
         style={{
           color: gdevelopTheme.message.valid,
@@ -201,7 +202,7 @@ export const OwnedLabel = (): React.Node => {
       <Text noMargin size="sub-title" color="inherit">
         <Trans>Owned</Trans>
       </Text>
-    </LineStackLayout>
+    </div>
   );
 };
 

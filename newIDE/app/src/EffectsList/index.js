@@ -6,8 +6,6 @@ import { type I18n as I18nType } from '@lingui/core';
 
 import { Column, Line, Spacer } from '../UI/Grid';
 import { LineStackLayout } from '../UI/Layout';
-import SelectField from '../UI/SelectField';
-import SelectOption from '../UI/SelectOption';
 import { mapFor } from '../Utils/MapFor';
 import RaisedButton from '../UI/RaisedButton';
 import IconButton from '../UI/IconButton';
@@ -57,6 +55,7 @@ import InlineCheckbox from '../UI/InlineCheckbox';
 import VisibilityIcon from '../UI/CustomSvgIcons/Visibility';
 import VisibilityOffIcon from '../UI/CustomSvgIcons/VisibilityOff';
 import PropertiesEditorByVisibility from '../PropertiesEditor/PropertiesEditorByVisibility';
+import NewEffectDialog from './NewEffectDialog';
 
 const gd: libGDevelop = global.gd;
 
@@ -64,11 +63,13 @@ const EFFECTS_CLIPBOARD_KIND = 'Effects';
 
 // $FlowFixMe[underconstrained-implicit-instantiation]
 const DragSourceAndDropTarget2D = makeDragSourceAndDropTarget(
-  '2d-effects-list'
+  '2d-effects-list',
+  { touchDragStart: 'immediate' }
 );
 // $FlowFixMe[underconstrained-implicit-instantiation]
 const DragSourceAndDropTarget3D = makeDragSourceAndDropTarget(
-  '3d-effects-list'
+  '3d-effects-list',
+  { touchDragStart: 'immediate' }
 );
 
 const styles = {
@@ -103,7 +104,6 @@ export const useEffectOverridingAlertDialog = (): ((
 const Effect = React.forwardRef((
   {
     layerRenderingType,
-    target,
     project,
     resourceManagementProps,
     projectScopedContainersAccessor,
@@ -112,7 +112,6 @@ const Effect = React.forwardRef((
     removeEffect,
     copyEffect,
     pasteEffectsBefore,
-    chooseEffectType,
     allEffectMetadata,
     onEffectsUpdated,
     onEffectsRenamed,
@@ -121,7 +120,6 @@ const Effect = React.forwardRef((
     connectDragSource,
   }: {|
     layerRenderingType: '2d' | '3d',
-    target: 'object' | 'layer',
     project: gdProject,
     resourceManagementProps: ResourceManagementProps,
     projectScopedContainersAccessor: ProjectScopedContainersAccessor,
@@ -132,7 +130,6 @@ const Effect = React.forwardRef((
     removeEffect: (effect: gdEffect) => void,
     copyEffect: (effect: gdEffect) => void,
     pasteEffectsBefore: (effect: gdEffect) => Promise<void>,
-    chooseEffectType: (effect: gdEffect, newEffectType: string) => void,
     allEffectMetadata: Array<EnumeratedEffectMetadata>,
     nameErrors: { [number]: React.Node },
     setNameErrors: (nameErrors: { [number]: React.Node }) => void,
@@ -238,27 +235,9 @@ const Effect = React.forwardRef((
                   <Trans>Type:</Trans>
                 </Text>
                 <Spacer />
-                <SelectField
-                  margin="none"
-                  value={effectType}
-                  onChange={(e, i, newEffectType: string) =>
-                    chooseEffectType(effect, newEffectType)
-                  }
-                  fullWidth
-                  translatableHintText={t`Choose the effect to apply`}
-                >
-                  {allEffectMetadata.map(effectMetadata => (
-                    <SelectOption
-                      key={effectMetadata.type}
-                      value={effectMetadata.type}
-                      label={effectMetadata.fullName}
-                      disabled={
-                        target === 'object' &&
-                        effectMetadata.isMarkedAsNotWorkingForObjects
-                      }
-                    />
-                  ))}
-                </SelectField>
+                <Text noMargin allowBrowserAutoTranslate={false}>
+                  {effectMetadata ? effectMetadata.fullName : effectType}
+                </Text>
               </Line>
             </ResponsiveLineStackLayout>
             <InlineCheckbox
@@ -399,11 +378,9 @@ export const getEffects3DCount = (
 
 type UseManageEffectsState = {|
   allEffectMetadata: Array<EnumeratedEffectMetadata>,
-  all2DEffectMetadata: Array<EnumeratedEffectMetadata>,
-  all3DEffectMetadata: Array<EnumeratedEffectMetadata>,
   draggedEffect: {| current: ?gdEffect |},
-  addEffect: boolean => void,
-  chooseEffectType: (effect: gdEffect, newEffectType: string) => void,
+  addEffect: (effectType: string) => void,
+  onEffectAddedFromStore: (effect: gdEffect) => void,
   copyAllEffects: () => void,
   copyEffect: (effect: gdEffect) => void,
   duplicatedUniqueEffectMetadata: ?EnumeratedEffectMetadata,
@@ -415,6 +392,15 @@ type UseManageEffectsState = {|
   resetJustAddedEffectName: () => void,
   justAddedEffectName: ?string,
 |};
+
+/**
+ * Name a new effect after its type (without the extension namespace),
+ * e.g: "DirectionalLight" for "Scene3D::DirectionalLight".
+ */
+const getDefaultEffectName = (effectType: string): string => {
+  const typeName = effectType.split('::').pop();
+  return typeName || 'Effect';
+};
 
 export const useManageEffects = ({
   effectsContainer,
@@ -442,81 +428,48 @@ export const useManageEffects = ({
     [project]
   );
 
-  const all3DEffectMetadata = React.useMemo(
-    () => {
-      const lightEffectMetadata = [];
-      const fogEffectMetadata = [];
-      const otherEffectMetadata = [];
-      for (const effect of allEffectMetadata) {
-        if (!effect.isMarkedAsOnlyWorkingFor3D) {
-          continue;
-        }
-        if (effect.type.endsWith('Light')) {
-          lightEffectMetadata.push(effect);
-        } else if (effect.type.endsWith('Fog')) {
-          fogEffectMetadata.push(effect);
-        } else {
-          otherEffectMetadata.push(effect);
-        }
-      }
-      return [
-        ...lightEffectMetadata,
-        ...fogEffectMetadata,
-        ...otherEffectMetadata,
-      ];
-    },
-    [allEffectMetadata]
-  );
-
-  const all2DEffectMetadata: Array<EnumeratedEffectMetadata> = React.useMemo(
-    () => allEffectMetadata.filter(effect => effect.isMarkedAsOnlyWorkingFor2D),
-    [allEffectMetadata]
-  );
-
   const showEffectOverridingConfirmation = useEffectOverridingAlertDialog();
 
-  const chooseEffectType = React.useCallback(
-    (effect: gdEffect, newEffectType: string) => {
-      effect.setEffectType(newEffectType);
-      const effectMetadata = getEnumeratedEffectMetadata(
-        allEffectMetadata,
-        newEffectType
-      );
-
-      if (effectMetadata) {
-        setEffectDefaultParameters(effect, effectMetadata.effectMetadata);
-      }
-
+  const onEffectAddedFromStore = React.useCallback(
+    (effect: gdEffect) => {
       onUpdate();
       onEffectsUpdated();
-      // Changing the type is like adding a new effect.
-      // TODO Make a new effect dialog like for objects or behaviors to make this clearer.
       onEffectAdded();
+      setJustAddedEffectName(effect.getName());
     },
-    [allEffectMetadata, onUpdate, onEffectsUpdated, onEffectAdded]
+    [onUpdate, onEffectsUpdated, onEffectAdded]
   );
 
   const _addEffect = React.useCallback(
-    (is3D: boolean) => {
-      const newName = newNameGenerator('Effect', name =>
+    (effectType: string) => {
+      const newName = newNameGenerator(getDefaultEffectName(effectType), name =>
         effectsContainer.hasEffectNamed(name)
       );
       const effect = effectsContainer.insertNewEffect(
         newName,
         effectsContainer.getEffectsCount()
       );
-
-      if (is3D) {
-        chooseEffectType(effect, 'Scene3D::DirectionalLight');
-      } else {
-        chooseEffectType(effect, 'Outline');
+      effect.setEffectType(effectType);
+      const effectMetadata = getEnumeratedEffectMetadata(
+        allEffectMetadata,
+        effectType
+      );
+      if (effectMetadata) {
+        setEffectDefaultParameters(effect, effectMetadata.effectMetadata);
       }
 
       onUpdate();
       onEffectsUpdated();
+      onEffectAdded();
       setJustAddedEffectName(newName);
     },
-    [chooseEffectType, effectsContainer, onUpdate, onEffectsUpdated]
+    [
+      allEffectMetadata,
+      effectsContainer,
+      onUpdate,
+      onEffectsUpdated,
+      onEffectAdded,
+    ]
   );
 
   const addEffect = addCreateBadgePreHookIfNotClaimed(
@@ -741,11 +694,9 @@ export const useManageEffects = ({
 
   return {
     allEffectMetadata,
-    all2DEffectMetadata,
-    all3DEffectMetadata,
     draggedEffect,
     addEffect,
-    chooseEffectType,
+    onEffectAddedFromStore,
     copyAllEffects,
     copyEffect,
     duplicatedUniqueEffectMetadata,
@@ -787,14 +738,15 @@ export default function EffectsList(props: Props): React.Node {
   } = props;
   const scrollView = React.useRef<?ScrollViewInterface>(null);
   const justAddedEffectElement = React.useRef<?any>(null);
+  const [isNewEffectDialogOpen, setIsNewEffectDialogOpen] = React.useState(
+    false
+  );
 
   const forceUpdate = useForceUpdate();
   const {
     allEffectMetadata,
-    all2DEffectMetadata,
-    all3DEffectMetadata,
     addEffect,
-    chooseEffectType,
+    onEffectAddedFromStore,
     copyAllEffects,
     copyEffect,
     duplicatedUniqueEffectMetadata,
@@ -944,7 +896,6 @@ export default function EffectsList(props: Props): React.Node {
                                       <Effect
                                         ref={effectRef}
                                         layerRenderingType={'3d'}
-                                        target={target}
                                         project={project}
                                         projectScopedContainersAccessor={
                                           props.projectScopedContainersAccessor
@@ -957,8 +908,7 @@ export default function EffectsList(props: Props): React.Node {
                                         removeEffect={removeEffect}
                                         copyEffect={copyEffect}
                                         pasteEffectsBefore={pasteEffectsBefore}
-                                        chooseEffectType={chooseEffectType}
-                                        allEffectMetadata={all3DEffectMetadata}
+                                        allEffectMetadata={allEffectMetadata}
                                         onEffectsUpdated={onEffectsUpdated}
                                         onEffectsRenamed={onEffectsRenamed}
                                         nameErrors={nameErrors}
@@ -1038,7 +988,6 @@ export default function EffectsList(props: Props): React.Node {
                                       <Effect
                                         ref={effectRef}
                                         layerRenderingType={'2d'}
-                                        target={target}
                                         project={project}
                                         resourceManagementProps={
                                           props.resourceManagementProps
@@ -1051,8 +1000,7 @@ export default function EffectsList(props: Props): React.Node {
                                         removeEffect={removeEffect}
                                         copyEffect={copyEffect}
                                         pasteEffectsBefore={pasteEffectsBefore}
-                                        chooseEffectType={chooseEffectType}
-                                        allEffectMetadata={all2DEffectMetadata}
+                                        allEffectMetadata={allEffectMetadata}
                                         onEffectsUpdated={onEffectsUpdated}
                                         onEffectsRenamed={onEffectsRenamed}
                                         nameErrors={nameErrors}
@@ -1093,75 +1041,59 @@ export default function EffectsList(props: Props): React.Node {
                     />
                   </LineStackLayout>
                   <LineStackLayout justifyContent="flex-end" expand>
-                    {props.layerRenderingType !== '2d' && (
-                      <RaisedButton
-                        primary
-                        label={<Trans>Add a 3D effect</Trans>}
-                        onClick={() => addEffect(true)}
-                        icon={<Add />}
-                      />
-                    )}
-                    {props.layerRenderingType !== '3d' && (
-                      <RaisedButton
-                        primary
-                        label={<Trans>Add a 2D effect</Trans>}
-                        onClick={() => addEffect(false)}
-                        icon={<Add />}
-                      />
-                    )}
+                    <RaisedButton
+                      primary
+                      label={<Trans>Add an effect</Trans>}
+                      icon={<Add />}
+                      onClick={() => setIsNewEffectDialogOpen(true)}
+                      id="add-effect-button"
+                    />
                   </LineStackLayout>
                 </Line>
               </Column>
             </React.Fragment>
           ) : (
             <Column noMargin expand justifyContent="center">
-              {props.layerRenderingType === '' ||
-              props.layerRenderingType === '2d+3d' ? (
-                <EmptyPlaceholder
-                  title={<Trans>Add your first effect</Trans>}
-                  description={
-                    <Trans>Effects create visual changes to the object.</Trans>
-                  }
-                  actionLabel={<Trans>Add a 2D effect</Trans>}
-                  helpPagePath={
-                    props.target === 'object'
-                      ? '/objects/effects'
-                      : '/interface/scene-editor/layer-effects'
-                  }
-                  onAction={() => addEffect(false)}
-                  secondaryActionIcon={<Add />}
-                  secondaryActionLabel={<Trans>Add a 3D effect</Trans>}
-                  onSecondaryAction={() => addEffect(true)}
-                />
-              ) : (
-                <EmptyPlaceholder
-                  title={<Trans>Add your first effect</Trans>}
-                  description={
-                    <Trans>Effects create visual changes to the object.</Trans>
-                  }
-                  actionLabel={
-                    props.layerRenderingType === '3d' ? (
-                      <Trans>Add a 3D effect</Trans>
-                    ) : (
-                      <Trans>Add a 2D effect</Trans>
-                    )
-                  }
-                  helpPagePath={
-                    props.target === 'object'
-                      ? '/objects/effects'
-                      : '/interface/scene-editor/layer-effects'
-                  }
-                  onAction={() => addEffect(props.layerRenderingType === '3d')}
-                  secondaryActionIcon={<PasteIcon />}
-                  secondaryActionLabel={
-                    isClipboardContainingEffects ? <Trans>Paste</Trans> : null
-                  }
-                  onSecondaryAction={() => {
-                    pasteEffectsAtTheEnd();
-                  }}
-                />
-              )}
+              <EmptyPlaceholder
+                title={<Trans>Add your first effect</Trans>}
+                description={
+                  <Trans>Effects create visual changes to the object.</Trans>
+                }
+                actionLabel={<Trans>Add an effect</Trans>}
+                actionButtonId="add-effect-button"
+                helpPagePath={
+                  props.target === 'object'
+                    ? '/objects/effects'
+                    : '/interface/scene-editor/layer-effects'
+                }
+                onAction={() => setIsNewEffectDialogOpen(true)}
+                secondaryActionIcon={<PasteIcon />}
+                secondaryActionLabel={
+                  isClipboardContainingEffects ? <Trans>Paste</Trans> : null
+                }
+                onSecondaryAction={() => {
+                  pasteEffectsAtTheEnd();
+                }}
+              />
             </Column>
+          )}
+          {isNewEffectDialogOpen && (
+            <NewEffectDialog
+              project={project}
+              effectsContainer={effectsContainer}
+              target={target}
+              layerRenderingType={props.layerRenderingType}
+              resourceManagementProps={props.resourceManagementProps}
+              onClose={() => setIsNewEffectDialogOpen(false)}
+              onChooseEffectType={effectType => {
+                setIsNewEffectDialogOpen(false);
+                addEffect(effectType);
+              }}
+              onEffectAddedFromStore={effect => {
+                setIsNewEffectDialogOpen(false);
+                onEffectAddedFromStore(effect);
+              }}
+            />
           )}
         </Column>
       )}

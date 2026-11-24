@@ -93,6 +93,15 @@ export type PrimitiveValueField =
       ...ValueFieldCommonProperties,
     |}
   | {|
+      /** A number of which each bit is displayed as a toggle. */
+      valueType: 'bitmask',
+      getValue: Instance => number,
+      setValue: (instance: Instance, newValue: number) => void,
+      firstBit: number,
+      bitCount: number,
+      ...ValueFieldCommonProperties,
+    |}
+  | {|
       valueType: 'multilinestring',
       getValue: Instance => string,
       setValue: (instance: Instance, newValue: string) => void,
@@ -182,6 +191,8 @@ export type Field =
       preventWrap?: boolean,
       removeSpacers?: boolean,
       title?: ?string,
+      /** A section inside a group, with a smaller title. */
+      isSubgroup?: boolean,
       children: Array<Field>,
       isHidden?: (Array<Instance>) => boolean,
     |};

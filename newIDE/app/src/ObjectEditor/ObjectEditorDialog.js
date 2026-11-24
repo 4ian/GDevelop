@@ -9,6 +9,7 @@ import HelpButton from '../UI/HelpButton';
 import BehaviorsEditor from '../BehaviorsEditor';
 import { Tabs } from '../UI/Tabs';
 import { useSerializableObjectCancelableEditor } from '../Utils/SerializableObjectCancelableEditor';
+import { useMarkObjectAsOpenedInEditor } from './ObjectsOpenedInEditor';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import { Column, Line } from '../UI/Grid';
 import { type EditorProps } from './Editors/EditorProps.flow';
@@ -66,6 +67,9 @@ type Props = {|
   openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  onCreateNewExtensionWithBehavior:
+    | ((project: gdProject, object: gdObject) => void)
+    | null,
   onOpenEventBasedObjectEditor: (
     extensionName: string,
     eventsBasedObjectName: string
@@ -113,6 +117,7 @@ const InnerDialog = (props: InnerDialogProps) => {
     onComputeAllVariableNames,
     onWillInstallExtension,
     onExtensionInstalled,
+    onCreateNewExtensionWithBehavior,
     onOpenEventBasedObjectEditor,
     onOpenEventBasedObjectVariantEditor,
     onDeleteEventsBasedObjectVariant,
@@ -125,17 +130,17 @@ const InnerDialog = (props: InnerDialogProps) => {
   const [objectName, setObjectName] = React.useState(props.objectName);
   const forceUpdate = useForceUpdate();
 
-  // Reset variable UUIDs for changeset tracking. This must happen before
-  // the cancelable editor hook serializes the object, so that both the
-  // serialized "original" state and the in-memory "new" state share
+  // Ensure variable UUIDs are set for changeset tracking. This must happen
+  // before the cancelable editor hook serializes the object, so that both
+  // the serialized "original" state and the in-memory "new" state share
   // the same UUIDs when changes are applied.
-  // We only reset variable UUIDs (not the object's own UUID).
-  // This can be removed once we decide to persist variable UUIDs in the project file.
-  // (and make sure they are properly reset when a variable is added/copied/pasted/etc).
-  const variableUuidsResetRef = React.useRef(false);
-  if (!variableUuidsResetRef.current) {
-    object.getVariables().resetPersistentUuid();
-    variableUuidsResetRef.current = true;
+  // Variables persistent UUIDs are persisted in the project file, so they
+  // must be kept stable: only set them for variables not having one yet.
+  // We only touch variable UUIDs (not the object's own UUID).
+  const variableUuidsEnsuredRef = React.useRef(false);
+  if (!variableUuidsEnsuredRef.current) {
+    object.getVariables().ensurePersistentUuids();
+    variableUuidsEnsuredRef.current = true;
   }
 
   const {
@@ -146,15 +151,9 @@ const InnerDialog = (props: InnerDialogProps) => {
   } = useSerializableObjectCancelableEditor({
     serializableObject: object,
     useProjectToUnserialize: project,
-    onCancel: React.useCallback(
-      () => {
-        // Clear variable UUIDs to avoid them being persisted in the project file.
-        object.getVariables().clearPersistentUuid();
-        onCancel();
-      },
-      [object, onCancel]
-    ),
+    onCancel,
   });
+  useMarkObjectAsOpenedInEditor(object);
 
   const [hasResourceChanged, setResourceChanged] = React.useState<boolean>(
     false
@@ -215,9 +214,6 @@ const InnerDialog = (props: InnerDialogProps) => {
         changeset
       );
     }
-
-    // Clear variable UUIDs to avoid them being persisted in the project file.
-    object.getVariables().clearPersistentUuid();
 
     // Do the renaming *after* applying changes, as "withSerializableObject"
     // HOC will unserialize the object to apply modifications, which will
@@ -387,11 +383,17 @@ const InnerDialog = (props: InnerDialogProps) => {
           openBehaviorEvents={askConfirmationAndOpenBehaviorEvents}
           onWillInstallExtension={onWillInstallExtension}
           onExtensionInstalled={onExtensionInstalled}
+          onCreateNewExtensionWithBehavior={(project, object) => {
+            if (onCreateNewExtensionWithBehavior) {
+              onApply();
+              onCreateNewExtensionWithBehavior(project, object);
+            }
+          }}
           isListLocked={isBehaviorListLocked}
         />
       )}
       {currentTab === 'variables' && (
-        <Column expand noMargin>
+        <Column expand noMargin noOverflowParent>
           {object.getVariables().count() > 0 && DismissableTutorialMessage && (
             <Line>
               <Column noMargin expand>

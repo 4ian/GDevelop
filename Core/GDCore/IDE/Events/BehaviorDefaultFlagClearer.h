@@ -20,7 +20,8 @@ namespace gd {
 
 /**
  * @brief This is used for project exports to keep default behaviors in
- * serialized data used by Runtime.
+ * serialized data used by Runtime, as well as the network synchronization
+ * of behaviors not synchronized by default.
  */
 class GD_CORE_API BehaviorDefaultFlagClearer : public ArbitraryObjectsWorker {
  public:
@@ -31,6 +32,8 @@ class GD_CORE_API BehaviorDefaultFlagClearer : public ArbitraryObjectsWorker {
       const gd::Object &object, SerializerElement &serializerElement);
 
 private:
+  static void ClearDefaultFlags(gd::Behavior& behavior);
+
   void DoVisitObject(gd::Object& object) override;
   void DoVisitBehavior(gd::Behavior& behavior) override;
 };

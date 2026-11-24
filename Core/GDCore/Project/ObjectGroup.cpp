@@ -7,6 +7,7 @@
 #include "ObjectGroup.h"
 
 #include <algorithm>
+#include <unordered_set>
 #include <vector>
 
 #include "GDCore/Serialization/SerializerElement.h"
@@ -61,8 +62,15 @@ void ObjectGroup::UnserializeFrom(const SerializerElement& element) {
   else {
     SerializerElement& objectsElement = element.GetChild("objects");
     objectsElement.ConsiderAsArrayOf("object");
-    for (std::size_t j = 0; j < objectsElement.GetChildrenCount(); ++j)
-      AddObject(objectsElement.GetChild(j).GetStringAttribute("name"));
+    // Skip the duplicates like AddObject, but without searching all the
+    // objects already added each time (O(number of objects^2)).
+    std::unordered_set<gd::String> addedObjectNames;
+    for (std::size_t j = 0; j < objectsElement.GetChildrenCount(); ++j) {
+      gd::String objectName =
+          objectsElement.GetChild(j).GetStringAttribute("name");
+      if (addedObjectNames.insert(objectName).second)
+        memberObjects.push_back(objectName);
+    }
   }
 }
 

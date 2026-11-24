@@ -34,6 +34,9 @@ namespace gdjs {
 
     onDeActivate() {
       this._endDrag();
+      // doStepPostEvents is not called while deactivated, so the flag
+      // must be reset here to avoid staying true forever.
+      this._justDropped = false;
     }
 
     onDestroy() {

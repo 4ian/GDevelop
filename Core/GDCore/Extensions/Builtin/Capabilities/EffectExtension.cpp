@@ -41,7 +41,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsEffectExtension(
 
   aut.AddScopedAction("EnableEffect",
                 _("Enable an object effect"),
-                _("Enable an effect on the object"),
+                _("Enable or disable an effect on the object"),
                 _("Enable effect _PARAM2_ on _PARAM0_: _PARAM3_"),
                 _("Effects"),
                 "res/actions/effect_black.svg",
@@ -103,7 +103,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsEffectExtension(
 
   aut.AddScopedCondition("IsEffectEnabled",
                    _("Effect is enabled"),
-                   _("Check if the effect on an object is enabled."),
+                   _("Check if the effect on an object is enabled or disabled."),
                    _("Effect _PARAM2_ of _PARAM0_ is enabled"),
                    _("Effects"),
                    "res/actions/effect_black.svg",

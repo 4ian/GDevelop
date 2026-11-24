@@ -2,11 +2,13 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import Text from '../../UI/Text';
-import RaisedButton from '../../UI/RaisedButton';
-import FlatButton from '../../UI/FlatButton';
-import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
-import HelpQuestion from '../../UI/CustomSvgIcons/HelpQuestion';
+import Check from '../../UI/CustomSvgIcons/Check';
+import Cross from '../../UI/CustomSvgIcons/Cross';
+import Edit from '../../UI/CustomSvgIcons/Edit';
+import Sparkle from '../../UI/CustomSvgIcons/Sparkle';
+import { ChatActionButton } from './ChatActionButton';
 import { type EditApprovalRequest } from '../Utils';
+import classes from './EditApprovalRow.module.css';
 
 type Props = {|
   pendingEditApproval: EditApprovalRequest,
@@ -15,10 +17,10 @@ type Props = {|
 |};
 
 const styles = {
-  icon: {
-    fontSize: 14,
-    flexShrink: 0,
-    marginTop: 1,
+  label: {
+    // Anywhere because the label can contain long object or scene names.
+    overflowWrap: 'anywhere',
+    fontWeight: 'bold',
   },
 };
 
@@ -31,27 +33,47 @@ export const EditApprovalRow = ({
   onResolveEditApproval,
   onAcceptAndEnableAutoEdit,
 }: Props): React.Node => (
-  <ColumnStackLayout noMargin>
-    <LineStackLayout noMargin alignItems="flex-start">
-      <HelpQuestion style={styles.icon} />
+  <div className={classes.container}>
+    <div className={classes.header}>
+      <span className={classes.iconBadge}>
+        <Edit fontSize="inherit" />
+      </span>
       <Text noMargin size="body-small" color="secondary">
-        <Trans>Apply this change:</Trans> {pendingEditApproval.label}
+        <Trans>The AI wants to edit your project</Trans>
       </Text>
-    </LineStackLayout>
-    <ColumnStackLayout noMargin alignItems="flex-start">
-      <RaisedButton
-        primary
-        label={<Trans>Yes, just this change</Trans>}
+    </div>
+    <Text
+      noMargin
+      size="body-small"
+      // $FlowFixMe[incompatible-type]
+      style={styles.label}
+    >
+      {pendingEditApproval.label}
+    </Text>
+    <div className={classes.actions}>
+      <ChatActionButton
+        emphasis="primary"
+        icon={<Check fontSize="inherit" />}
+        label={<Trans>Apply</Trans>}
         onClick={() => onResolveEditApproval(true)}
       />
-      <FlatButton
-        label={<Trans>Yes, and enable auto-edit</Trans>}
+      <ChatActionButton
+        icon={<Sparkle fontSize="inherit" />}
+        label={<Trans>Always apply</Trans>}
+        tooltip={
+          <Trans>
+            Apply this change and turn on auto edit, so the next changes are
+            applied without asking.
+          </Trans>
+        }
         onClick={onAcceptAndEnableAutoEdit}
       />
-      <FlatButton
-        label={<Trans>No</Trans>}
+      <ChatActionButton
+        emphasis="quiet"
+        icon={<Cross fontSize="inherit" />}
+        label={<Trans>Don't apply</Trans>}
         onClick={() => onResolveEditApproval(false)}
       />
-    </ColumnStackLayout>
-  </ColumnStackLayout>
+    </div>
+  </div>
 );

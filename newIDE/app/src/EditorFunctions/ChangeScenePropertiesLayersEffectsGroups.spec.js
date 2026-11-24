@@ -1,0 +1,901 @@
+// @flow
+import { editorFunctions, type EditorFunctionGenericOutput } from './index';
+import { makeFakeLaunchFunctionOptionsWithProject } from './TestHelpers';
+import { makeTestExtensions } from '../fixtures/TestExtensions';
+
+const gd: libGDevelop = global.gd;
+
+describe('change_scene_properties_layers_effects_groups', () => {
+  let project: gdProject;
+  let testScene: gdLayout;
+
+  beforeEach(() => {
+    makeTestExtensions(gd);
+    // $FlowFixMe[invalid-constructor]
+    project = new gd.ProjectHelper.createNewGDJSProject();
+    testScene = project.insertNewLayout('TestScene', 0);
+  });
+
+  afterEach(() => {
+    project.delete();
+  });
+
+  it('deletes a layer and moves its instances to another layer', async () => {
+    testScene.getLayers().insertNewLayer('Background', 1);
+    testScene.getLayers().insertNewLayer('UI', 2);
+    testScene.getObjects().insertNewObject(project, 'Sprite', 'Button', 0);
+    const instance = testScene.getInitialInstances().insertNewInitialInstance();
+    instance.setObjectName('Button');
+    instance.setLayer('UI');
+
+    const fakeOptions = makeFakeLaunchFunctionOptionsWithProject(project);
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...fakeOptions,
+        args: {
+          scene_name: 'TestScene',
+          changed_layers: [
+            {
+              layer_name: 'UI',
+              delete_this_layer: true,
+              move_instances_to_layer: 'Background',
+            },
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.message).toContain(
+      'Removed layer "UI" for scene "TestScene" (instances moved to layer "Background").'
+    );
+    expect(testScene.hasLayerNamed('UI')).toBe(false);
+    expect(testScene.hasLayerNamed('Background')).toBe(true);
+    // The instance was moved to the target layer instead of being deleted.
+    expect(instance.getLayer()).toBe('Background');
+    // The editor is notified that instances have been modified.
+    expect(fakeOptions.onInstancesModifiedOutsideEditor).toHaveBeenCalledWith({
+      scene: testScene,
+    });
+  });
+
+  it('deletes a layer and moves its instances to the base layer (named "")', async () => {
+    testScene.getLayers().insertNewLayer('UI', 1);
+    testScene.getObjects().insertNewObject(project, 'Sprite', 'Button', 0);
+    const instance = testScene.getInitialInstances().insertNewInitialInstance();
+    instance.setObjectName('Button');
+    instance.setLayer('UI');
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          changed_layers: [
+            {
+              layer_name: 'UI',
+              delete_this_layer: true,
+              move_instances_to_layer: '',
+            },
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.message).toContain(
+      'Removed layer "UI" for scene "TestScene" (instances moved to the base layer).'
+    );
+    expect(testScene.hasLayerNamed('UI')).toBe(false);
+    // The instance was moved to the base layer instead of being deleted.
+    expect(instance.getLayer()).toBe('');
+  });
+
+  it('deletes a layer along with its instances when move_instances_to_layer is not set', async () => {
+    testScene.getLayers().insertNewLayer('UI', 1);
+    testScene.getObjects().insertNewObject(project, 'Sprite', 'Button', 0);
+    const instance = testScene.getInitialInstances().insertNewInitialInstance();
+    instance.setObjectName('Button');
+    instance.setLayer('UI');
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          changed_layers: [{ layer_name: 'UI', delete_this_layer: true }],
+        },
+      }
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.message).toContain(
+      'Removed layer "UI" for scene "TestScene" (its instances were removed too).'
+    );
+    expect(testScene.hasLayerNamed('UI')).toBe(false);
+    expect(testScene.getInitialInstances().getInstancesCount()).toBe(0);
+  });
+
+  // Layer deletion/merge must also handle the external layouts associated
+  // with the scene — the exact area covered by the WholeProjectRefactorer.
+  it('moves the instances of associated external layouts when deleting a layer', async () => {
+    testScene.getLayers().insertNewLayer('UI', 1);
+    testScene.getObjects().insertNewObject(project, 'Sprite', 'Button', 0);
+    const externalLayout = project.insertNewExternalLayout(
+      'MyExternalLayout',
+      0
+    );
+    externalLayout.setAssociatedLayout('TestScene');
+    const externalInstance = externalLayout
+      .getInitialInstances()
+      .insertNewInitialInstance();
+    externalInstance.setObjectName('Button');
+    externalInstance.setLayer('UI');
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          changed_layers: [
+            {
+              layer_name: 'UI',
+              delete_this_layer: true,
+              move_instances_to_layer: '',
+            },
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(true);
+    expect(testScene.hasLayerNamed('UI')).toBe(false);
+    // The external layout instance was moved to the base layer, not orphaned.
+    expect(externalInstance.getLayer()).toBe('');
+  });
+
+  it('removes the instances of associated external layouts when deleting a layer with its instances', async () => {
+    testScene.getLayers().insertNewLayer('UI', 1);
+    testScene.getObjects().insertNewObject(project, 'Sprite', 'Button', 0);
+    const externalLayout = project.insertNewExternalLayout(
+      'MyExternalLayout',
+      0
+    );
+    externalLayout.setAssociatedLayout('TestScene');
+    const externalInstance = externalLayout
+      .getInitialInstances()
+      .insertNewInitialInstance();
+    externalInstance.setObjectName('Button');
+    externalInstance.setLayer('UI');
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          changed_layers: [{ layer_name: 'UI', delete_this_layer: true }],
+        },
+      }
+    );
+
+    expect(result.success).toBe(true);
+    expect(testScene.hasLayerNamed('UI')).toBe(false);
+    // The external layout instances on the deleted layer are removed too.
+    expect(externalLayout.getInitialInstances().getInstancesCount()).toBe(0);
+  });
+
+  // The position block used to look up the deleted layer and report a move
+  // that never happened.
+  it('ignores new_layer_position when the layer is deleted in the same item', async () => {
+    testScene.getLayers().insertNewLayer('UI', 1);
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          changed_layers: [
+            {
+              layer_name: 'UI',
+              delete_this_layer: true,
+              new_layer_position: 0,
+            },
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.message).toContain('Removed layer "UI"');
+    expect(result.warnings).toContain(
+      '"new_layer_position" was ignored: layer "UI" was deleted.'
+    );
+    // No false "Moved layer" report for a layer that no longer exists.
+    expect(result.message).not.toContain('Moved layer');
+    expect(testScene.hasLayerNamed('UI')).toBe(false);
+  });
+
+  // `moveLayer` silently no-ops on an out-of-range position: the tool must
+  // clamp (documented as "set on top") and report the real position.
+  it('clamps an out-of-range new_layer_position to the top', async () => {
+    testScene.getLayers().insertNewLayer('Background', 1);
+    testScene.getLayers().insertNewLayer('UI', 2);
+    expect(testScene.getLayers().getLayerPosition('Background')).toBe(1);
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          changed_layers: [
+            { layer_name: 'Background', new_layer_position: 99 },
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.message).toContain(
+      'Moved layer "Background" to position 2 for scene "TestScene".'
+    );
+    // The layer was really moved on top (last position).
+    expect(testScene.getLayers().getLayerPosition('Background')).toBe(2);
+  });
+
+  it('refuses to delete a layer when the target layer for instances does not exist', async () => {
+    testScene.getLayers().insertNewLayer('UI', 1);
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          changed_layers: [
+            {
+              layer_name: 'UI',
+              delete_this_layer: true,
+              move_instances_to_layer: 'DoesNotExist',
+            },
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(false);
+    expect(result.message).toBe('Nothing changed. See warnings.');
+    expect(result.warnings).toBe(
+      'Layer "DoesNotExist" does not exist in scene "TestScene": layer "UI" was NOT deleted (its instances would have nowhere to go). The base layer is named "".'
+    );
+    expect(testScene.hasLayerNamed('UI')).toBe(true);
+  });
+
+  it('adds a skybox from the asset store on a layer', async () => {
+    const effects = testScene
+      .getLayers()
+      .getLayer('')
+      .getEffects();
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          changed_layer_effects: [
+            {
+              layer_name: '',
+              effect_name: 'Sky',
+              asset_id: 'e1d2c3b4a5',
+            },
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.message).toContain(
+      'Added the effect "Sky" (Scene3D::Skybox) from the asset store on layer ""'
+    );
+    expect(effects.hasEffectNamed('Sky')).toBe(true);
+    expect(effects.getEffect('Sky').getEffectType()).toBe('Scene3D::Skybox');
+    expect(
+      effects.getEffect('Sky').getStringParameter('frontFaceResourceName')
+    ).toBe('FakeSky_Front.png');
+  });
+
+  it('refuses a resource the project does not have as an effect property', async () => {
+    const effects = testScene
+      .getLayers()
+      .getLayer('')
+      .getEffects();
+    const effect = effects.insertNewEffect('Various', 0);
+    effect.setEffectType('FakeEffectWithVariousParameters');
+    effect.setStringParameter('image', 'Existing.png');
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          changed_layer_effects: [
+            {
+              layer_name: '',
+              effect_name: 'Various',
+              changed_properties: [
+                { property_name: 'image', new_value: 'Skybox_Front.png' },
+              ],
+            },
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(false);
+    expect(result.warnings).toContain(
+      '"image" of the "Various" effect -> "Skybox_Front.png": no such resource in the project'
+    );
+    expect(effect.getStringParameter('image')).toBe('Existing.png');
+  });
+
+  it('asks the asset store for an effect made for layers', async () => {
+    let askedEffectTarget = null;
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        searchAndInstallEffectAsset: async ({ effectTarget }) => {
+          askedEffectTarget = effectTarget;
+          return {
+            status: 'nothing-found',
+            message:
+              'Asset with id "a1b2c3" is an effect made for objects, not layers: choose another asset, or add a "HslAdjustment" effect without an asset and set its properties.',
+            effect: null,
+            assetShortHeader: null,
+          };
+        },
+        args: {
+          scene_name: 'TestScene',
+          changed_layer_effects: [
+            { layer_name: '', effect_name: 'Flash', asset_id: 'a1b2c3' },
+          ],
+        },
+      }
+    );
+
+    expect(askedEffectTarget).toBe('layer');
+    expect(result.success).toBe(false);
+    expect(result.warnings).toContain(
+      'No effect could be added from the asset store on layer "" for "Flash": Asset with id "a1b2c3" is an effect made for objects, not layers: choose another asset, or add a "HslAdjustment" effect without an asset and set its properties.'
+    );
+  });
+
+  it('reports an effect the asset store does not have, or of another type', async () => {
+    const effects = testScene
+      .getLayers()
+      .getLayer('')
+      .getEffects();
+    const fakeOptions = makeFakeLaunchFunctionOptionsWithProject(project);
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...fakeOptions,
+        searchAndInstallEffectAsset: async ({ effectType }) => ({
+          status: 'nothing-found',
+          message: effectType
+            ? `Asset with id "e1d2c3b4a5" is a "Scene3D::Skybox" effect, not a "${effectType}".`
+            : 'No asset found with id "ffffff".',
+          effect: null,
+          assetShortHeader: null,
+        }),
+        args: {
+          scene_name: 'TestScene',
+          changed_layer_effects: [
+            { layer_name: '', effect_name: 'Sky', asset_id: 'ffffff' },
+            {
+              layer_name: '',
+              effect_name: 'Sky2',
+              effect_type: 'FakeSepia',
+              asset_id: 'e1d2c3b4a5',
+            },
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(false);
+    expect(result.warnings).toContain(
+      'No effect could be added from the asset store on layer "" for "Sky": No asset found with id "ffffff".'
+    );
+    expect(result.warnings).toContain(
+      'No effect could be added from the asset store on layer "" for "Sky2": Asset with id "e1d2c3b4a5" is a "Scene3D::Skybox" effect, not a "FakeSepia".'
+    );
+    expect(effects.hasEffectNamed('Sky')).toBe(false);
+    expect(effects.hasEffectNamed('Sky2')).toBe(false);
+  });
+
+  it('gives a new layer effect the default values of its parameters', async () => {
+    const effects = testScene
+      .getLayers()
+      .getLayer('')
+      .getEffects();
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          changed_layer_effects: [
+            {
+              layer_name: '',
+              effect_name: 'MySepia',
+              effect_type: 'FakeSepia',
+            },
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(true);
+    expect(effects.getEffect('MySepia').getDoubleParameter('opacity')).toBe(1);
+  });
+
+  it('renames a layer effect', async () => {
+    const effects = testScene
+      .getLayers()
+      .getLayer('')
+      .getEffects();
+    effects.insertNewEffect('MySepia', 0).setEffectType('FakeSepia');
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          changed_layer_effects: [
+            {
+              layer_name: '',
+              effect_name: 'MySepia',
+              new_effect_name: 'OldTimes',
+            },
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.message).toContain(
+      'Renamed the "MySepia" effect on layer "" to "OldTimes".'
+    );
+    expect(effects.hasEffectNamed('MySepia')).toBe(false);
+    expect(effects.hasEffectNamed('OldTimes')).toBe(true);
+    // The effect type is kept when renaming.
+    expect(effects.getEffect('OldTimes').getEffectType()).toBe('FakeSepia');
+  });
+
+  // The effects container does not enforce name uniqueness: renaming onto a
+  // taken name used to leave two effects with the same name.
+  it('refuses to rename a layer effect to an existing effect name', async () => {
+    const effects = testScene
+      .getLayers()
+      .getLayer('')
+      .getEffects();
+    effects.insertNewEffect('MySepia', 0).setEffectType('FakeSepia');
+    effects.insertNewEffect('MyNight', 1).setEffectType('FakeNight');
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          changed_layer_effects: [
+            {
+              layer_name: '',
+              effect_name: 'MySepia',
+              new_effect_name: 'MyNight',
+            },
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(false);
+    expect(result.warnings).toContain(
+      'An effect named "MyNight" already exists on layer "": "MySepia" was NOT renamed.'
+    );
+    // Both effects still exist under their original names.
+    expect(effects.hasEffectNamed('MySepia')).toBe(true);
+    expect(effects.hasEffectNamed('MyNight')).toBe(true);
+  });
+
+  // Deleting/renaming an effect that does not exist used to be a silent
+  // no-op, producing an unexplained "nothing changed" for the whole call.
+  it('warns when deleting or renaming an effect that does not exist', async () => {
+    const effects = testScene
+      .getLayers()
+      .getLayer('')
+      .getEffects();
+    effects.insertNewEffect('MySepia', 0).setEffectType('FakeSepia');
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          changed_layer_effects: [
+            {
+              layer_name: '',
+              effect_name: 'Sepai', // Typo on purpose.
+              delete_this_effect: true,
+            },
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(false);
+    expect(result.warnings).toContain(
+      'Effect "Sepai" not found on layer "". Existing effects are: "MySepia". Nothing was changed for this effect.'
+    );
+    expect(effects.hasEffectNamed('MySepia')).toBe(true);
+  });
+
+  // Groups share the object namespace and nothing enforces uniqueness on
+  // rename: renaming onto a taken name used to leave two groups with the
+  // same name.
+  it('refuses to rename a group to an existing group or object name', async () => {
+    testScene.getObjects().insertNewObject(project, 'Sprite', 'Ghost', 0);
+    const groups = testScene.getObjects().getObjectGroups();
+    groups.insertNew('Enemies', 0);
+    groups.insertNew('Allies', 1);
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          changed_groups: [
+            { group_name: 'Enemies', new_group_name: 'Allies' },
+            { group_name: 'Allies', new_group_name: 'Ghost' },
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(false);
+    expect(result.warnings).toContain(
+      'An object or group named "Allies" already exists (in scene "TestScene" or globally): group "Enemies" was NOT renamed.'
+    );
+    expect(result.warnings).toContain(
+      'An object or group named "Ghost" already exists (in scene "TestScene" or globally): group "Allies" was NOT renamed.'
+    );
+    expect(groups.has('Enemies')).toBe(true);
+    expect(groups.has('Allies')).toBe(true);
+  });
+
+  // Groups share the object namespace with the GLOBAL scope too: renaming a
+  // scene group onto a global object (or global group) name would conflate
+  // their references in events.
+  it('refuses to rename a group to an existing global object or global group name', async () => {
+    project.getObjects().insertNewObject(project, 'Sprite', 'Hero', 0);
+    project
+      .getObjects()
+      .getObjectGroups()
+      .insertNew('Bosses', 0);
+    const groups = testScene.getObjects().getObjectGroups();
+    groups.insertNew('Enemies', 0);
+    groups.insertNew('Allies', 1);
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          changed_groups: [
+            { group_name: 'Enemies', new_group_name: 'Hero' },
+            { group_name: 'Allies', new_group_name: 'Bosses' },
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(false);
+    expect(result.warnings).toContain(
+      'An object or group named "Hero" already exists (in scene "TestScene" or globally): group "Enemies" was NOT renamed.'
+    );
+    expect(result.warnings).toContain(
+      'An object or group named "Bosses" already exists (in scene "TestScene" or globally): group "Allies" was NOT renamed.'
+    );
+    expect(groups.has('Enemies')).toBe(true);
+    expect(groups.has('Allies')).toBe(true);
+  });
+
+  it('moves a layer effect to a new position', async () => {
+    const effects = testScene
+      .getLayers()
+      .getLayer('')
+      .getEffects();
+    effects.insertNewEffect('MySepia', 0).setEffectType('FakeSepia');
+    effects.insertNewEffect('MyNight', 1).setEffectType('FakeNight');
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          changed_layer_effects: [
+            {
+              layer_name: '',
+              effect_name: 'MySepia',
+              new_effect_position: 1,
+            },
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.message).toContain(
+      'Moved the "MySepia" effect on layer "" to position 1.'
+    );
+    expect(effects.getEffectAt(0).getName()).toBe('MyNight');
+    expect(effects.getEffectAt(1).getName()).toBe('MySepia');
+  });
+
+  it('warns and skips an unknown scene property', async () => {
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          changed_properties: [{ property_name: 'gravity', new_value: '9.8' }],
+        },
+      }
+    );
+
+    expect(result.success).toBe(false);
+    expect(result.message).toBe('Nothing changed. See warnings.');
+    expect(result.warnings).toBe('Unknown scene property: "gravity". Skipped.');
+  });
+
+  it('deletes an existing group', async () => {
+    const groups = testScene.getObjects().getObjectGroups();
+    const group = groups.insertNew('Enemies', 0);
+    group.addObject('Enemy1');
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          changed_groups: [{ group_name: 'Enemies', delete_this_group: true }],
+        },
+      }
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.message).toContain(
+      'Deleted group "Enemies" from scene "TestScene".'
+    );
+    expect(groups.has('Enemies')).toBe(false);
+  });
+
+  it('reports no changes when only the scene name is provided', async () => {
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: { scene_name: 'TestScene' },
+      }
+    );
+
+    // Pre-v12 (no toolsVersion here) a no-op stays a failure.
+    expect(result.success).toBe(false);
+    expect(result.message).toBe(
+      'Nothing changed: the requested values are already the current ones, or nothing was requested.'
+    );
+    expect(result.warnings).toBeUndefined();
+  });
+
+  // The most frequent script failure measured in production: a `change_*` call
+  // that changes nothing killed the whole script, throwing away every other
+  // edit of the batch. From v12 it is a reported success.
+  it('is a success carrying the reasons when nothing changed, from v12', async () => {
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        toolsVersion: 'v12',
+        args: {
+          scene_name: 'TestScene',
+          changed_properties: [
+            { property_name: 'notAProperty', new_value: 'whatever' },
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.nothingChanged).toBe(true);
+    // The reason is still reported, so the agent can fix it in a follow-up.
+    expect(result.warnings).toEqual(expect.stringContaining('notAProperty'));
+  });
+
+  // `changed_layers: [{ layer_name: "HUD" }]` is how an agent asks to make sure
+  // a layer exists. When it does, that is satisfied — not an unexplained no-op.
+  it('reports an existing layer as nothing to change (not a failure)', async () => {
+    testScene
+      .getLayers()
+      .insertNewLayer('HUD', testScene.getLayers().getLayersCount());
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          changed_layers: [{ layer_name: 'HUD' }],
+        },
+      }
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.message).toEqual(
+      expect.stringContaining('already exists in scene "TestScene"')
+    );
+    expect(testScene.getLayers().hasLayerNamed('HUD')).toBe(true);
+  });
+
+  it('changes the 3D camera of a layer', async () => {
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          changed_layers: [
+            {
+              layer_name: '',
+              new_camera_3d_near_plane_distance: 8,
+              new_camera_3d_far_plane_distance: 110000,
+              new_camera_3d_field_of_view: 58,
+            },
+            {
+              layer_name: 'Far',
+              new_camera_3d_far_plane_distance: 50000,
+            },
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(true);
+    const baseLayer = testScene.getLayers().getLayer('');
+    expect(baseLayer.getCamera3DNearPlaneDistance()).toBe(8);
+    expect(baseLayer.getCamera3DFarPlaneDistance()).toBe(110000);
+    expect(baseLayer.getCamera3DFieldOfView()).toBe(58);
+    expect(result.message).toContain(
+      'Set the 3D camera of layer "" for scene "TestScene": near plane distance 8, far plane distance 110000, field of view 58°.'
+    );
+    expect(
+      testScene
+        .getLayers()
+        .getLayer('Far')
+        .getCamera3DFarPlaneDistance()
+    ).toBe(50000);
+  });
+
+  it('refuses values the 3D camera of a layer cannot have', async () => {
+    const baseLayer = testScene.getLayers().getLayer('');
+    const initialNearPlaneDistance = baseLayer.getCamera3DNearPlaneDistance();
+    const initialFarPlaneDistance = baseLayer.getCamera3DFarPlaneDistance();
+    const initialFieldOfView = baseLayer.getCamera3DFieldOfView();
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          changed_layers: [
+            {
+              layer_name: '',
+              new_camera_3d_near_plane_distance: initialFarPlaneDistance + 10,
+              new_camera_3d_field_of_view: 200,
+            },
+          ],
+        },
+      }
+    );
+
+    expect(baseLayer.getCamera3DNearPlaneDistance()).toBe(
+      initialNearPlaneDistance
+    );
+    expect(baseLayer.getCamera3DFarPlaneDistance()).toBe(
+      initialFarPlaneDistance
+    );
+    expect(baseLayer.getCamera3DFieldOfView()).toBe(initialFieldOfView);
+    expect(result.warnings).toContain(
+      'The near plane distance of the 3D camera must be greater than 0 and lower than the far plane distance'
+    );
+    expect(result.warnings).toContain(
+      'The field of view of the 3D camera must be greater than 0° and at most 180°'
+    );
+  });
+
+  it('changes the rendering type, the camera type and the default camera behavior of a layer', async () => {
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          changed_layers: [
+            {
+              layer_name: '',
+              new_rendering_type: '3d',
+              new_camera_type: 'orthographic',
+              new_camera_3d_near_plane_distance: 0,
+            },
+            {
+              layer_name: 'UI',
+              new_rendering_type: '2d',
+              new_default_camera_behavior: 'top-left-anchored-if-never-moved',
+            },
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(true);
+    const baseLayer = testScene.getLayers().getLayer('');
+    expect(baseLayer.getRenderingType()).toBe('3d');
+    expect(baseLayer.getCameraType()).toBe('orthographic');
+    // Allowed with an orthographic camera only.
+    expect(baseLayer.getCamera3DNearPlaneDistance()).toBe(0);
+    const uiLayer = testScene.getLayers().getLayer('UI');
+    expect(uiLayer.getRenderingType()).toBe('2d');
+    expect(uiLayer.getDefaultCameraBehavior()).toBe(
+      'top-left-anchored-if-never-moved'
+    );
+    expect(result.message).toContain(
+      'Set the rendering type of layer "" to "3d" for scene "TestScene".'
+    );
+    expect(result.message).toContain(
+      'Set the camera type of layer "" to "orthographic" for scene "TestScene".'
+    );
+    expect(result.message).toContain(
+      'Set the default camera behavior of layer "UI" to "top-left-anchored-if-never-moved" for scene "TestScene".'
+    );
+  });
+
+  it('refuses values the rendering type, the camera type and the default camera behavior cannot have', async () => {
+    const baseLayer = testScene.getLayers().getLayer('');
+    baseLayer.setCameraType('orthographic');
+    baseLayer.setCamera3DNearPlaneDistance(0);
+    const initialRenderingType = baseLayer.getRenderingType();
+    const initialDefaultCameraBehavior = baseLayer.getDefaultCameraBehavior();
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          changed_layers: [
+            {
+              layer_name: '',
+              new_rendering_type: 'isometric',
+              new_camera_type: 'perspective',
+              new_default_camera_behavior: 'follow-player',
+            },
+          ],
+        },
+      }
+    );
+
+    expect(baseLayer.getRenderingType()).toBe(initialRenderingType);
+    expect(baseLayer.getCameraType()).toBe('orthographic');
+    expect(baseLayer.getDefaultCameraBehavior()).toBe(
+      initialDefaultCameraBehavior
+    );
+    expect(result.warnings).toContain(
+      'Unknown rendering type "isometric" for layer "": use "" (2D and 3D objects, the default), "2d", "3d" or "2d+3d".'
+    );
+    expect(result.warnings).toContain(
+      'The camera of layer "" was not changed to "perspective": its near plane distance (0) must be greater than 0 with a perspective camera. Set `new_camera_3d_near_plane_distance` too.'
+    );
+    expect(result.warnings).toContain(
+      'Unknown default camera behavior "follow-player" for layer "": use "do-nothing" (the camera stays centered) or "top-left-anchored-if-never-moved".'
+    );
+  });
+});

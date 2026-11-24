@@ -22,6 +22,7 @@ import {
 import Window from '../../../Utils/Window';
 import { getIDEVersionWithHash } from '../../../Version';
 import { setEmbeddedGameFramePreviewLocation } from '../../../EmbeddedGame/EmbeddedGameFrame';
+import { setGameplayTestFramePreviewLocation } from '../../../GameplayTests/GameplayTestFrame';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
@@ -51,8 +52,10 @@ type State = {|
 
 const prepareExporter = async ({
   isForInGameEdition,
+  isForGameplayTest,
 }: {
   isForInGameEdition: boolean,
+  isForGameplayTest: boolean,
 }): Promise<{|
   outputDir: string,
   exporter: gdjsExporter,
@@ -67,7 +70,11 @@ const prepareExporter = async ({
   const fileSystem = assignIn(new gd.AbstractFileSystemJS(), localFileSystem);
   const outputDir = path.join(
     fileSystem.getTempDir(),
-    isForInGameEdition ? 'in-game-editor-preview' : 'preview'
+    isForGameplayTest
+      ? 'gameplay-test-preview'
+      : isForInGameEdition
+      ? 'in-game-editor-preview'
+      : 'preview'
   );
   const exporter = new gd.Exporter(fileSystem, gdjsRoot);
 
@@ -169,6 +176,7 @@ export default class LocalPreviewLauncher extends React.Component<
             // Allow Node.js API access in renderer process, as long
             // as we've not removed dependency on it and on "@electron/remote".
             nodeIntegration: true,
+            sandbox: false,
             contextIsolation: false,
             backgroundThrottling: false,
           },
@@ -247,6 +255,7 @@ export default class LocalPreviewLauncher extends React.Component<
 
     const { outputDir, exporter, gdjsRoot } = await prepareExporter({
       isForInGameEdition: previewOptions.isForInGameEdition,
+      isForGameplayTest: !!previewOptions.isForGameplayTest,
     });
 
     var previewStartTime = performance.now();
@@ -269,7 +278,7 @@ export default class LocalPreviewLauncher extends React.Component<
       );
     }
 
-    if (previewOptions.isForInGameEdition) {
+    if (previewOptions.isForInGameEdition || previewOptions.isForGameplayTest) {
       previewExportOptions.useWindowMessageDebuggerClient();
     } else {
       const previewDebuggerServerAddress = getDebuggerServerAddress();
@@ -306,7 +315,10 @@ export default class LocalPreviewLauncher extends React.Component<
     const debuggerIds = previewOptions.isForInGameEdition
       ? this.getPreviewDebuggerServer().getExistingEmbeddedGameFrameDebuggerIds()
       : this.getPreviewDebuggerServer().getExistingPreviewDebuggerIds();
-    const shouldHotReload = previewOptions.hotReload && !!debuggerIds.length;
+    const shouldHotReload =
+      previewOptions.hotReload &&
+      !previewOptions.isForGameplayTest &&
+      !!debuggerIds.length;
     if (shouldHotReload) {
       previewExportOptions.setShouldClearExportFolder(
         previewOptions.shouldHardReload
@@ -328,9 +340,8 @@ export default class LocalPreviewLauncher extends React.Component<
     previewExportOptions.setCrashReportUploadLevel(
       this.props.crashReportUploadLevel
     );
-    previewExportOptions.setPreviewContext(this.props.previewContext);
+    previewExportOptions.setPreviewContext('preview');
     previewExportOptions.setProjectTemplateSlug(project.getTemplateSlug());
-    previewExportOptions.setSourceGameId(this.props.sourceGameId);
 
     if (previewOptions.inAppTutorialMessageInPreview) {
       previewExportOptions.setInAppTutorialMessageInPreview(
@@ -363,15 +374,31 @@ export default class LocalPreviewLauncher extends React.Component<
         });
       }
     }
-    if (previewOptions.editorCameraState3D) {
+    if (
+      previewOptions.captureOptions &&
+      previewOptions.captureOptions.previewVideo
+    ) {
+      previewExportOptions.setPreviewVideoCapture(
+        previewOptions.captureOptions.previewVideo.signedUrl,
+        previewOptions.captureOptions.previewVideo.publicUrl,
+        previewOptions.captureOptions.previewVideo.isRecordedByUser
+      );
+    }
+    const editorCameraState = previewOptions.editorCameraState;
+    if (editorCameraState) {
       previewExportOptions.setEditorCameraState3D(
-        previewOptions.editorCameraState3D.cameraMode,
-        previewOptions.editorCameraState3D.positionX,
-        previewOptions.editorCameraState3D.positionY,
-        previewOptions.editorCameraState3D.positionZ,
-        previewOptions.editorCameraState3D.rotationAngle,
-        previewOptions.editorCameraState3D.elevationAngle,
-        previewOptions.editorCameraState3D.distance
+        editorCameraState.camera3D.cameraMode,
+        editorCameraState.camera3D.positionX,
+        editorCameraState.camera3D.positionY,
+        editorCameraState.camera3D.positionZ,
+        editorCameraState.camera3D.rotationAngle,
+        editorCameraState.camera3D.elevationAngle,
+        editorCameraState.camera3D.distance
+      );
+      previewExportOptions.setEditorCameraState2D(
+        editorCameraState.camera2D.centerX,
+        editorCameraState.camera2D.centerY,
+        editorCameraState.camera2D.zoom
       );
     }
     if (previewOptions.inGameEditorSettings) {
@@ -444,7 +471,20 @@ export default class LocalPreviewLauncher extends React.Component<
         });
       }
 
-      if (previewOptions.numberOfWindows >= 1) {
+      if (previewOptions.isForGameplayTest) {
+        // The preview is shown in (and run by) the gameplay test frame:
+        // no window to open. The previewId in the URL forces the frame to
+        // reload the game when the same preview is re-exported.
+        setGameplayTestFramePreviewLocation({
+          previewIndexHtmlLocation: `file://${outputDir}/index.html?previewId=${previewId}`,
+          // The game window of the frame is fixed at the project
+          // resolution: the frame only zooms its display.
+          gameResolution: {
+            width: project.getGameResolutionWidth(),
+            height: project.getGameResolutionHeight(),
+          },
+        });
+      } else if (previewOptions.numberOfWindows >= 1) {
         this._openPreviewWindow(project, outputDir, previewOptions);
       }
     }

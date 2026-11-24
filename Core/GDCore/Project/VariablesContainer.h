@@ -188,6 +188,14 @@ class GD_CORE_API VariablesContainer {
   VariablesContainer& ResetPersistentUuid();
 
   /**
+   * \brief Set the persistent UUID of the container and all its variables
+   * if they are not set already - contrary to `ResetPersistentUuid`,
+   * existing UUIDs are preserved (so that they stay stable across
+   * serializations, avoiding useless changes in the project file).
+   */
+  VariablesContainer& EnsurePersistentUuids();
+
+  /**
    * \brief Remove the persistent UUID - when the variables no
    * longer need to be recognized between serializations.
    */

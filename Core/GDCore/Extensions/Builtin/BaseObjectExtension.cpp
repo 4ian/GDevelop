@@ -77,6 +77,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetResourceName("InGameEditor-OrbitCameraIcon")
       .SetFilePath("InGameEditor/OrbitCameraIcon.svg")
       .SetKind("internal-in-game-editor-only-svg");
+  extension.AddInGameEditorResource()
+      .SetResourceName("InGameEditor-HiddenInstanceIcon")
+      .SetFilePath("InGameEditor/HiddenInstanceIcon.svg")
+      .SetKind("internal-in-game-editor-only-svg");
+  extension.AddInGameEditorResource()
+      .SetResourceName("InGameEditor-rotate24_black")
+      .SetFilePath("InGameEditor/rotate24_black.png")
+      .SetKind("image");
 
   gd::ObjectMetadata& obj = extension.AddObject<gd::ObjectConfiguration>(
       "", _("Base object"), _("Base object"), "res/functions/object_black.svg");
@@ -479,7 +487,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddAction("SetZOrder",
                 _("Z order"),
-                _("Modify the Z-order of an object"),
+                _("Modify the Z order of an object"),
                 _("the z-order"),
                 _("Layers and cameras"),
                 "res/actions/planicon24.png",
@@ -515,7 +523,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/var.png")
 
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Variable"))
+      .AddParameter("objectvar", _("Variable"), "primitive")
       .UseStandardOperatorParameters("number",
                                      ParameterOptions::MakeNewOptions())
       .SetHelpPath("/all-features/variables/object-variables/")
@@ -530,7 +538,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/var.png")
 
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Variable"))
+      .AddParameter("objectvar", _("Variable"), "primitive")
       .UseStandardOperatorParameters("string",
                                      ParameterOptions::MakeNewOptions())
       .SetHelpPath("/all-features/variables/object-variables/")
@@ -544,7 +552,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/var24.png",
                 "res/actions/var.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Variable"))
+      .AddParameter("objectvar", _("Variable"), "primitive")
       .AddParameter("operator", _("Value"), "boolean")
       // This parameter allows to keep the operand expression
       // when the editor switch between variable instructions.
@@ -561,7 +569,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    "res/conditions/var.png")
 
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Variable"))
+      .AddParameter("objectvar", _("Variable"), "primitive")
       .UseStandardRelationalOperatorParameters(
           "number", ParameterOptions::MakeNewOptions())
       .SetHelpPath("/all-features/variables/object-variables/")
@@ -576,7 +584,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    "res/conditions/var.png")
 
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Variable"))
+      .AddParameter("objectvar", _("Variable"), "primitive")
       .UseStandardRelationalOperatorParameters(
           "string", ParameterOptions::MakeNewOptions())
       .SetHelpPath("/all-features/variables/object-variables/")
@@ -590,7 +598,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    "res/conditions/var24.png",
                    "res/conditions/var.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Variable"))
+      .AddParameter("objectvar", _("Variable"), "primitive")
       .AddParameter("trueorfalse", _("Check if the value is"))
       .SetDefaultValue("true")
       // This parameter allows to keep the operand expression
@@ -608,7 +616,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/var.png")
 
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Variable"))
+      .AddParameter("objectvar", _("Variable"), "primitive")
       .SetHelpPath("/all-features/variables/object-variables/")
       .UseStandardOperatorParameters("number",
                                      ParameterOptions::MakeNewOptions())
@@ -623,7 +631,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/var.png")
 
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Variable"))
+      .AddParameter("objectvar", _("Variable"), "primitive")
       .SetHelpPath("/all-features/variables/object-variables/")
       .UseStandardOperatorParameters("string",
                                      ParameterOptions::MakeNewOptions())
@@ -639,7 +647,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/var.png")
 
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Variable"))
+      .AddParameter("objectvar", _("Variable"), "primitive")
       .AddParameter("trueorfalse", _("New Value:"))
       .SetHelpPath("/all-features/variables/object-variables/")
       .SetRelevantForFunctionEventsOnly();
@@ -657,7 +665,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          "res/actions/var.png")
 
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Variable"))
+      .AddParameter("objectvar", _("Variable"), "primitive")
       .SetHelpPath("/all-features/variables/object-variables/")
       .SetRelevantForFunctionEventsOnly();
 
@@ -703,7 +711,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddAction("Hide",
                 _("Hide"),
-                _("Hide the specified object."),
+                _("Hide the specified object, making it invisible."),
                 _("Hide _PARAM0_"),
                 _("Visibility"),
                 "res/actions/visibilite24.png",
@@ -718,7 +726,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddAction("Show",
                 _("Show"),
-                _("Show the specified object."),
+                _("Show the specified object, making it visible."),
                 _("Show _PARAM0_"),
                 _("Visibility"),
                 "res/actions/visibilite24.png",
@@ -749,9 +757,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced();
 
   obj.AddCondition("ZOrder",
-                   _("Z-order"),
-                   _("Compare the Z-order of the specified object."),
-                   _("the Z-order"),
+                   _("Z order"),
+                   _("Compare the Z order of the specified object."),
+                   _("the Z order"),
                    _("Layer"),
                    "res/conditions/planicon24.png",
                    "res/conditions/planicon.png")
@@ -871,7 +879,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    "res/conditions/var.png")
 
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Variable"))
+      .AddParameter("objectvar", _("Variable"), "primitive")
       .UseStandardRelationalOperatorParameters(
           "number", ParameterOptions::MakeNewOptions())
       .SetHelpPath("/all-features/variables/object-variables/")
@@ -886,7 +894,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    "res/conditions/var.png")
 
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Variable"))
+      .AddParameter("objectvar", _("Variable"), "primitive")
       .UseStandardRelationalOperatorParameters(
           "string", ParameterOptions::MakeNewOptions())
       .SetHelpPath("/all-features/variables/object-variables/")
@@ -901,7 +909,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    "res/conditions/var24.png",
                    "res/conditions/var.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Variable"))
+      .AddParameter("objectvar", _("Variable"), "primitive")
       .AddParameter("trueorfalse", _("Check if the value is"))
       .SetDefaultValue("true")
       .SetHelpPath("/all-features/variables/object-variables/")
@@ -928,7 +936,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          "res/actions/var24.png",
          "res/actions/var.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Array variable"))
+      .AddParameter("objectvar", _("Array variable"), "collection")
       .AddParameter("string", _("Text to add"))
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced()
@@ -942,7 +950,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/var24.png",
                 "res/actions/var.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Array variable"))
+      .AddParameter("objectvar", _("Array variable"), "collection")
       .AddParameter("expression", _("Number to add"))
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced()
@@ -956,7 +964,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/var24.png",
                 "res/actions/var.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Array variable"))
+      .AddParameter("objectvar", _("Array variable"), "collection")
       .AddParameter("trueorfalse", _("Boolean to add"))
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced()
@@ -990,7 +998,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          "res/actions/var24.png",
          "res/actions/var.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Array variable"))
+      .AddParameter("objectvar", _("Array variable"), "collection")
       .AddParameter("variable", _("Scene variable with the content to add"))
       .SetParameterLongDescription(_("The content of the object variable will "
                                      "*be copied* and added at the "
@@ -1007,7 +1015,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          "res/actions/var24.png",
          "res/actions/var.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Array variable"))
+      .AddParameter("objectvar", _("Array variable"), "collection")
       .AddParameter("string", _("Text to add"))
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced()
@@ -1021,7 +1029,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/var24.png",
                 "res/actions/var.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Array variable"))
+      .AddParameter("objectvar", _("Array variable"), "collection")
       .AddParameter("expression", _("Number to add"))
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced()
@@ -1036,7 +1044,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          "res/actions/var24.png",
          "res/actions/var.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Array variable"))
+      .AddParameter("objectvar", _("Array variable"), "collection")
       .AddParameter("trueorfalse", _("Boolean to add"))
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced()
@@ -1053,7 +1061,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          "res/actions/var24.png",
          "res/actions/var.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Array variable"))
+      .AddParameter("objectvar", _("Array variable"), "collection")
       .AddParameter("expression", _("Index to remove"))
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced();
@@ -1067,7 +1075,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          "res/conditions/var24.png",
          "res/conditions/var.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Variable"))
+      .AddParameter("objectvar", _("Variable"), "collection")
       .UseStandardRelationalOperatorParameters(
           "number", ParameterOptions::MakeNewOptions())
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
@@ -1081,7 +1089,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Variables ❯ Arrays and structures"),
          "res/actions/var.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Array variable"))
+      .AddParameter("objectvar", _("Array variable"), "collection")
       .SetHelpPath("/all-features/variables/structures-and-arrays/");
 
   obj.AddExpression(
@@ -1092,7 +1100,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Variables ❯ Arrays and structures"),
          "res/actions/var.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Array variable"))
+      .AddParameter("objectvar", _("Array variable"), "collection")
       .SetHelpPath("/all-features/variables/structures-and-arrays/");
 
   obj.AddStrExpression(
@@ -1103,7 +1111,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Variables ❯ Arrays and structures"),
          "res/actions/var.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Array variable"))
+      .AddParameter("objectvar", _("Array variable"), "collection")
       .SetHelpPath("/all-features/variables/structures-and-arrays/");
 
   obj.AddExpression(
@@ -1114,12 +1122,12 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Variables ❯ Arrays and structures"),
          "res/actions/var.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Array variable"))
+      .AddParameter("objectvar", _("Array variable"), "collection")
       .SetHelpPath("/all-features/variables/structures-and-arrays/");
 
   obj.AddCondition("BehaviorActivated",
                    _("Behavior activated"),
-                   _("Check if the behavior is activated for the object."),
+                   _("Check if the behavior is activated or deactivated for the object."),
                    _("Behavior _PARAM1_ of _PARAM0_ is activated"),
                    _("Behaviors"),
                    "res/functions/activate_black.svg",
@@ -1131,7 +1139,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddAction("ActivateBehavior",
                 _("De/activate a behavior"),
-                _("De/activate the behavior for the object."),
+                _("Activate or deactivate the behavior for the object."),
                 _("Activate behavior _PARAM1_ of _PARAM0_: _PARAM2_"),
                 _("Behaviors"),
                 "res/functions/activate_black.svg",
@@ -1362,7 +1370,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddAction("UnPauseObjectTimer",
                 _("Unpause an object timer"),
-                _("Unpause an object timer."),
+                _("Unpause (resume) an object timer."),
                 _("Unpause timer _PARAM1_ of _PARAM0_"),
                 _("Timers"),
                 "res/actions/unPauseTimer24.png",
@@ -1482,41 +1490,44 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetHidden();
 
   obj.AddExpression("ZOrder",
-                    _("Z-order"),
-                    _("Z-order of an object"),
+                    _("Z order"),
+                    _("Z order of an object"),
                     "",
                     "res/actions/planicon.png")
       .AddParameter("object", _("Object"));
 
   obj.AddExpression("Plan",
-                    _("Z-order"),
-                    _("Z-order of an object"),
+                    _("Z order"),
+                    _("Z order of an object"),
                     _("Visibility"),
                     "res/actions/planicon.png")
       .AddParameter("object", _("Object"))
       .SetHidden();
 
   obj.AddExpression("Distance",
-                    _("Distance between two objects"),
-                    _("Distance between two objects, on the X/Y plane only (Z "
-                      "is ignored)"),
+                    _("Distance between two objects (2D)"),
+                    _("Distance between the centers of two objects, on the "
+                      "X/Y plane only. To include Z, use ‘Distance between "
+                      "two objects (3D)’."),
                     _("Position"),
                     "res/conditions/distance.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectPtr", _("Object"));
 
   obj.AddExpression("SqDistance",
-                    _("Square distance between two objects"),
-                    _("Square distance between two objects, on the X/Y plane "
-                      "only (Z is ignored)"),
+                    _("Square distance between two objects (2D)"),
+                    _("Square distance between the centers of two objects, on "
+                      "the X/Y plane only."),
                     _("Position"),
                     "res/conditions/distance.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectPtr", _("Object"));
 
   obj.AddExpression("DistanceToPosition",
-                    _("Distance between an object and a position"),
-                    _("Distance between an object and a position"),
+                    _("Distance between an object and a position (2D)"),
+                    _("Distance between the center of an object and a "
+                      "position, on the X/Y plane only. To include Z, use "
+                      "‘Distance between an object and a position (3D)’."),
                     _("Position"),
                     "res/conditions/distance.png")
       .AddParameter("object", _("Object"))
@@ -1524,8 +1535,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("Target Y position"));
 
   obj.AddExpression("SqDistanceToPosition",
-                    _("Square distance between an object and a position"),
-                    _("Square distance between an object and a position"),
+                    _("Square distance between an object and a position (2D)"),
+                    _("Square distance between the center of an object and a "
+                      "position, on the X/Y plane only."),
                     _("Position"),
                     "res/conditions/distance.png")
       .AddParameter("object", _("Object"))
@@ -1619,7 +1631,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   // Deprecated
   obj.AddAction("EnableEffect",
                 _("Enable an object effect"),
-                _("Enable an effect on the object"),
+                _("Enable or disable an effect on the object"),
                 _("Enable effect _PARAM1_ on _PARAM0_: _PARAM2_"),
                 _("Effects"),
                 "res/actions/effect_black.svg",
@@ -1685,7 +1697,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   // Deprecated
   obj.AddCondition("IsEffectEnabled",
                    _("Effect is enabled"),
-                   _("Check if the effect on an object is enabled."),
+                   _("Check if the effect on an object is enabled or disabled."),
                    _("Effect _PARAM1_ of _PARAM0_ is enabled"),
                    _("Effects"),
                    "res/actions/effect_black.svg",
@@ -1841,9 +1853,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   extension
       .AddCondition("Distance",
-                    _("Distance between two objects"),
-                    _("Compare the distance between two objects.\nIf condition "
-                      "is inverted, only objects that have a distance greater "
+                    _("Distance between two objects (2D)"),
+                    _("Compare the distance between the centers of two "
+                      "objects, on the X/Y plane only. To include Z, use "
+                      "‘Distance between two objects (3D)’.\nIf condition is "
+                      "inverted, only objects that have a distance greater "
                       "than specified to any other object will be picked."),
                     _("_PARAM0_ distance to _PARAM1_ is below _PARAM2_ pixels"),
                     _("Position"),
@@ -1855,8 +1869,28 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddCodeOnlyParameter("conditionInverted", "")
       .SetHint(
           "The distance is measured on the X/Y plane only: Z is ignored. For "
-          "3D games, also compare the Z difference between the objects, or "
-          "compute the full 3D distance in an expression.")
+          "3D games, use the condition comparing the distance in 3D "
+          "(Distance3D).")
+      .MarkAsSimple();
+
+  extension
+      .AddCondition("Distance3D",
+                    _("Distance between two objects (3D)"),
+                    _("Compare the distance between the centers of two "
+                      "objects, on the X, Y and Z axes (a 2D object is at a Z "
+                      "of 0). To ignore Z, use ‘Distance between two objects "
+                      "(2D)’.\nIf condition is inverted, only objects that "
+                      "have a distance greater than specified to any other "
+                      "object will be picked."),
+                    _("_PARAM0_ distance to _PARAM1_ in 3D is below _PARAM2_ "
+                      "pixels"),
+                    _("Position"),
+                    "res/conditions/distance24.png",
+                    "res/conditions/distance.png")
+      .AddParameter("objectList", _("Object"))
+      .AddParameter("objectList", _("Object 2"))
+      .AddParameter("expression", _("Distance"))
+      .AddCodeOnlyParameter("conditionInverted", "")
       .MarkAsSimple();
 
   extension
@@ -2004,9 +2038,31 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   extension
       .AddCondition("IsTurnedTowardObject",
-                    _("An object is turned toward another"),
-                    _("Check if an object is turned toward another"),
+                    _("An object is turned toward another (2D)"),
+                    _("Check if the angle of an object points toward the "
+                      "center of another one, on the X/Y plane only. To "
+                      "include Z, use ‘An object is turned toward another "
+                      "(3D)’."),
                     _("_PARAM0_ is turned toward _PARAM1_ ± _PARAM2_°"),
+                    _("Angle"),
+                    "res/conditions/estTourne24.png",
+                    "res/conditions/estTourne.png")
+      .AddParameter("objectList", _("Name of the object"))
+      .AddParameter("objectList", _("Name of the second object"))
+      .AddParameter("expression",
+                    _("Angle of tolerance, in degrees (0: minimum tolerance)"))
+      .AddCodeOnlyParameter("conditionInverted", "")
+      .MarkAsAdvanced();
+
+  extension
+      .AddCondition("IsTurnedTowardObject3D",
+                    _("An object is turned toward another (3D)"),
+                    _("Check if the forward direction of an object (with its "
+                      "rotations on X, Y and Z) points toward the center of "
+                      "another one, on the X, Y and Z axes (a 2D object is at "
+                      "a Z of 0 and points along its angle). To ignore Z, use "
+                      "‘An object is turned toward another (2D)’."),
+                    _("_PARAM0_ is turned toward _PARAM1_ ± _PARAM2_° in 3D"),
                     _("Angle"),
                     "res/conditions/estTourne24.png",
                     "res/conditions/estTourne.png")

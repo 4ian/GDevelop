@@ -14,11 +14,20 @@ import {
   filterEnumeratedInstructionOrExpressionMetadataByScope,
 } from '../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { getVisibleParameterTypes } from '../EventsSheet/ParameterFields/GenericExpressionField/FormatExpressionCall';
-import { getParameterChoiceAutocompletions } from '../EventsSheet/ParameterFields/ParameterMetadataTools';
+import {
+  getParameterChoiceAutocompletions,
+  getEasingChoices,
+} from '../EventsSheet/ParameterFields/ParameterMetadataTools';
 import getObjectByName from '../Utils/GetObjectByName';
 import { getAllPointNames } from '../ObjectEditor/Editors/SpriteEditor/Utils/SpriteObjectHelper';
 import { enumerateParametersUsableInExpressions } from '../EventsSheet/ParameterFields/EnumerateFunctionParameters';
 import { filterStringListWithPrefix } from '../Utils/ListFiltering';
+import { customEasingExampleIdentifier } from '../Utils/Easings';
+import {
+  getEasingChoicesWithNamedEasings,
+  getNamedEasingNames,
+  getNamedEasingsContainerFromAccessor,
+} from '../Utils/NamedEasings';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
 const gd: libGDevelop = global.gd;
@@ -306,6 +315,15 @@ const getAutocompletionsForText = function(
     autocompletionTexts = getParameterChoiceAutocompletions(
       completionDescription.getParameterMetadata()
     ).map(autocompletion => autocompletion.completion);
+  } else if (type === 'easing') {
+    autocompletionTexts = getEasingChoicesWithNamedEasings(
+      getEasingChoices(completionDescription.getParameterMetadata()),
+      getNamedEasingNames(
+        getNamedEasingsContainerFromAccessor(projectScopedContainersAccessor)
+      )
+    )
+      .concat(customEasingExampleIdentifier)
+      .map(choice => `"${choice}"`);
   } else if (type === 'objectPointName') {
     const objectName: string = completionDescription.getObjectName();
     if (!objectName) {
@@ -549,7 +567,7 @@ export const getAutocompletionsFromDescriptions = (
   );
 };
 
-type InsertedAutocompletion = {|
+export type InsertedAutocompletion = {|
   completion: string,
   replacementStartPosition?: number,
   replacementEndPosition?: number,
@@ -581,6 +599,27 @@ const findLastNodeStartPosition = (expression: string) => {
     indexes.push(match.index);
   }
   return Math.max(...indexes);
+};
+
+const findClosingParenthesisEndPosition = (
+  expression: string,
+  openingParenthesisPosition: number
+): number => {
+  let depth = 0;
+  let isInString = false;
+  for (let i = openingParenthesisPosition; i < expression.length; i++) {
+    const character = expression[i];
+    if (isInString) {
+      if (character === '\\') i++;
+      else if (character === '"') isInString = false;
+    } else if (character === '"') isInString = true;
+    else if (character === '(') depth++;
+    else if (character === ')') {
+      depth--;
+      if (depth === 0) return i + 1;
+    }
+  }
+  return expression.length;
 };
 
 const insertWordInExpressionWithToString = ({
@@ -664,8 +703,8 @@ export const insertAutocompletionInExpression = (
     replacementEndPosition,
     hasVisibleParameters,
   } = insertedAutocompletion;
-  const formatCompletion = (nextCharacter: ?string) => {
-    const suffix = addDot
+  const getSuffix = () =>
+    addDot
       ? '.'
       : addParameterSeparator
       ? ', '
@@ -674,12 +713,12 @@ export const insertAutocompletionInExpression = (
       : addParenthesis
       ? '()'
       : '';
-
-    const addSuffix =
-      !nextCharacter || !suffix || nextCharacter[0] !== suffix[0];
-
-    return completion + (addSuffix ? suffix : '');
+  const shouldAddSuffix = (nextCharacter: ?string) => {
+    const suffix = getSuffix();
+    return !!suffix && (!nextCharacter || nextCharacter[0] !== suffix[0]);
   };
+  const formatCompletion = (nextCharacter: ?string) =>
+    completion + (shouldAddSuffix(nextCharacter) ? getSuffix() : '');
 
   if (caretLocation > expression.length) {
     caretLocation = expression.length;
@@ -705,13 +744,24 @@ export const insertAutocompletionInExpression = (
   // The next character, if any, will be useful to format the completion
   // (to avoid repeating an existing character).
   const maybeNextCharacter: ?string = expression[wordEndPosition];
+  const isSuffixAdded = shouldAddSuffix(maybeNextCharacter);
   const insertedWord = formatCompletion(maybeNextCharacter);
+
+  // Existing arguments of the function call must stay inside ToString.
+  const existingArgumentsEndPosition =
+    shouldConvertToString && addParenthesis && maybeNextCharacter === '('
+      ? findClosingParenthesisEndPosition(expression, wordEndPosition)
+      : wordEndPosition;
+  const existingArguments = expression.substring(
+    wordEndPosition,
+    existingArgumentsEndPosition
+  );
 
   const newAutocompletedExpression = shouldConvertToString
     ? insertWordInExpressionWithToString({
         expression,
-        insertedWord,
-        wordEndPosition,
+        insertedWord: insertedWord + existingArguments,
+        wordEndPosition: existingArgumentsEndPosition,
         wordStartPosition,
       })
     : insertWordInExpression({
@@ -720,8 +770,12 @@ export const insertAutocompletionInExpression = (
         wordEndPosition,
         wordStartPosition,
       });
+  newAutocompletedExpression.caretLocation -= existingArguments.length;
 
-  if (addParenthesis && hasVisibleParameters) {
+  if (
+    (isSuffixAdded && addParenthesis && hasVisibleParameters) ||
+    insertedWord.endsWith('[]')
+  ) {
     newAutocompletedExpression.caretLocation =
       newAutocompletedExpression.caretLocation - 1;
   }

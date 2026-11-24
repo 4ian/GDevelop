@@ -529,10 +529,12 @@ export const updateCloudProject = async (
   const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
   if (!firebaseUser) return;
 
+  const { name } = attributes;
   const cleanedAttributes = {
-    name: attributes.name
-      ? attributes.name.slice(0, CLOUD_PROJECT_NAME_MAX_LENGTH)
-      : undefined,
+    name:
+      name && name.trim()
+        ? name.slice(0, CLOUD_PROJECT_NAME_MAX_LENGTH)
+        : undefined,
     gameId: attributes.gameId,
   };
 

@@ -13,6 +13,8 @@
 #include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/EventsFunctionsContainer.h"
 #include "GDCore/Project/EventsFunctionsExtensionChangelog.h"
+#include "GDCore/Project/NamedEasingsContainer.h"
+#include "GDCore/Project/TestsContainer.h"
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/SerializableWithNameList.h"
@@ -183,6 +185,22 @@ class GD_CORE_API EventsFunctionsExtension {
   const gd::SerializableWithNameList<EventsBasedObject>&
   GetEventsBasedObjects() const {
     return eventsBasedObjects;
+  }
+
+  /**
+   * \brief Return a reference to the tests of the extension.
+   */
+  gd::TestsContainer& GetTests() { return tests; }
+
+  /**
+   * \brief Return a const reference to the tests of the extension.
+   */
+  const gd::TestsContainer& GetTests() const { return tests; }
+
+  gd::NamedEasingsContainer& GetNamedEasings() { return namedEasings; }
+
+  const gd::NamedEasingsContainer& GetNamedEasings() const {
+    return namedEasings;
   }
 
   /**
@@ -427,6 +445,8 @@ class GD_CORE_API EventsFunctionsExtension {
   gd::EventsFunctionsContainer eventsFunctionsContainer;
   gd::VariablesContainer globalVariables;
   gd::VariablesContainer sceneVariables;
+  gd::TestsContainer tests;  ///< The tests of the extension.
+  gd::NamedEasingsContainer namedEasings;
 };
 
 }  // namespace gd

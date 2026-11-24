@@ -13,6 +13,8 @@ import CompactSearchBar from '../../UI/CompactSearchBar';
 import RemoveCircle from '../../UI/CustomSvgIcons/RemoveCircle';
 import Lock from '../../UI/CustomSvgIcons/Lock';
 import LockOpen from '../../UI/CustomSvgIcons/LockOpen';
+import Visibility from '../../UI/CustomSvgIcons/Visibility';
+import VisibilityOff from '../../UI/CustomSvgIcons/VisibilityOff';
 import RotateZ from '../../UI/CustomSvgIcons/RotateZ';
 import Layers from '../../UI/CustomSvgIcons/Layers';
 import SortArrowUp from '../../UI/CustomSvgIcons/SortArrowUp';
@@ -35,6 +37,7 @@ type RenderedRowInfo = {
   instance: gdInitialInstance,
   name: string,
   locked: boolean,
+  hidden: boolean,
   x: string,
   y: string,
   angle: string,
@@ -153,6 +156,7 @@ class InstancesList extends Component<Props, State> {
           instance,
           name,
           locked: instance.isLocked(),
+          hidden: instance.isHidden(),
           x: toFixedWithoutTrailingZeros(instance.getX(), 2),
           y: toFixedWithoutTrailingZeros(instance.getY(), 2),
           angle: toFixedWithoutTrailingZeros(instance.getAngle(), 2),
@@ -190,6 +194,29 @@ class InstancesList extends Component<Props, State> {
 
       return index % 2 === 0 ? 'tableEvenRow' : 'tableOddRow';
     }
+  };
+
+  _renderVisibilityCell = ({
+    rowData: { instance },
+  }: {
+    rowData: RenderedRowInfo,
+  }): React.Node => {
+    return (
+      <IconButton
+        size="small"
+        tooltip={
+          instance.isHidden()
+            ? t`Hidden when the scene starts`
+            : t`Visible when the scene starts`
+        }
+        onClick={() => {
+          instance.setHidden(!instance.isHidden());
+          this.props.onInstancesModified([instance]);
+        }}
+      >
+        {instance.isHidden() ? <VisibilityOff /> : <Visibility />}
+      </IconButton>
+    );
   };
 
   _renderLockCell = ({
@@ -378,6 +405,13 @@ class InstancesList extends Component<Props, State> {
                   width={Math.max(width * 0.2, minimumWidths.layerName)}
                   className={'tableColumn tableColumnSecondary'}
                   headerRenderer={renderSortableHeader}
+                />
+                <RVColumn
+                  label=""
+                  dataKey="hidden"
+                  width={Math.max(width * 0.05, minimumWidths.numberProperty)}
+                  className={'tableColumn'}
+                  cellRenderer={this._renderVisibilityCell}
                 />
                 <RVColumn
                   label=""

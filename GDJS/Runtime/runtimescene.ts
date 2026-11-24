@@ -4,6 +4,18 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  /**
+   * Options of `gdjs.RuntimeScene.render`.
+   * @category Core Engine > Scene
+   */
+  export type RuntimeSceneRenderOptions = {
+    /** Update everything for rendering, but don't draw anything. */
+    skipDrawing?: boolean;
+    /** Draw on this background color, instead of the one of the scene and
+     * instead of what an effect shows as the background (a skybox). */
+    backgroundColor?: integer;
+  };
+
   const logger = new gdjs.Logger('RuntimeScene');
   const setupWarningLogger = new gdjs.Logger('RuntimeScene (setup warnings)');
 
@@ -60,6 +72,9 @@ namespace gdjs {
      * that the scene is re-created on every peer.
      */
     networkId: string | null = null;
+
+    private _renderer3DWorldScale: float = 100;
+    private _renderer3DInverseWorldScale: float = 0.01;
 
     /**
      * @param runtimeGame The game associated to this scene.
@@ -156,6 +171,7 @@ namespace gdjs {
       }
       this._name = sceneData.name;
       this._resourcesUnloading = sceneData.resourcesUnloading || 'inherit';
+      this.setRenderer3DWorldScale(sceneData.renderer3DWorldScale);
       this.setBackgroundColor(sceneData.r, sceneData.v, sceneData.b);
 
       //Load layers
@@ -382,10 +398,14 @@ namespace gdjs {
     /**
      * Step (execute the game logic) and render the scene.
      * @param elapsedTime In milliseconds
+     * @param renderOptions See `render`.
      * @return true if the game loop should continue, false if a scene change/push/pop
      * or a game stop was requested.
      */
-    renderAndStep(elapsedTime: float): boolean {
+    renderAndStep(
+      elapsedTime: float,
+      renderOptions?: RuntimeSceneRenderOptions
+    ): boolean {
       if (this._profiler) {
         this._profiler.beginFrame();
       }
@@ -441,10 +461,18 @@ namespace gdjs {
         this._profiler.end('callbacks and extensions (post-events)');
       }
 
-      this.render();
+      this.render(renderOptions);
       this._isJustResumed = false;
       if (this._profiler) {
         this._profiler.end('render');
+      }
+      if (this._profiler) {
+        const threeRenderer = this._runtimeGame
+          .getRenderer()
+          .getThreeRenderer();
+        if (threeRenderer) {
+          this._profiler.record3DRendererInfo(threeRenderer.info);
+        }
       }
       if (this._profiler) {
         this._profiler.endFrame();
@@ -453,8 +481,16 @@ namespace gdjs {
     }
     /**
      * Render the scene (but do not execute the game logic).
+     *
+     * With `skipDrawing`, everything is done except the drawing itself (the
+     * draw calls of the layers, their post-processing passes, the shadow maps
+     * and the debug draw): objects and layers are still updated for rendering
+     * (culling, effects, `updatePreRender` of objects) and the world matrices
+     * of the 3D objects are still updated, as game logic can read them (3D
+     * raycasts, bounding boxes of 3D models...). Used to step a game faster
+     * when nobody looks at it (gameplay tests).
      */
-    render() {
+    render(options?: RuntimeSceneRenderOptions) {
       if (this._profiler) {
         this._profiler.begin('objects (pre-render, effects update)');
       }
@@ -473,18 +509,25 @@ namespace gdjs {
         this._profiler.begin('render');
       }
 
+      if (options && options.skipDrawing) {
+        this._renderer.updateWithoutDrawing();
+        return;
+      }
+
       // Set to true to enable debug rendering (look for the implementation in the renderer
       // to see what is rendered).
       if (this._debugDrawEnabled) {
         this._debuggerRenderer.renderDebugDraw(
           this.getAdhocListOfAllInstances(),
+          this._debugDrawShowHitBoxes,
           this._debugDrawShowHiddenInstances,
           this._debugDrawShowPointsNames,
-          this._debugDrawShowCustomPoints
+          this._debugDrawShowCustomPoints,
+          this._debugDrawHooks
         );
       }
 
-      this._renderer.render();
+      this._renderer.render(options);
     }
 
     /**
@@ -953,6 +996,26 @@ namespace gdjs {
         this.networkId = newNetworkId;
       }
       return this.networkId;
+    }
+
+    setRenderer3DWorldScale(worldScale: float): void {
+      const value = Math.abs(worldScale) || 100;
+      this._renderer3DWorldScale = value;
+      this._renderer3DInverseWorldScale = 1 / value;
+
+      for (const layer of this._orderedLayers) {
+        const layerRenderer = layer.getRenderer();
+        layerRenderer.updateWorldScale();
+        layerRenderer.updatePosition();
+      }
+    }
+
+    getRenderer3DWorldScale(): float {
+      return this._renderer3DWorldScale;
+    }
+
+    getRenderer3DInverseWorldScale(): float {
+      return this._renderer3DInverseWorldScale;
     }
   }
 

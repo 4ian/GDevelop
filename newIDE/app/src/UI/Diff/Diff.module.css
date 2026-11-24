@@ -1,0 +1,125 @@
+/* Colors of the changes: the text and a translucent background use the color
+of the change (via currentColor). */
+.added {
+  color: var(--theme-success-color);
+}
+
+.removed {
+  color: var(--theme-error-color);
+}
+
+.modified {
+  color: var(--theme-warning-color);
+}
+
+.sign {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  font-family: 'Fira Mono', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  background-color: color-mix(in srgb, currentColor 18%, transparent);
+}
+
+.itemList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  max-width: 100%;
+  height: 24px;
+  padding: 0 8px 0 4px;
+  border-radius: 6px;
+  background-color: color-mix(in srgb, currentColor 10%, transparent);
+}
+
+.itemName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--theme-text-default-color);
+  font-family: 'Fira Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    Roboto, sans-serif;
+  font-size: 13px;
+}
+
+.removed .itemName {
+  text-decoration: line-through;
+  text-decoration-color: color-mix(in srgb, currentColor 60%, transparent);
+  color: var(--theme-text-secondary-color);
+}
+
+.valueDiff {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.valueDiffInline {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.value {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+  padding: 4px 8px 4px 4px;
+  border-radius: 6px;
+  background-color: color-mix(in srgb, currentColor 10%, transparent);
+}
+
+.valueText {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  color: var(--theme-text-default-color);
+  font-family: 'Fira Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    Roboto, sans-serif;
+  font-size: 13px;
+  line-height: 16px;
+}
+
+.valueDiffInline .value {
+  padding: 2px 8px;
+}
+
+/* A value that is not a text (like an image) has the same space on all its
+sides, without the space left below images displayed inline. */
+.value.elementValue {
+  padding: 4px;
+}
+
+.elementValue .valueText {
+  display: flex;
+  line-height: 0;
+}
+
+.emptyValue {
+  font-style: italic;
+  color: var(--theme-text-secondary-color);
+}
+
+.arrow {
+  color: var(--theme-text-secondary-color);
+  font-size: 13px;
+}

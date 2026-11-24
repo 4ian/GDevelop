@@ -75,10 +75,11 @@ export type SceneEditorsDisplayProps = {|
   editLayerEffects: (layer: ?gdLayer) => void,
   editLayer: (layer: ?gdLayer) => void,
   onRemoveLayer: (layerName: string, done: (boolean) => void) => void,
-  onLayerRenamed: () => void,
+  onLayerRenamed: (oldName: string, newName: string) => void,
   onLayersModified: () => void,
   onLayersVisibilityInEditorChanged: () => void,
   onBackgroundColorChanged: () => void,
+  onRenderer3DWorldScaleFieldChanged: () => void,
   selectedObjectGroup: gdObjectGroup | null,
   onSelectObjectGroup: (objectGroup: gdObjectGroup | null) => void,
   openSceneVariables: () => void,
@@ -91,11 +92,13 @@ export type SceneEditorsDisplayProps = {|
     objectWithContext: ObjectWithContext,
     hasResourceChanged: boolean
   ) => void,
-  onObjectFolderOrObjectWithContextSelected: (
-    ?ObjectFolderOrObjectWithContext
+  onObjectFolderOrObjectsWithContextSelected: (
+    Array<ObjectFolderOrObjectWithContext>
   ) => void,
   onSetAsGlobalObject: (object: gdObject) => void,
-  onExportAssets: () => void,
+  onExportAssets: (
+    objectFolderOrObjectsWithContext: Array<ObjectFolderOrObjectWithContext> | null
+  ) => void,
   onImportAssets: () => void,
   onDeleteObjects: (
     i18n: I18nType,
@@ -136,6 +139,9 @@ export type SceneEditorsDisplayProps = {|
   ) => boolean,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  onCreateNewExtensionWithBehavior:
+    | ((project: gdProject, object: gdObject) => void)
+    | null,
 
   updateBehaviorsSharedData: () => void,
   onInstancesAdded: (Array<gdInitialInstance>) => void,
@@ -169,6 +175,7 @@ export type SceneEditorsDisplayProps = {|
 
   onOpenedEditorsChanged: () => void,
   onRestartInGameEditor: (reason: string) => void,
+  onSwitchToInstancesEditor: () => void,
   showRestartInGameEditorAfterErrorButton: boolean,
   onEventsBasedObjectChildrenEdited: (
     eventsBasedObject: gdEventsBasedObject,
@@ -212,6 +219,7 @@ export type SceneEditorsDisplayInterface = {|
       layer: string
     ) => Array<gdInitialInstance>,
     clearHighlightedInstance: () => void,
+    cancelClickInterception: () => boolean,
     resetInstanceRenderersFor: (objectName: string) => void,
     forceRemountInstancesRenderers: () => void,
     addSerializedInstances: ({|

@@ -13,6 +13,11 @@ const useStyles = (
   gdevelopTheme: GDevelopTheme
 ) =>
   makeStyles({
+    // Display the current value immediately: the default transition animates
+    // from the previous value, which looks like the bar goes backward.
+    bar1Determinate: {
+      transition: 'none',
+    },
     colorSecondary: {
       backgroundColor: trackColor || gdevelopTheme.paper.backgroundColor.light,
     },

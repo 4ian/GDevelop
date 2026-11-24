@@ -41,6 +41,7 @@ const enumerateExpressionMetadataMap = (
       type: expressionType,
       name: expressionType,
       displayedName: exprMetadata.getFullName(),
+      description: exprMetadata.getDescription(),
       fullGroupName: [prefix, groupName].filter(Boolean).join(GROUP_DELIMITER),
       iconFilename: exprMetadata.getSmallIconFilename(),
       metadata: exprMetadata,

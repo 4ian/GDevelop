@@ -29,7 +29,7 @@ OpacityExtension::OpacityExtension() {
       .SetIncludeFile("object-capabilities/OpacityBehavior.js");
   expressions["Value"]
       .SetFunctionName("getOpacity")
-      .SetIncludeFile("object-capabilities/ScalableBehavior.js");
+      .SetIncludeFile("object-capabilities/OpacityBehavior.js");
 }
 
 }  // namespace gdjs

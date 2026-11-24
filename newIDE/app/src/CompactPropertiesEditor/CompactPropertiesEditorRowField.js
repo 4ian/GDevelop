@@ -6,6 +6,7 @@ import { LineStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
 import { MarkdownText } from '../UI/MarkdownText';
 import { tooltipEnterDelay } from '../UI/Tooltip';
+import PortalContainerContext from '../UI/PortalContainerContext';
 
 const styles = {
   leftColumn: { flex: 2, minWidth: 0, maxWidth: 150 },
@@ -26,6 +27,7 @@ type Props = {|
 |};
 
 const CompactPropertiesEditorRowField = (props: Props): React.Node => {
+  const portalContainer = React.useContext(PortalContainerContext);
   const title = !props.markdownDescription
     ? props.label
     : [
@@ -47,6 +49,8 @@ const CompactPropertiesEditorRowField = (props: Props): React.Node => {
           enterDelay={tooltipEnterDelay}
           placement="bottom"
           PopperProps={{
+            // Passing PopperProps replaces the theme default container (see FullThemeProvider).
+            container: portalContainer,
             modifiers: {
               offset: {
                 enabled: true,

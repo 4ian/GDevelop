@@ -69,6 +69,7 @@ namespace gdjs {
     // and old messages are ignored.
     _clock: number = 0;
     _destroyInstanceTimeoutId: NodeJS.Timeout | null = null;
+    _hasStartedDelayBeforeDestroyingObjectWithoutNetworkId = false;
     _timeBeforeDestroyingObjectWithoutNetworkIdInMs = 500;
 
     constructor(
@@ -82,25 +83,39 @@ namespace gdjs {
           ? 0
           : parseInt(behaviorData.playerNumber, 10);
       this.actionOnPlayerDisconnect = behaviorData.actionOnPlayerDisconnect;
+    }
 
-      // When a synchronized object is created, we assume it will be assigned a networkId quickly if:
-      // - It is a new object created by the current player. -> will be assigned a networkId when sending the update message.
-      // - It is an object created by another player. -> will be assigned a networkId when receiving the update message.
-      // There is a small risk that the object is created by us after we receive an update message from the host,
-      // ending up with 2 objects created, one with a networkId (from the host) and one without (from us).
-      // To handle this case and avoid having an object not synchronized, we set a timeout to destroy the object
-      // if it has not been assigned a networkId after a short delay.
+    /**
+     * When a synchronized object is created, we assume it will be assigned a networkId quickly if:
+     * - It is a new object created by the current player. -> will be assigned a networkId when sending the update message.
+     * - It is an object created by another player. -> will be assigned a networkId when receiving the update message.
+     * There is a small risk that the object is created by us after we receive an update message from the host,
+     * ending up with 2 objects created, one with a networkId (from the host) and one without (from us).
+     * To handle this case and avoid having an object not synchronized, we set a timeout to destroy the object
+     * if it has not been assigned a networkId after a short delay.
+     *
+     * The delay starts at the first frame of the object (while the lobby game is running), not at its creation:
+     * instances placed in the scene are created while the scene is loading, which can take seconds,
+     * and only get a networkId in their first frame (when an event takes their ownership for example).
+     */
+    private _startDelayBeforeDestroyingObjectWithoutNetworkId() {
+      this._hasStartedDelayBeforeDestroyingObjectWithoutNetworkId = true;
+      if (this.owner.networkId) {
+        return;
+      }
+
       this._destroyInstanceTimeoutId = setTimeout(() => {
+        this._destroyInstanceTimeoutId = null;
         const sceneNetworkId = this.owner.getRuntimeScene().networkId;
         if (
-          !owner.networkId &&
+          !this.owner.networkId &&
           gdjs.multiplayer.isLobbyGameRunning() &&
           sceneNetworkId
         ) {
           debugLogger.info(
-            `Lobby game is running on a synced scene and object ${owner.getName()} has not been assigned a networkId after a short delay, destroying it.`
+            `Lobby game is running on a synced scene and object ${this.owner.getName()} has not been assigned a networkId after a short delay, destroying it.`
           );
-          owner.deleteFromScene();
+          this.owner.deleteFromScene();
         }
       }, this._timeBeforeDestroyingObjectWithoutNetworkIdInMs);
     }
@@ -251,6 +266,10 @@ namespace gdjs {
       // Before doing anything, check if the game is running, if not, return.
       if (!gdjs.multiplayer.isLobbyGameRunning()) {
         return;
+      }
+
+      if (!this._hasStartedDelayBeforeDestroyingObjectWithoutNetworkId) {
+        this._startDelayBeforeDestroyingObjectWithoutNetworkId();
       }
 
       // If game is running and the object belongs to a player who is not connected, destroy the object.

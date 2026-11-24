@@ -47,6 +47,11 @@ export type GameMetrics = {
     /** Day 7 retained players (number of players who played this day, and were new players 7 days earlier). */
     d7RetainedPlayers: number,
   },
+  /** The number is not defined for the days before it was counted (2026-11). */
+  platforms?: ?{
+    /** Number of players for this day on a device with a touch screen (mostly phones and tablets). */
+    d0TouchPlayers?: ?number,
+  },
 };
 
 // $FlowFixMe[cannot-resolve-name]
@@ -107,4 +112,29 @@ export const getGameMetricsFrom = async (
     data: response.data,
     endpointName: '/game-metrics of Analytics API',
   });
+};
+
+/** A crash report, in the format sent by the game engine. */
+export type GameCrashReport = {|
+  type: 'javascript-uncaught-exception',
+  exception: {
+    message: string,
+    stack: string,
+    ...
+  },
+  isPreview: boolean,
+  isInGameEdition: boolean,
+  gdevelop: {| versionWithHash: string |},
+  game: {|
+    gameId: string,
+    name: string,
+    packageName: string,
+    version: string,
+  |},
+|};
+
+export const createGameCrashReport = async (
+  gameCrashReport: GameCrashReport
+): Promise<void> => {
+  await client.post('/game-crash-report', gameCrashReport);
 };

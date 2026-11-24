@@ -98,6 +98,7 @@ const ProfileDetails = ({
     : null;
   const twitterUsername = profile ? communityLinks.twitterUsername : null;
   const facebookUsername = profile ? communityLinks.facebookUsername : null;
+  const blueskyUsername = profile ? communityLinks.blueskyUsername : null;
   const youtubeUsername = profile ? communityLinks.youtubeUsername : null;
   const tiktokUsername = profile ? communityLinks.tiktokUsername : null;
   const instagramUsername = profile ? communityLinks.instagramUsername : null;
@@ -421,6 +422,10 @@ const ProfileDetails = ({
                     {
                       text: facebookUsername,
                       icon: communityLinksConfig.facebookUsername.icon,
+                    },
+                    {
+                      text: blueskyUsername,
+                      icon: communityLinksConfig.blueskyUsername.icon,
                     },
                     {
                       text: instagramUsername,

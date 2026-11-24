@@ -106,7 +106,6 @@ export const create = (authentication: Authentication): React.Node => {
                   gamesList={props.gamesList}
                 />
               )}
-              quickPublishOnlineWebExporter={localOnlineWebExporter}
               renderGDJSDevelopmentWatcher={
                 isDev ? ({ onGDJSUpdated }) => <LocalGDJSDevelopmentWatcher onGDJSUpdated={onGDJSUpdated} /> : null
               }

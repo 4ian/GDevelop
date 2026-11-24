@@ -1,0 +1,177 @@
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-bottom: 12px;
+}
+
+.headerLine {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toolbarSearch {
+  flex: 1;
+  min-width: 0;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.groupHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
+}
+
+.groupCount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  box-sizing: border-box;
+  border-radius: 999px;
+  font-family: 'Fira Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    Roboto, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--theme-text-secondary-color);
+  background-color: var(--theme-text-field-default-background-color);
+}
+
+.groupActions {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: var(--theme-surface-window-background-color);
+  border: 1px solid var(--theme-list-item-separator-color);
+}
+
+.row {
+  position: relative;
+  border-bottom: 1px solid var(--theme-list-item-separator-color);
+}
+
+.row:last-child {
+  border-bottom: 0;
+}
+
+/* A bar on the left of the parts kept from the project. */
+.row::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background-color: transparent;
+  transition: background-color 0.15s linear;
+}
+
+.row.kept::before {
+  background-color: var(--theme-primary-color);
+}
+
+.row.withProblem::before {
+  background-color: var(--theme-warning-color);
+}
+
+.rowMain {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 6px 12px 6px 8px;
+  cursor: pointer;
+}
+
+.rowMain:hover {
+  background-color: var(--theme-list-item-hover-background-color);
+}
+
+.expandIcon {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--theme-text-secondary-color);
+  transition: transform 0.15s ease-out;
+}
+
+.expanded .expandIcon {
+  transform: rotate(90deg);
+}
+
+.rowTitle {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.rowChips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 4px;
+  min-width: 0;
+}
+
+.rowProblem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 12px 8px 40px;
+  padding: 6px 6px 6px 10px;
+  border-radius: 6px;
+  color: var(--theme-warning-color);
+  background-color: color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.rowProblemText {
+  flex: 1;
+  min-width: 0;
+}
+
+.rowDetails {
+  padding: 4px 16px 14px 70px;
+}
+
+.changes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.changeSection {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.emptyResults {
+  padding: 24px;
+  text-align: center;
+}

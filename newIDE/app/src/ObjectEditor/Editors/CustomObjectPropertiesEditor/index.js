@@ -64,6 +64,8 @@ import useAlertDialog from '../../../UI/Alert/useAlertDialog';
 import { MarkdownText } from '../../../UI/MarkdownText';
 import ResponsiveFlatButton from '../../../UI/ResponsiveFlatButton';
 import propertiesMapToSchema from '../../../PropertiesEditor/PropertiesMapToSchema';
+import { renameObjectPointReferences } from '../../../Utils/ObjectAnimationsRefactoring';
+import { isDefaultVariantReplacedByUpdates } from '../../../Utils/Extension/ExtensionOrigin';
 
 const gd: libGDevelop = global.gd;
 
@@ -129,7 +131,7 @@ export const isVariantEditable = (
     ).getAssetStoreAssetId() === '' &&
     // The default variant is reset when updating the extension.
     (!!getVariantName(eventsBasedObject, customObjectConfiguration) ||
-      eventsFunctionsExtension.getOriginName() !== 'gdevelop-extension-store')
+      !isDefaultVariantReplacedByUpdates(eventsFunctionsExtension))
   );
 };
 
@@ -451,8 +453,12 @@ const CustomObjectPropertiesEditor = (props: Props): React.Node => {
         visibility: 'All',
         layersContainer: null,
         shouldDisabledFieldsWithMixedValues: false,
+        propertyGroups: gd.MetadataProvider.getObjectMetadata(
+          project.getCurrentPlatform(),
+          customObjectConfiguration.getType()
+        ).getPropertyGroups(),
       }),
-    [customObjectConfiguration, customObjectEventsBasedObject, object]
+    [customObjectConfiguration, customObjectEventsBasedObject, object, project]
   );
 
   return (
@@ -835,24 +841,17 @@ const CustomObjectPropertiesEditor = (props: Props): React.Node => {
                   if (!object) {
                     return;
                   }
-                  if (layout) {
-                    gd.WholeProjectRefactorer.renameObjectPointInScene(
+                  renameObjectPointReferences(
+                    {
                       project,
-                      layout,
                       object,
-                      oldName,
-                      newName
-                    );
-                  } else if (eventsFunctionsExtension && eventsBasedObject) {
-                    gd.WholeProjectRefactorer.renameObjectPointInEventsBasedObject(
-                      project,
+                      layout,
                       eventsFunctionsExtension,
                       eventsBasedObject,
-                      object,
-                      oldName,
-                      newName
-                    );
-                  }
+                    },
+                    oldName,
+                    newName
+                  );
                 }}
               />
             </Dialog>

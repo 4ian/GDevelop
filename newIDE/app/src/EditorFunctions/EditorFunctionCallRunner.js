@@ -13,6 +13,8 @@ import {
   type EventsGenerationOptions,
   type AssetSearchAndInstallOptions,
   type AssetSearchAndInstallResult,
+  type EffectAssetSearchAndInstallOptions,
+  type EffectAssetSearchAndInstallResult,
   type RelatedAiRequestLastMessages,
   type ResourceSearchAndInstallOptions,
   type ResourceSearchAndInstallResult,
@@ -25,10 +27,15 @@ import {
   type ObjectGroupsOutsideEditorChanges,
   type ProjectItemRenamedOutsideEditorChanges,
   type WillDeleteSceneChanges,
+  type WillDeleteGameplayTestChanges,
   type WillDeleteObjectChanges,
+  type ExtensionsOutsideEditorChanges,
+  type WillDeleteExtensionItemChanges,
 } from './OutsideEditorChanges';
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import { type EnsureExtensionInstalledOptions } from '../AiGeneration/UseEnsureExtensionInstalled';
+import { normalizeLegacyArguments } from './Scope';
+import { type AttachmentsForResources } from './AttachmentResources';
 
 type ProcessEditorFunctionCallsOptions = {|
   project: ?gdProject,
@@ -36,6 +43,12 @@ type ProcessEditorFunctionCallsOptions = {|
   i18n: I18nType,
   editorCallbacks: EditorCallbacks,
   toolOptions: ToolOptions | null,
+  // The AI request's tools version (e.g. 'v12'), threaded to the functions so
+  // they can gate version-dependent behavior (e.g. isNoOpConsideredSuccess).
+  toolsVersion?: ?string,
+  // When true, a `run_script` call is exposed only non-mutating functions
+  // (explorer sub-agent scripts, which must stay read-only).
+  runScriptReadOnly?: boolean,
   relatedAiRequestId: string | null,
   getRelatedAiRequestLastMessages: () => RelatedAiRequestLastMessages,
   generateEvents: (
@@ -50,6 +63,7 @@ type ProcessEditorFunctionCallsOptions = {|
   onObjectsModifiedOutsideEditor: (
     changes: ObjectsOutsideEditorChanges
   ) => void,
+  onEffectsModifiedOutsideEditor: () => void,
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
   ) => void,
@@ -57,7 +71,19 @@ type ProcessEditorFunctionCallsOptions = {|
     changes: ProjectItemRenamedOutsideEditorChanges
   ) => void,
   onWillDeleteScene: (changes: WillDeleteSceneChanges) => Promise<void>,
+  onWillDeleteGameplayTest: (
+    changes: WillDeleteGameplayTestChanges
+  ) => Promise<void>,
   onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
+  sendChangesToEditor: () => void,
+  onExtensionsModifiedOutsideEditor: (
+    changes: ExtensionsOutsideEditorChanges
+  ) => void,
+  ensureExtensionsUpToDate: () => Promise<void>,
+  reloadExtensionMetadata: (extensionName: string) => void,
+  onWillDeleteExtensionItem: (
+    changes: WillDeleteExtensionItemChanges
+  ) => Promise<void>,
   ensureExtensionInstalled: (
     options: EnsureExtensionInstalledOptions
   ) => Promise<void>,
@@ -66,9 +92,13 @@ type ProcessEditorFunctionCallsOptions = {|
   searchAndInstallAsset: (
     options: AssetSearchAndInstallOptions
   ) => Promise<AssetSearchAndInstallResult>,
+  searchAndInstallEffectAsset: (
+    options: EffectAssetSearchAndInstallOptions
+  ) => Promise<EffectAssetSearchAndInstallResult>,
   searchAndInstallResources: (
     options: ResourceSearchAndInstallOptions
   ) => Promise<ResourceSearchAndInstallResult>,
+  attachmentsForResources: AttachmentsForResources,
   getAssetStoreTagForNewObject: (objectType: string) => string | null,
 |};
 
@@ -78,35 +108,48 @@ export const processEditorFunctionCalls = async ({
   i18n,
   editorCallbacks,
   toolOptions,
+  toolsVersion,
+  runScriptReadOnly,
   generateEvents,
   onSceneEventsModifiedOutsideEditor,
   onInstancesModifiedOutsideEditor,
   onObjectsModifiedOutsideEditor,
+  onEffectsModifiedOutsideEditor,
   onObjectGroupsModifiedOutsideEditor,
   onProjectItemRenamedOutsideEditor,
   onWillDeleteScene,
+  onWillDeleteGameplayTest,
   onWillDeleteObject,
+  sendChangesToEditor,
+  onExtensionsModifiedOutsideEditor,
+  ensureExtensionsUpToDate,
+  reloadExtensionMetadata,
+  onWillDeleteExtensionItem,
   relatedAiRequestId,
   getRelatedAiRequestLastMessages,
   ensureExtensionInstalled,
   onWillInstallExtension,
   onExtensionInstalled,
   searchAndInstallAsset,
+  searchAndInstallEffectAsset,
   searchAndInstallResources,
+  attachmentsForResources,
   getAssetStoreTagForNewObject,
 }: ProcessEditorFunctionCallsOptions): Promise<{|
   results: Array<EditorFunctionCallResult>,
   createdSceneNames: Array<string>,
+  createdExternalLayoutNames: Array<string>,
   createdProject: ?gdProject,
 |}> => {
   const results: Array<EditorFunctionCallResult> = [];
   const createdSceneNames: Array<string> = [];
+  const createdExternalLayoutNames: Array<string> = [];
   let createdProject: ?gdProject = null;
 
   for (const functionCall of functionCalls) {
     const call_id = functionCall.call_id;
     const name = functionCall.name;
-    if (!project && name !== 'initialize_project') {
+    if (!project && !editorFunctionsWithoutProject[name]) {
       results.push({
         status: 'finished',
         call_id,
@@ -143,6 +186,9 @@ export const processEditorFunctionCalls = async ({
             message: 'Invalid arguments (not a valid JSON string).',
           },
         });
+        // Without this, the function would still run with `args: undefined`
+        // and a second result would be pushed for the same call_id.
+        continue;
       }
 
       // $FlowFixMe[invalid-compare]
@@ -171,6 +217,10 @@ export const processEditorFunctionCalls = async ({
         continue;
       }
 
+      // Legacy argument names (e.g. `scene_name`) are mapped to their current
+      // form once here, so the functions implement one version of the tools.
+      args = normalizeLegacyArguments(args);
+
       // Check if the function exists
       const editorFunction: EditorFunction | null =
         editorFunctions[name] || null;
@@ -192,6 +242,8 @@ export const processEditorFunctionCalls = async ({
         args,
         i18n,
         toolOptions,
+        toolsVersion,
+        runScriptReadOnly,
         editorCallbacks,
         relatedAiRequestId,
         getRelatedAiRequestLastMessages,
@@ -199,15 +251,24 @@ export const processEditorFunctionCalls = async ({
         onSceneEventsModifiedOutsideEditor,
         onInstancesModifiedOutsideEditor,
         onObjectsModifiedOutsideEditor,
+        onEffectsModifiedOutsideEditor,
         onObjectGroupsModifiedOutsideEditor,
         onProjectItemRenamedOutsideEditor,
         onWillDeleteScene,
+        onWillDeleteGameplayTest,
         onWillDeleteObject,
+        sendChangesToEditor,
+        onExtensionsModifiedOutsideEditor,
+        ensureExtensionsUpToDate,
+        reloadExtensionMetadata,
+        onWillDeleteExtensionItem,
         ensureExtensionInstalled,
         onWillInstallExtension,
         onExtensionInstalled,
         searchAndInstallAsset,
+        searchAndInstallEffectAsset,
         searchAndInstallResources,
+        attachmentsForResources,
         getAssetStoreTagForNewObject,
         PixiResourcesLoader,
       };
@@ -244,8 +305,13 @@ export const processEditorFunctionCalls = async ({
 
       const { success, meta, ...output } = result;
       const editorFunctionDef = editorFunction || editorFunctionWithoutProject;
+      // `run_script` sets `meta.didModifyProject` explicitly: a script can
+      // apply project-changing calls before failing, so its "did modify" is
+      // NOT `modifiesProject && success` — honor the reported value when given.
       const didModifyProject =
-        editorFunctionDef && editorFunctionDef.modifiesProject && success
+        meta && typeof meta.didModifyProject === 'boolean'
+          ? meta.didModifyProject || undefined
+          : editorFunctionDef && editorFunctionDef.modifiesProject && success
           ? true
           : undefined;
       results.push({
@@ -258,6 +324,9 @@ export const processEditorFunctionCalls = async ({
 
       if (meta && meta.newSceneNames) {
         createdSceneNames.push(...meta.newSceneNames);
+      }
+      if (meta && meta.newExternalLayoutNames) {
+        createdExternalLayoutNames.push(...meta.newExternalLayoutNames);
       }
       if (meta && meta.createdProject) {
         createdProject = meta.createdProject;
@@ -272,5 +341,10 @@ export const processEditorFunctionCalls = async ({
     }
   }
 
-  return { results, createdSceneNames, createdProject };
+  return {
+    results,
+    createdSceneNames,
+    createdExternalLayoutNames,
+    createdProject,
+  };
 };

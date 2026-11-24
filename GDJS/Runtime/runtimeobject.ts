@@ -4,6 +4,57 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  export interface AbstractRuntimeObject3D
+    extends gdjs.RuntimeObject,
+      gdjs.Base3DHandler,
+      gdjs.Resizable,
+      gdjs.Scalable,
+      gdjs.Flippable {
+    /**
+     * @returns `true` when a movement behavior has moved the object and
+     * declared a velocity to be used for physics collisions.
+     */
+    hasEstimatedVelocity(): boolean;
+    /**
+     * Called every frame by the 3D Physics.
+     */
+    resetEstimatedVelocity(): void;
+    /**
+     * @see hasEstimatedVelocity
+     */
+    getEstimatedVelocityX(): float;
+    /**
+     * @see hasEstimatedVelocity
+     */
+    getEstimatedVelocityY(): float;
+    /**
+     * @see hasEstimatedVelocity
+     */
+    getEstimatedVelocityZ(): float;
+    /**
+     * @see hasEstimatedVelocity
+     */
+    setEstimatedVelocityX(velocityX: float): void;
+    /**
+     * @see hasEstimatedVelocity
+     */
+    setEstimatedVelocityY(velocityY: float): void;
+    /**
+     * @see hasEstimatedVelocity
+     */
+    setEstimatedVelocityZ(velocityZ: float): void;
+  }
+
+  /** @category Objects > 3D Objects */
+  export namespace Base3DHandler {
+    export const is3D = (
+      object: gdjs.RuntimeObject
+    ): object is AbstractRuntimeObject3D => {
+      //@ts-ignore We are checking if the methods are present.
+      return object.getZ && object.setZ;
+    };
+  }
+
   /**
    * An axis-aligned bounding box. Used to represents a box around an object for example.
    * @category Core Engine > Object
@@ -14,6 +65,73 @@ namespace gdjs {
     /** The [x,y] coordinates of the bottom right point */
     max: FloatPoint;
   };
+
+  /**
+   * A surface given as triangles (see `gdjs.Surface`).
+   * @category Core Engine > Object
+   */
+  export type SurfaceTriangles = {
+    /** The X, Y and Z positions of the vertices, from 0 to 1 in the object box. */
+    positions: Float32Array;
+    /**
+     * The 3 vertex indices of each triangle, in the order giving a normal,
+     * `(b - a) x (c - a)`, going out of the surface (up for a ground).
+     */
+    indices: Uint32Array;
+  };
+
+  /**
+   * A surface given as the heights of a grid covering the object box (see
+   * `gdjs.Surface`).
+   * @category Core Engine > Object
+   */
+  export type SurfaceHeightField = {
+    /** The number of samples along X (at least 2), from the left of the box to its right. */
+    columns: integer;
+    /** The number of samples along Y (at least 2), from the top of the box to its bottom. */
+    rows: integer;
+    /**
+     * The heights, row after row, from 0 (bottom of the box) to 1 (top), or
+     * NaN where the surface has a hole.
+     */
+    heights: Float32Array;
+  };
+
+  /**
+   * A part of a surface, from 0 to 1 in the object box (see `gdjs.Surface`).
+   * @category Core Engine > Object
+   */
+  export type SurfaceArea = {
+    minX: float;
+    minY: float;
+    maxX: float;
+    maxY: float;
+  };
+
+  /**
+   * The exact shape of an object, used instead of its box by navigation
+   * meshes and physics engines. It's given as triangles or as a height field,
+   * whichever suits the object: each feature uses the one it handles best and
+   * converts the other.
+   *
+   * Positions are relative to the object box before its rotation, from 0 to 1
+   * on each axis: (0, 0, 0) is its left, top and bottom corner. This way, the
+   * surface follows the object size without changing.
+   * @category Core Engine > Object
+   */
+  export interface Surface {
+    /** A number changing each time the surface changes. */
+    getVersion(): integer;
+    /**
+     * The part of the surface that changed since a version, to only update
+     * this part, or null to update the whole surface.
+     */
+    getChangedArea(sinceVersion: integer): gdjs.SurfaceArea | null;
+    /** The triangles of the surface, or null if it's given as a height field. */
+    getTriangles(): gdjs.SurfaceTriangles | null;
+    /** The height field of the surface, or null if it's given as triangles. */
+    getHeightField(): gdjs.SurfaceHeightField | null;
+  }
 
   /**
    * @category Core Engine > Object
@@ -233,6 +351,7 @@ namespace gdjs {
      */
     protected _behaviorsTable: Hashtable<gdjs.RuntimeBehavior>;
     protected _timers: Hashtable<gdjs.Timer>;
+    private _surface: gdjs.Surface | null = null;
 
     /**
      * @param instanceContainer The scene or custom object the object belongs to.
@@ -306,8 +425,21 @@ namespace gdjs {
         }
       }
 
+      const game = this._runtimeScene.getGame();
       for (let i = 0; i < this._behaviors.length; ++i) {
-        this._behaviors[i].onCreated();
+        const behavior = this._behaviors[i];
+        if (game.isInGameEdition()) {
+          try {
+            behavior.onCreated();
+          } catch (error) {
+            game.reportInGameEditorExtensionError(error, {
+              phase: 'onCreated',
+              type: behavior.type,
+            });
+          }
+        } else {
+          behavior.onCreated();
+        }
       }
     }
 
@@ -353,6 +485,7 @@ namespace gdjs {
       this.aabb.max[1] = 0;
       this._variables = new gdjs.VariablesContainer(objectData.variables);
       this.clearForces();
+      this._surface = null;
 
       // Reinitialize behaviors.
       this._behaviorsTable.clear();
@@ -401,6 +534,22 @@ namespace gdjs {
     }
 
     static supportsReinitialization = false;
+
+    /**
+     * Like in the 2D editor, transparent instances stay partially visible in
+     * the in-game editor so they can't be lost or misplaced.
+     */
+    static applyInGameEditorMinimumOpacity(object: gdjs.RuntimeObject): void {
+      const objectWithOpacity = object as gdjs.RuntimeObject &
+        Partial<gdjs.OpacityHandler>;
+      if (!objectWithOpacity.getOpacity || !objectWithOpacity.setOpacity) {
+        return;
+      }
+      const minimumOpacity = 255 / 2;
+      if (objectWithOpacity.getOpacity() < minimumOpacity) {
+        objectWithOpacity.setOpacity(minimumOpacity);
+      }
+    }
 
     /**
      * Return the time elapsed since the last frame,
@@ -685,8 +834,21 @@ namespace gdjs {
       if (rendererObject3D) {
         theLayer.getRenderer().remove3DRendererObject(rendererObject3D);
       }
+      const game = this._runtimeScene.getGame();
       for (let j = 0, lenj = this._behaviors.length; j < lenj; ++j) {
-        this._behaviors[j].onDestroy();
+        const behavior = this._behaviors[j];
+        if (game.isInGameEdition()) {
+          try {
+            behavior.onDestroy();
+          } catch (error) {
+            game.reportInGameEditorExtensionError(error, {
+              phase: 'onDestroy',
+              type: behavior.type,
+            });
+          }
+        } else {
+          behavior.onDestroy();
+        }
       }
       this.destroyCallbacks.forEach((c) => c());
       this.clearEffects();
@@ -1040,6 +1202,22 @@ namespace gdjs {
     }
 
     /**
+     * The exact shape of the object, if the object (or the extension defining
+     * it) gives one. It's used instead of the object box by navigation meshes
+     * and physics engines.
+     */
+    getSurface(): gdjs.Surface | null {
+      return this._surface;
+    }
+
+    /**
+     * Give the exact shape of the object (see `getSurface`).
+     */
+    setSurface(surface: gdjs.Surface | null): void {
+      this._surface = surface;
+    }
+
+    /**
      * Get the container of the object variables
      * @return The variables of the object
      */
@@ -1219,7 +1397,8 @@ namespace gdjs {
       if (array.getChildrenCount() === 0) {
         return '';
       }
-      return array.getAllChildrenArray()[0].getAsString();
+      const firstChild = array.getAllChildrenArray()[0];
+      return firstChild ? firstChild.getAsString() : '';
     };
 
     /**
@@ -1229,7 +1408,8 @@ namespace gdjs {
       if (array.getChildrenCount() === 0) {
         return 0;
       }
-      return array.getAllChildrenArray()[0].getAsNumber();
+      const firstChild = array.getAllChildrenArray()[0];
+      return firstChild ? firstChild.getAsNumber() : 0;
     };
 
     /**
@@ -1237,9 +1417,11 @@ namespace gdjs {
      */
     static getLastVariableString = function (array: gdjs.Variable): string {
       const children = array.getAllChildrenArray();
-      return children.length === 0
-        ? ''
-        : children[children.length - 1].getAsString();
+      if (children.length === 0) {
+        return '';
+      }
+      const lastChild = children[children.length - 1];
+      return lastChild ? lastChild.getAsString() : '';
     };
 
     /**
@@ -1247,9 +1429,11 @@ namespace gdjs {
      */
     static getLastVariableNumber = function (array: gdjs.Variable): number {
       const children = array.getAllChildrenArray();
-      return children.length === 0
-        ? 0
-        : children[children.length - 1].getAsNumber();
+      if (children.length === 0) {
+        return 0;
+      }
+      const lastChild = children[children.length - 1];
+      return lastChild ? lastChild.getAsNumber() : 0;
     };
 
     /**

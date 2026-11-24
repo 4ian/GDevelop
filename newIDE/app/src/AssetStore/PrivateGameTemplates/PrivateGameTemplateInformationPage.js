@@ -34,6 +34,10 @@ import {
 import { sendGameTemplateBuyClicked } from '../../Utils/Analytics/EventSender';
 import { MarkdownText } from '../../UI/MarkdownText';
 import Window from '../../Utils/Window';
+import {
+  getPublicGame,
+  getPublicGameUrl,
+} from '../../Utils/GDevelopServices/Game';
 import ScrollView from '../../UI/ScrollView';
 import { shouldUseAppStoreProduct } from '../../Utils/AppStorePurchases';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
@@ -58,7 +62,10 @@ import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import RaisedButton from '../../UI/RaisedButton';
 import Play from '../../UI/CustomSvgIcons/Play';
 import PrivateGameTemplatePurchaseDialog from './PrivateGameTemplatePurchaseDialog';
+import GiftPurchaseDialog from '../Gift/GiftPurchaseDialog';
+import BuyAsGiftButton from '../Gift/BuyAsGiftButton';
 import PasswordPromptDialog from '../PasswordPromptDialog';
+import ClaimProductCallout from '../ClaimProductCallout';
 import PublicProfileContext from '../../Profile/PublicProfileContext';
 import { LARGE_WIDGET_SIZE } from '../../MainFrame/EditorContainers/HomePage/CardWidget';
 import { BundleStoreContext } from '../Bundles/BundleStoreContext';
@@ -178,6 +185,10 @@ const PrivateGameTemplateInformationPage = ({
     purchasingPrivateGameTemplateListingData,
     setPurchasingPrivateGameTemplateListingData,
   ] = React.useState<?PrivateGameTemplateListingData>(null);
+  const [
+    isGiftPurchaseDialogOpen,
+    setIsGiftPurchaseDialogOpen,
+  ] = React.useState<boolean>(false);
   const [isFetching, setIsFetching] = React.useState<boolean>(false);
   const { openUserPublicProfile } = React.useContext(PublicProfileContext);
   const [
@@ -190,6 +201,12 @@ const PrivateGameTemplateInformationPage = ({
   ] = React.useState<boolean>(false);
   const [password, setPassword] = React.useState<string>('');
   const [errorText, setErrorText] = React.useState<?React.Node>(null);
+  // The gd.games URL of the game showcasing this template, once verified
+  // that the game is actually published. Null otherwise.
+  const [
+    verifiedShowcasedGameUrl,
+    setVerifiedShowcasedGameUrl,
+  ] = React.useState<?string>(null);
   const {
     windowSize,
     isLandscape,
@@ -229,6 +246,12 @@ const PrivateGameTemplateInformationPage = ({
     ]
   );
   const isAlreadyReceived = !!userGameTemplatePurchaseUsageType;
+  // Products no longer sold (archived, or replaced by another offer) can't be offered.
+  const isListedInStore =
+    !!privateGameTemplateListingDatas &&
+    privateGameTemplateListingDatas.some(
+      ({ id }) => id === privateGameTemplateListingData.id
+    );
 
   const templatesIncludedInBundleTiles = React.useMemo(
     () =>
@@ -338,6 +361,50 @@ const PrivateGameTemplateInformationPage = ({
     [id, sellerId]
   );
 
+  // The listing data is available immediately, the game template is fetched:
+  // prefer the former so the check starts right away. Both are strings, so the
+  // effect below only runs when the id itself changes (once, in practice).
+  const showcasedGameId =
+    privateGameTemplateListingData.showcasedGameId ||
+    (gameTemplate ? gameTemplate.showcasedGameId : null);
+
+  React.useEffect(
+    () => {
+      setVerifiedShowcasedGameUrl(null);
+      if (!showcasedGameId) return;
+
+      let isCancelled = false;
+      (async () => {
+        try {
+          const publicGame = await getPublicGame(showcasedGameId);
+          if (isCancelled) return;
+          // Only link to the game if it's actually published (has a web build),
+          // otherwise the link would lead to a "not found" page.
+          setVerifiedShowcasedGameUrl(
+            publicGame.publicWebBuildId ? getPublicGameUrl(publicGame) : null
+          );
+        } catch (error) {
+          // The game does not exist (anymore) or could not be fetched:
+          // don't display a button leading nowhere.
+          if (!isCancelled) setVerifiedShowcasedGameUrl(null);
+        }
+      })();
+
+      return () => {
+        isCancelled = true;
+      };
+    },
+    [showcasedGameId]
+  );
+
+  // Templates not synced with a showcased game id yet fall back to the
+  // deprecated, unverified preview link, if any.
+  const tryItOnlineUrl = showcasedGameId
+    ? verifiedShowcasedGameUrl
+    : gameTemplate
+    ? gameTemplate.gamePreviewLink
+    : null;
+
   const onClickBuy = React.useCallback(
     async () => {
       if (!gameTemplate) return;
@@ -418,6 +485,7 @@ const PrivateGameTemplateInformationPage = ({
       if (currentCreditsAmount < gameTemplateCreditsAmount) {
         openCreditsPackageDialog({
           missingCredits: gameTemplateCreditsAmount - currentCreditsAmount,
+          placementId: 'asset-store',
         });
         return;
       }
@@ -561,6 +629,10 @@ const PrivateGameTemplateInformationPage = ({
                           </Link>
                         </Text>
                       </LineStackLayout>
+                      <ClaimProductCallout
+                        productListingData={privateGameTemplateListingData}
+                        isAlreadyReceived={isAlreadyReceived}
+                      />
                       <LineStackLayout
                         noMargin
                         justifyContent="space-between"
@@ -575,21 +647,18 @@ const PrivateGameTemplateInformationPage = ({
                             helpPagePath="https://gdevelop.io/page/asset-store-license-agreement"
                           />
                         </Line>
-                        {!isAlreadyReceived &&
-                        !privateGameTemplateListingData.includedListableProductIds && ( // Bundles don't have a preview link.
-                            <Column noMargin>
-                              <RaisedButton
-                                primary
-                                label={<Trans>Try it online</Trans>}
-                                onClick={() =>
-                                  Window.openExternalURL(
-                                    gameTemplate.gamePreviewLink
-                                  )
-                                }
-                                icon={<Play style={styles.playIcon} />}
-                              />
-                            </Column>
-                          )}
+                        {!isAlreadyReceived && !!tryItOnlineUrl && (
+                          <Column noMargin>
+                            <RaisedButton
+                              primary
+                              label={<Trans>Try it online</Trans>}
+                              onClick={() =>
+                                Window.openExternalURL(tryItOnlineUrl)
+                              }
+                              icon={<Play style={styles.playIcon} />}
+                            />
+                          </Column>
+                        )}
                       </LineStackLayout>
                       <ProductLicenseOptions
                         value={selectedUsageType}
@@ -612,6 +681,18 @@ const PrivateGameTemplateInformationPage = ({
                               isAlreadyReceived={isAlreadyReceived}
                               onClickBuy={onClickBuy}
                               onClickBuyWithCredits={onWillBuyWithCredits}
+                              additionalButton={
+                                isListedInStore ? (
+                                  <BuyAsGiftButton
+                                    onClick={() =>
+                                      setIsGiftPurchaseDialogOpen(true)
+                                    }
+                                    simulateAppStoreProduct={
+                                      simulateAppStoreProduct
+                                    }
+                                  />
+                                ) : null
+                              }
                             />
                           )}
                           {!shouldUseOrSimulateAppStoreProduct && (
@@ -629,6 +710,17 @@ const PrivateGameTemplateInformationPage = ({
                           label={<Trans>Open template</Trans>}
                         />
                       ) : null}
+                      {!errorText &&
+                        isAlreadyReceived &&
+                        isListedInStore &&
+                        !shouldUseOrSimulateAppStoreProduct && (
+                          <Line noMargin justifyContent="center">
+                            <BuyAsGiftButton
+                              onClick={() => setIsGiftPurchaseDialogOpen(true)}
+                              simulateAppStoreProduct={simulateAppStoreProduct}
+                            />
+                          </Line>
+                        )}
                     </ColumnStackLayout>
                   </div>
                 </ResponsiveLineStackLayout>
@@ -707,6 +799,13 @@ const PrivateGameTemplateInformationPage = ({
               }
               usageType={selectedUsageType}
               onClose={() => setPurchasingPrivateGameTemplateListingData(null)}
+            />
+          )}
+          {isGiftPurchaseDialogOpen && (
+            <GiftPurchaseDialog
+              productListingData={privateGameTemplateListingData}
+              usageType={selectedUsageType}
+              onClose={() => setIsGiftPurchaseDialogOpen(false)}
             />
           )}
         </>

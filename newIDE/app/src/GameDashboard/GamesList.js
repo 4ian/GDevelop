@@ -30,8 +30,6 @@ import BackgroundText from '../UI/BackgroundText';
 import GamesListFilterSelector, {
   type GamesListFilter,
 } from './GamesListFilterSelector';
-import GetSubscriptionCard from '../Profile/Subscription/GetSubscriptionCard';
-import { hasValidSubscriptionPlan } from '../Utils/GDevelopServices/Usage';
 import { type CloudProjectWithUserAccessInfo } from '../Utils/GDevelopServices/Project';
 import {
   type FileMetadataAndStorageProviderName,
@@ -130,42 +128,6 @@ const areDashboardItemsEqual = (
     });
   }
   return false;
-};
-
-const getProjectsRestorationMessage = (
-  restorationTimeWindowInSeconds: ?number
-): React.Node => {
-  if (
-    restorationTimeWindowInSeconds == null ||
-    restorationTimeWindowInSeconds <= 0
-  ) {
-    return <Trans>Restore projects with a subscription</Trans>;
-  }
-
-  const days = Math.floor(restorationTimeWindowInSeconds / (24 * 3600));
-  const hours = Math.floor(restorationTimeWindowInSeconds / 3600);
-  const minutes = Math.max(1, Math.floor(restorationTimeWindowInSeconds / 60));
-  const duration =
-    days > 1 ? (
-      <Trans>{days} days</Trans>
-    ) : days === 1 ? (
-      <Trans>1 day</Trans>
-    ) : hours > 1 ? (
-      <Trans>{hours} hours</Trans>
-    ) : hours === 1 ? (
-      <Trans>1 hour</Trans>
-    ) : minutes > 1 ? (
-      <Trans>{minutes} minutes</Trans>
-    ) : (
-      <Trans>1 minute</Trans>
-    );
-
-  return (
-    <Trans>
-      By default, a project can only be restored during the {duration} following
-      its deletion. Get a subscription to restore older projects.
-    </Trans>
-  );
 };
 
 const isProjectRestorable = (
@@ -340,6 +302,8 @@ type Props = {|
   setCurrentPage: (currentPage: number) => void,
   searchText: string,
   setSearchText: (searchText: string) => void,
+  filter: GamesListFilter,
+  setFilter: (filter: GamesListFilter) => void,
 |};
 
 const GamesList = ({
@@ -367,20 +331,19 @@ const GamesList = ({
   setCurrentPage,
   searchText,
   setSearchText,
+  filter,
+  setFilter,
 }: Props): React.Node => {
   const {
     cloudProjects,
     profile,
     onCloudProjectsChanged,
-    subscription,
     limits,
   } = React.useContext(AuthenticatedUserContext);
   const {
     values: { gamesDashboardOrderBy: orderBy },
     setGamesDashboardOrderBy,
   } = React.useContext(PreferencesContext);
-
-  const [filter, setFilter] = React.useState<GamesListFilter>('active');
 
   React.useEffect(
     () => {
@@ -391,7 +354,7 @@ const GamesList = ({
         setFilter('active');
       }
     },
-    [profile, filter]
+    [profile, filter, setFilter]
   );
 
   const { isMobile } = useResponsiveWindowSize();
@@ -715,32 +678,6 @@ const GamesList = ({
               </Line>
             </ResponsiveLineStackLayout>
           )}
-          {filter === 'deleted' &&
-            !!profile &&
-            !hasValidSubscriptionPlan(subscription) && (
-              <GetSubscriptionCard
-                subscriptionDialogOpeningReason="Restore deleted project"
-                label={<Trans>Get a subscription</Trans>}
-                recommendedPlanId="gdevelop_silver"
-                placementId="restore-deleted-project"
-              >
-                <Line>
-                  <Column noMargin expand>
-                    <Text size="block-title" noMargin>
-                      <Trans>Deleted a project by mistake?</Trans>
-                    </Text>
-                    <Text noMargin>
-                      {getProjectsRestorationMessage(
-                        limits
-                          ? limits.capabilities.cloudProjects
-                              .projectRestorationTimeWindowInSeconds
-                          : null
-                      )}
-                    </Text>
-                  </Column>
-                </Line>
-              </GetSubscriptionCard>
-            )}
           {!displayedDashboardItems &&
             Array.from({ length: pageSize }).map((_, i) => (
               <Line key={i} expand>

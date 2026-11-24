@@ -151,13 +151,13 @@ class GD_CORE_API ObjectsContainersList {
                        bool searchInGroups = true) const;
 
   /**
-   * \brief Check if a behavior is a default one or doesn't exist in an object
+   * \brief Check if a behavior is a default one and exists in an object
    * or all objects of a group.
    *
    * \note The behaviors of a group are the behaviors
    * which are found in common when looking all the objects of the group.
    */
-  bool IsDefaultBehavior(const gd::String &objectOrGroupName,
+  bool HasDefaultBehavior(const gd::String &objectOrGroupName,
                                             const gd::String &behaviorType,
                                             bool searchInGroups = true) const;
 

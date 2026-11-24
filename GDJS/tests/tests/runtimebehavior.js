@@ -114,5 +114,82 @@ describe('gdjs.RuntimeBehavior', () => {
       const result = behavior.updateFromBehaviorData(behaviorData, updatedData);
       expect(result).to.be(false);
     });
+
+    it('updates the network synchronization when changed in the editor', () => {
+      const behaviorData = {
+        name: 'MyBehavior',
+        type: 'TestBehavior::RecordingBehavior',
+      };
+      const behavior = makeBehavior(behaviorData);
+      expect(behavior.isSyncedOverNetwork()).to.be(true);
+
+      const notSynchronizedBehaviorData = {
+        ...behaviorData,
+        isSynchronizedOverNetwork: false,
+      };
+      behavior.updateFromBehaviorData(
+        behaviorData,
+        notSynchronizedBehaviorData
+      );
+      expect(behavior.isSyncedOverNetwork()).to.be(false);
+
+      behavior.updateFromBehaviorData(
+        notSynchronizedBehaviorData,
+        behaviorData
+      );
+      expect(behavior.isSyncedOverNetwork()).to.be(true);
+    });
+  });
+
+  describe('network synchronization', () => {
+    /**
+     * @param {BehaviorData} behaviorData
+     * @returns {gdjs.RuntimeBehavior}
+     */
+    const makeBehavior = (behaviorData) => {
+      const object = new gdjs.TestRuntimeObject(runtimeScene, {
+        name: 'obj1',
+        type: '',
+        variables: [],
+        behaviors: [],
+        effects: [],
+      });
+      return new gdjs.TestRuntimeBehavior(runtimeScene, behaviorData, object);
+    };
+
+    it('is synchronized unless set otherwise in the behavior data', () => {
+      expect(
+        makeBehavior({
+          name: 'MyBehavior',
+          type: 'TestBehavior::TestBehavior',
+        }).isSyncedOverNetwork()
+      ).to.be(true);
+      expect(
+        makeBehavior({
+          name: 'MyBehavior',
+          type: 'TestBehavior::TestBehavior',
+          isSynchronizedOverNetwork: true,
+        }).isSyncedOverNetwork()
+      ).to.be(true);
+      expect(
+        makeBehavior({
+          name: 'MyBehavior',
+          type: 'TestBehavior::TestBehavior',
+          isSynchronizedOverNetwork: false,
+        }).isSyncedOverNetwork()
+      ).to.be(false);
+    });
+
+    it('can still be changed at runtime by the action', () => {
+      const behavior = makeBehavior({
+        name: 'MyBehavior',
+        type: 'TestBehavior::TestBehavior',
+        isSynchronizedOverNetwork: false,
+      });
+
+      behavior.enableSynchronization(true);
+
+      expect(behavior.isSyncedOverNetwork()).to.be(true);
+    });
   });
 });

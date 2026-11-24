@@ -64,12 +64,28 @@ export const NoProjectOpen = (): React.Node => {
                   )}
                   onSceneAdded={action('onSceneAdded')}
                   onExternalLayoutAdded={action('onExternalLayoutAdded')}
-                  onDeleteLayout={action('onDeleteLayout')}
-                  onDeleteExternalLayout={action('onDeleteExternalLayout')}
+                  onDeleteLayouts={async () => {
+                    action('onDeleteLayouts')();
+                    return false;
+                  }}
+                  onDeleteExternalLayouts={async () => {
+                    action('onDeleteExternalLayouts')();
+                    return false;
+                  }}
                   onDeleteEventsFunctionsExtension={action(
                     'onDeleteEventsFunctionsExtension'
                   )}
-                  onDeleteExternalEvents={action('onDeleteExternalEvents')}
+                  onDeleteExternalEventsList={async () => {
+                    action('onDeleteExternalEventsList')();
+                    return false;
+                  }}
+                  onDeleteGameplayTests={async () => {
+                    action('onDeleteGameplayTests')();
+                    return false;
+                  }}
+                  onRenameGameplayTest={action('onRenameGameplayTest')}
+                  onOpenGameplayTest={action('onOpenGameplayTest')}
+                  onRunGameplayTest={action('onRunGameplayTest')}
                   onRenameLayout={action('onRenameLayout')}
                   onRenameExternalLayout={action('onRenameExternalLayout')}
                   onRenameEventsFunctionsExtension={action(
@@ -140,12 +156,28 @@ export const ProjectOpen = (): React.Node => {
                   )}
                   onSceneAdded={action('onSceneAdded')}
                   onExternalLayoutAdded={action('onExternalLayoutAdded')}
-                  onDeleteLayout={action('onDeleteLayout')}
-                  onDeleteExternalLayout={action('onDeleteExternalLayout')}
+                  onDeleteLayouts={async () => {
+                    action('onDeleteLayouts')();
+                    return false;
+                  }}
+                  onDeleteExternalLayouts={async () => {
+                    action('onDeleteExternalLayouts')();
+                    return false;
+                  }}
                   onDeleteEventsFunctionsExtension={action(
                     'onDeleteEventsFunctionsExtension'
                   )}
-                  onDeleteExternalEvents={action('onDeleteExternalEvents')}
+                  onDeleteExternalEventsList={async () => {
+                    action('onDeleteExternalEventsList')();
+                    return false;
+                  }}
+                  onDeleteGameplayTests={async () => {
+                    action('onDeleteGameplayTests')();
+                    return false;
+                  }}
+                  onRenameGameplayTest={action('onRenameGameplayTest')}
+                  onOpenGameplayTest={action('onOpenGameplayTest')}
+                  onRunGameplayTest={action('onRunGameplayTest')}
                   onRenameLayout={action('onRenameLayout')}
                   onRenameExternalLayout={action('onRenameExternalLayout')}
                   onRenameEventsFunctionsExtension={action(

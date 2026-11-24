@@ -59,7 +59,7 @@ namespace gdjs {
     eventsBasedObjectType: string | null;
     eventsBasedObjectVariantName: string | null;
     editorId: string | null;
-    editorCamera3D?: EditorCameraState;
+    editorCamera?: EditorCameraState;
   };
 
   /**
@@ -85,7 +85,7 @@ namespace gdjs {
         eventsBasedObjectVariantName:
           parsedRuntimeGameStatus.eventsBasedObjectVariantName,
         editorId: parsedRuntimeGameStatus.editorId,
-        editorCamera3D: parsedRuntimeGameStatus.editorCamera3D,
+        editorCamera: parsedRuntimeGameStatus.editorCamera,
       };
     } catch (e) {
       return null;
@@ -108,6 +108,12 @@ namespace gdjs {
 
     inGameEditorSettings?: InGameEditorSettings;
 
+    /**
+     * The base URL (or relative path) from which the game engine files are
+     * served. Most of the time, they are next to the game index.html ("./"),
+     * but some previews serve them from a server.
+     */
+    runtimeFilesBaseUrl?: string;
     /** Script files, used for hot-reloading. */
     scriptFiles?: Array<RuntimeGameOptionsScriptFile>;
     /** if true, export is a partial preview without reloading libraries. */
@@ -159,9 +165,6 @@ namespace gdjs {
     /** The template slug that was used to create the project. */
     projectTemplateSlug?: string;
 
-    /** The source game id that was used to create the project. */
-    sourceGameId?: string;
-
     /** Any capture that should be done during the preview. */
     captureOptions?: CaptureOptions;
 
@@ -196,6 +199,7 @@ namespace gdjs {
     _sceneAndExtensionsData: Array<SceneAndExtensionsData> = [];
     _eventsBasedObjectDatas: Map<String, EventsBasedObjectData>;
     _effectsManager: EffectsManager;
+    _namedEasingsManager: gdjs.NamedEasingsManager;
     _maxFPS: integer;
     _minFPS: integer;
     _gameResolutionWidth: integer;
@@ -239,6 +243,9 @@ namespace gdjs {
      * This has nothing to do with `_paused`.
      */
     _hasJustResumed: boolean = false;
+
+    /** True as soon as the game startup began - see `hasGameStartupBegun`. */
+    _hasGameStartupBegun: boolean = false;
 
     //Inputs :
     private _inputManager: InputManager;
@@ -332,6 +339,7 @@ namespace gdjs {
         ? new gdjs.DebuggerClient(this)
         : null;
       this._effectsManager = new gdjs.EffectsManager();
+      this._namedEasingsManager = new gdjs.NamedEasingsManager(data);
       this._maxFPS = this._data.properties.maxFPS;
       this._minFPS = this._data.properties.minFPS;
       this._gameResolutionWidth = this._data.properties.windowWidth;
@@ -359,10 +367,7 @@ namespace gdjs {
       this._sceneStack = new gdjs.SceneStack(this);
       this._inputManager = new gdjs.InputManager();
       this._captureManager = gdjs.CaptureManager
-        ? new gdjs.CaptureManager(
-            this._renderer,
-            this._options.captureOptions || {}
-          )
+        ? new gdjs.CaptureManager(this, this._options.captureOptions || {})
         : null;
       this._sessionId = null;
       this._playerId = null;
@@ -394,6 +399,7 @@ namespace gdjs {
         getGlobalResourceNames(projectData),
         projectData.layouts
       );
+      this._namedEasingsManager = new gdjs.NamedEasingsManager(projectData);
     }
 
     private _updateSceneAndExtensionsData(): void {
@@ -561,6 +567,10 @@ namespace gdjs {
      */
     getEffectsManager(): gdjs.EffectsManager {
       return this._effectsManager;
+    }
+
+    getNamedEasingsManager(): gdjs.NamedEasingsManager {
+      return this._namedEasingsManager;
     }
 
     /**
@@ -1100,6 +1110,19 @@ namespace gdjs {
     }
 
     /**
+     * True while the game is in its startup sequence: the initial loading
+     * (`loadAllAssets` - assets and asynchronously loaded libraries) has
+     * begun but the first scene (created by `startGameLoop` at the end of
+     * it) does not exist yet. Always false for a game that is never
+     * started and only driven manually (as in tests).
+     */
+    isStartingUp(): boolean {
+      return (
+        this._hasGameStartupBegun && !this._sceneStack.wasFirstSceneLoaded()
+      );
+    }
+
+    /**
      * Load all assets needed to display the 1st scene, displaying progress in
      * renderer.
      */
@@ -1125,6 +1148,7 @@ namespace gdjs {
       firstSceneName: string,
       progressCallback?: (progress: float) => void
     ): Promise<void> {
+      this._hasGameStartupBegun = true;
       try {
         // Download the loading screen background image first to be able to
         // display the loading screen as soon as possible.
@@ -1193,6 +1217,10 @@ namespace gdjs {
       ) => Promise<void>,
       progressCallback?: (progress: float) => void
     ): Promise<void> {
+      // Remember if the game was already paused (e.g. by a gameplay test or
+      // the debugger), to restore that state - not blindly unpause - once
+      // the assets are loaded.
+      const wasPaused = this._paused;
       this.pause(true);
       const loadingScreen = new gdjs.LoadingScreenRenderer(
         this.getRenderer(),
@@ -1221,7 +1249,7 @@ namespace gdjs {
 
       this._displayedLoadingScreen = null;
       if (!this._isInGameEdition) {
-        this.pause(false);
+        this.pause(wasPaused);
       }
     }
 
@@ -1261,15 +1289,15 @@ namespace gdjs {
               ?.eventsBasedObjectVariantName || null;
           const editorId =
             this._options.initialRuntimeGameStatus?.editorId || null;
-          const editorCamera3D =
-            this._options.initialRuntimeGameStatus?.editorCamera3D || null;
+          const editorCamera =
+            this._options.initialRuntimeGameStatus?.editorCamera || null;
           this._inGameEditor.switchToSceneOrVariant(
             editorId,
             sceneName,
             externalLayoutName,
             eventsBasedObjectType,
             eventsBasedObjectVariantName,
-            editorCamera3D
+            editorCamera
           );
         } else {
           if (sceneName) {
@@ -1725,6 +1753,24 @@ namespace gdjs {
      */
     isInGameEdition(): boolean {
       return this._isInGameEdition;
+    }
+
+    /**
+     * In the in-game editor, report an error thrown by the code of an
+     * extension, instead of letting it stop the editor.
+     * @param error What was thrown.
+     * @param origin Where: the phase (`onCreated`, `doStepPostEvents`...), and
+     * the type of the object or behavior running it, if any.
+     */
+    reportInGameEditorExtensionError(
+      error: unknown,
+      origin: { phase: string; type?: string }
+    ): void {
+      if (this._debuggerClient) {
+        this._debuggerClient.reportInGameEditorExtensionError(error, origin);
+      } else {
+        logger.error('Error in the code of an extension:', error);
+      }
     }
 
     /**

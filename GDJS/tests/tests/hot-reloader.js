@@ -178,6 +178,7 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
       name: 'Scene1',
       stopSoundsOnStartup: false,
       title: '',
+      renderer3DWorldScale: 100,
       behaviorsSharedData: [],
       objects: objects || [
         createSpriteData({ name: 'MyObject', image: 'ResourceA' }),
@@ -199,7 +200,8 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
         gridColor: 0,
         gridAlpha: 1,
         snap: false,
-      }
+        windowMask: false,
+      },
     };
   };
 
@@ -222,7 +224,7 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
       objects: objects || [
         createSpriteData({ name: 'MyChildObject', image: 'ResourceA' }),
       ],
-        objectsGroups: [],
+      objectsGroups: [],
       layers: [baseLayer],
       areaMinX: 0,
       areaMinY: 0,
@@ -246,7 +248,8 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
         gridColor: 0,
         gridAlpha: 1,
         snap: false,
-      }
+        windowMask: false,
+      },
     };
   };
 
@@ -308,6 +311,292 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
     expect(instances[0].getY()).to.be(678);
     expect(instances[1].getX()).to.be(222);
     expect(instances[1].getY()).to.be(234);
+  });
+
+  it('can hide then show again an instance at hot-reload', async () => {
+    const oldProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1', x: 111, y: 123 }],
+        }),
+      ],
+    });
+    const runtimeGame = new gdjs.RuntimeGame(oldProjectData);
+    const hotReloader = new gdjs.HotReloader(runtimeGame);
+    await runtimeGame.loadFirstAssetsAndStartBackgroundLoading(
+      'Scene1',
+      () => {}
+    );
+    runtimeGame._sceneStack.push('Scene1');
+    const scene = runtimeGame.getSceneStack().getCurrentScene();
+    if (!scene) throw new Error("Couldn't set a current scene for testing.");
+
+    expect(scene.getInstancesOf('MyObject')[0].isVisible()).to.be(true);
+
+    // Mark the instance as hidden at start (the serializer only writes the
+    // attribute when true).
+    const hiddenProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1', x: 111, y: 123, hidden: true }],
+        }),
+      ],
+    });
+    await hotReloader._hotReloadRuntimeGame(
+      oldProjectData,
+      hiddenProjectData,
+      [],
+      runtimeGame
+    );
+    expect(scene.getInstancesOf('MyObject')[0].isVisible()).to.be(false);
+
+    // Mark it as visible again: the attribute is absent from the data, like
+    // the serializer produces.
+    const visibleAgainProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1', x: 111, y: 123 }],
+        }),
+      ],
+    });
+    await hotReloader._hotReloadRuntimeGame(
+      hiddenProjectData,
+      visibleAgainProjectData,
+      [],
+      runtimeGame
+    );
+    expect(scene.getInstancesOf('MyObject')[0].isVisible()).to.be(true);
+  });
+
+  it('can set then remove the custom size of an instance at hot-reload', async () => {
+    const oldProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1', x: 111, y: 123 }],
+        }),
+      ],
+    });
+    const runtimeGame = new gdjs.RuntimeGame(oldProjectData);
+    const hotReloader = new gdjs.HotReloader(runtimeGame);
+    await runtimeGame.loadFirstAssetsAndStartBackgroundLoading(
+      'Scene1',
+      () => {}
+    );
+    runtimeGame._sceneStack.push('Scene1');
+    const scene = runtimeGame.getSceneStack().getCurrentScene();
+    if (!scene) throw new Error("Couldn't set a current scene for testing.");
+
+    const instance = scene.getInstancesOf('MyObject')[0];
+    const originalWidth = instance.getOriginalWidth();
+    const originalHeight = instance.getOriginalHeight();
+    expect(originalWidth).not.to.be(0);
+    expect(instance.getWidth()).to.be(originalWidth);
+    expect(instance.getHeight()).to.be(originalHeight);
+
+    const customSizeProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [
+            {
+              persistentUuid: '1',
+              x: 111,
+              y: 123,
+              customSize: true,
+              width: 50,
+              height: 60,
+            },
+          ],
+        }),
+      ],
+    });
+    await hotReloader._hotReloadRuntimeGame(
+      oldProjectData,
+      customSizeProjectData,
+      [],
+      runtimeGame
+    );
+    expect(instance.getWidth()).to.be(50);
+    expect(instance.getHeight()).to.be(60);
+
+    // Remove the custom size (like an undo in the editor would do).
+    const defaultSizeProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1', x: 111, y: 123 }],
+        }),
+      ],
+    });
+    await hotReloader._hotReloadRuntimeGame(
+      customSizeProjectData,
+      defaultSizeProjectData,
+      [],
+      runtimeGame
+    );
+    expect(instance.getWidth()).to.be(originalWidth);
+    expect(instance.getHeight()).to.be(originalHeight);
+  });
+
+  it('can change then restore the opacity of an instance at hot-reload', async () => {
+    const oldProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1', x: 111, y: 123 }],
+        }),
+      ],
+    });
+    const runtimeGame = new gdjs.RuntimeGame(oldProjectData);
+    const hotReloader = new gdjs.HotReloader(runtimeGame);
+    await runtimeGame.loadFirstAssetsAndStartBackgroundLoading(
+      'Scene1',
+      () => {}
+    );
+    runtimeGame._sceneStack.push('Scene1');
+    const scene = runtimeGame.getSceneStack().getCurrentScene();
+    if (!scene) throw new Error("Couldn't set a current scene for testing.");
+
+    const instance = scene.getInstancesOf('MyObject')[0];
+    if (!(instance instanceof gdjs.SpriteRuntimeObject)) {
+      throw new Error("Couldn't instantiate a sprite for testing.");
+    }
+    expect(instance.getOpacity()).to.be(255);
+
+    const translucentProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1', x: 111, y: 123, opacity: 128 }],
+        }),
+      ],
+    });
+    await hotReloader._hotReloadRuntimeGame(
+      oldProjectData,
+      translucentProjectData,
+      [],
+      runtimeGame
+    );
+    expect(instance.getOpacity()).to.be(128);
+
+    // Restore the default opacity: the attribute is absent from the data,
+    // like the serializer produces.
+    const opaqueAgainProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1', x: 111, y: 123 }],
+        }),
+      ],
+    });
+    await hotReloader._hotReloadRuntimeGame(
+      translucentProjectData,
+      opaqueAgainProjectData,
+      [],
+      runtimeGame
+    );
+    expect(instance.getOpacity()).to.be(255);
+  });
+
+  it('can flip then unflip an instance at hot-reload', async () => {
+    const oldProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1', x: 111, y: 123 }],
+        }),
+      ],
+    });
+    const runtimeGame = new gdjs.RuntimeGame(oldProjectData);
+    const hotReloader = new gdjs.HotReloader(runtimeGame);
+    await runtimeGame.loadFirstAssetsAndStartBackgroundLoading(
+      'Scene1',
+      () => {}
+    );
+    runtimeGame._sceneStack.push('Scene1');
+    const scene = runtimeGame.getSceneStack().getCurrentScene();
+    if (!scene) throw new Error("Couldn't set a current scene for testing.");
+
+    const instance = scene.getInstancesOf('MyObject')[0];
+    if (!(instance instanceof gdjs.SpriteRuntimeObject)) {
+      throw new Error("Couldn't instantiate a sprite for testing.");
+    }
+    expect(instance.isFlippedX()).to.be(false);
+    expect(instance.isFlippedY()).to.be(false);
+
+    const flippedProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [
+            {
+              persistentUuid: '1',
+              x: 111,
+              y: 123,
+              flippedX: true,
+              flippedY: true,
+            },
+          ],
+        }),
+      ],
+    });
+    await hotReloader._hotReloadRuntimeGame(
+      oldProjectData,
+      flippedProjectData,
+      [],
+      runtimeGame
+    );
+    expect(instance.isFlippedX()).to.be(true);
+    expect(instance.isFlippedY()).to.be(true);
+
+    // Unflip: the attributes are absent from the data, like the serializer
+    // produces.
+    const unflippedProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1', x: 111, y: 123 }],
+        }),
+      ],
+    });
+    await hotReloader._hotReloadRuntimeGame(
+      flippedProjectData,
+      unflippedProjectData,
+      [],
+      runtimeGame
+    );
+    expect(instance.isFlippedX()).to.be(false);
+    expect(instance.isFlippedY()).to.be(false);
+  });
+
+  it('keeps instances hidden at start visible when in the in-game editor', async () => {
+    const oldProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1', x: 111, y: 123 }],
+        }),
+      ],
+    });
+    const runtimeGame = new gdjs.RuntimeGame(oldProjectData);
+    // Simulate the in-game editor (where hidden instances must stay visible,
+    // to be seen and manipulated).
+    runtimeGame.isInGameEdition = () => true;
+    const hotReloader = new gdjs.HotReloader(runtimeGame);
+    await runtimeGame.loadFirstAssetsAndStartBackgroundLoading(
+      'Scene1',
+      () => {}
+    );
+    runtimeGame._sceneStack.push('Scene1');
+    const scene = runtimeGame.getSceneStack().getCurrentScene();
+    if (!scene) throw new Error("Couldn't set a current scene for testing.");
+
+    const hiddenProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1', x: 111, y: 123, hidden: true }],
+        }),
+      ],
+    });
+    await hotReloader._hotReloadRuntimeGame(
+      oldProjectData,
+      hiddenProjectData,
+      [],
+      runtimeGame
+    );
+    // The instance is hidden at start, but stays visible in the editor.
+    expect(scene.getInstancesOf('MyObject')[0].isVisible()).to.be(true);
   });
 
   it('can move instances of a global object at hot-reload', async () => {
@@ -762,6 +1051,133 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
     expect(variablesContainer.has('MyVariable2')).to.be(true);
     expect(variablesContainer.get('MyVariable2').getAsNumber()).to.be(789);
     expect(variablesContainer.getFromIndex(1).getAsNumber()).to.be(789);
+  });
+
+  it('keeps the project data up-to-date when objects are hot-reloaded several times', async () => {
+    const projectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1' }],
+          objects: [createSpriteData({ name: 'MyObject', image: 'ResourceA' })],
+        }),
+      ],
+    });
+    const runtimeGame = new gdjs.RuntimeGame(projectData);
+    const hotReloader = new gdjs.HotReloader(runtimeGame);
+    await runtimeGame.loadFirstAssetsAndStartBackgroundLoading(
+      'Scene1',
+      () => {}
+    );
+    runtimeGame._sceneStack.push('Scene1');
+    const scene = runtimeGame.getSceneStack().getCurrentScene();
+    if (!scene) throw new Error("Couldn't set a current scene for testing.");
+
+    // Like the in-game editor does when an object is edited.
+    hotReloader.hotReloadRuntimeSceneObjects(
+      [createSpriteData({ name: 'MyObject', image: 'ResourceB' })],
+      scene
+    );
+    hotReloader.hotReloadRuntimeSceneObjects(
+      [createSpriteData({ name: 'MyObject', image: 'ResourceC' })],
+      scene
+    );
+
+    const instances = scene.getInstancesOf('MyObject');
+    expect(instances.length).to.be(1);
+    expect(getSpriteCurrentFrameImage(instances[0])).to.be('ResourceC');
+
+    const createdInstance = scene.createObject('MyObject');
+    if (!createdInstance)
+      throw new Error("Couldn't create an instance for testing.");
+    expect(getSpriteCurrentFrameImage(createdInstance)).to.be('ResourceC');
+
+    // Like the in-game editor does when it switches back to the scene.
+    const sceneAndExtensionsData =
+      runtimeGame.getSceneAndExtensionsData('Scene1');
+    if (!sceneAndExtensionsData)
+      throw new Error("Couldn't find the scene data for testing.");
+    const reloadedScene = new gdjs.RuntimeScene(runtimeGame);
+    reloadedScene.loadFromScene(sceneAndExtensionsData);
+    const reloadedInstances = reloadedScene.getInstancesOf('MyObject');
+    expect(reloadedInstances.length).to.be(1);
+    expect(getSpriteCurrentFrameImage(reloadedInstances[0])).to.be('ResourceC');
+  });
+
+  it('keeps the project data up-to-date when custom objects are hot-reloaded several times', async () => {
+    /**
+     * @param {number} myProperty
+     * @returns {ObjectData & gdjs.CustomObjectConfiguration}
+     */
+    const createCustomObjectData = (myProperty) => ({
+      ...defaultCustomObject,
+      content: { MyProperty: myProperty },
+    });
+    /**
+     * @param {gdjs.RuntimeObject} instance
+     * @returns {number}
+     */
+    const getMyProperty = (instance) => {
+      if (
+        !(
+          instance instanceof
+          gdjs.evtsExt__MyExtension__MyCustomObject.MyCustomObject
+        )
+      ) {
+        throw new Error("Couldn't instantiate a custom object for testing.");
+      }
+      return instance._getMyProperty();
+    };
+
+    const projectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1', name: 'MyCustomObject' }],
+          objects: [createCustomObjectData(1)],
+        }),
+      ],
+      eventsBasedObjects: [
+        createEventsBasedObjectData({ name: 'MyCustomObject' }),
+      ],
+    });
+    const runtimeGame = new gdjs.RuntimeGame(projectData);
+    const hotReloader = new gdjs.HotReloader(runtimeGame);
+    await runtimeGame.loadFirstAssetsAndStartBackgroundLoading(
+      'Scene1',
+      () => {}
+    );
+    runtimeGame._sceneStack.push('Scene1');
+    const scene = runtimeGame.getSceneStack().getCurrentScene();
+    if (!scene) throw new Error("Couldn't set a current scene for testing.");
+
+    // Like the in-game editor does when an object is edited.
+    hotReloader.hotReloadRuntimeSceneObjects(
+      [createCustomObjectData(2)],
+      scene
+    );
+    hotReloader.hotReloadRuntimeSceneObjects(
+      [createCustomObjectData(3)],
+      scene
+    );
+
+    const instances = scene.getInstancesOf('MyCustomObject');
+    expect(instances.length).to.be(1);
+    expect(getMyProperty(instances[0])).to.be(3);
+
+    const createdInstance = scene.createObject('MyCustomObject');
+    if (!createdInstance)
+      throw new Error("Couldn't create an instance for testing.");
+    expect(getMyProperty(createdInstance)).to.be(3);
+
+    // Like the in-game editor does when it switches back to the scene.
+    const sceneAndExtensionsData =
+      runtimeGame.getSceneAndExtensionsData('Scene1');
+    if (!sceneAndExtensionsData)
+      throw new Error("Couldn't find the scene data for testing.");
+    const reloadedScene = new gdjs.RuntimeScene(runtimeGame);
+    reloadedScene.loadFromScene(sceneAndExtensionsData);
+    const reloadedInstances = reloadedScene.getInstancesOf('MyCustomObject');
+    expect(reloadedInstances.length).to.be(1);
+    expect(getMyProperty(reloadedInstances[0])).to.be(3);
   });
 });
 

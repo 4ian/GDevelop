@@ -10,6 +10,7 @@ import Reddit from '../../UI/CustomSvgIcons/Reddit';
 import Snapchat from '../../UI/CustomSvgIcons/Snapchat';
 import TikTok from '../../UI/CustomSvgIcons/TikTok';
 import Twitter from '../../UI/CustomSvgIcons/Twitter';
+import Bluesky from '../../UI/CustomSvgIcons/Bluesky';
 import YouTube from '../../UI/CustomSvgIcons/YouTube';
 import GitHub from '../../UI/CustomSvgIcons/GitHub';
 import { GDevelopUserApi } from './ApiConfigs';
@@ -37,6 +38,7 @@ export type CommunityLinkType =
   | 'personalWebsiteLink'
   | 'personalWebsite2Link'
   | 'twitterUsername'
+  | 'blueskyUsername'
   | 'facebookUsername'
   | 'youtubeUsername'
   | 'tiktokUsername'
@@ -49,6 +51,7 @@ export type CommunityLinks = {|
   personalWebsiteLink?: string,
   personalWebsite2Link?: string,
   twitterUsername?: string,
+  blueskyUsername?: string,
   facebookUsername?: string,
   youtubeUsername?: string,
   tiktokUsername?: string,
@@ -123,19 +126,10 @@ export type GuidedLessonsRecommendation = {
   type: 'guided-lessons',
   lessonsIds: string[],
 };
-export type QuickCustomizationRecommendation = {
-  type: 'quick-customization',
-  list: Array<{
-    type: 'example',
-    exampleSlug: string,
-    thumbnailTitleByLocale: MessageByLocale,
-  }>,
-};
 export type Recommendation =
   | GDevelopTutorialRecommendation
   | GuidedLessonsRecommendation
-  | PlanRecommendation
-  | QuickCustomizationRecommendation;
+  | PlanRecommendation;
 
 export type UserPublicProfile = {|
   id: string,
@@ -181,7 +175,18 @@ export type User = {|
   +password?: ?string,
 |};
 
-export type Team = {| id: string, createdAt: number, seats: number |};
+export type Team = {|
+  id: string,
+  createdAt: number,
+  seats: number,
+  /**
+   * Overrides applied to the `classrooms` capability of the students of this
+   * team. Keys mirror the `classrooms` capability of the limits.
+   */
+  classrooms?: ?{| hideAskAi: boolean |},
+  /** Days an archived member must wait before reactivation. 0 means no delay. */
+  minimumDelayBeforeReactivationInDays?: number,
+|};
 export type TeamGroup = {| id: string, name: string |};
 export type TeamInvitation = {|
   teamId: string,
@@ -342,6 +347,24 @@ export const updateGroup = async (
     data: response.data,
     propertyName: 'id',
     endpointName: '/team/{id}/group/{id} of User API',
+  });
+};
+
+export const updateTeam = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  teamId: string,
+  attributes: {| classrooms: {| hideAskAi: boolean |} |}
+): Promise<Team> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await client.patch(`/team/${teamId}`, attributes, {
+    headers: { Authorization: authorizationHeader },
+    params: { userId },
+  });
+  return ensureObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/team/{id} of User API',
   });
 };
 
@@ -800,6 +823,11 @@ export const communityLinksConfig = {
   facebookUsername: {
     icon: (<Facebook />: React.Node),
     prefix: 'https://facebook.com/',
+    maxLength: 50,
+  },
+  blueskyUsername: {
+    icon: (<Bluesky />: React.Node),
+    prefix: 'https://bsky.app/profile/',
     maxLength: 50,
   },
   youtubeUsername: {

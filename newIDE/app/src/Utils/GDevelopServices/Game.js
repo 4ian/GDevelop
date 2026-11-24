@@ -9,7 +9,10 @@ import { type UserPublicProfile } from './User';
 import { t } from '@lingui/macro';
 import { ensureIsArray, ensureObjectHasProperty } from '../DataValidator';
 
-export type GameUploadType = 'game-thumbnail' | 'game-screenshot';
+export type GameUploadType =
+  | 'game-thumbnail'
+  | 'game-screenshot'
+  | 'game-preview-video';
 
 export type SavedStatus = 'draft' | 'saved';
 
@@ -38,6 +41,8 @@ export type PublicGame = {
   orientation: string,
   thumbnailUrl?: string,
   screenshotUrls?: Array<string>,
+  previewVideoUrls?: Array<string>,
+  thumbnailVideoUrl?: string,
   cachedLastWeekSessionsCount?: number,
   cachedLastYearSessionsCount?: number,
   categories?: string[],
@@ -60,6 +65,8 @@ export type Game = {|
   description?: string,
   thumbnailUrl?: string,
   screenshotUrls?: Array<string>,
+  previewVideoUrls?: Array<string>,
+  thumbnailVideoUrl?: string,
   cachedTotalSessionsCount?: number,
   cachedLastYearSessionsCount?: number,
   cachedLastWeekSessionsCount?: number,
@@ -87,6 +94,8 @@ export type GameUpdatePayload = {|
   orientation?: string,
   thumbnailUrl?: ?string,
   screenshotUrls?: ?Array<string>,
+  previewVideoUrls?: ?Array<string>,
+  thumbnailVideoUrl?: string,
   discoverable?: boolean,
   acceptsBuildComments?: boolean,
   acceptsGameComments?: boolean,
@@ -351,6 +360,8 @@ export const updateGame = async (
     orientation,
     thumbnailUrl,
     screenshotUrls,
+    previewVideoUrls,
+    thumbnailVideoUrl,
     discoverable,
     acceptsBuildComments,
     acceptsGameComments,
@@ -373,6 +384,8 @@ export const updateGame = async (
       orientation,
       thumbnailUrl,
       screenshotUrls,
+      previewVideoUrls,
+      thumbnailVideoUrl,
       discoverable,
       acceptsBuildComments,
       acceptsGameComments,
@@ -638,6 +651,14 @@ export const createGameResourceSignedUrls = async ({
   });
 
   return response.data;
+};
+
+/** The video shown on gd.games: recorded by the creator, or else the latest automatic one. */
+export const getGameVideoUrl = (game: Game | PublicGame): ?string => {
+  if (game.thumbnailVideoUrl) return game.thumbnailVideoUrl;
+  if (game.previewVideoUrls && game.previewVideoUrls.length)
+    return game.previewVideoUrls[game.previewVideoUrls.length - 1];
+  return null;
 };
 
 export const getGameMainImageUrl = (game: Game | PublicGame): ?string => {

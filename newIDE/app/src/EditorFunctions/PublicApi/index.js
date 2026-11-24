@@ -1,0 +1,63 @@
+// @flow
+import functionsV24 from './v24/functions.json';
+import scriptApiDefinitionV24 from './v24/script-api.d.ts';
+import eventScriptGuide from './event-script-guide.md';
+import gameplayHarnessGuide from './gameplay-harness-guide.md';
+import multiplayerGameplayTests from '../../../../../Extensions/Multiplayer/gameplay-tests.md';
+
+// The documentation of the helpers that extensions add to the gameplay test
+// harness, next to their code.
+const extensionsGameplayTests = [multiplayerGameplayTests];
+
+/**
+ * The public API of the editor functions, as given to the external agents
+ * (the MCP server and the CLI): what the GDevelop AI is given to call them.
+ *
+ * The argument schemas (of the editor functions and of the functions reading
+ * the docs or searching the stores) and the script API definition are exported from the
+ * GDevelop AI backend (`generation-api/scripts/export-editor-functions-api.js`
+ * in GDevelop-services) for a version of its tools, and committed here.
+ * The EventScript and gameplay test harness guides are authored here, and
+ * read by the prompts of the GDevelop AI (the AiPrompts repository) from
+ * these files.
+ */
+
+export type PublicApiFunction = {|
+  name: string,
+  description: string,
+  // A JSON Schema of the arguments of the function.
+  inputSchema: Object,
+|};
+
+export type PublicApi = {|
+  toolsVersion: string,
+  functions: Array<PublicApiFunction>,
+  // The functions reading the docs or searching the stores, which the
+  // GDevelop AI backend resolves (see `createLookupToolCall`).
+  lookupFunctions: Array<PublicApiFunction>,
+  // The TypeScript definition of the functions a `run_script` script can
+  // call, with their output types.
+  scriptApiDefinition: string,
+  // The syntax of the "EventScript" of `generate_events`.
+  eventScriptGuide: string,
+  // The API of the `harness` of the gameplay tests (`run_gameplay_test`).
+  gameplayHarnessGuide: string,
+|};
+
+export const PUBLIC_API_TOOLS_VERSION = 'v24';
+
+export const getPublicApi = (): PublicApi => ({
+  toolsVersion: functionsV24.toolsVersion,
+  functions: functionsV24.functions,
+  lookupFunctions: functionsV24.lookupFunctions,
+  scriptApiDefinition: scriptApiDefinitionV24,
+  eventScriptGuide,
+  gameplayHarnessGuide: [
+    gameplayHarnessGuide.trim(),
+    '## Helpers added by extensions',
+    'Only in the projects using these extensions:',
+    ...extensionsGameplayTests.map(extensionGameplayTests =>
+      extensionGameplayTests.replace(/^## /gm, '### ').trim()
+    ),
+  ].join('\n\n'),
+});

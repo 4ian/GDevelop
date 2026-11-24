@@ -33,6 +33,5 @@ void DeclareAnchorBehaviorExtension(gd::PlatformExtension& extension) {
       "AnchorBehavior",
       std::make_shared<AnchorBehavior>(),
       std::make_shared<gd::BehaviorsSharedData>())
-      .MarkAsActivatedByDefaultInEditor()
-      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
+      .MarkAsActivatedByDefaultInEditor();
 }

@@ -18,14 +18,24 @@ const existingPreviewWindows: {
 } = {};
 
 let embbededGameFrameWindow: WindowProxy | null = null;
+let isEmbeddedGameFrameReady = false;
+let gameplayTestFrameWindow: WindowProxy | null = null;
 
 const getExistingDebuggerIds = (): Array<DebuggerId> => [
   ...getExistingEmbeddedGameFrameDebuggerIds(),
+  ...getExistingGameplayTestFrameDebuggerIds(),
   ...getExistingPreviewDebuggerIds(),
 ];
 
+// A frame that has a location loaded but no game running in it yet (or a game that
+// failed to start) can't be hot-reloaded: messages sent to it are silently lost.
 const getExistingEmbeddedGameFrameDebuggerIds = (): Array<DebuggerId> =>
-  embbededGameFrameWindow ? ['embedded-game-frame'] : [];
+  embbededGameFrameWindow && isEmbeddedGameFrameReady
+    ? ['embedded-game-frame']
+    : [];
+
+const getExistingGameplayTestFrameDebuggerIds = (): Array<DebuggerId> =>
+  gameplayTestFrameWindow ? ['gameplay-test-frame'] : [];
 
 const getExistingPreviewDebuggerIds = (): Array<DebuggerId> =>
   Object.keys(existingPreviewWindows).map(key => key);
@@ -35,6 +45,9 @@ const getDebuggerIdForPreviewWindow = (
 ): DebuggerId | null => {
   if (embbededGameFrameWindow && embbededGameFrameWindow === previewWindow) {
     return 'embedded-game-frame';
+  }
+  if (gameplayTestFrameWindow && gameplayTestFrameWindow === previewWindow) {
+    return 'gameplay-test-frame';
   }
 
   for (const id in existingPreviewWindows) {
@@ -134,8 +147,17 @@ class BrowserPreviewDebuggerServer {
     const theWindow =
       id === 'embedded-game-frame'
         ? embbededGameFrameWindow
+        : id === 'gameplay-test-frame'
+        ? gameplayTestFrameWindow
         : existingPreviewWindows[id];
     if (!theWindow) return;
+
+    if (id === 'embedded-game-frame' && message.command === 'hardReload') {
+      // The game is about to navigate away: it can't be considered as running - and
+      // so can't be hot-reloaded or have its files re-exported - until it announces
+      // itself again.
+      this.setEmbeddedGameFrameReady(false);
+    }
 
     try {
       theWindow.postMessage(message, previewOrigin);
@@ -146,14 +168,17 @@ class BrowserPreviewDebuggerServer {
       );
     }
   }
-  sendMessageWithResponse(message: Object): Promise<Object> {
+  sendMessageWithResponse(
+    message: Object,
+    options?: {| timeoutMs?: number |}
+  ): Promise<Object> {
     const messageId = nextMessageWithResponseId;
     nextMessageWithResponseId++;
     for (const id of getExistingDebuggerIds()) {
       this.sendMessage(id, { ...message, messageId });
     }
 
-    const timeout = 1000;
+    const timeout = (options && options.timeoutMs) || 1000;
     const promise = new Promise<Object>((resolve, reject) => {
       responseCallbacks.set(messageId, resolve);
       setTimeout(() => {
@@ -195,6 +220,51 @@ class BrowserPreviewDebuggerServer {
     );
     embbededGameFrameWindow = window;
   }
+  setEmbeddedGameFrameReady(isReady: boolean) {
+    if (isEmbeddedGameFrameReady === isReady) return;
+
+    isEmbeddedGameFrameReady = isReady;
+    if (isReady) {
+      callbacksList.forEach(({ onConnectionOpened }) =>
+        onConnectionOpened({
+          id: 'embedded-game-frame',
+          debuggerIds: getExistingDebuggerIds(),
+        })
+      );
+    } else {
+      notifyConnectionClosed('embedded-game-frame');
+    }
+  }
+  registerGameplayTestFrame(window: WindowProxy) {
+    if (window === gameplayTestFrameWindow) return;
+
+    console.info(
+      'Registered the gameplay test frame window in the debugger server.'
+    );
+    gameplayTestFrameWindow = window;
+    callbacksList.forEach(({ onConnectionOpened }) =>
+      onConnectionOpened({
+        id: 'gameplay-test-frame',
+        debuggerIds: getExistingDebuggerIds(),
+      })
+    );
+  }
+  unregisterGameplayTestFrame(window: WindowProxy) {
+    if (gameplayTestFrameWindow !== window) {
+      if (!!gameplayTestFrameWindow) {
+        console.warn(
+          'The gameplay test frame window to unregister is not the same as the one registered. Ignoring the unregistration.'
+        );
+      }
+      return;
+    }
+
+    console.info(
+      'Unregistered the gameplay test frame window in the debugger server.'
+    );
+    gameplayTestFrameWindow = null;
+    notifyConnectionClosed('gameplay-test-frame');
+  }
   unregisterEmbeddedGameFrame(window: WindowProxy) {
     if (embbededGameFrameWindow !== window) {
       if (!!embbededGameFrameWindow) {
@@ -209,6 +279,7 @@ class BrowserPreviewDebuggerServer {
       'Unregistered the embedded game frame window in the debugger server.'
     );
     embbededGameFrameWindow = null;
+    isEmbeddedGameFrameReady = false;
     notifyConnectionClosed('embedded-game-frame');
   }
   closeAllConnections() {
@@ -235,7 +306,13 @@ class BrowserPreviewDebuggerServer {
 
     if (embbededGameFrameWindow) {
       embbededGameFrameWindow = null;
+      isEmbeddedGameFrameReady = false;
       notifyConnectionClosed('embedded-game-frame');
+    }
+
+    if (gameplayTestFrameWindow) {
+      gameplayTestFrameWindow = null;
+      notifyConnectionClosed('gameplay-test-frame');
     }
 
     responseCallbacks.clear();

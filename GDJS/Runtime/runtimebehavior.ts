@@ -43,8 +43,9 @@ namespace gdjs {
     _activated: boolean;
 
     // When synchronised over the network, a behavior is always owned by the player owning the object,
-    // and always synced. If set to false, the behavior properties will not be synced to others.
-    _syncOverNetwork: boolean = true;
+    // and synced unless set otherwise in the editor (`isSynchronizedOverNetwork` in the behavior data)
+    // or by an action. If set to false, the behavior properties will not be synced to others.
+    _syncOverNetwork: boolean;
 
     /**
      * @param instanceContainer The container owning the object of the behavior
@@ -59,6 +60,7 @@ namespace gdjs {
       this.name = behaviorData.name || '';
       this.type = behaviorData.type || '';
       this._nameId = gdjs.RuntimeObject.getNameIdentifier(this.name);
+      this._syncOverNetwork = behaviorData.isSynchronizedOverNetwork !== false;
       const game = instanceContainer.getGame();
       this._activated =
         !game.isInGameEdition() ||
@@ -79,6 +81,13 @@ namespace gdjs {
       oldBehaviorData: BehaviorData,
       newBehaviorData: BehaviorData
     ): boolean {
+      if (
+        oldBehaviorData.isSynchronizedOverNetwork !==
+        newBehaviorData.isSynchronizedOverNetwork
+      ) {
+        this._syncOverNetwork =
+          newBehaviorData.isSynchronizedOverNetwork !== false;
+      }
       const diffBehaviorData: BehaviorData & { [key: string]: any } = {
         name: newBehaviorData.name,
         type: newBehaviorData.type,

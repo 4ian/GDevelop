@@ -87,8 +87,9 @@ export const generateProjectName = (nameToAppend: ?string): string =>
 
 export type NewProjectCreationSource =
   | 'default'
-  | 'quick-customization'
   | 'ai-agent-request'
+  // An AI agent connected to the MCP server of the editor.
+  | 'mcp'
   | 'course-chapter'
   | 'in-app-tutorial';
 
@@ -100,9 +101,11 @@ export type NewProjectSetup = {|
   width?: number,
   orientation?: 'landscape' | 'portrait' | 'default',
   optimizeForPixelArt?: boolean,
-  openQuickCustomizationDialog?: boolean,
   forceOpenAskAiEditor?: boolean,
   creationSource: NewProjectCreationSource,
+  // Open this file instead of the one of the example (a copy of the example
+  // with other assets, for instance).
+  projectFileUrl?: ?string,
 |};
 
 export type ExampleProjectSetup = {|
@@ -461,7 +464,7 @@ const NewProjectSetupDialog = ({
       if (!shouldAllowCreatingProject) return;
 
       setProjectNameError(null);
-      if (!projectName) {
+      if (!projectName.trim()) {
         setProjectNameError(
           <Trans>Please enter a name for your project.</Trans>
         );

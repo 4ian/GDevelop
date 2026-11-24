@@ -324,8 +324,9 @@ export const WithObjectsList = (): React.Node => (
                     cb
                   ) => cb(true)}
                   onObjectCreated={() => {}}
+                  onEffectAdded={() => {}}
                   onObjectEdited={() => {}}
-                  onObjectFolderOrObjectWithContextSelected={() => {}}
+                  onObjectFolderOrObjectsWithContextSelected={() => {}}
                   onSetAsGlobalObject={action('onSetAsGlobalObject')}
                   hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
                   isListLocked={false}

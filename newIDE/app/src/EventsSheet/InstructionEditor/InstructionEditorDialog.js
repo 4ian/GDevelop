@@ -70,18 +70,20 @@ type Props = {|
   onCancel: () => void,
   onSubmit: () => void,
   open: boolean,
-  openInstructionOrExpression: (
-    extension: gdPlatformExtension,
-    type: string
-  ) => void,
+  openInstructionOrExpression: (type: string) => void,
   i18n: I18nType,
   anchorEl?: any, // Unused
   canPasteInstructions: boolean, // Unused
   onPasteInstructions: () => void, // Unused
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
-  editEventsFunctionParameter: VariableDialogOpeningProps => void,
-  openEventsBasedEntityPropertyEditorDialog: VariableDialogOpeningProps => void,
+  onCreateNewExtensionWithBehavior:
+    | ((project: gdProject, object: gdObject) => void)
+    | null,
+  editEventsFunctionParameter: (VariableDialogOpeningProps => void) | null,
+  openEventsBasedEntityPropertyEditorDialog:
+    | (VariableDialogOpeningProps => void)
+    | null,
 |};
 
 const getInitialStepName = (isNewInstruction: boolean): StepName => {
@@ -117,6 +119,7 @@ const InstructionEditorDialog = ({
   openInstructionOrExpression,
   onWillInstallExtension,
   onExtensionInstalled,
+  onCreateNewExtensionWithBehavior,
   i18n,
   editEventsFunctionParameter,
   openEventsBasedEntityPropertyEditorDialog,
@@ -293,11 +296,13 @@ const InstructionEditorDialog = ({
                 eventsFunction,
                 behaviorParameter
               );
-              editEventsFunctionParameter({
-                variableName: behaviorParameter.getName(),
-                shouldCreate: false,
-                variableType: null,
-              });
+              if (editEventsFunctionParameter) {
+                editEventsFunctionParameter({
+                  variableName: behaviorParameter.getName(),
+                  shouldCreate: false,
+                  variableType: null,
+                });
+              }
               setNewBehaviorDialogOpen(false);
             }
           }
@@ -572,6 +577,15 @@ const InstructionEditorDialog = ({
             freeInstructionComponentRef.current &&
               freeInstructionComponentRef.current.reEnumerateInstructions(i18n);
           }}
+          onCreateNewExtensionWithBehavior={
+            onCreateNewExtensionWithBehavior
+              ? () => {
+                  onCreateNewExtensionWithBehavior(project, chosenObject);
+                  setNewBehaviorDialogOpen(false);
+                  onCancel();
+                }
+              : null
+          }
           shouldShowCapabilityBehaviors={
             chosenObject && !isSceneObject(chosenObject)
           }

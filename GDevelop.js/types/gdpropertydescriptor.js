@@ -27,8 +27,6 @@ declare class gdPropertyDescriptor {
   setMeasurementUnit(measurementUnit: gdMeasurementUnit): gdPropertyDescriptor;
   hasImpactOnOtherProperties(): boolean;
   setHasImpactOnOtherProperties(enable: boolean): gdPropertyDescriptor;
-  getQuickCustomizationVisibility(): QuickCustomization_Visibility;
-  setQuickCustomizationVisibility(visibility: QuickCustomization_Visibility): gdPropertyDescriptor;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(element: gdSerializerElement): void;
   serializeValuesTo(element: gdSerializerElement): void;

@@ -10,12 +10,38 @@ import paperDecorator from '../../PaperDecorator';
 import BehaviorsEditor from '../../../BehaviorsEditor';
 import SerializedObjectDisplay from '../../SerializedObjectDisplay';
 import fakeResourceManagementProps from '../../FakeResourceManagement';
+import { getOrCreateObjectWithNotSynchronizedBehavior } from '../../MultiplayerObjects';
 
 export default {
   title: 'ObjectEditor/BehaviorsEditor',
   component: BehaviorsEditor,
   decorators: [paperDecorator],
 };
+
+const BehaviorsEditorForObject = ({ object }: {| object: gdObject |}) => (
+  <SerializedObjectDisplay object={object}>
+    <BehaviorsEditor
+      project={testProject.project}
+      eventsFunctionsExtension={null}
+      objects={[object]}
+      layersContainer={testProject.testLayout.getLayers()}
+      isChildObject={false}
+      resourceManagementProps={fakeResourceManagementProps}
+      projectScopedContainersAccessor={
+        testProject.testSceneProjectScopedContainersAccessor
+      }
+      onUpdateBehaviorsSharedData={() => {}}
+      openBehaviorEvents={() => action('Open behavior events')}
+      onBehaviorsUpdated={action('onBehaviorsUpdated')}
+      onWillInstallExtension={action('extension will be installed')}
+      onExtensionInstalled={action('extension installed')}
+      onCreateNewExtensionWithBehavior={action(
+        'onCreateNewExtensionWithBehavior'
+      )}
+      isListLocked={false}
+    />
+  </SerializedObjectDisplay>
+);
 
 export const Default = (): React.Node => (
   <SerializedObjectDisplay object={testProject.spriteObjectWithBehaviors}>
@@ -34,6 +60,9 @@ export const Default = (): React.Node => (
       onBehaviorsUpdated={() => {}}
       onWillInstallExtension={action('extension will be installed')}
       onExtensionInstalled={action('extension installed')}
+      onCreateNewExtensionWithBehavior={action(
+        'onCreateNewExtensionWithBehavior'
+      )}
       isListLocked={false}
     />
   </SerializedObjectDisplay>
@@ -56,6 +85,9 @@ export const WithoutAnyBehaviors = (): React.Node => (
       onBehaviorsUpdated={() => {}}
       onWillInstallExtension={action('extension will be installed')}
       onExtensionInstalled={action('extension installed')}
+      onCreateNewExtensionWithBehavior={action(
+        'onCreateNewExtensionWithBehavior'
+      )}
       isListLocked={false}
     />
   </SerializedObjectDisplay>
@@ -78,6 +110,9 @@ export const Locked = (): React.Node => (
       onBehaviorsUpdated={() => {}}
       onWillInstallExtension={action('extension will be installed')}
       onExtensionInstalled={action('extension installed')}
+      onCreateNewExtensionWithBehavior={action(
+        'onCreateNewExtensionWithBehavior'
+      )}
       isListLocked={true}
     />
   </SerializedObjectDisplay>
@@ -100,7 +135,28 @@ export const LockedWithoutAnyBehaviors = (): React.Node => (
       onBehaviorsUpdated={() => {}}
       onWillInstallExtension={action('extension will be installed')}
       onExtensionInstalled={action('extension installed')}
+      onCreateNewExtensionWithBehavior={action(
+        'onCreateNewExtensionWithBehavior'
+      )}
       isListLocked={true}
     />
   </SerializedObjectDisplay>
+);
+
+export const WithMultiplayerBehavior = (): React.Node => (
+  <BehaviorsEditorForObject
+    object={getOrCreateObjectWithNotSynchronizedBehavior({
+      name: 'MyMultiplayerObject',
+      hasMultiplayerBehavior: true,
+    })}
+  />
+);
+
+export const WithoutMultiplayerBehavior = (): React.Node => (
+  <BehaviorsEditorForObject
+    object={getOrCreateObjectWithNotSynchronizedBehavior({
+      name: 'MyObjectWithoutMultiplayerBehavior',
+      hasMultiplayerBehavior: false,
+    })}
+  />
 );

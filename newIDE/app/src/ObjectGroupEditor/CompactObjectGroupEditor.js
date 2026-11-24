@@ -7,6 +7,8 @@ import { List, ListItem } from '../UI/List';
 import CompactObjectSelector from '../ObjectsList/CompactObjectSelector';
 import ListIcon from '../UI/ListIcon';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
+import useForceUpdate from '../Utils/UseForceUpdate';
+import { useOnResource3DPreviewRendered } from '../ResourcesList/ResourcePreview/Resource3DPreviewContext';
 import getObjectByName from '../Utils/GetObjectByName';
 import { ColumnStackLayout } from '../UI/Layout';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
@@ -38,6 +40,7 @@ const CompactObjectGroupEditor = ({
   onObjectRemoved,
   isObjectListLocked,
 }: Props): React.Node => {
+  useOnResource3DPreviewRendered(useForceUpdate());
   const [objectName, setObjectName] = React.useState<string>('');
 
   const addObject = React.useCallback(
@@ -95,6 +98,20 @@ const CompactObjectGroupEditor = ({
               }
             />
           ) : null}
+          <CompactObjectSelector
+            id="add-object-to-group"
+            label=""
+            project={project}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
+            value={objectName}
+            excludedObjectOrGroupNames={groupObjectNames}
+            onChange={setObjectName}
+            onChoose={addObject}
+            noGroups
+            hintText={t`Choose an object to add to the group`}
+            fullWidth
+            disabled={isObjectListLocked}
+          />
           <List>
             {groupObjectNames.map(objectName => {
               let object = getObjectByName(
@@ -129,20 +146,6 @@ const CompactObjectGroupEditor = ({
               );
             })}
           </List>
-          <CompactObjectSelector
-            id="add-object-to-group"
-            label=""
-            project={project}
-            projectScopedContainersAccessor={projectScopedContainersAccessor}
-            value={objectName}
-            excludedObjectOrGroupNames={groupObjectNames}
-            onChange={setObjectName}
-            onChoose={addObject}
-            noGroups
-            hintText={t`Choose an object to add to the group`}
-            fullWidth
-            disabled={isObjectListLocked}
-          />
         </ColumnStackLayout>
       )}
     </I18n>

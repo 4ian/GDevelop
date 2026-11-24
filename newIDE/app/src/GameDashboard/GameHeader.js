@@ -5,7 +5,11 @@ import { I18n } from '@lingui/react';
 import { t, Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import Tooltip from '@material-ui/core/Tooltip';
-import { getGameMainImageUrl, type Game } from '../Utils/GDevelopServices/Game';
+import {
+  getGameMainImageUrl,
+  getGameVideoUrl,
+  type Game,
+} from '../Utils/GDevelopServices/Game';
 import { GameThumbnail } from './GameThumbnail';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import {
@@ -136,6 +140,7 @@ const GameHeader = ({
       gameName={game.gameName}
       gameId={game.id}
       thumbnailUrl={gameMainImageUrl}
+      videoUrl={getGameVideoUrl(game)}
       background="medium"
       width={Math.min(272, Math.max(150, window.innerWidth / 4.5))}
     />

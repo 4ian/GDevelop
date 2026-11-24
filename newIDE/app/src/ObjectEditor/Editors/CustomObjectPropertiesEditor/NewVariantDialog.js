@@ -62,8 +62,8 @@ const NewVariantDialog = ({
         {isDuplicationBeforeEdition && (
           <Text>
             <Trans>
-              This variant can't be modified directly. It must be duplicated
-              first.
+              This variant is replaced when the extension or the asset it comes
+              from is updated. Create your own variant to keep your changes.
             </Trans>
           </Text>
         )}

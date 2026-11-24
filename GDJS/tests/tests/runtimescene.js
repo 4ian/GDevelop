@@ -30,6 +30,7 @@ describe('gdjs.RuntimeScene integration tests', function () {
         name: 'Scene1',
         stopSoundsOnStartup: false,
         title: '',
+            renderer3DWorldScale: 100,
         behaviorsSharedData: [],
         objects: [
           {
@@ -60,6 +61,7 @@ describe('gdjs.RuntimeScene integration tests', function () {
           gridColor: 0,
           gridAlpha: 1,
           snap: false,
+        windowMask: false,
         }
       }, usedExtensionsWithVariablesData: []});
 

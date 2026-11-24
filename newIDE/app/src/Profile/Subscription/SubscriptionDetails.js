@@ -85,6 +85,8 @@ type Props = {
   onManageSubscription: () => void | Promise<void>,
   isManageSubscriptionLoading: boolean,
   simulateNativeMobileApp?: boolean,
+  /** Called when the subscription dialog opens the store, to close what's behind it. */
+  onOpenStore?: () => void,
 };
 
 /**
@@ -104,6 +106,7 @@ const SubscriptionDetails = ({
   isManageSubscriptionLoading,
   onManageSubscription,
   simulateNativeMobileApp,
+  onOpenStore,
 }: Props): React.Node => {
   const {
     openSubscriptionDialog,
@@ -250,6 +253,7 @@ const SubscriptionDetails = ({
                           reason: 'Consult profile',
                           placementId: 'profile',
                         },
+                        onOpenStore,
                       });
                     }}
                     disabled={isManageSubscriptionLoading}

@@ -4,11 +4,14 @@ export const aboveMaterialUiMaxZIndex = 1501; // highest z-index used by Materia
 export const classNameToStillAllowRenderingInstancesEditor =
   'allow-rendering-instances';
 
+const getOpenedDialogElement = (): ?Element =>
+  document.querySelector('body > div[role="presentation"].MuiDialog-root');
+
+export const isAnyDialogOpened = (): boolean => !!getOpenedDialogElement();
+
 export const shouldPreventRenderingInstanceEditors = (): boolean => {
   // Fast check: if no dialog is opened, rendering is not prevented.
-  const dialogElement = document.querySelector(
-    'body > div[role="presentation"].MuiDialog-root'
-  );
+  const dialogElement = getOpenedDialogElement();
   if (!dialogElement) {
     return false;
   }

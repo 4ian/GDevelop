@@ -38,10 +38,12 @@ declare class gdBehaviorMetadata {
   markAsIrrelevantForChildObjects(): gdBehaviorMetadata;
   isActivatedByDefaultInEditor(): boolean;
   markAsActivatedByDefaultInEditor(): gdBehaviorMetadata;
-  getQuickCustomizationVisibility(): QuickCustomization_Visibility;
-  setQuickCustomizationVisibility(visibility: QuickCustomization_Visibility): gdBehaviorMetadata;
+  isSynchronizedByDefault(): boolean;
+  setNotSynchronizedByDefault(): gdBehaviorMetadata;
   setOpenFullEditorLabel(label: string): gdBehaviorMetadata;
   getOpenFullEditorLabel(): string;
+  addPropertyGroup(group: string): gdBehaviorMetadata;
+  getPropertyGroups(): gdVectorString;
   get(): gdBehavior;
   getSharedDataInstance(): gdBehaviorsSharedData;
   getProperties(): gdMapStringPropertyDescriptor;

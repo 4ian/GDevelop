@@ -24,6 +24,12 @@ export default class ElementWithMenu extends React.Component<Props, State> {
   _wrappedElement: ?any;
 
   open = (event?: Event) => {
+    // Prevent the default behavior, notably the browser context menu
+    // on the web version, which is otherwise not prevented because
+    // `stopPropagation` stops the event before it reaches the global
+    // `contextmenu` handler set up by `Window.setUpContextMenu`.
+    // $FlowFixMe[method-unbinding]
+    if (event && event.preventDefault) event.preventDefault();
     // $FlowFixMe[method-unbinding]
     if (event && event.stopPropagation) event.stopPropagation();
     const { _contextMenu } = this;

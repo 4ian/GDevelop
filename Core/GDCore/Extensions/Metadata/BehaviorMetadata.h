@@ -12,7 +12,6 @@
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/String.h"
-#include "GDCore/Project/QuickCustomization.h"
 namespace gd {
 class Behavior;
 class BehaviorsSharedData;
@@ -329,12 +328,19 @@ class GD_CORE_API BehaviorMetadata : public InstructionOrExpressionContainerMeta
     return *this;
   }
 
-  QuickCustomization::Visibility GetQuickCustomizationVisibility() const {
-    return quickCustomizationVisibility;
-  }
+  /**
+   * Check if the behavior is synchronized over the network by default, when
+   * its object is synchronized with other players (multiplayer).
+   */
+  bool IsSynchronizedByDefault() const { return isSynchronizedByDefault; }
 
-  BehaviorMetadata &SetQuickCustomizationVisibility(QuickCustomization::Visibility visibility) {
-    quickCustomizationVisibility = visibility;
+  /**
+   * Set that the behavior is not synchronized over the network by default:
+   * only the game of the player owning the object runs it. Useful for
+   * behaviors reacting to the inputs of the player.
+   */
+  BehaviorMetadata &SetNotSynchronizedByDefault() {
+    isSynchronizedByDefault = false;
     return *this;
   }
 
@@ -345,6 +351,19 @@ class GD_CORE_API BehaviorMetadata : public InstructionOrExpressionContainerMeta
 
   const gd::String& GetOpenFullEditorLabel() const {
     return openFullEditorLabel;
+  }
+
+  /**
+   * \brief Add a group of properties. Editors show the added groups first, in
+   * this order, then the other groups sorted alphabetically.
+   */
+  BehaviorMetadata &AddPropertyGroup(const gd::String& group) {
+    propertyGroups.push_back(group);
+    return *this;
+  }
+
+  const std::vector<gd::String>& GetPropertyGroups() const {
+    return propertyGroups;
   }
 
   /**
@@ -426,8 +445,9 @@ class GD_CORE_API BehaviorMetadata : public InstructionOrExpressionContainerMeta
   bool isHidden = false;
   bool isRelevantForChildObjects = true;
   bool isActivatedByDefaultInEditor = false;
+  bool isSynchronizedByDefault = true;
   gd::String openFullEditorLabel;
-  QuickCustomization::Visibility quickCustomizationVisibility = QuickCustomization::Visibility::Default;
+  std::vector<gd::String> propertyGroups;
 
   // TODO: Nitpicking: convert these to std::unique_ptr to clarify ownership.
   std::shared_ptr<gd::Behavior> instance;

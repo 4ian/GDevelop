@@ -21,6 +21,8 @@ declare class gdInitialInstance {
   setSealed(seal: boolean): void;
   shouldKeepRatio(): boolean;
   setShouldKeepRatio(keepRatio: boolean): void;
+  isHidden(): boolean;
+  setHidden(hidden: boolean): void;
   getZOrder(): number;
   setZOrder(zOrder: number): void;
   getOpacity(): number;

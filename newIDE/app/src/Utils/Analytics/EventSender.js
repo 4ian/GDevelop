@@ -4,6 +4,7 @@ import { getUserUUID, resetUserUUID } from './UserUUID';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { User as FirebaseUser } from 'firebase/auth';
 import {
+  countDailyAggregatedEventOccurrence,
   getProgramOpeningCount,
   incrementProgramOpeningCount,
 } from './LocalStats';
@@ -13,7 +14,12 @@ import { getBrowserLanguageOrLocale } from '../Language';
 import { type SubscriptionAnalyticsMetadata } from '../../Profile/Subscription/SubscriptionContext';
 import optionalRequire from '../OptionalRequire';
 import Window from '../Window';
-import { isMobile, isNativeMobileApp } from '../Platform';
+import {
+  isMobile,
+  isNativeMobileApp,
+  isNativeIos,
+  isNativeAndroid,
+} from '../Platform';
 import { retryIfFailed } from '../RetryIfFailed';
 import { type NewProjectCreationSource } from '../../ProjectCreation/NewProjectSetupDialog';
 import { isServiceWorkerSupported } from '../../ServiceWorkerSetup';
@@ -27,8 +33,37 @@ let posthogLoaded = false;
 // Flag helpful to know if the user has been identified, to avoid sending initial events
 // to a random uuid (like program_opening), which may not be merged to the main user's account.
 let userIdentified = false;
-let posthogLastPropertiesSent = '';
 let currentlyRunningInAppTutorial = null;
+// User properties that changed, sent with the next event rather than in a `$set` event.
+let pendingUserIdAndProperties: {|
+  userIdAndProperties: string,
+  userProperties: { [string]: any },
+|} | null = null;
+let currentProjectUuid: string | null = null;
+
+const lastUserIdAndPropertiesSentLocalStorageKey =
+  'gd-analytics-last-user-id-and-properties-sent';
+
+const loadLastUserIdAndPropertiesSent = (): ?string => {
+  try {
+    return localStorage.getItem(lastUserIdAndPropertiesSentLocalStorageKey);
+  } catch (e) {
+    console.warn('Unable to load the last user properties sent', e);
+  }
+
+  return null;
+};
+
+const saveLastUserIdAndPropertiesSent = (userIdAndProperties: string) => {
+  try {
+    localStorage.setItem(
+      lastUserIdAndPropertiesSentLocalStorageKey,
+      userIdAndProperties
+    );
+  } catch (e) {
+    console.warn('Unable to store the last user properties sent', e);
+  }
+};
 
 let gdevelopEditorAnalytics: {|
   initialize: (rootElement: HTMLElement) => Promise<void>,
@@ -88,28 +123,48 @@ export const setCurrentlyRunningInAppTutorial = (
   tutorial: string | null
 ): string | null => (currentlyRunningInAppTutorial = tutorial);
 
-const makeCanSendEvent = (options: {| minimumTimeBetweenEvents: number |}) => {
-  const lastSentEventTimestamps = {};
-  return (eventName: string) => {
-    const now = Date.now();
-    // $FlowFixMe[invalid-computed-prop]
-    if (lastSentEventTimestamps[eventName]) {
-      const timeSinceLastEvent = now - lastSentEventTimestamps[eventName];
-      if (timeSinceLastEvent < options.minimumTimeBetweenEvents) {
-        return false;
-      }
-    }
-    // $FlowFixMe[prop-missing]
-    lastSentEventTimestamps[eventName] = now;
-    return true;
-  };
+export const setCurrentProjectUuid = (projectUuid: string | null) => {
+  currentProjectUuid = projectUuid;
 };
+
+/**
+ * Metadata about the app, added to every event. Note that `appKind` is `mobile-app` for both
+ * iOS and Android: use `appPlatform` to tell them apart.
+ */
+const getAppMetadata = () => ({
+  isInAppTutorialRunning: currentlyRunningInAppTutorial,
+  currentProjectUuid,
+  isInDesktopApp: isElectronApp,
+  isInWebApp: !isElectronApp && !isNativeMobileApp(),
+  isInNativeMobileApp: isNativeMobileApp(),
+  isInNativeIosApp: isNativeIos(),
+  isInNativeAndroidApp: isNativeAndroid(),
+  appKind: isElectronApp
+    ? 'desktop-app'
+    : isNativeMobileApp()
+    ? 'mobile-app'
+    : 'web-app',
+  appPlatform: isNativeIos()
+    ? 'ios'
+    : isNativeAndroid()
+    ? 'android'
+    : isElectronApp
+    ? 'desktop'
+    : 'web',
+  appVersion: getIDEVersion(),
+  appVersionWithHash: getIDEVersionWithHash(),
+  serviceWorkerSupported: isServiceWorkerSupported(),
+});
 
 /**
  * Used to send an event to the analytics.
  * This function will retry to send the event if the analytics service is not ready.
  */
-const recordEvent = (name: string, metadata?: { [string]: any }) => {
+const recordEvent = (
+  name: string,
+  metadata?: { [string]: any },
+  appMetadata: { [string]: any } = getAppMetadata()
+) => {
   if (isDev) {
     // Uncomment to inspect analytics in development.
     // console.log(`Should have sent analytics event "${name}"`, metadata);
@@ -123,35 +178,58 @@ const recordEvent = (name: string, metadata?: { [string]: any }) => {
         console.info(
           `Retrying to send the app analytics event with name ${name}`
         );
-        recordEvent(name, metadata);
+        recordEvent(name, metadata, appMetadata);
       }, 2000);
 
       return;
     }
 
-    posthog.capture(name, {
-      ...metadata,
-      // Always add metadata about the app:
-      isInAppTutorialRunning: currentlyRunningInAppTutorial,
-      isInDesktopApp: isElectronApp,
-      isInWebApp: !isElectronApp,
-      appKind: isElectronApp
-        ? 'desktop-app'
-        : isNativeMobileApp()
-        ? 'mobile-app'
-        : 'web-app',
-      appVersion: getIDEVersion(),
-      appVersionWithHash: getIDEVersionWithHash(),
-      serviceWorkerSupported: isServiceWorkerSupported(),
-    });
+    const userIdAndPropertiesToSend = pendingUserIdAndProperties;
+    pendingUserIdAndProperties = null;
+    const properties: { [string]: any } = { ...metadata, ...appMetadata };
+    if (userIdAndPropertiesToSend) {
+      properties.$set = {
+        ...userIdAndPropertiesToSend.userProperties,
+        ...properties.$set,
+      };
+    }
+    posthog.capture(name, properties);
+    if (userIdAndPropertiesToSend) {
+      saveLastUserIdAndPropertiesSent(
+        userIdAndPropertiesToSend.userIdAndProperties
+      );
+    }
   })();
 
   (async () => {
     await ensureGDevelopEditorAnalyticsReady();
     if (gdevelopEditorAnalytics) {
-      await gdevelopEditorAnalytics.trackEvent(name, metadata || {});
+      await gdevelopEditorAnalytics.trackEvent(name, {
+        ...metadata,
+        ...appMetadata,
+      });
     }
   })();
+};
+
+/**
+ * Used to send an event at most once per day (UTC), for events happening often: each
+ * occurrence costs one analytics event otherwise.
+ * The sent event has a `countSinceLastSent` property with the number of occurrences since
+ * the last time it was sent (the occurrences of the day are reported by the next sent one),
+ * so the total number of occurrences is the sum of this property.
+ */
+const recordDailyAggregatedEvent = (
+  name: string,
+  metadata?: { [string]: any },
+  aggregationKey?: string
+) => {
+  const countSinceLastSent = countDailyAggregatedEventOccurrence(
+    aggregationKey || name
+  );
+  if (countSinceLastSent === null) return;
+
+  recordEvent(name, { ...metadata, countSinceLastSent });
 };
 
 /**
@@ -173,6 +251,22 @@ export const installAnalyticsEvents = () => {
       posthogLoaded = true;
     },
     autocapture: false, // we disable autocapture because we want to control which events we send.
+    // The app is opened once per session and `program_opening` is already sent:
+    // page views would be redundant events.
+    capture_pageview: false,
+    capture_pageleave: false,
+    // When nothing is stored by PostHog yet (first launch), use the anonymous UUID
+    // as the PostHog anonymous id: identifying the anonymous user with it then
+    // does not require an `$identify` event.
+    get_device_id: () => getUserUUID(),
+    // Anonymous users have a person profile too (their user properties are sent with
+    // an event rather than with `identify`, which would otherwise be required for this).
+    person_profiles: 'always',
+    session_recording: {
+      // Iframes (in-game editor, gameplay tests) are not recorded: the recording would
+      // keep a reference to every document loaded in them (including game WebAssembly memories).
+      blockSelector: 'iframe',
+    },
   });
 };
 
@@ -206,7 +300,6 @@ export const identifyUserForAnalytics = (
     versionWithHash: getIDEVersionWithHash(),
     appLanguage,
     browserLanguage,
-    programOpeningCount: getProgramOpeningCount(),
     themeName: userPreferences ? userPreferences.themeName : 'Unknown',
     ...(isElectronApp ? { usedDesktopApp: true } : { usedWebApp: true }),
     // Additional profile information:
@@ -233,16 +326,20 @@ export const identifyUserForAnalytics = (
       return;
     }
 
-    // Identify which user is using the app, after de-duplicating the call to
-    // avoid useless calls.
-    // This is so we can build stats on the used version, languages and usage
-    // of GDevelop features.
-    const stringifiedUserProperties = JSON.stringify(userProperties);
-    if (stringifiedUserProperties !== posthogLastPropertiesSent) {
+    // Identify which user is using the app, so we can build stats on the used version,
+    // languages and usage of GDevelop features. User properties are only sent if they
+    // changed since they were last sent (even in a previous launch of the app), and
+    // with the next event unless the user changed: `identify` sends an `$identify`
+    // or a `$set` event.
+    const userIdAndProperties = JSON.stringify({ userId, userProperties });
+    if (posthog.get_distinct_id() !== userId) {
       posthog.identify(userId, userProperties);
-      posthogLastPropertiesSent = stringifiedUserProperties;
-      userIdentified = true;
+      saveLastUserIdAndPropertiesSent(userIdAndProperties);
+      pendingUserIdAndProperties = null;
+    } else if (userIdAndProperties !== loadLastUserIdAndPropertiesSent()) {
+      pendingUserIdAndProperties = { userIdAndProperties, userProperties };
     }
+    userIdentified = true;
   })();
 
   (async () => {
@@ -296,7 +393,9 @@ export const onUserLogoutForAnalytics = () => {
 
 export const sendProgramOpening = () => {
   incrementProgramOpeningCount();
-  recordEvent('program_opening');
+  recordDailyAggregatedEvent('program_opening', {
+    $set: { programOpeningCount: getProgramOpeningCount() },
+  });
 };
 
 export const sendExportLaunched = (exportKind: string) => {
@@ -347,7 +446,13 @@ export const sendProjectOpened = (metadata: {|
   // the storage provider does not expose a last-modified date.
   timeSinceLastModified: number | null,
 |}) => {
-  recordEvent('project-opened', metadata);
+  // Sent once a day per project, so that the projects (and so the templates
+  // they were created from) that are opened again can still be known.
+  recordDailyAggregatedEvent(
+    'project-opened',
+    metadata,
+    `project-opened-${metadata.projectUuid}`
+  );
 };
 
 export const sendTutorialOpened = (tutorialName: string) => {
@@ -386,7 +491,14 @@ export const sendAssetPackOpened = (options: {|
   assetPackKind: 'public' | 'private' | 'unknown',
   source: 'store-home' | 'author-profile' | 'new-object',
 |}) => {
-  recordEvent('asset_pack_opened', options);
+  // Sent once a day per asset pack, so that asset packs can be compared.
+  recordDailyAggregatedEvent(
+    'asset_pack_opened',
+    options,
+    `asset_pack_opened-${options.assetPackId ||
+      options.assetPackTag ||
+      options.assetPackName}`
+  );
 };
 
 export const sendAssetPackBuyClicked = (options: {|
@@ -511,6 +623,19 @@ export const sendErrorMessage = (
   });
 };
 
+/**
+ * Sent when the editor starts again after the previous session was interrupted (on mobile,
+ * when the system killed the WebView or the app: see NativeAppLifecycle.js).
+ */
+export const sendNativeAppRestart = (metadata: { [string]: any }) => {
+  recordEvent('native-app-restart', metadata);
+};
+
+/** Sent when the system warns the app that it's running low on memory. */
+export const sendNativeAppMemoryWarning = (metadata: { [string]: any }) => {
+  recordEvent('native-app-memory-warning', metadata);
+};
+
 export const sendSignupDone = (email: string) => {
   recordEvent('signup', {
     email,
@@ -596,7 +721,7 @@ export const sendAssetOpened = (options: {|
   assetPackId: string | null,
   assetPackKind: 'public' | 'private' | 'unknown',
 |}) => {
-  recordEvent('asset-opened', options);
+  recordDailyAggregatedEvent('asset-opened', options);
 };
 
 export const sendAssetAddedToProject = (options: {|
@@ -607,7 +732,7 @@ export const sendAssetAddedToProject = (options: {|
   assetPackId: string | null,
   assetPackKind: 'public' | 'private' | 'unknown',
 |}) => {
-  recordEvent('asset-added-to-project', options);
+  recordDailyAggregatedEvent('asset-added-to-project', options);
 };
 
 export const sendExtensionDetailsOpened = (name: string) => {
@@ -615,11 +740,16 @@ export const sendExtensionDetailsOpened = (name: string) => {
 };
 
 export const sendExtensionAddedToProject = (name: string) => {
-  recordEvent('extension-added-to-project', { name });
+  // Sent once a day per extension, so that extensions can be compared.
+  recordDailyAggregatedEvent(
+    'extension-added-to-project',
+    { name },
+    `extension-added-to-project-${name}`
+  );
 };
 
 export const sendNewObjectCreated = (name: string) => {
-  recordEvent('new-object-created', { name });
+  recordDailyAggregatedEvent('new-object-created', { name });
 };
 
 export const sendShowcaseGameLinkOpened = (title: string, linkType: string) => {
@@ -641,16 +771,12 @@ export const sendCancelSubscriptionToChange = (metadata: {|
   recordEvent('cancel-subscription-to-change', metadata);
 };
 
-const canSendExternalEditorOpened = makeCanSendEvent({
-  minimumTimeBetweenEvents: 1000 * 60 * 60, // Only once per hour per external editor.
-});
-
 export const sendExternalEditorOpened = (editorName: string) => {
-  if (!canSendExternalEditorOpened(editorName)) {
-    return;
-  }
-
-  recordEvent('open_external_editor', { editorName });
+  recordDailyAggregatedEvent(
+    'open_external_editor',
+    { editorName },
+    `open_external_editor-${editorName}`
+  );
 };
 
 export const sendBehaviorsEditorShown = (metadata: {|
@@ -668,7 +794,12 @@ export const sendBehaviorAdded = (metadata: {|
   behaviorType: string,
   parentEditor: 'behaviors-editor' | 'instruction-editor-dialog',
 |}) => {
-  recordEvent('behavior-added', metadata);
+  // Sent once a day per behavior type, so that behaviors can be compared.
+  recordDailyAggregatedEvent(
+    'behavior-added',
+    metadata,
+    `behavior-added-${metadata.behaviorType}`
+  );
 };
 
 export const sendCloudProjectCouldNotBeOpened = (metadata: {|
@@ -688,17 +819,8 @@ export const sendEventsExtractedAsFunction = (metadata: {|
   recordEvent('events-extracted-as-function', metadata);
 };
 
-const canSendPreviewStarted = makeCanSendEvent({
-  minimumTimeBetweenEvents: 1000 * 60 * 60 * 6, // Only once every 6 hours per preview kind (outside quick customization).
-});
-
-const canSendPreviewStartedForQuickCustomization = makeCanSendEvent({
-  minimumTimeBetweenEvents: 1000 * 60 * 10, // Only once every 10 minutes per game for quick customization.
-});
-
 export const sendPreviewStarted = (metadata: {|
   projectUuid: string,
-  quickCustomizationGameId: string | null,
   networkPreview: boolean,
   numberOfWindows: number,
   hotReload: boolean,
@@ -707,48 +829,18 @@ export const sendPreviewStarted = (metadata: {|
   forceDiagnosticReport: boolean,
   previewLaunchDuration: number,
 |}) => {
-  if (
-    metadata.quickCustomizationGameId &&
-    !canSendPreviewStartedForQuickCustomization(
-      metadata.quickCustomizationGameId
-    )
-  ) {
-    return;
-  }
-
-  if (
-    !metadata.quickCustomizationGameId &&
-    !canSendPreviewStarted(
-      JSON.stringify({
-        networkPreview: metadata.networkPreview,
-        hotReload: metadata.hotReload,
-        projectDataOnlyExport: metadata.projectDataOnlyExport,
-        fullLoadingScreen: metadata.fullLoadingScreen,
-        forceDiagnosticReport: metadata.forceDiagnosticReport,
-      })
-    )
-  ) {
-    return;
-  }
-
-  recordEvent('preview-started', metadata);
-};
-
-const canSendQuickCustomizationProgress = makeCanSendEvent({
-  // Send only one event per step every minute, to avoid sending too many events.
-  minimumTimeBetweenEvents: 1000 * 60 * 1,
-});
-
-export const sendQuickCustomizationProgress = (metadata: {|
-  stepName: string,
-  sourceGameId: string,
-  projectName: string,
-|}) => {
-  if (!canSendQuickCustomizationProgress(metadata.stepName)) {
-    return;
-  }
-
-  recordEvent('quick-customization-progress', metadata);
+  // Sent once a day per preview kind.
+  recordDailyAggregatedEvent(
+    'preview-started',
+    metadata,
+    `preview-started-${JSON.stringify({
+      networkPreview: metadata.networkPreview,
+      hotReload: metadata.hotReload,
+      projectDataOnlyExport: metadata.projectDataOnlyExport,
+      fullLoadingScreen: metadata.fullLoadingScreen,
+      forceDiagnosticReport: metadata.forceDiagnosticReport,
+    })}`
+  );
 };
 
 export const sendSocialFollowUpdated = (
@@ -843,10 +935,15 @@ export const sendAssetSwapStart = ({
   originalObjectName: string,
   objectType: string,
 |}) => {
-  recordEvent('asset-swap-start', {
-    originalObjectName,
-    objectType,
-  });
+  // Sent once a day per swapped object, so that swaps can be compared.
+  recordDailyAggregatedEvent(
+    'asset-swap-start',
+    {
+      originalObjectName,
+      objectType,
+    },
+    `asset-swap-start-${JSON.stringify({ objectType, originalObjectName })}`
+  );
 };
 
 export const sendAssetSwapFinished = ({
@@ -858,23 +955,20 @@ export const sendAssetSwapFinished = ({
   newObjectName: string,
   objectType: string,
 |}) => {
-  recordEvent('asset-swap-finished', {
-    originalObjectName,
-    newObjectName,
-    objectType,
-  });
+  // Sent once a day per swapped object, so that swaps can be compared.
+  recordDailyAggregatedEvent(
+    'asset-swap-finished',
+    {
+      originalObjectName,
+      newObjectName,
+      objectType,
+    },
+    `asset-swap-finished-${JSON.stringify({ objectType, originalObjectName })}`
+  );
 };
 
-const canSendPlaySectionOpened = makeCanSendEvent({
-  minimumTimeBetweenEvents: 1000 * 60 * 60 * 2, // Only once every 2 hours.
-});
-
 export const sendPlaySectionOpened = () => {
-  if (!canSendPlaySectionOpened('play-section-opened')) {
-    return;
-  }
-
-  recordEvent('play-section-opened');
+  recordDailyAggregatedEvent('play-section-opened');
 };
 
 export const sendAiRequestStarted = (metadata: {|
@@ -896,5 +990,59 @@ export const sendAiRequestMessageSent = (metadata: {|
   aiRequestId: string,
   outputLength: number,
 |}) => {
-  recordEvent('ai-request-message-sent', metadata);
+  // Sent once a day per mode and payment kind: the number of AI requests and
+  // messages is stored by the backend.
+  recordDailyAggregatedEvent(
+    'ai-request-message-sent',
+    metadata,
+    `ai-request-message-sent-${JSON.stringify({
+      mode: metadata.mode,
+      payWithCredits: metadata.payWithCredits,
+    })}`
+  );
+};
+
+export const sendMcpToolCalled = (metadata: {|
+  toolName: string,
+  clientName: string | null,
+  success: boolean,
+  durationMs: number,
+  // `http`: an agent connected to the opened editor; `stdio`: `--mcp`.
+  transport: 'http' | 'stdio',
+|}) => {
+  // Failures are sent each time to be investigated. Successes are sent once a day
+  // per tool and client (with the duration of the sent call only), as an agent
+  // can call tools hundreds of times a day.
+  if (!metadata.success) {
+    recordEvent('mcp-tool-called', metadata);
+    return;
+  }
+  recordDailyAggregatedEvent(
+    'mcp-tool-called',
+    metadata,
+    `mcp-tool-called-${JSON.stringify({
+      toolName: metadata.toolName,
+      clientName: metadata.clientName,
+      transport: metadata.transport,
+    })}`
+  );
+};
+
+export const sendMcpAgentConnected = (metadata: {|
+  clientName: string | null,
+  clientVersion: string | null,
+  transport: 'http' | 'stdio',
+  isReadOnly: boolean,
+  // Null for `--mcp`, where the project is the one given in the arguments.
+  hasOpenedProject: boolean | null,
+|}) => {
+  // Sent once a day per client, as some agents reconnect for every tool call.
+  recordDailyAggregatedEvent(
+    'mcp-agent-connected',
+    metadata,
+    `mcp-agent-connected-${JSON.stringify({
+      clientName: metadata.clientName,
+      transport: metadata.transport,
+    })}`
+  );
 };

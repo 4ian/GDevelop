@@ -24,6 +24,7 @@ import {
   setUserAsMember,
   listTeamInvitations,
   editUser,
+  updateTeam,
   type EditUserChanges,
 } from '../../Utils/GDevelopServices/User';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
@@ -399,12 +400,27 @@ const TeamProvider = ({ children }: Props): React.Node => {
     [team, getAuthorizationHeader, adminUserId]
   );
 
+  const onUpdateTeam = React.useCallback(
+    async (attributes: {| classrooms: {| hideAskAi: boolean |} |}) => {
+      if (!adminUserId || !team) return;
+      const updatedTeam = await updateTeam(
+        getAuthorizationHeader,
+        adminUserId,
+        team.id,
+        attributes
+      );
+      setTeam(updatedTeam);
+    },
+    [team, getAuthorizationHeader, adminUserId]
+  );
+
   const getAvailableSeats = React.useCallback(
     () =>
       team && members && admins && invitations
         ? team.seats -
           members.filter(member => !member.deactivatedAt).length -
-          admins.length -
+          // The team owner holds the plan and does not occupy a seat.
+          (admins.length - 1) -
           invitations.length
         : null,
     [team, members, admins, invitations]
@@ -434,6 +450,7 @@ const TeamProvider = ({ children }: Props): React.Node => {
         onActivateMembers,
         onSetAdmin,
         onSetMember,
+        onUpdateTeam,
       }}
     >
       {children}

@@ -4,7 +4,7 @@ import Measure from 'react-measure';
 import { makeStyles } from '@material-ui/core/styles';
 import CardMedia from '@material-ui/core/CardMedia';
 import Grid from '@material-ui/core/Grid';
-import { CorsAwareImage } from './CorsAwareImage';
+import { ImageWithFallback } from './ImageWithFallback';
 import { Line } from './Grid';
 import { shouldValidate } from './KeyboardShortcuts/InteractionKeys';
 import { useResponsiveWindowSize } from './Responsive/ResponsiveWindowMeasurer';
@@ -192,7 +192,7 @@ const ResponsiveMediaGallery = ({
                   >
                     <CardMedia>
                       {kind === 'image' ? (
-                        <CorsAwareImage
+                        <ImageWithFallback
                           src={url}
                           style={{
                             ...styles.mobileImageCarouselItem,
@@ -229,7 +229,7 @@ const ResponsiveMediaGallery = ({
   return (
     <ColumnStackLayout noMargin>
       {selectedMedia.kind === 'image' ? (
-        <CorsAwareImage
+        <ImageWithFallback
           style={styles.selectedMedia}
           src={selectedMedia.url}
           alt={altTextTemplate.replace(
@@ -264,7 +264,7 @@ const ResponsiveMediaGallery = ({
             }}
           >
             {kind === 'image' ? (
-              <CorsAwareImage
+              <ImageWithFallback
                 src={url}
                 style={styles.imageCarouselItem}
                 alt={altTextTemplate.replace(

@@ -194,6 +194,8 @@ type SubscriptionState = {|
   openSubscriptionDialog: ({|
     analyticsMetadata: SubscriptionAnalyticsMetadata,
     couponCode?: string,
+    /** Called when the dialog closes itself to open the store, so the caller can close too. */
+    onOpenStore?: () => void,
   |}) => void,
   /**
    * Returns the current coupon code being used, or null.
@@ -207,6 +209,10 @@ type SubscriptionState = {|
     codeToPrefill?: string,
     autoSubmit?: boolean,
   |}) => void,
+  /**
+   * True while the user is choosing, paying or confirming a subscription.
+   */
+  isSubscriptionDialogOpen: boolean,
 |};
 
 export const SubscriptionContext: React.Context<SubscriptionState> = React.createContext<SubscriptionState>(
@@ -217,6 +223,7 @@ export const SubscriptionContext: React.Context<SubscriptionState> = React.creat
     getCouponCode: () => null,
     clearCouponCode: () => {},
     openRedeemCodeDialog: () => {},
+    isSubscriptionDialogOpen: false,
   }
 );
 
@@ -234,6 +241,7 @@ export const SubscriptionProvider = ({
     setAnalyticsMetadata,
   ] = React.useState<?SubscriptionAnalyticsMetadata>(null);
   const [couponCode, setCouponCode] = React.useState<?string>(null);
+  const [onOpenStore, setOnOpenStore] = React.useState<?() => void>(null);
   const recommendedPlanId = analyticsMetadata
     ? analyticsMetadata.recommendedPlanId
     : null;
@@ -330,11 +338,12 @@ export const SubscriptionProvider = ({
   const closeSubscriptionDialog = () => {
     setAnalyticsMetadata(null);
     setCouponCode(null);
+    setOnOpenStore(null);
   };
 
   const openSubscriptionDialog = React.useCallback(
     // $FlowFixMe[missing-local-annot]
-    ({ analyticsMetadata: metadata, couponCode: coupon }) => {
+    ({ analyticsMetadata: metadata, couponCode: coupon, onOpenStore }) => {
       if (isNativeMobileApp() || simulateMobileApp) {
         if (hasValidSubscriptionPlan(authenticatedUser.subscription)) {
           if (
@@ -376,6 +385,8 @@ export const SubscriptionProvider = ({
             });
         setAnalyticsMetadata({ ...metadata, dialogVariant, featuredPlanId });
         setCouponCode(coupon || null);
+        // Wrapped, as a function given to a state setter would be called.
+        setOnOpenStore(() => onOpenStore || null);
       }
     },
     [
@@ -443,6 +454,8 @@ export const SubscriptionProvider = ({
       getCouponCode,
       clearCouponCode,
       openRedeemCodeDialog,
+      isSubscriptionDialogOpen:
+        subscriptionPendingDialogOpen || !!analyticsMetadata,
     }),
     [
       getSubscriptionPlansWithPricingSystems,
@@ -451,6 +464,8 @@ export const SubscriptionProvider = ({
       getCouponCode,
       clearCouponCode,
       openRedeemCodeDialog,
+      subscriptionPendingDialogOpen,
+      analyticsMetadata,
     ]
   );
 
@@ -500,6 +515,7 @@ export const SubscriptionProvider = ({
             recommendedPlanId={recommendedPlanId}
             onOpenPendingDialog={openSubscriptionPendingDialog}
             couponCode={couponCode}
+            onOpenStore={onOpenStore}
           />
         )
       ) : null}

@@ -33,6 +33,12 @@ namespace gdjs {
        */
       _transformationUpToDateCount: integer = 1;
       /**
+       * How far (in pixels) hitboxes can go outside of their tile.
+       * Tiles from an image collection can be bigger than the grid.
+       * @see {@link getHitboxesAround}
+       */
+      private _hitboxesOverflow: float = 0;
+      /**
        * A reusable Point to avoid allocations.
        */
       private static readonly workingPoint: FloatPoint = [0, 0];
@@ -50,6 +56,7 @@ namespace gdjs {
         this._layerIndex = layerIndex;
         this._layers = new Map<integer, TransformedCollisionTileMapLayer>();
         this._buildLayersFromTileMap(source, this._layers);
+        this._hitboxesOverflow = this._computeHitboxesOverflow(source);
       }
 
       updateFromTileMap(tileMap: TileMapHelper.EditableTileMap) {
@@ -57,6 +64,37 @@ namespace gdjs {
         this._layers = new Map<integer, TransformedCollisionTileMapLayer>();
 
         this._buildLayersFromTileMap(tileMap, this._layers);
+        this._hitboxesOverflow = this._computeHitboxesOverflow(tileMap);
+      }
+
+      /**
+       * @returns How far (in pixels) the hitboxes of any tile definition go
+       * outside of their tile, in any direction (tiles can be flipped).
+       */
+      private _computeHitboxesOverflow(
+        tileMap: TileMapHelper.EditableTileMap
+      ): float {
+        const tileWidth = tileMap.getTileWidth();
+        const tileHeight = tileMap.getTileHeight();
+        let overflow = 0;
+        for (const definition of tileMap.getTileDefinitions()) {
+          const hitboxes = definition.getHitBoxes(this.tag);
+          if (!hitboxes) {
+            continue;
+          }
+          for (const polygon of hitboxes) {
+            for (const [vertexX, vertexY] of polygon) {
+              overflow = Math.max(
+                overflow,
+                -vertexX,
+                vertexX - tileWidth,
+                -vertexY,
+                vertexY - tileHeight
+              );
+            }
+          }
+        }
+        return overflow;
       }
 
       _buildLayersFromTileMap(
@@ -275,31 +313,37 @@ namespace gdjs {
         const bottomLeftY = workingPoint[1];
 
         // Calculate the AABB of the area in the tile map basis.
+        // It's extended to include tiles with hitboxes outside of their cell.
+        const overflow = this._hitboxesOverflow;
         const xMin = Math.max(
           0,
           Math.floor(
-            Math.min(topLeftX, topRightX, bottomRightX, bottomLeftX) /
+            (Math.min(topLeftX, topRightX, bottomRightX, bottomLeftX) -
+              overflow) /
               this._source.getTileWidth()
           )
         );
         const xMax = Math.min(
           this.getDimensionX() - 1,
           Math.floor(
-            Math.max(topLeftX, topRightX, bottomRightX, bottomLeftX) /
+            (Math.max(topLeftX, topRightX, bottomRightX, bottomLeftX) +
+              overflow) /
               this._source.getTileWidth()
           )
         );
         const yMin = Math.max(
           0,
           Math.floor(
-            Math.min(topLeftY, topRightY, bottomRightY, bottomLeftY) /
+            (Math.min(topLeftY, topRightY, bottomRightY, bottomLeftY) -
+              overflow) /
               this._source.getTileHeight()
           )
         );
         const yMax = Math.min(
           this.getDimensionY() - 1,
           Math.floor(
-            Math.max(topLeftY, topRightY, bottomRightY, bottomLeftY) /
+            (Math.max(topLeftY, topRightY, bottomRightY, bottomLeftY) +
+              overflow) /
               this._source.getTileHeight()
           )
         );

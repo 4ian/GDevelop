@@ -8,8 +8,6 @@
 #include <map>
 #include <memory>
 
-#include "GDCore/Project/QuickCustomization.h"
-#include "GDCore/Project/QuickCustomizationVisibilitiesContainer.h"
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/String.h"
 
@@ -35,16 +33,12 @@ namespace gd {
 class GD_CORE_API BehaviorConfigurationContainer {
  public:
   BehaviorConfigurationContainer()
-      : folded(false),
-        quickCustomizationVisibility(QuickCustomization::Visibility::Default),
-        propertiesQuickCustomizationVisibilities() {};
+      : folded(false) {};
   BehaviorConfigurationContainer(const gd::String& name_,
                                  const gd::String& type_)
       : name(name_),
         type(type_),
-        folded(false),
-        quickCustomizationVisibility(QuickCustomization::Visibility::Default),
-        propertiesQuickCustomizationVisibilities() {};
+        folded(false) {};
   virtual ~BehaviorConfigurationContainer();
 
   /**
@@ -170,41 +164,6 @@ class GD_CORE_API BehaviorConfigurationContainer {
   bool IsFolded() const { return folded; }
 
   /**
-   * @brief Set if the whole behavior should be visible or not in the Quick
-   * Customization.
-   */
-  void SetQuickCustomizationVisibility(
-      QuickCustomization::Visibility visibility) {
-    quickCustomizationVisibility = visibility;
-  }
-
-  /**
-   * @brief Get if the whole behavior should be visible or not in the Quick
-   * Customization.
-   */
-  QuickCustomization::Visibility GetQuickCustomizationVisibility() const {
-    return quickCustomizationVisibility;
-  }
-
-  /**
-   * @brief Get the map of properties and their visibility in the Quick
-   * Customization.
-   */
-  QuickCustomizationVisibilitiesContainer&
-  GetPropertiesQuickCustomizationVisibilities() {
-    return propertiesQuickCustomizationVisibilities;
-  }
-
-  /**
-   * @brief Get the map of properties and their visibility in the Quick
-   * Customization.
-   */
-  const QuickCustomizationVisibilitiesContainer&
-  GetPropertiesQuickCustomizationVisibilities() const {
-    return propertiesQuickCustomizationVisibilities;
-  }
-
-  /**
    * \brief Called ( e.g. during compilation ) so as to inventory internal
    * resources and sometimes update their filename. Implementation example:
    * \code
@@ -272,9 +231,6 @@ class GD_CORE_API BehaviorConfigurationContainer {
 
   gd::SerializerElement content;  // Storage for the behavior properties
   bool folded;
-  QuickCustomization::Visibility quickCustomizationVisibility;
-  QuickCustomizationVisibilitiesContainer
-      propertiesQuickCustomizationVisibilities;
 };
 
 }  // namespace gd

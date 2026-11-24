@@ -159,6 +159,7 @@ export const CompactInstanceBehaviorPropertiesEditor = ({
         showcaseNonDefaultValues: true,
         hideResourceProperties: true,
         shouldDisabledFieldsWithMixedValues: false,
+        propertyGroups: behaviorMetadata.getPropertyGroups(),
       });
     },
     [
@@ -167,6 +168,7 @@ export const CompactInstanceBehaviorPropertiesEditor = ({
       object,
       layersContainer,
       project,
+      behaviorMetadata,
     ]
   );
 

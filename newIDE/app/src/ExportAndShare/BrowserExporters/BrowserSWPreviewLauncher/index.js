@@ -23,6 +23,7 @@ import {
   getBrowserSWPreviewRootUrl,
 } from './BrowserSWPreviewIndexedDB';
 import { setEmbeddedGameFramePreviewLocation } from '../../../EmbeddedGame/EmbeddedGameFrame';
+import { setGameplayTestFramePreviewLocation } from '../../../GameplayTests/GameplayTestFrame';
 import { immediatelyOpenNewPreviewWindow } from '../BrowserPreview/BrowserPreviewWindow';
 const gd: libGDevelop = global.gd;
 
@@ -30,8 +31,10 @@ let nextPreviewId = 1;
 
 const prepareExporter = async ({
   isForInGameEdition,
+  isForGameplayTest,
 }: {
   isForInGameEdition: boolean,
+  isForGameplayTest: boolean,
 }): Promise<{|
   outputDir: string,
   exporter: gdjsExporter,
@@ -43,7 +46,11 @@ const prepareExporter = async ({
   const baseUrl = getBrowserSWPreviewBaseUrl();
   const rootUrl = getBrowserSWPreviewRootUrl();
   const outputDir = `${baseUrl}/${
-    isForInGameEdition ? 'in-game-editor-preview' : 'preview'
+    isForGameplayTest
+      ? 'gameplay-test-preview'
+      : isForInGameEdition
+      ? 'in-game-editor-preview'
+      : 'preview'
   }`;
 
   console.log(
@@ -140,7 +147,10 @@ export default class BrowserSWPreviewLauncher extends React.Component<
     const debuggerIds = previewOptions.isForInGameEdition
       ? this.getPreviewDebuggerServer().getExistingEmbeddedGameFrameDebuggerIds()
       : this.getPreviewDebuggerServer().getExistingPreviewDebuggerIds();
-    const shouldHotReload = previewOptions.hotReload && !!debuggerIds.length;
+    const shouldHotReload =
+      previewOptions.hotReload &&
+      !previewOptions.isForGameplayTest &&
+      !!debuggerIds.length;
 
     try {
       await this.getPreviewDebuggerServer().startServer({
@@ -162,6 +172,7 @@ export default class BrowserSWPreviewLauncher extends React.Component<
         browserSWFileSystem,
       } = await prepareExporter({
         isForInGameEdition: previewOptions.isForInGameEdition,
+        isForGameplayTest: !!previewOptions.isForGameplayTest,
       });
 
       const previewExportOptions = new gd.PreviewExportOptions(
@@ -221,9 +232,8 @@ export default class BrowserSWPreviewLauncher extends React.Component<
       previewExportOptions.setCrashReportUploadLevel(
         this.props.crashReportUploadLevel
       );
-      previewExportOptions.setPreviewContext(this.props.previewContext);
+      previewExportOptions.setPreviewContext('preview');
       previewExportOptions.setProjectTemplateSlug(project.getTemplateSlug());
-      previewExportOptions.setSourceGameId(this.props.sourceGameId);
 
       if (previewOptions.inAppTutorialMessageInPreview) {
         previewExportOptions.setInAppTutorialMessageInPreview(
@@ -257,15 +267,31 @@ export default class BrowserSWPreviewLauncher extends React.Component<
           );
         });
       }
-      if (previewOptions.editorCameraState3D) {
+      if (
+        previewOptions.captureOptions &&
+        previewOptions.captureOptions.previewVideo
+      ) {
+        previewExportOptions.setPreviewVideoCapture(
+          previewOptions.captureOptions.previewVideo.signedUrl,
+          previewOptions.captureOptions.previewVideo.publicUrl,
+          previewOptions.captureOptions.previewVideo.isRecordedByUser
+        );
+      }
+      const editorCameraState = previewOptions.editorCameraState;
+      if (editorCameraState) {
         previewExportOptions.setEditorCameraState3D(
-          previewOptions.editorCameraState3D.cameraMode,
-          previewOptions.editorCameraState3D.positionX,
-          previewOptions.editorCameraState3D.positionY,
-          previewOptions.editorCameraState3D.positionZ,
-          previewOptions.editorCameraState3D.rotationAngle,
-          previewOptions.editorCameraState3D.elevationAngle,
-          previewOptions.editorCameraState3D.distance
+          editorCameraState.camera3D.cameraMode,
+          editorCameraState.camera3D.positionX,
+          editorCameraState.camera3D.positionY,
+          editorCameraState.camera3D.positionZ,
+          editorCameraState.camera3D.rotationAngle,
+          editorCameraState.camera3D.elevationAngle,
+          editorCameraState.camera3D.distance
+        );
+        previewExportOptions.setEditorCameraState2D(
+          editorCameraState.camera2D.centerX,
+          editorCameraState.camera2D.centerY,
+          editorCameraState.camera2D.zoom
         );
       }
       if (previewOptions.inGameEditorSettings) {
@@ -295,7 +321,20 @@ export default class BrowserSWPreviewLauncher extends React.Component<
         });
       }
 
-      if (shouldHotReload) {
+      if (previewOptions.isForGameplayTest) {
+        // The preview is shown in (and run by) the gameplay test frame:
+        // no window to open.
+        setGameplayTestFramePreviewLocation({
+          previewIndexHtmlLocation:
+            outputDir + '/index.html?previewId=' + previewId,
+          // The game window of the frame is fixed at the project
+          // resolution: the frame only zooms its display.
+          gameResolution: {
+            width: project.getGameResolutionWidth(),
+            height: project.getGameResolutionHeight(),
+          },
+        });
+      } else if (shouldHotReload) {
         const projectDataElement = new gd.SerializerElement();
         exporter.serializeProjectData(
           project,
@@ -416,6 +455,9 @@ export default class BrowserSWPreviewLauncher extends React.Component<
       this.setState({
         error,
       });
+      // The gameplay test runner waits for the game to boot: tell it now
+      // that it never will.
+      if (previewOptions.isForGameplayTest) throw error;
     }
   };
 

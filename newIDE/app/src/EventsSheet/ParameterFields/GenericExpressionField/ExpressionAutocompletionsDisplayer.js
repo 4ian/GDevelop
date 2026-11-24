@@ -23,6 +23,9 @@ import { getVariableSourceIcon } from '../../ParameterFields/VariableField';
 import PropertyIcon from '../../../UI/CustomSvgIcons/Settings';
 import ParameterIcon from '../../../UI/CustomSvgIcons/Parameter';
 import { LineStackLayout } from '../../../UI/Layout';
+import { type AutocompletionAction } from './ExpressionAutocompletionsHandler';
+import useForceUpdate from '../../../Utils/UseForceUpdate';
+import { useOnResource3DPreviewRendered } from '../../../ResourcesList/ResourcePreview/Resource3DPreviewContext';
 
 const gd: libGDevelop = global.gd;
 
@@ -202,6 +205,7 @@ type Props = {|
   expressionAutocompletions: Array<ExpressionAutocompletion>,
   remainingCount: number,
   selectedCompletionIndex: number,
+  additionalActions?: Array<AutocompletionAction>,
   anchorEl: Element,
   onChoose: (chosenExpressionAutocompletion: ExpressionAutocompletion) => void,
   onScroll: () => void,
@@ -240,6 +244,7 @@ export default function ExpressionAutocompletionsDisplayer({
   expressionAutocompletions,
   remainingCount,
   selectedCompletionIndex,
+  additionalActions,
   anchorEl,
   onChoose,
   onScroll,
@@ -250,6 +255,7 @@ export default function ExpressionAutocompletionsDisplayer({
     (null: ?React.Component<any, any>)
   );
   const portalContainer = React.useContext(PortalContainerContext);
+  useOnResource3DPreviewRendered(useForceUpdate());
   React.useEffect(
     () => {
       if (scrollView.current && selectedAutocompletionElement.current) {
@@ -259,7 +265,11 @@ export default function ExpressionAutocompletionsDisplayer({
     [scrollView, selectedAutocompletionElement, selectedCompletionIndex]
   );
 
-  if (expressionAutocompletions.length === 0) return null;
+  if (
+    expressionAutocompletions.length === 0 &&
+    (!additionalActions || additionalActions.length === 0)
+  )
+    return null;
 
   return (
     <I18n>
@@ -390,9 +400,33 @@ export default function ExpressionAutocompletionsDisplayer({
                   </Text>
                 </Column>
               )}
+              {additionalActions &&
+                additionalActions.map((action, index) => {
+                  const isSelected =
+                    selectedCompletionIndex ===
+                    index + expressionAutocompletions.length;
+                  const ref = isSelected
+                    ? selectedAutocompletionElement
+                    : undefined;
+
+                  return (
+                    <AutocompletionRow
+                      key={index}
+                      icon={action.renderIcon()}
+                      iconSrc={null}
+                      secondaryIcon={null}
+                      label={i18n._(action.translatableValue)}
+                      parametersLabel={null}
+                      onClick={() => action.onClick()}
+                      isSelected={isSelected}
+                      ref={ref}
+                    />
+                  );
+                })}
             </ScrollView>
           </Paper>
           {selectedCompletionIndex != null &&
+            selectedCompletionIndex < expressionAutocompletions.length &&
             expressionAutocompletions[selectedCompletionIndex].kind ===
               'Expression' &&
             !expressionAutocompletions[selectedCompletionIndex].isExact && (

@@ -27,6 +27,29 @@ Tests are launched using Chrome. You need Chrome installed to run them. You can 
 
 Tests are located in the **tests** folder for the game engine, or directly in the folder of the tested extensions.
 
+### Benchmarks
+
+Benchmarks are in the **benchmarks** folder: micro benchmarks of the game engine functions, and scene benchmarks (in **benchmarks/scenes**) running scenes like a game with the gameplay test harness (`harness.benchmark`).
+
+To compare the speed of your changes with the version your branch started from:
+
+```bash
+npm run benchmark:compare -- --base-ref=origin/master --grep="Scene benchmarks" # --grep is optional
+```
+
+Both versions are built and the benchmarks are run alternately on each one (3 times by default, set with `--rounds`). A change is only reported when larger than 5% and measured between every round of one version and every round of the other, as speed varies between runs of a browser (by up to ~15% on a shared machine). The same comparison runs on pull requests changing the game engine (see `.github/workflows/benchmarks.yml`).
+
+### Rendering snapshots
+
+The rendering snapshots (`tests/rendering-snapshots.js`) draw scenes covering the rendering features (2D, 3D, lights, shadows, fog, post-processing effects, stencil, layers above each other...) and compare them to the images in **rendering-snapshots**. They are compared only when drawn by SwiftShader, the software renderer of Chrome, on a x86 processor: it draws the same pixels on every machine. A graphics card, or SwiftShader on an ARM processor (Apple Silicon), draws slightly different ones: the snapshots are skipped there, including in `npm test`.
+
+```bash
+npm run test:rendering-snapshots # Draw with SwiftShader and compare the images
+npm run test:rendering-snapshots:update # Update the images after a change of the rendering made on purpose
+```
+
+When an image differs, the image drawn (`.actual.png`) and the pixels that differ (`.diff.png`, in magenta) are written in **rendering-snapshots-results**, also kept as artifacts of the "GDJS tests" CI job. After updating the images, check them in the diff of your changes: they are what the change does to the rendering. Without a x86 machine, the `.actual.png` images of the CI artifacts can be used as the new images.
+
 ### Games in the _games_ folder
 
 Games contained in the _games_ folder are mainly here to be launched manually to check that a particular feature is working. Read the comments in the events to see what is the expected behavior, or compare with the native platform if you can.

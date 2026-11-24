@@ -34,6 +34,8 @@ import {
 } from '../InstanceOrObjectPropertiesEditorContainer';
 import { useDoNowOrAfterRender } from '../../Utils/UseDoNowOrAfterRender';
 import { EmbeddedGameFrameHole } from '../../EmbeddedGame/EmbeddedGameFrameHole';
+import { InGameEditorUnavailableMessage } from '../../EmbeddedGame/InGameEditorUnavailableMessage';
+import { useInGameEditorUnavailabilityReason } from '../../EmbeddedGame/InGameEditorAvailability';
 import { exceptionallyGuardAgainstDeadObject } from '../../Utils/IsNullPtr';
 
 export const swipeableDrawerContainerId = 'swipeable-drawer-container';
@@ -90,6 +92,7 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
       onExtensionInstalled,
       isActive,
       onRestartInGameEditor,
+      onSwitchToInstancesEditor,
       showRestartInGameEditorAfterErrorButton,
     } = props;
     const selectedInstances = props.instancesSelection.getSelectedInstances();
@@ -223,6 +226,8 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
       [drawerOpeningState]
     );
 
+    const inGameEditorUnavailabilityReason = useInGameEditorUnavailabilityReason();
+
     // $FlowFixMe[incompatible-type]
     React.useImperativeHandle(ref, () => {
       const { current: editor } = editorRef;
@@ -266,6 +271,9 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
           clearHighlightedInstance: editor
             ? editor.clearHighlightedInstance
             : noop,
+          cancelClickInterception: editor
+            ? editor.cancelClickInterception
+            : () => false,
           resetInstanceRenderersFor: editor
             ? editor.resetInstanceRenderersFor
             : noop,
@@ -319,7 +327,14 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
               componentTitle={<Trans>Instances editor.</Trans>}
               scope="scene-editor-canvas"
             >
-              {gameEditorMode === 'embedded-game' ? (
+              {gameEditorMode === 'embedded-game' &&
+              inGameEditorUnavailabilityReason ? (
+                <InGameEditorUnavailableMessage
+                  reason={inGameEditorUnavailabilityReason}
+                  marginBottom={bottomContainerHeight}
+                  onSwitchToInstancesEditor={onSwitchToInstancesEditor}
+                />
+              ) : gameEditorMode === 'embedded-game' ? (
                 <EmbeddedGameFrameHole
                   marginBottom={bottomContainerHeight}
                   isActive={isActive}
@@ -424,9 +439,10 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                           )
                         }
                         onObjectCreated={props.onObjectCreated}
+                        onEffectAdded={props.onEffectAdded}
                         onObjectEdited={props.onObjectEdited}
-                        onObjectFolderOrObjectWithContextSelected={
-                          props.onObjectFolderOrObjectWithContextSelected
+                        onObjectFolderOrObjectsWithContextSelected={
+                          props.onObjectFolderOrObjectsWithContextSelected
                         }
                         onRenameObjectFolderOrObjectWithContextFinish={
                           props.onRenameObjectFolderOrObjectWithContextFinish
@@ -469,6 +485,9 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                           projectScopedContainersAccessor
                         }
                         objects={selectedObjects}
+                        selectedObjectFolderOrObjectsCount={
+                          props.selectedObjectFolderOrObjectsWithContext.length
+                        }
                         instances={selectedInstances}
                         layer={selectedLayer}
                         objectGroup={selectedObjectGroup}
@@ -489,6 +508,9 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                         lastSelectionType={props.lastSelectionType}
                         onWillInstallExtension={props.onWillInstallExtension}
                         onExtensionInstalled={props.onExtensionInstalled}
+                        onCreateNewExtensionWithBehavior={
+                          props.onCreateNewExtensionWithBehavior
+                        }
                         onOpenEventBasedObjectVariantEditor={
                           props.onOpenEventBasedObjectVariantEditor
                         }
@@ -515,6 +537,9 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                         }
                         onBackgroundColorChanged={
                           props.onBackgroundColorChanged
+                        }
+                        onRenderer3DWorldScaleFieldChanged={
+                          props.onRenderer3DWorldScaleFieldChanged
                         }
                         openSceneVariables={props.openSceneVariables}
                       />

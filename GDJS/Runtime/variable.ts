@@ -26,7 +26,8 @@ namespace gdjs {
     _str: string = '0';
     _bool: boolean = false;
     _children: Children = {};
-    _childrenArray: gdjs.Variable[] = [];
+    /** Arrays can have holes when a child has been set outside of its bounds. */
+    _childrenArray: Array<gdjs.Variable | undefined> = [];
     _undefinedInContainer: boolean = false;
 
     // When synchronised over the network, this defines which player is the owner of the variable.
@@ -66,15 +67,17 @@ namespace gdjs {
           this._bool = !!varData.value;
         } else if (this._type === 'structure') {
           if (varData.children !== undefined) {
-            for (var i = 0, len = varData.children.length; i < len; ++i) {
-              var childData = varData.children[i];
-              if (childData.name === undefined) continue;
+            for (let i = 0, len = varData.children.length; i < len; ++i) {
+              const childData = varData.children[i];
+              if (!childData || childData.name === undefined) continue;
               this._children[childData.name] = new gdjs.Variable(childData);
             }
           }
         } else if (this._type === 'array' && varData.children) {
           for (const childData of varData.children)
-            this._childrenArray.push(new gdjs.Variable(childData));
+            this._childrenArray.push(
+              childData ? new gdjs.Variable(childData) : undefined
+            );
         }
       }
     }
@@ -111,8 +114,11 @@ namespace gdjs {
             target.addChild(p, children[p].clone());
         }
       } else if (source.getType() === 'array') {
-        for (const p of source.getAllChildrenArray())
-          target.pushVariableCopy(p);
+        const array: Array<gdjs.Variable | undefined> = [];
+        for (const child of source.getAllChildrenArray()) {
+          array.push(child ? child.clone() : child);
+        }
+        target.replaceChildrenArray(array);
       }
       return target;
     }
@@ -126,7 +132,11 @@ namespace gdjs {
         type: syncData.type,
         children: syncData.children
           ? syncData.children.map((childSyncData) =>
-              gdjs.Variable.getVariableDataFromNetworkSyncData(childSyncData)
+              childSyncData
+                ? gdjs.Variable.getVariableDataFromNetworkSyncData(
+                    childSyncData
+                  )
+                : undefined
             )
           : undefined,
       };
@@ -187,10 +197,16 @@ namespace gdjs {
     // get the sync data for each child variable.
     getStructureNetworkSyncData(
       variable: gdjs.Variable
-    ): VariableNetworkSyncData[] | undefined {
+    ): Array<VariableNetworkSyncData | undefined> | undefined {
       if (variable.getType() === 'array') {
-        const allVariableNetworkSyncData: VariableNetworkSyncData[] = [];
+        const allVariableNetworkSyncData: Array<
+          VariableNetworkSyncData | undefined
+        > = [];
         variable.getAllChildrenArray().forEach((childVariable) => {
+          if (!childVariable) {
+            allVariableNetworkSyncData.push(undefined);
+            return;
+          }
           const childVariableType = childVariable.getType();
           const childVariableValue =
             childVariableType === 'structure' || childVariableType === 'array'
@@ -329,7 +345,7 @@ namespace gdjs {
       } else if (typeof obj === 'object') {
         this.castTo('structure');
         this.clearChildren();
-        for (var p in obj)
+        for (const p in obj)
           if (obj.hasOwnProperty(p)) this.getChild(p).fromJSObject(obj[p]);
       } else if (typeof obj === 'symbol') {
         this.setString(obj.toString());
@@ -551,7 +567,7 @@ namespace gdjs {
      * Replaces all the children with a new array of children.
      * @param newChildren The array of new children.
      */
-    replaceChildrenArray(newChildren: gdjs.Variable[]) {
+    replaceChildrenArray(newChildren: Array<gdjs.Variable | undefined>) {
       this._type = 'array';
       this._childrenArray = newChildren;
     }
@@ -714,8 +730,10 @@ namespace gdjs {
 
     /**
      * Return an Array containing all the children of the variable.
+     *
+     * Arrays can have holes when a child has been set outside of its bounds.
      */
-    getAllChildrenArray(): gdjs.Variable[] {
+    getAllChildrenArray(): Array<gdjs.Variable | undefined> {
       return this._type === 'structure'
         ? Object.values(this._children)
         : this._type === 'array'
@@ -786,15 +804,15 @@ namespace gdjs {
     /**
      * Get a variable at a given index of the array.
      */
-    getChildAt(index: integer) {
+    getChildAt(index: integer): gdjs.Variable {
       if (this._type !== 'array') this.castTo('array');
 
-      if (
-        this._childrenArray[index] === undefined ||
-        this._childrenArray[index] === null
-      )
-        this._childrenArray[index] = new gdjs.Variable();
-      return this._childrenArray[index];
+      let child = this._childrenArray[index];
+      if (!child) {
+        child = new gdjs.Variable();
+        this._childrenArray[index] = child;
+      }
+      return child;
     }
 
     /**

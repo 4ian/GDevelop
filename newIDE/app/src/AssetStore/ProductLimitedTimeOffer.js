@@ -2,8 +2,7 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import Text from '../UI/Text';
-import { Column, Spacer } from '../UI/Grid';
-import { LineStackLayout } from '../UI/Layout';
+import { Column } from '../UI/Grid';
 
 const styles = {
   limitedTimeContainer: {
@@ -13,6 +12,15 @@ const styles = {
     borderRadius: 4,
     padding: '8px 0',
   },
+  // Wrap the units on narrow screens rather than overflowing the page.
+  countdown: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    columnGap: 24,
+    rowGap: 4,
+  },
+  countdownUnit: { display: 'flex', alignItems: 'center', gap: 8 },
 };
 
 type Props = {|
@@ -64,6 +72,17 @@ const ProductLimitedTimeOffer = ({
 
   if (!timeLeft) return null;
 
+  const countdownUnits = [
+    { value: timeLeft.days, label: <Trans>Days</Trans> },
+    { value: timeLeft.hours, label: <Trans>Hours</Trans> },
+    ...(hideMinutesAndSeconds
+      ? []
+      : [
+          { value: timeLeft.minutes, label: <Trans>Minutes</Trans> },
+          { value: timeLeft.seconds, label: <Trans>Seconds</Trans> },
+        ]),
+  ];
+
   return (
     <div style={styles.limitedTimeContainer}>
       <Column
@@ -74,57 +93,25 @@ const ProductLimitedTimeOffer = ({
         <Text>
           <Trans>Limited time offer:</Trans>
         </Text>
-        <LineStackLayout alignItems="center" noMargin>
-          <Text noMargin size="block-title">
-            {String(timeLeft.days).padStart(2, '0')}
-          </Text>
-          <Text noMargin>
-            <Trans>Days</Trans>
-          </Text>
-          <Spacer />
-          <Text
-            noMargin
-            size="block-title"
-            style={{
-              fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            {String(timeLeft.hours).padStart(2, '0')}
-          </Text>
-          <Text noMargin>
-            <Trans>Hours</Trans>
-          </Text>
-          {!hideMinutesAndSeconds && (
-            <LineStackLayout alignItems="center" noMargin>
-              <Spacer />
+        <div
+          style={{
+            ...styles.countdown,
+            justifyContent: alignCenter ? 'center' : undefined,
+          }}
+        >
+          {countdownUnits.map(({ value, label }, index) => (
+            <div key={index} style={styles.countdownUnit}>
               <Text
                 noMargin
                 size="block-title"
-                style={{
-                  fontVariantNumeric: 'tabular-nums',
-                }}
+                style={{ fontVariantNumeric: 'tabular-nums' }}
               >
-                {String(timeLeft.minutes).padStart(2, '0')}
+                {String(value).padStart(2, '0')}
               </Text>
-              <Text noMargin>
-                <Trans>Minutes</Trans>
-              </Text>
-              <Spacer />
-              <Text
-                noMargin
-                size="block-title"
-                style={{
-                  fontVariantNumeric: 'tabular-nums',
-                }}
-              >
-                {String(timeLeft.seconds).padStart(2, '0')}
-              </Text>
-              <Text noMargin>
-                <Trans>Seconds</Trans>
-              </Text>
-            </LineStackLayout>
-          )}
-        </LineStackLayout>
+              <Text noMargin>{label}</Text>
+            </div>
+          ))}
+        </div>
       </Column>
     </div>
   );

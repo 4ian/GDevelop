@@ -124,26 +124,6 @@ class GD_CORE_API EventsRefactorer {
 
  private:
   /**
-   * Remove all conditions of the list using an object
-   *
-   * \return true if something was modified.
-   */
-  static bool RemoveObjectInConditions(const gd::Platform& platform,
-                                       const gd::ProjectScopedContainers& projectScopedContainers,
-                                       gd::InstructionsList& conditions,
-                                       gd::String name);
-
-  /**
-   * Remove all actions of the list using an object
-   *
-   * \return true if something was modified.
-   */
-  static bool RemoveObjectInActions(const gd::Platform& platform,
-                                    const gd::ProjectScopedContainers& projectScopedContainers,
-                                    gd::InstructionsList& conditions,
-                                    gd::String name);
-
-  /**
    * Replace all occurrences of a gd::String in conditions
    *
    * \return true if something was modified.

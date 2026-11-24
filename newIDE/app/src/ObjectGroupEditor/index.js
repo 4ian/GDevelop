@@ -7,6 +7,8 @@ import ObjectSelector from '../ObjectsList/ObjectSelector';
 import { Column } from '../UI/Grid';
 import ListIcon from '../UI/ListIcon';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
+import useForceUpdate from '../Utils/UseForceUpdate';
+import { useOnResource3DPreviewRendered } from '../ResourcesList/ResourcePreview/Resource3DPreviewContext';
 import getObjectByName from '../Utils/GetObjectByName';
 import Paper from '../UI/Paper';
 import { ColumnStackLayout } from '../UI/Layout';
@@ -18,7 +20,7 @@ const styles = {
 };
 
 type Props = {|
-  project: ?gdProject,
+  project: gdProject,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
@@ -40,6 +42,7 @@ const ObjectGroupEditor = ({
   onObjectRemoved,
   isObjectListLocked,
 }: Props): React.Node => {
+  useOnResource3DPreviewRendered(useForceUpdate());
   const [objectName, setObjectName] = React.useState<string>('');
 
   const addObject = React.useCallback(
@@ -99,6 +102,23 @@ const ObjectGroupEditor = ({
   return (
     <ColumnStackLayout noMargin>
       {renderExplanation()}
+      <Paper style={styles.objectSelector} background="medium">
+        <Column noMargin>
+          <ObjectSelector
+            project={project}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
+            value={objectName}
+            excludedObjectOrGroupNames={groupObjectNames}
+            onChange={setObjectName}
+            onChoose={addObject}
+            openOnFocus
+            noGroups
+            hintText={t`Choose an object to add to the group`}
+            fullWidth
+            disabled={isObjectListLocked}
+          />
+        </Column>
+      </Paper>
       <List>
         {groupObjectNames.map(objectName => {
           let object = getObjectByName(
@@ -133,23 +153,6 @@ const ObjectGroupEditor = ({
           );
         })}
       </List>
-      <Paper style={styles.objectSelector} background="medium">
-        <Column noMargin>
-          <ObjectSelector
-            project={project}
-            projectScopedContainersAccessor={projectScopedContainersAccessor}
-            value={objectName}
-            excludedObjectOrGroupNames={groupObjectNames}
-            onChange={setObjectName}
-            onChoose={addObject}
-            openOnFocus
-            noGroups
-            hintText={t`Choose an object to add to the group`}
-            fullWidth
-            disabled={isObjectListLocked}
-          />
-        </Column>
-      </Paper>
     </ColumnStackLayout>
   );
 };

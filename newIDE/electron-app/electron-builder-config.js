@@ -38,6 +38,8 @@ const config = {
   mac: {
     category: 'public.app-category.developer-tools',
     hardenedRuntime: true,
+    // Electron does not run on older versions: this also prevents them from being auto-updated to it.
+    minimumSystemVersion: '13.0',
     entitlements: './build/entitlements.mac.inherit.plist',
     target: {
       target: 'default',

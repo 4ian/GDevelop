@@ -46,12 +46,21 @@ export const Default = (): React.Node => (
               onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
               onRenamedEventsBasedObject={action('onRenamedEventsBasedObject')}
               onDeletedEventsBasedObject={action('onDeletedEventsBasedObject')}
+              onEventsBasedObjectMoved={action('custom object moved')}
+              onEventsBasedBehaviorMoved={action('custom behavior moved')}
+              onEventsFunctionMoved={action('function moved')}
               onEventsBasedObjectChildrenEdited={action(
                 'onEventsBasedObjectChildrenEdited'
               )}
               hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
               onWillInstallExtension={action('extension will be installed')}
               onExtensionInstalled={action('extension installed')}
+              gameplayTestsCallbacks={{
+                onOpenGameplayTest: action('open gameplay test'),
+                onRenameGameplayTest: action('rename gameplay test'),
+                onDeleteGameplayTest: action('delete gameplay test'),
+                onRunGameplayTest: action('run gameplay test'),
+              }}
               onEventBasedObjectTypeChanged={action(
                 'onEventBasedObjectTypeChanged'
               )}
@@ -97,12 +106,21 @@ export const WithObjectEditor = (): React.Node => {
                   onDeletedEventsBasedObject={action(
                     'onDeletedEventsBasedObject'
                   )}
+                  onEventsBasedObjectMoved={action('custom object moved')}
+                  onEventsBasedBehaviorMoved={action('custom behavior moved')}
+                  onEventsFunctionMoved={action('function moved')}
                   onEventsBasedObjectChildrenEdited={action(
                     'onEventsBasedObjectChildrenEdited'
                   )}
                   hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
                   onWillInstallExtension={action('extension will be installed')}
                   onExtensionInstalled={action('extension installed')}
+                  gameplayTestsCallbacks={{
+                    onOpenGameplayTest: action('open gameplay test'),
+                    onRenameGameplayTest: action('rename gameplay test'),
+                    onDeleteGameplayTest: action('delete gameplay test'),
+                    onRunGameplayTest: action('run gameplay test'),
+                  }}
                   onEventBasedObjectTypeChanged={action(
                     'onEventBasedObjectTypeChanged'
                   )}

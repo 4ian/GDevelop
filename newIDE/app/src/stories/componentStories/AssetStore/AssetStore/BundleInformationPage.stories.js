@@ -202,6 +202,17 @@ export const Default = (): React.Node => (
   />
 );
 
+export const WithLimitedTimeOffer = (): React.Node => (
+  <BundleInformationPageStory
+    bundleListingDataToDisplay={{
+      ...fakeBundleListingData,
+      visibleUntil: new Date(
+        Date.now() + 5 * 24 * 60 * 60 * 1000
+      ).toISOString(),
+    }}
+  />
+);
+
 export const ForAlreadyPurchasedBundle = (): React.Node => (
   <BundleInformationPageStory
     bundleListingDataToDisplay={fakeBundleListingData}

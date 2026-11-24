@@ -74,11 +74,6 @@ const castFunctions = {
 };
 
 const extraClassAttributes = {
-  QuickCustomization: [
-    'static Default = 0;',
-    'static Visible = 1;',
-    'static Hidden = 2;',
-  ],
   ObjectJsImplementation: ['content: Record<string, any>;'],
   VectorString: ['toJSArray(): Array<string>;'],
   Serializer: [

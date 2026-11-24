@@ -3,9 +3,23 @@ import * as React from 'react';
 // Import the worker (will be handled by worker-loader)
 import Resource3DPreviewWorker from './Resource3DPreview.worker';
 import { checkIfCredentialsRequired } from '../../Utils/CrossOrigin';
+import {
+  loadDracoDecoderFiles,
+  type DracoDecoderFiles,
+} from '../../Utils/DracoDecoder';
+import {
+  getCachedResource3DPreview,
+  setCachedResource3DPreview,
+  setResource3DPreviewRequester,
+  subscribeToResource3DPreviewRendered,
+} from './Resource3DPreviewCache';
 
 type WorkerInitMessage = {|
   type: 'INIT',
+  // The Draco decoder files are read by the main thread, because a worker can't
+  // read them by itself in the desktop app (`file://` URLs can't be fetched by
+  // workers).
+  dracoDecoderFiles: ?DracoDecoderFiles,
 |};
 
 type WorkerRenderModelMessage = {|
@@ -63,7 +77,8 @@ const MESSAGE_TYPES = {
 // Worker manager that handles initialization and communication
 class Resource3DPreviewWorkerManager {
   worker: Worker;
-  isInitialized: boolean = false;
+  initializationPromise: Promise<boolean>;
+  _onInitialized: (isInitialized: boolean) => void = () => {};
   pendingPromises: Map<
     string,
     { resolve: (dataUrl: string) => void, reject: () => void }
@@ -75,7 +90,7 @@ class Resource3DPreviewWorkerManager {
     // $FlowFixMe[invalid-constructor]
     this.worker = new Resource3DPreviewWorker();
     this.setupMessageHandlers();
-    this.initWorker();
+    this.initializationPromise = this.initWorker();
   }
 
   setupMessageHandlers() {
@@ -89,7 +104,7 @@ class Resource3DPreviewWorkerManager {
           const { success } =
             // $FlowFixMe[incompatible-type]
             (workerOutMessageData: WorkerOutInitMessage);
-          this.isInitialized = success;
+          this._onInitialized(success);
           break;
 
         case MESSAGE_TYPES.RENDER_COMPLETE:
@@ -124,6 +139,10 @@ class Resource3DPreviewWorkerManager {
 
     this.worker.onerror = error => {
       console.error('Worker error:', error);
+      // In case the worker crashed before answering the initialization
+      // message, consider it not initialized (so that renders requests
+      // are not waiting forever and get the fallback image instead).
+      this._onInitialized(false);
       // Resolve any pending promises with the fallback image
       this.pendingPromises.forEach(promise => {
         promise.resolve(this.fallbackImagePath);
@@ -132,23 +151,52 @@ class Resource3DPreviewWorkerManager {
     };
   }
 
-  initWorker() {
-    // $FlowFixMe[incompatible-type]
-    const message: WorkerInitMessage = { type: MESSAGE_TYPES.INIT };
-    this.worker.postMessage(message);
+  async initWorker(): Promise<boolean> {
+    const initializedPromise: Promise<boolean> = new Promise(resolve => {
+      this._onInitialized = resolve;
+    });
+
+    // Read the Draco decoder files so that the worker can render the models
+    // compressed with Draco.
+    let dracoDecoderFiles = null;
+    try {
+      dracoDecoderFiles = await loadDracoDecoderFiles();
+    } catch (error) {
+      // Without the decoder files, only the models that are not compressed
+      // with Draco can be rendered.
+      console.error("Can't read the Draco decoder files:", error);
+    }
+
+    const message: WorkerInitMessage = {
+      // $FlowFixMe[incompatible-type]
+      type: MESSAGE_TYPES.INIT,
+      dracoDecoderFiles,
+    };
+    this.worker.postMessage(
+      message,
+      dracoDecoderFiles
+        ? // Transfer the ArrayBuffers to avoid copying them across threads.
+          [
+            dracoDecoderFiles.dracoWasmWrapperJs,
+            dracoDecoderFiles.dracoDecoderWasm,
+          ]
+        : []
+    );
+
+    return initializedPromise;
   }
 
-  renderModel(
+  async renderModel(
     resourceUrl: string,
     resourceData: ArrayBuffer,
     basePath: string
   ): Promise<string> {
-    return new Promise((resolve, reject) => {
-      if (!this.isInitialized) {
-        resolve(this.fallbackImagePath);
-        return;
-      }
+    const isInitialized = await this.initializationPromise;
+    if (!isInitialized) {
+      return this.fallbackImagePath;
+    }
 
+    return new Promise((resolve, reject) => {
       this.pendingPromises.set(resourceUrl, { resolve, reject });
       const message: WorkerRenderModelMessage = {
         // $FlowFixMe[incompatible-type]
@@ -173,14 +221,34 @@ type Props = {|
   children: React.Node,
 |};
 
+export const useOnResource3DPreviewRendered = (listener: () => void) => {
+  React.useEffect(() => subscribeToResource3DPreviewRendered(listener), [
+    listener,
+  ]);
+};
+
+// The resource data is fetched on the main thread. Workers in Electron cannot
+// fetch file:// URLs because webSecurity:false only applies to the renderer
+// process, not the network service process used by workers.
+const fetchModelData = async (url: string): Promise<?ArrayBuffer> => {
+  try {
+    const response = await fetch(url, {
+      credentials: checkIfCredentialsRequired(url) ? 'include' : 'same-origin',
+    });
+    if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+    return await response.arrayBuffer();
+  } catch (error) {
+    console.error('Error fetching 3D model resource:', error);
+    return null;
+  }
+};
+
 export const Resource3DPreviewProvider = ({
   children,
 }: Props): React.MixedElement => {
-  const [currentResource, setCurrentResource] = React.useState<?string>(null);
   const queueRef = React.useRef<
     Array<{ url: string, resolve: (dataUrl: ?string) => void }>
   >([]);
-  const previewCache = React.useRef<{ [url: string]: string }>({});
   const workerManagerRef = React.useRef<?Resource3DPreviewWorkerManager>(null);
 
   // Initialize the worker manager on mount
@@ -190,7 +258,6 @@ export const Resource3DPreviewProvider = ({
     // Cleanup on unmount
     return () => {
       queueRef.current = [];
-      previewCache.current = {};
 
       // Terminate the worker
       if (workerManagerRef.current) {
@@ -200,45 +267,35 @@ export const Resource3DPreviewProvider = ({
     };
   }, []);
 
-  const enqueueResource = React.useCallback((url: string): Promise<?string> => {
-    return new Promise(resolve => {
-      // If it's already in the cache, resolve immediately.
-      if (previewCache.current[url]) {
-        resolve(previewCache.current[url]);
-        return;
-      }
-
-      // Add the item to the queue.
-      queueRef.current.push({ url, resolve });
-      // If the queue didn't have items before,
-      // then process it immediately.
-      // Otherwise, let the queue process handle it.
-      if (queueRef.current.length === 1) {
-        setCurrentResource(url);
-      }
-    });
-  }, []);
+  // The next model of the queue is fetched while the current one is rendered.
+  const prefetchedModelRef = React.useRef<?{
+    url: string,
+    resourceDataPromise: Promise<?ArrayBuffer>,
+  }>(null);
 
   const renderModel = React.useCallback(async (url: string) => {
     const workerManager = workerManagerRef.current;
     if (!workerManager) {
-      return null;
+      return 'JsPlatform/Extensions/3d_model.svg';
     }
 
-    // Fetch the resource data on the main thread. Workers in Electron cannot
-    // fetch file:// URLs because webSecurity:false only applies to the renderer
-    // process, not the network service process used by workers.
-    let resourceData: ArrayBuffer;
-    try {
-      const response = await fetch(url, {
-        credentials: checkIfCredentialsRequired(url)
-          ? 'include'
-          : 'same-origin',
-      });
-      if (!response.ok) throw new Error(`HTTP error ${response.status}`);
-      resourceData = await response.arrayBuffer();
-    } catch (error) {
-      console.error('Error fetching 3D model resource:', error);
+    const prefetchedModel = prefetchedModelRef.current;
+    prefetchedModelRef.current = null;
+    const resourceDataPromise =
+      prefetchedModel && prefetchedModel.url === url
+        ? prefetchedModel.resourceDataPromise
+        : fetchModelData(url);
+
+    const nextItem = queueRef.current.find(item => item.url !== url);
+    if (nextItem && !getCachedResource3DPreview(nextItem.url)) {
+      prefetchedModelRef.current = {
+        url: nextItem.url,
+        resourceDataPromise: fetchModelData(nextItem.url),
+      };
+    }
+
+    const resourceData = await resourceDataPromise;
+    if (!resourceData) {
       return 'JsPlatform/Extensions/3d_model.svg';
     }
 
@@ -257,51 +314,57 @@ export const Resource3DPreviewProvider = ({
     }
   }, []);
 
-  // Effect to process the current resource
+  // The models are rendered one after the other, until the queue is empty.
+  const processQueue = React.useCallback(
+    async () => {
+      while (queueRef.current.length) {
+        const url = queueRef.current[0].url;
+        const dataUrl = await renderModel(url);
+        setCachedResource3DPreview(url, dataUrl);
+
+        // Resolve all the requests made for that URL and remove them from the queue.
+        queueRef.current
+          .filter(item => item.url === url)
+          .forEach(item => item.resolve(dataUrl));
+        queueRef.current = queueRef.current.filter(item => item.url !== url);
+      }
+    },
+    [renderModel]
+  );
+
+  const enqueueResource = React.useCallback(
+    (url: string): Promise<?string> => {
+      return new Promise(resolve => {
+        // If it's already in the cache, resolve immediately.
+        const cachedPreview = getCachedResource3DPreview(url);
+        if (cachedPreview) {
+          resolve(cachedPreview);
+          return;
+        }
+
+        queueRef.current.push({ url, resolve });
+        // Unless the queue is already being processed.
+        if (queueRef.current.length === 1) processQueue();
+      });
+    },
+    [processQueue]
+  );
+
   React.useEffect(
     () => {
-      if (!currentResource) return;
-
-      const processResource = async () => {
-        const dataUrl = await renderModel(currentResource);
-
-        // Handle the result
-        if (dataUrl) {
-          // Save it in the cache for future use
-          previewCache.current[currentResource] = dataUrl;
-
-          // Resolve all the requests made for that URL
-          const queueItemsToResolve = queueRef.current.filter(
-            item => item.url === currentResource
-          );
-          queueItemsToResolve.forEach(item => {
-            const { resolve } = item;
-            // $FlowFixMe[constant-condition]
-            if (resolve) resolve(dataUrl);
-          });
-
-          // Remove the items from the queue
-          queueRef.current = queueRef.current.filter(
-            item => item.url !== currentResource
-          );
-
-          // And trigger the next item to be processed
-          const nextItemToProcess = queueRef.current[0];
-          if (nextItemToProcess) {
-            setCurrentResource(nextItemToProcess.url);
-          }
-        }
-      };
-
-      processResource();
+      setResource3DPreviewRequester(enqueueResource);
+      return () => setResource3DPreviewRequester(null);
     },
-    [currentResource, renderModel]
+    [enqueueResource]
+  );
+
+  const contextValue = React.useMemo(
+    () => ({ getResourcePreview: enqueueResource }),
+    [enqueueResource]
   );
 
   return (
-    <Resource3DPreviewContext.Provider
-      value={{ getResourcePreview: enqueueResource }}
-    >
+    <Resource3DPreviewContext.Provider value={contextValue}>
       {children}
     </Resource3DPreviewContext.Provider>
   );

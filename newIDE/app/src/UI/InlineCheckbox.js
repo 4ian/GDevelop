@@ -30,6 +30,7 @@ type Props = {|
   name?: string,
   label?: ?React.Node,
   checked: boolean,
+  indeterminate?: boolean,
   onCheck?: (e: {||}, checked: boolean) => void | Promise<void>,
   checkedIcon?: React.Node,
   uncheckedIcon?: React.Node,
@@ -48,6 +49,7 @@ const InlineCheckbox = ({
   onCheck,
   disabled,
   checked,
+  indeterminate,
   label,
   uncheckedIcon,
   checkedIcon,
@@ -62,6 +64,7 @@ const InlineCheckbox = ({
       id={id}
       disabled={disabled}
       checked={checked}
+      indeterminate={indeterminate}
       onChange={
         onCheck ? event => onCheck(event, event.target.checked) : undefined
       }

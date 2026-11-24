@@ -1,89 +1,87 @@
 // @flow
-import * as PIXI from 'pixi.js-legacy';
 
-type Props = {
+type Props = {|
+  container: HTMLElement,
   getLastCursorSceneCoordinates: () => [number, number] | null,
-  width: number,
-  height: number,
-};
+  isPointerOverCanvas: () => boolean,
+|};
 
+/**
+ * Display the cursor coordinates in a DOM element over the canvas
+ * (rather than in the canvas) so that the text is rendered crisply.
+ */
 export default class StatusBar {
-  _width: number;
-  _height: number;
   _getLastCursorSceneCoordinates: () => [number, number] | null;
-  // $FlowFixMe[value-as-type]
-  _statusBarContainer: PIXI.Container;
-  // $FlowFixMe[value-as-type]
-  _statusBarBackground: PIXI.Graphics;
-  // $FlowFixMe[value-as-type]
-  _statusBarText: PIXI.Text;
+  _isPointerOverCanvas: () => boolean;
+  _element: HTMLDivElement;
+  _xValueElement: HTMLSpanElement;
+  _yValueElement: HTMLSpanElement;
+  _displayedX: string = '';
+  _displayedY: string = '';
 
-  constructor({ getLastCursorSceneCoordinates, width, height }: Props) {
+  constructor({
+    container,
+    getLastCursorSceneCoordinates,
+    isPointerOverCanvas,
+  }: Props) {
     this._getLastCursorSceneCoordinates = getLastCursorSceneCoordinates;
-    this._statusBarContainer = new PIXI.Container();
-    this._statusBarContainer.alpha = 0.8;
-    this._statusBarContainer.hitArea = new PIXI.Rectangle(0, 0, 0, 0);
-    this._statusBarBackground = new PIXI.Graphics();
-    this._statusBarText = new PIXI.Text('', {
-      fontSize: 15,
-      fill: 0xffffff,
-      align: 'left',
-    });
-    this._statusBarContainer.addChild(this._statusBarBackground);
-    this._statusBarContainer.addChild(this._statusBarText);
-    this.resize(width, height);
-  }
+    this._isPointerOverCanvas = isPointerOverCanvas;
 
-  resize(width: number, height: number) {
-    this._width = width;
-    this._height = height;
-  }
+    const element = document.createElement('div');
+    element.style.cssText = [
+      'position: absolute',
+      'right: 15px',
+      'bottom: 15px',
+      'color: #ddd',
+      'font-family: var(--gdevelop-classic-font-family)',
+      'font-size: 14px',
+      'font-weight: 600',
+      // Dark halo keeps the text readable over any scene content.
+      'text-shadow: 0 0 2px #000, 0 0 2px #000, 0 0 2px #000, 0 0 4px #000',
+      // Keeps the halos of neighbouring digits from merging.
+      'letter-spacing: 0.5px',
+      // Same width for all digits, so the text does not jitter.
+      'font-variant-numeric: tabular-nums',
+      'white-space: nowrap',
+      'pointer-events: none',
+      'user-select: none',
+      'display: none',
+    ].join(';');
+    const createLabel = (text: string, marginLeft: string) => {
+      const label = document.createElement('span');
+      label.textContent = text;
+      label.style.cssText = `opacity: 0.6; margin-right: 4px; margin-left: ${marginLeft}`;
+      return label;
+    };
+    this._xValueElement = document.createElement('span');
+    this._yValueElement = document.createElement('span');
+    element.appendChild(createLabel('X', '0'));
+    element.appendChild(this._xValueElement);
+    element.appendChild(createLabel('Y', '14px'));
+    element.appendChild(this._yValueElement);
 
-  // $FlowFixMe[value-as-type]
-  getPixiObject(): PIXI.Container {
-    return this._statusBarContainer;
+    container.appendChild(element);
+    this._element = element;
   }
 
   render() {
-    const textPadding = 5;
-    const statusBarPadding = 15;
-    const borderRadius = 6;
-    const textXPosition = Math.round(
-      this._width - statusBarPadding - textPadding - this._statusBarText.width
-    );
-    const textYPosition = Math.round(
-      this._height - textPadding - statusBarPadding - this._statusBarText.height
-    );
-
     const lastCursorSceneCoordinates = this._getLastCursorSceneCoordinates();
-    if (!lastCursorSceneCoordinates) return;
+    if (!lastCursorSceneCoordinates || !this._isPointerOverCanvas()) {
+      this._element.style.display = 'none';
+      return;
+    }
+    this._element.style.display = 'block';
+
     const [x, y] = lastCursorSceneCoordinates;
-    this._statusBarText.text = `${x.toFixed(0)};${y.toFixed(0)}`;
-    this._statusBarText.position.x = textXPosition;
-    this._statusBarText.position.y = textYPosition;
-
-    const statusBarXPosition =
-      this._width -
-      statusBarPadding -
-      textPadding * 2 -
-      this._statusBarText.width;
-    const statusBarYPosition =
-      this._height -
-      statusBarPadding -
-      textPadding * 2 -
-      this._statusBarText.height;
-    const statusBarWidth = this._statusBarText.width + textPadding * 2;
-    const statusBarHeight = this._statusBarText.height + textPadding * 2;
-
-    this._statusBarBackground.clear();
-    this._statusBarBackground.beginFill(0x000000, 0.8);
-    this._statusBarBackground.drawRoundedRect(
-      statusBarXPosition,
-      statusBarYPosition,
-      statusBarWidth,
-      statusBarHeight,
-      borderRadius
-    );
-    this._statusBarBackground.endFill();
+    const displayedX = x.toFixed(0);
+    const displayedY = y.toFixed(0);
+    if (displayedX !== this._displayedX) {
+      this._displayedX = displayedX;
+      this._xValueElement.textContent = displayedX;
+    }
+    if (displayedY !== this._displayedY) {
+      this._displayedY = displayedY;
+      this._yValueElement.textContent = displayedY;
+    }
   }
 }

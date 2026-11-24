@@ -53,6 +53,7 @@ describe('gdjs.TileMapCollisionMaskRuntimeObject', function () {
         name: 'Scene1',
         stopSoundsOnStartup: false,
         title: '',
+        renderer3DWorldScale: 100,
         behaviorsSharedData: [],
         objects: [],
         objectsGroups: [],
@@ -70,6 +71,7 @@ describe('gdjs.TileMapCollisionMaskRuntimeObject', function () {
           gridColor: 0,
           gridAlpha: 1,
           snap: false,
+          windowMask: false,
         },
       },
       usedExtensionsWithVariablesData: [],
@@ -265,6 +267,16 @@ describe('gdjs.TileMapCollisionMaskRuntimeObject', function () {
       expect(gdjs.RuntimeObject.collisionTest(object, tileMap, true)).to.be(
         false
       );
+    });
+
+    it('destroys its renderer object when it is deleted', function () {
+      const rendererObject = tileMap.getRendererObject();
+      expect(rendererObject.destroyed).to.be(false);
+
+      tileMap.deleteFromScene();
+      runtimeScene.renderAndStep(1000 / 60);
+
+      expect(rendererObject.destroyed).to.be(true);
     });
   });
 

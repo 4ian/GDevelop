@@ -321,6 +321,14 @@ namespace gdjs {
       this.setHeight(newHeight);
     }
 
+    override getOriginalWidth(): float {
+      return this._renderer.getUnscaledWidth();
+    }
+
+    override getOriginalHeight(): float {
+      return this._renderer.getUnscaledHeight();
+    }
+
     setScale(newScale: float): void {
       if (newScale < 0) {
         newScale = 0;

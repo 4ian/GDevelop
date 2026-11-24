@@ -24,7 +24,9 @@ class GD_CORE_API SerializerValue {
   SerializerValue(const gd::String &val);
   SerializerValue(int val);
   SerializerValue(double val);
-  virtual ~SerializerValue(){};
+  // Not virtual: no class derives from SerializerValue, and a pointer to a
+  // virtual table would make each gd::SerializerElement bigger.
+  ~SerializerValue(){};
 
   /**
    * Set the value, its type being a boolean.

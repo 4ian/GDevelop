@@ -374,6 +374,19 @@ class GD_CORE_API ObjectMetadata : public InstructionOrExpressionContainerMetada
   }
 
   /**
+   * \brief Add a group of properties. Editors show the added groups first, in
+   * this order, then the other groups sorted alphabetically.
+   */
+  ObjectMetadata &AddPropertyGroup(const gd::String& group) {
+    propertyGroups.push_back(group);
+    return *this;
+  }
+
+  const std::vector<gd::String>& GetPropertyGroups() const {
+    return propertyGroups;
+  }
+
+  /**
    * \brief Declare a new resource to be used in the in-game editor.
    */
   InGameEditorResourceMetadata& AddInGameEditorResource() {
@@ -410,6 +423,7 @@ class GD_CORE_API ObjectMetadata : public InstructionOrExpressionContainerMetada
   bool hidden = false;
   bool isRenderedIn3D = false;
   gd::String openFullEditorLabel;
+  std::vector<gd::String> propertyGroups;
   std::vector<gd::InGameEditorResourceMetadata> inGameEditorResources;
 
   std::shared_ptr<gd::ObjectConfiguration>

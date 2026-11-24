@@ -62,7 +62,6 @@ PlatformerObjectBehavior::GetProperties(
           gd::String::From(behaviorContent.GetDoubleAttribute("jumpSpeed")));
   properties["JumpSustainTime"]
       .SetLabel(_("Jump sustain time"))
-      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden)
       .SetGroup(_("Jump"))
       .SetType("Number")
       .SetMeasurementUnit(gd::MeasurementUnit::GetSecond())
@@ -81,7 +80,6 @@ PlatformerObjectBehavior::GetProperties(
           behaviorContent.GetDoubleAttribute("maxFallingSpeed")));
   properties["LadderClimbingSpeed"]
       .SetLabel(_("Ladder climbing speed"))
-      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden)
       .SetGroup(_("Ladder"))
       .SetType("Number")
       .SetMeasurementUnit(gd::MeasurementUnit::GetPixelSpeed())
@@ -110,14 +108,12 @@ PlatformerObjectBehavior::GetProperties(
           gd::String::From(behaviorContent.GetDoubleAttribute("maxSpeed")));
   properties["IgnoreDefaultControls"]
       .SetLabel(_("Disable default keyboard controls"))
-      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden)
       .SetValue(behaviorContent.GetBoolAttribute("ignoreDefaultControls")
                     ? "true"
                     : "false")
       .SetType("Boolean");
   properties["SlopeMaxAngle"]
       .SetLabel(_("Slope max. angle"))
-      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden)
       .SetGroup(_("Walk"))
       .SetType("Number")
       .SetMeasurementUnit(gd::MeasurementUnit::GetDegreeAngle())
@@ -125,7 +121,6 @@ PlatformerObjectBehavior::GetProperties(
           behaviorContent.GetDoubleAttribute("slopeMaxAngle")));
   properties["CanGrabPlatforms"]
       .SetLabel(_("Can grab platform ledges"))
-      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden)
       .SetGroup(_("Ledge"))
       .SetValue(behaviorContent.GetBoolAttribute("canGrabPlatforms", false)
                     ? "true"
@@ -134,7 +129,6 @@ PlatformerObjectBehavior::GetProperties(
   properties["CanGrabWithoutMoving"]
       .SetLabel(_("Automatically grab platform ledges without having to move "
                   "horizontally"))
-      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden)
       .SetGroup(_("Ledge"))
       .SetValue(behaviorContent.GetBoolAttribute("canGrabWithoutMoving", false)
                     ? "true"
@@ -142,7 +136,6 @@ PlatformerObjectBehavior::GetProperties(
       .SetType("Boolean");
   properties["YGrabOffset"]
       .SetLabel(_("Grab offset on Y axis"))
-      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden)
       .SetGroup(_("Ledge"))
       .SetType("Number")
       .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
@@ -150,7 +143,6 @@ PlatformerObjectBehavior::GetProperties(
           gd::String::From(behaviorContent.GetDoubleAttribute("yGrabOffset")));
   properties["XGrabTolerance"]
       .SetLabel(_("Grab tolerance on X axis"))
-      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden)
       .SetGroup(_("Ledge"))
       .SetType("Number")
       .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
@@ -176,7 +168,6 @@ PlatformerObjectBehavior::GetProperties(
       .SetType("Boolean");
   properties["CanGoDownFromJumpthru"]
       .SetLabel(_("Can go down from jumpthru platforms"))
-      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden)
       .SetGroup(_("Walk"))
       .SetValue(behaviorContent.GetBoolAttribute("canGoDownFromJumpthru", false)
                     ? "true"

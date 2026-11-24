@@ -16,6 +16,7 @@ import {
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
   type WillDeleteObjectChanges,
+  type ExtensionsOutsideEditorChanges,
 } from '../../EditorFunctions/OutsideEditorChanges';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
@@ -25,9 +26,16 @@ import {
   type HotReloadSteps,
   switchInGameEditorIfNoHotReloadIsNeeded,
 } from '../../EmbeddedGame/EmbeddedGameFrame';
+import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 
 export class SceneEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?SceneEditor;
+  _projectScopedContainersAccessor: ProjectScopedContainersAccessor | null = null;
+
+  constructor(props: RenderEditorContainerProps) {
+    super(props);
+    this._rebuildProjectScopedContainersAccessor();
+  }
 
   getProject(): ?gdProject {
     return this.props.project;
@@ -44,6 +52,15 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
     return this.props.isActive || nextProps.isActive;
   }
 
+  componentDidUpdate(prevProps: RenderEditorContainerProps): void {
+    if (
+      this.props.project !== prevProps.project ||
+      this.props.projectItemName !== prevProps.projectItemName
+    ) {
+      this._rebuildProjectScopedContainersAccessor();
+    }
+  }
+
   componentDidMount() {
     if (this.props.isActive) {
       this._setPreviewedLayout();
@@ -58,6 +75,21 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
       eventsBasedObjectType: null,
       eventsBasedObjectVariantName: null,
     });
+  }
+
+  _rebuildProjectScopedContainersAccessor() {
+    const { project } = this.props;
+    const scene = this.getLayout();
+    if (scene && project) {
+      this._projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+        {
+          project,
+          layout: scene,
+        }
+      );
+    } else {
+      this._projectScopedContainersAccessor = null;
+    }
   }
 
   notifyChangesToInGameEditor(hotReloadSteps: HotReloadSteps) {
@@ -181,7 +213,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
   }
 
   onInstancesModifiedOutsideEditor(changes: InstancesOutsideEditorChanges) {
-    if (changes.scene !== this.getLayout()) {
+    if (changes.externalLayout || changes.scene !== this.getLayout()) {
       return;
     }
 
@@ -207,6 +239,26 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
 
     if (this.editor) {
       this.editor.onWillDeleteObject(changes);
+    }
+  }
+
+  onExtensionsModifiedOutsideEditor(changes: ExtensionsOutsideEditorChanges) {
+    const { project } = this.props;
+    const { editor } = this;
+    if (!project || !editor) return;
+
+    // The custom objects of the changed extensions may be rendered differently
+    // now (children, area or properties changed).
+    for (const extensionName of changes.extensionNames) {
+      if (!project.hasEventsFunctionsExtensionNamed(extensionName)) continue;
+      const eventsBasedObjects = project
+        .getEventsFunctionsExtension(extensionName)
+        .getEventsBasedObjects();
+      for (let index = 0; index < eventsBasedObjects.getCount(); index++) {
+        editor.forceUpdateCustomObjectRenderedInstances(
+          eventsBasedObjects.getAt(index)
+        );
+      }
     }
   }
 
@@ -249,86 +301,95 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
   render(): any {
     const { project, projectItemName, isActive } = this.props;
     const layout = this.getLayout();
-    if (!layout || !project) {
+
+    const projectScopedContainersAccessor = this
+      ._projectScopedContainersAccessor;
+    if (!project || !layout || !projectScopedContainersAccessor) {
       //TODO: Error component
       return <div>No layout called {projectItemName} found!</div>;
     }
 
-    const projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
-      {
-        project,
-        layout,
-      }
-    );
-
     return (
-      <SceneEditor
-        editorId={this.props.editorId}
-        gameEditorMode={this.props.gameEditorMode}
-        setGameEditorMode={this.props.setGameEditorMode}
-        onRestartInGameEditor={this.props.onRestartInGameEditor}
-        showRestartInGameEditorAfterErrorButton={
-          this.props.showRestartInGameEditorAfterErrorButton
-        }
-        setToolbar={this.props.setToolbar}
-        resourceManagementProps={this.props.resourceManagementProps}
-        unsavedChanges={this.props.unsavedChanges}
-        ref={editor => (this.editor = editor)}
-        project={project}
-        projectScopedContainersAccessor={projectScopedContainersAccessor}
-        layout={layout}
-        eventsFunctionsExtension={null}
-        eventsBasedObject={null}
-        eventsBasedObjectVariant={null}
-        globalObjectsContainer={project.getObjects()}
-        objectsContainer={layout.getObjects()}
-        layersContainer={layout.getLayers()}
-        initialInstances={layout.getInitialInstances()}
-        getInitialInstancesEditorSettings={() =>
-          prepareInstancesEditorSettings(
-            serializeToJSObject(layout.getAssociatedEditorSettings()),
-            Math.max(
-              project.getGameResolutionWidth(),
-              project.getGameResolutionHeight()
-            )
-          )
-        }
-        onOpenEvents={this.props.onOpenEvents}
-        isActive={isActive}
-        previewDebuggerServer={this.props.previewDebuggerServer}
-        hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
-        openBehaviorEvents={this.props.openBehaviorEvents}
-        onExtractAsExternalLayout={this.props.onExtractAsExternalLayout}
-        onExtractAsEventBasedObject={this.props.onExtractAsEventBasedObject}
-        onOpenEventBasedObjectEditor={this.props.onOpenEventBasedObjectEditor}
-        onOpenEventBasedObjectVariantEditor={
-          this.props.onOpenEventBasedObjectVariantEditor
-        }
-        onWillInstallExtension={this.props.onWillInstallExtension}
-        onExtensionInstalled={this.props.onExtensionInstalled}
-        onDeleteEventsBasedObjectVariant={
-          this.props.onDeleteEventsBasedObjectVariant
-        }
-        onEffectAdded={this.props.onEffectAdded}
-        onObjectListsModified={this.props.onObjectListsModified}
-        onObjectEdited={(objectWithContext, hasResourceChanged) =>
-          this.props.onSceneObjectEdited(
-            layout,
-            objectWithContext,
-            hasResourceChanged
-          )
-        }
-        onObjectsDeleted={() => this.props.onSceneObjectsDeleted(layout)}
-        triggerHotReloadInGameEditorIfNeeded={
-          this.props.triggerHotReloadInGameEditorIfNeeded
-        }
-        // It's only used to refresh events-based object variants.
-        onObjectGroupEdited={() => {}}
-        onObjectGroupsDeleted={() => {}}
-        onEventsBasedObjectChildrenEdited={
-          this.props.onEventsBasedObjectChildrenEdited
-        }
-      />
+      <PreferencesContext.Consumer>
+        {({ getUseRealTime2DEditor }) => (
+          <SceneEditor
+            editorId={this.props.editorId}
+            gameEditorMode={this.props.gameEditorMode}
+            setGameEditorMode={this.props.setGameEditorMode}
+            setEditorMode={this.props.setEditorMode}
+            onRestartInGameEditor={this.props.onRestartInGameEditor}
+            showRestartInGameEditorAfterErrorButton={
+              this.props.showRestartInGameEditorAfterErrorButton
+            }
+            setToolbar={this.props.setToolbar}
+            resourceManagementProps={this.props.resourceManagementProps}
+            unsavedChanges={this.props.unsavedChanges}
+            ref={editor => (this.editor = editor)}
+            project={project}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
+            layout={layout}
+            eventsFunctionsExtension={null}
+            eventsBasedObject={null}
+            eventsBasedObjectVariant={null}
+            globalObjectsContainer={project.getObjects()}
+            objectsContainer={layout.getObjects()}
+            layersContainer={layout.getLayers()}
+            initialInstances={layout.getInitialInstances()}
+            getInitialInstancesEditorSettings={() =>
+              prepareInstancesEditorSettings(
+                serializeToJSObject(layout.getAssociatedEditorSettings()),
+                Math.max(
+                  project.getGameResolutionWidth(),
+                  project.getGameResolutionHeight()
+                )
+              )
+            }
+            saveUiSettings={this.saveUiSettings}
+            shouldUseRealTime2DEditor={getUseRealTime2DEditor()}
+            onOpenEvents={this.props.onOpenEvents}
+            isActive={isActive}
+            previewDebuggerServer={this.props.previewDebuggerServer}
+            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
+            openBehaviorEvents={this.props.openBehaviorEvents}
+            onExtractAsExternalLayout={this.props.onExtractAsExternalLayout}
+            onExtractAsEventBasedObject={this.props.onExtractAsEventBasedObject}
+            onOpenEventBasedObjectEditor={
+              this.props.onOpenEventBasedObjectEditor
+            }
+            onOpenEventBasedObjectVariantEditor={
+              this.props.onOpenEventBasedObjectVariantEditor
+            }
+            onWillInstallExtension={this.props.onWillInstallExtension}
+            onExtensionInstalled={this.props.onExtensionInstalled}
+            onCreateNewExtensionWithBehavior={
+              this.props.onCreateNewExtensionWithBehavior
+            }
+            onDeleteEventsBasedObjectVariant={
+              this.props.onDeleteEventsBasedObjectVariant
+            }
+            onEffectAdded={this.props.onEffectAdded}
+            onLayerRenamedOrRemoved={this.props.onLayerRenamedOrRemoved}
+            onObjectListsModified={this.props.onObjectListsModified}
+            onObjectEdited={(objectWithContext, hasResourceChanged) =>
+              this.props.onSceneObjectEdited(
+                layout,
+                objectWithContext,
+                hasResourceChanged
+              )
+            }
+            onObjectsDeleted={() => this.props.onSceneObjectsDeleted(layout)}
+            triggerHotReloadInGameEditorIfNeeded={
+              this.props.triggerHotReloadInGameEditorIfNeeded
+            }
+            // It's only used to refresh events-based object variants.
+            onObjectGroupEdited={() => {}}
+            onObjectGroupsDeleted={() => {}}
+            onEventsBasedObjectChildrenEdited={
+              this.props.onEventsBasedObjectChildrenEdited
+            }
+          />
+        )}
+      </PreferencesContext.Consumer>
     );
   }
 }

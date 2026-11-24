@@ -35,6 +35,8 @@ type Props = {|
   displayInlineAsSpan?: boolean,
   /** To use list item */
   displayAsListItem?: boolean,
+  /** To use a `div`, when the content has paragraphs (like a `MarkdownText`), which can't be inside a `p`. */
+  displayAsBlockContainer?: boolean,
   /** Hide the text - but keep its layouting on screen. Perfect for avoiding layout shift while loading content. */
   hidden?: boolean,
   /** A limited set of styling is supported. */
@@ -62,6 +64,9 @@ type Props = {|
 
     // Allow to prevent numbers from changing size when they change
     fontVariantNumeric?: 'tabular-nums',
+
+    // Allow to display code or raw values in a monospaced font
+    fontFamily?: '"Lucida Console", Monaco, monospace',
 
     // Allow to override the font weight
     fontWeight?: 'bold' | 'normal' | number,
@@ -128,6 +133,7 @@ const Text: React.ComponentType<{
       allowBrowserAutoTranslate = true,
       displayInlineAsSpan,
       displayAsListItem,
+      displayAsBlockContainer,
       tooltip,
       hidden,
       ...otherProps // Used by possible parent element (such as Tooltip) to pass down props.
@@ -140,7 +146,13 @@ const Text: React.ComponentType<{
       translate={allowBrowserAutoTranslate ? undefined : 'no'}
       color={getTextColorFromColor(color)}
       component={
-        displayInlineAsSpan ? 'span' : displayAsListItem ? 'li' : undefined
+        displayInlineAsSpan
+          ? 'span'
+          : displayAsListItem
+          ? 'li'
+          : displayAsBlockContainer
+          ? 'div'
+          : undefined
       }
       title={tooltip}
       style={{

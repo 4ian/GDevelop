@@ -9,6 +9,7 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import ResourcesLoader from '../ResourcesLoader';
 import { loadFontFace } from '../Utils/FontFaceLoader';
 import { checkIfCredentialsRequired } from '../Utils/CrossOrigin';
+import { dracoDecoderPath } from '../Utils/DracoDecoder';
 import { type ResourceKind } from '../ResourcesList/ResourceSource';
 const gd: libGDevelop = global.gd;
 
@@ -49,6 +50,33 @@ export type SpineDataOrLoadingError = {|
 
 type ResourcePromise<T> = { [resourceName: string]: Promise<T> };
 
+/**
+ * Release the GPU memory of a 3D model, and the decoded images of its
+ * textures: they would otherwise stay in memory until garbage collected.
+ */
+// $FlowFixMe[value-as-type]
+const dispose3DModel = (model: THREE.THREE_ADDONS.GLTF) => {
+  model.scene.traverse(object => {
+    if (object.geometry) object.geometry.dispose();
+    const materials = Array.isArray(object.material)
+      ? object.material
+      : object.material
+      ? [object.material]
+      : [];
+    for (const material of materials) {
+      for (const key in material) {
+        const texture = material[key];
+        if (!texture || !texture.isTexture) continue;
+        texture.dispose();
+        const image = texture.image;
+        if (typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap)
+          image.close();
+      }
+      material.dispose();
+    }
+  });
+};
+
 let loadedBitmapFonts = {};
 let loadedFontFamilies = {};
 
@@ -67,6 +95,11 @@ const loadedOrLoadingPixiTextures = (() => {
   return {
     clear() {
       entriesByResourceName = {};
+    },
+    getAllEntries(): Array<LoadedTexture> {
+      return Object.keys(entriesByResourceName).map(
+        resourceName => entriesByResourceName[resourceName]
+      );
     },
     get(resourceName: string): LoadedTexture | void {
       return entriesByResourceName[resourceName];
@@ -174,7 +207,7 @@ const getOrCreateGltfLoader = () => {
   if (!gltfLoader) {
     gltfLoader = new GLTFLoader();
     const dracoLoader = new DRACOLoader();
-    dracoLoader.setDecoderPath('./external/draco/gltf/');
+    dracoLoader.setDecoderPath(dracoDecoderPath);
     gltfLoader.setDRACOLoader(dracoLoader);
   }
   return gltfLoader;
@@ -226,13 +259,15 @@ const determineCrossOrigin = (url: string) => {
   return 'anonymous';
 };
 
+const getPixiScaleMode = (imageResource: gdImageResource): number =>
+  imageResource.isSmooth() ? PIXI.SCALE_MODES.LINEAR : PIXI.SCALE_MODES.NEAREST;
+
 const applyPixiTextureSettings = (resource: gdResource, texture: any) => {
   if (resource.getKind() !== 'image') return;
 
-  const imageResource = gd.asImageResource(resource);
-  if (!imageResource.isSmooth()) {
-    texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
-  }
+  texture.baseTexture.scaleMode = getPixiScaleMode(
+    gd.asImageResource(resource)
+  );
 };
 
 const applyThreeTextureSettings = (
@@ -243,10 +278,11 @@ const applyThreeTextureSettings = (
   if (resource.getKind() !== 'image') return;
 
   const imageResource = gd.asImageResource(resource);
-  if (!imageResource.isSmooth()) {
-    threeTexture.magFilter = THREE.NearestFilter;
-    threeTexture.minFilter = THREE.NearestFilter;
-  }
+  const filter = imageResource.isSmooth()
+    ? THREE.LinearFilter
+    : THREE.NearestFilter;
+  threeTexture.magFilter = filter;
+  threeTexture.minFilter = filter;
 };
 
 // If modifying this function, make sure to update Resource3DPreview.worker.js copy.
@@ -340,7 +376,29 @@ const getEmbedderResources = (
  * This internally uses ResourcesLoader to get the URL of the resources.
  */
 export default class PixiResourcesLoader {
-  static burstCache() {
+  /**
+   * Forget and unload everything that was loaded (typically, when a project is closed).
+   *
+   * Just dropping the references is not enough: PIXI.Assets (and PIXI.utils caches)
+   * keep the textures, and so their decoded images, alive - which would accumulate
+   * the textures of every project opened during the session.
+   */
+  static async burstCache(): Promise<void> {
+    const pixiTextureEntries = loadedOrLoadingPixiTextures.getAllEntries();
+    const threeTexturePromises = Object.keys(loadedOrLoadingThreeTextures).map(
+      key => loadedOrLoadingThreeTextures[key]
+    );
+    const threeMaterialPromises = Object.keys(
+      loadedOrLoadingThreeMaterials
+    ).map(key => loadedOrLoadingThreeMaterials[key]);
+    const threeModelPromises = Object.keys(loadedOrLoading3DModelPromises).map(
+      key => loadedOrLoading3DModelPromises[key]
+    );
+    const spineAliases = [
+      ...Object.keys(spineAtlasPromises),
+      ...Object.keys(spineDataPromises),
+    ];
+
     loadedBitmapFonts = {};
     loadedFontFamilies = {};
     loadedOrLoadingPixiTextures.clear();
@@ -351,6 +409,73 @@ export default class PixiResourcesLoader {
     spineDataPromises = {};
     ongoingResourceReloads = null;
     pendingResourceReloadPromises = {};
+
+    const logUnloadError = (error: Error) => {
+      console.warn('Error while unloading a resource (ignored):', error);
+    };
+
+    // Several resources can share the same texture (same file): unload it once.
+    const unloadedPixiTextures = new Set<any>();
+    const pixiTextureUnloadPromises = pixiTextureEntries.map(
+      async ({ pixiTexture, loadedFromUrl }) => {
+        if (
+          !pixiTexture ||
+          pixiTexture === invalidTexture ||
+          pixiTexture === loadingTexture ||
+          unloadedPixiTextures.has(pixiTexture)
+        )
+          return;
+        unloadedPixiTextures.add(pixiTexture);
+
+        if (
+          loadedFromUrl &&
+          PIXI.Assets.cache.has(loadedFromUrl) &&
+          PIXI.Assets.cache.get(loadedFromUrl) === pixiTexture
+        ) {
+          // Loaded with PIXI.Assets.load: let it remove it from its cache.
+          await PIXI.Assets.unload(loadedFromUrl);
+        } else if (!pixiTexture.destroyed) {
+          // Created with PIXI.Texture.from (videos, textures loaded synchronously):
+          // destroying the base texture removes it from PIXI.utils caches.
+          pixiTexture.destroy(true);
+        }
+      }
+    );
+
+    // Three.js textures, materials and models are only cached here (already
+    // emptied above): release them when they are loaded, without waiting for
+    // it, as some of them may never finish loading (e.g. a failed image).
+    threeTexturePromises.forEach(promise =>
+      promise.then(threeTexture => threeTexture.dispose(), logUnloadError)
+    );
+    threeMaterialPromises.forEach(promise =>
+      promise.then(material => material.dispose(), logUnloadError)
+    );
+    threeModelPromises.forEach(promise =>
+      promise.then(model => {
+        if (model !== invalidModel) dispose3DModel(model);
+      }, logUnloadError)
+    );
+
+    // Wait for PIXI.Assets to forget the unloaded files, so that a file used
+    // by the next project (e.g. from the asset store) is loaded again instead
+    // of reusing a texture being destroyed.
+    await Promise.all([
+      ...pixiTextureUnloadPromises.map(promise =>
+        promise.catch(logUnloadError)
+      ),
+      ...spineAliases.map(alias =>
+        PIXI.Assets.unload(alias).catch(logUnloadError)
+      ),
+    ]);
+
+    if (spineAliases.length > 0) {
+      for (const cacheKey of Object.keys(Spine.skeletonCache)) {
+        delete Spine.skeletonCache[cacheKey];
+      }
+      // See _doReloadResource: PIXI.Assets.resolver keeps data passed to `PIXI.Assets.add`.
+      PIXI.Assets.resolver.prefer();
+    }
   }
 
   static async _reloadEmbedderResources(
@@ -405,6 +530,11 @@ export default class PixiResourcesLoader {
     //   every "resource content changed" code path does).
     // In any other case (texture not loaded yet, invalid/loading texture, no
     // recorded URL, or a non-image resource), we fall back to a full reload.
+    //
+    // A change of settings (like the smoothing) also does a full reload: the
+    // texture is replaced instead of having its parameters changed, as the
+    // parameters of a texture already on the GPU are not always taken into
+    // account by the scene editor.
     const resourcesManager = project.getResourcesManager();
     if (
       loadedEntry &&
@@ -421,9 +551,16 @@ export default class PixiResourcesLoader {
         resourceName,
         { isResourceForPixi: true }
       );
-      if (currentUrl === loadedEntry.loadedFromUrl) {
+      const imageResource = gd.asImageResource(
+        resourcesManager.getResource(resourceName)
+      );
+      if (
+        currentUrl === loadedEntry.loadedFromUrl &&
+        loadedEntry.pixiTexture.baseTexture.scaleMode ===
+          getPixiScaleMode(imageResource)
+      ) {
         console.info(
-          `Resource "${resourceName}" file/URL is unchanged: keeping the already loaded texture (no reload needed).`
+          `Resource "${resourceName}" file/URL and settings are unchanged: keeping the already loaded texture (no reload needed).`
         );
         return;
       }
@@ -847,8 +984,6 @@ export default class PixiResourcesLoader {
     }
 
     const threeTexture = new THREE.Texture(image);
-    threeTexture.magFilter = THREE.LinearFilter;
-    threeTexture.minFilter = THREE.LinearFilter;
     threeTexture.wrapS = THREE.RepeatWrapping;
     threeTexture.wrapT = THREE.RepeatWrapping;
     threeTexture.colorSpace = THREE.SRGBColorSpace;
@@ -874,12 +1009,14 @@ export default class PixiResourcesLoader {
     resourceName: string,
     {
       useTransparentTexture,
+      forceBasicMaterial,
     }: {|
       useTransparentTexture: boolean,
+      forceBasicMaterial: boolean,
     |}
   ): // $FlowFixMe[value-as-type]
   Promise<THREE.Material> {
-    const cacheKey = `${resourceName}|transparent:${useTransparentTexture.toString()}`;
+    const cacheKey = `${resourceName}|transparent:${useTransparentTexture.toString()}|basic:${forceBasicMaterial.toString()}`;
     const loadedOrLoadingPromise = loadedOrLoadingThreeMaterials[cacheKey];
     // $FlowFixMe[constant-condition]
     if (loadedOrLoadingPromise) return loadedOrLoadingPromise;
@@ -888,12 +1025,20 @@ export default class PixiResourcesLoader {
       project,
       resourceName
     ).then(texture => {
-      const material = new THREE.MeshBasicMaterial({
-        map: texture,
-        side: useTransparentTexture ? THREE.DoubleSide : THREE.FrontSide,
-        transparent: useTransparentTexture,
-        vertexColors: true,
-      });
+      const material = forceBasicMaterial
+        ? new THREE.MeshBasicMaterial({
+            map: texture,
+            side: useTransparentTexture ? THREE.DoubleSide : THREE.FrontSide,
+            transparent: useTransparentTexture,
+            vertexColors: true,
+          })
+        : new THREE.MeshStandardMaterial({
+            map: texture,
+            side: useTransparentTexture ? THREE.DoubleSide : THREE.FrontSide,
+            transparent: useTransparentTexture,
+            metalness: 0,
+            vertexColors: true,
+          });
 
       return material;
     }));

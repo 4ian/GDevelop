@@ -170,6 +170,8 @@ const LoginForm = ({
                       }}
                       fullWidth
                       type="email"
+                      name="email"
+                      autoComplete="username"
                       disabled={loginInProgress}
                     />
                     <TextField
@@ -177,6 +179,8 @@ const LoginForm = ({
                       floatingLabelText={<Trans>Password</Trans>}
                       errorText={getPasswordErrorText(error)}
                       type="password"
+                      name="password"
+                      autoComplete="current-password"
                       onChange={(e, value) => {
                         onChangePassword(value);
                       }}

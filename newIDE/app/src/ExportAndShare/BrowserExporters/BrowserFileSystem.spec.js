@@ -181,5 +181,21 @@ describe('BrowserFileSystem', () => {
         '/folder/file2'
       );
     });
+    test('it gives the file name of a path', () => {
+      const browserFileSystem = new BrowserFileSystem({ textFiles: [] });
+
+      expect(browserFileSystem.fileNameFrom('/folder/file1.png')).toBe(
+        'file1.png'
+      );
+    });
+    test('it gives a decoded file name for a percent-encoded URL', () => {
+      const browserFileSystem = new BrowserFileSystem({ textFiles: [] });
+
+      expect(
+        browserFileSystem.fileNameFrom(
+          'https://project-resources.gdevelop.io/project/Green%20Button_Hovered.png'
+        )
+      ).toBe('Green Button_Hovered.png');
+    });
   });
 });

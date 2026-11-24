@@ -262,7 +262,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
   obj.AddAction("SetBold",
                 _("Bold"),
-                _("De/activate bold"),
+                _("Activate or deactivate bold."),
                 _("Set bold style of _PARAM0_ : _PARAM1_"),
                 _("Style"),
                 "res/actions/bold.png",
@@ -285,7 +285,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
   obj.AddAction("SetItalic",
                 _("Italic"),
-                _("De/activate italic."),
+                _("Activate or deactivate italic."),
                 _("Set italic style for _PARAM0_ : _PARAM1_"),
                 _("Style"),
                 "res/actions/italic.png",
@@ -308,7 +308,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
   obj.AddAction("SetUnderlined",
                 _("Underlined"),
-                _("De/activate underlined style."),
+                _("Activate or deactivate underlined style."),
                 _("Set underlined style of _PARAM0_: _PARAM1_"),
                 _("Style"),
                 "res/actions/underline.png",
@@ -390,7 +390,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
   obj.AddAction(
          "SetWrapping",
          _("Word wrapping"),
-         _("De/activate word wrapping. Note that word wrapping is a graphical "
+         _("Activate or deactivate word wrapping. Note that word wrapping is a graphical "
            "option,\nyou can't get the number of lines displayed"),
          _("Activate word wrapping of _PARAM0_: _PARAM1_"),
          _("Style"),

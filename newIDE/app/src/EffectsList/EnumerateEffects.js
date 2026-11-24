@@ -75,6 +75,26 @@ export const enumerateEffectNames = (
   });
 };
 
+/**
+ * Values given to new effects instead of the default values of their
+ * properties.
+ *
+ * The default values are also the ones displayed for effects saved without
+ * these parameters, so they must stay the values that the game engine uses for
+ * them.
+ */
+const parameterValuesForNewEffects: {
+  [effectType: string]: {|
+    stringParameters?: { [string]: string },
+    doubleParameters?: { [string]: number },
+  |},
+} = {
+  'Scene3D::DirectionalLight': {
+    stringParameters: { shadowRenderingMode: 'fittedToCameraView' },
+    doubleParameters: { shadowNormalBias: 1 },
+  },
+};
+
 export const setEffectDefaultParameters = (
   effect: gdEffect,
   effectMetadata: gdEffectMetadata
@@ -98,4 +118,25 @@ export const setEffectDefaultParameters = (
       effect.setStringParameter(parameterName, property.getValue());
     }
   });
+
+  const parameterValues = parameterValuesForNewEffects[effect.getEffectType()];
+  if (parameterValues) {
+    const { stringParameters, doubleParameters } = parameterValues;
+    if (stringParameters) {
+      Object.keys(stringParameters).forEach(parameterName => {
+        effect.setStringParameter(
+          parameterName,
+          stringParameters[parameterName]
+        );
+      });
+    }
+    if (doubleParameters) {
+      Object.keys(doubleParameters).forEach(parameterName => {
+        effect.setDoubleParameter(
+          parameterName,
+          doubleParameters[parameterName]
+        );
+      });
+    }
+  }
 };

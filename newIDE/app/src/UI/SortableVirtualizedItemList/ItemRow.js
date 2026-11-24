@@ -25,6 +25,12 @@ const styles = {
 
 const LEFT_MOUSE_BUTTON = 0;
 
+export type ItemSelectionEvent = {|
+  shiftKey: boolean,
+  ctrlKey: boolean,
+  metaKey: boolean,
+|};
+
 type Props<Item> = {|
   item: Item,
   itemName: string,
@@ -36,7 +42,7 @@ type Props<Item> = {|
   getThumbnail?: () => string,
   renderItemLabel?: () => React.Node,
   selected: boolean,
-  onItemSelected: (?Item) => void,
+  onItemSelected: (?Item, event?: ItemSelectionEvent) => void,
   errorStatus: '' | 'error' | 'warning',
   buildMenuTemplate: () => Array<MenuItemTemplate>,
   onEdit?: ?(Item) => void,
@@ -158,12 +164,16 @@ function ItemRow<Item>({
           : gdevelopTheme.listItem.rightIconColor
       }
       buildMenuTemplate={buildMenuTemplate}
-      onClick={() => {
+      onClick={event => {
         // $FlowFixMe[constant-condition]
         if (!onItemSelected) return;
         if (editingName) return;
 
-        onItemSelected(selected ? null : item);
+        onItemSelected(item, {
+          shiftKey: event.shiftKey,
+          ctrlKey: event.ctrlKey,
+          metaKey: event.metaKey,
+        });
       }}
       onDoubleClick={event => {
         if (event.button !== LEFT_MOUSE_BUTTON) return;

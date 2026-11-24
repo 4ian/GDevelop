@@ -32,6 +32,7 @@ const readLocalFileToArrayBuffer = async (
 const extensionToMimeType = {
   // Common audio extensions:
   aac: 'audio/aac',
+  m4a: 'audio/x-m4a',
   wav: 'audio/wav',
   mp3: 'audio/mp3',
   ogg: 'audio/ogg',

@@ -41,7 +41,92 @@ export const initializeCompletions = (monaco: any) => {
     checkJs: true,
   });
 
-  setupAutocompletions(monaco);
+  setupAutocompletions(monaco).catch(error => {
+    // No GDJS sources at hand (the web app, or a desktop build without them):
+    // the code editor works without autocompletions.
+    console.info('No GDJS autocompletions for the code editor:', error.message);
+  });
+};
+
+// The version of Monaco used does not support ignoring some diagnostics
+// per model (`diagnosticCodesToIgnore` appeared in a later version, and
+// would be global anyway). To avoid showing diagnostics that don't apply
+// to a specific editor (like "'await' expression is only allowed within an
+// async function" in a gameplay test, whose code is actually run inside an
+// async function), `setModelMarkers` is patched to filter the markers of
+// the registered models.
+const patchedMonacoInstances: WeakSet<any> = new WeakSet();
+const suppressedMessagesByMonacoInstance: WeakMap<
+  any,
+  Map<string, Array<string>>
+> = new WeakMap();
+
+const patchSetModelMarkersToFilterSuppressedMessages = (monaco: any) => {
+  if (patchedMonacoInstances.has(monaco)) return;
+  patchedMonacoInstances.add(monaco);
+
+  const originalSetModelMarkers = monaco.editor.setModelMarkers;
+  monaco.editor.setModelMarkers = (model: any, owner: string, markers: any) => {
+    const suppressedMessagesByModelUri = suppressedMessagesByMonacoInstance.get(
+      monaco
+    );
+    const suppressedMessages =
+      suppressedMessagesByModelUri && model
+        ? suppressedMessagesByModelUri.get(model.uri.toString())
+        : null;
+    const filteredMarkers = suppressedMessages
+      ? markers.filter(
+          marker =>
+            !suppressedMessages.some(suppressedMessage =>
+              marker.message.includes(suppressedMessage)
+            )
+        )
+      : markers;
+    originalSetModelMarkers.call(monaco.editor, model, owner, filteredMarkers);
+  };
+};
+
+/**
+ * Don't show the diagnostics whose message contains one of the given texts,
+ * for the given model. Used by editors whose code is run in a way the
+ * TypeScript language service can not know about (see `CodeEditor`).
+ */
+export const suppressDiagnosticsMessagesForModel = (
+  monaco: any,
+  model: any,
+  suppressedMessages: Array<string>
+) => {
+  if (!model) return;
+  patchSetModelMarkersToFilterSuppressedMessages(monaco);
+
+  let suppressedMessagesByModelUri = suppressedMessagesByMonacoInstance.get(
+    monaco
+  );
+  if (!suppressedMessagesByModelUri) {
+    suppressedMessagesByModelUri = new Map();
+    suppressedMessagesByMonacoInstance.set(
+      monaco,
+      suppressedMessagesByModelUri
+    );
+  }
+  suppressedMessagesByModelUri.set(model.uri.toString(), suppressedMessages);
+};
+
+/**
+ * Stop filtering the diagnostics of the given model (when the editor that
+ * asked for it is unmounted).
+ */
+export const unsuppressDiagnosticsMessagesForModel = (
+  monaco: any,
+  model: any
+) => {
+  if (!model) return;
+  const suppressedMessagesByModelUri = suppressedMessagesByMonacoInstance.get(
+    monaco
+  );
+  if (suppressedMessagesByModelUri) {
+    suppressedMessagesByModelUri.delete(model.uri.toString());
+  }
 };
 
 /**
@@ -62,7 +147,7 @@ export const enableJsTypeDiagnostics = (monaco: any) => {
  * In Electron, `document.execCommand('paste')` fails in newer Chromium
  * versions. This runtime patch wraps the clipboard paste action's `run`
  * method so that when the native paste command fails, we fall back to
- * Electron's clipboard API. Because we patch the action itself (not just
+ * `navigator.clipboard`. Because we patch the action itself (not just
  * keybindings), this covers keyboard shortcuts, the context menu "Paste"
  * item, and any programmatic trigger.
  *
@@ -73,29 +158,21 @@ export const enableJsTypeDiagnostics = (monaco: any) => {
  * See https://github.com/microsoft/monaco-editor/issues/4855
  */
 export const applyElectronClipboardPatch = (editor: any, monaco: any) => {
-  let electronClipboard;
-  try {
-    electronClipboard = window.require('electron').clipboard;
-  } catch (e) {
-    // Not in Electron environment, no patch needed.
-    return;
-  }
-
   const pasteAction = editor.getAction('editor.action.clipboardPasteAction');
   if (!pasteAction) return;
 
   // Replace the run method entirely. The original just does:
   //   editor.focus(); document.execCommand('paste');
-  // We add the Electron clipboard fallback when execCommand fails.
-  pasteAction.run = (accessor: any, ed: any) => {
+  // We add a clipboard fallback when execCommand fails.
+  pasteAction.run = async (accessor: any, ed: any) => {
     const target = ed || editor;
     target.focus();
     const domNode: HTMLElement = target.getDomNode();
     const doc = domNode ? domNode.ownerDocument : document;
     const result = doc.execCommand('paste');
-    if (!result) {
+    if (!result && navigator.clipboard) {
       try {
-        const text = electronClipboard.readText();
+        const text = await navigator.clipboard.readText();
         if (text) {
           const selection = target.getSelection();
           target.executeEdits('paste', [

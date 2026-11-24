@@ -45,6 +45,7 @@ const BehaviorPropertiesEditor = ({
         layersContainer,
         visibility: 'All',
         shouldDisabledFieldsWithMixedValues: true,
+        propertyGroups: behaviorMetadata.getPropertyGroups(),
       }),
     [behavior, behaviorMetadata, layersContainer, object]
   );

@@ -25,6 +25,8 @@ import Text from '../UI/Text';
 import Link from '../UI/Link';
 import CreditsStatusBanner from '../Credits/CreditsStatusBanner';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
+import PurchasesDialog from './PurchasesDialog';
+import { isNativeMobileApp } from '../Utils/Platform';
 
 type Props = {|
   onClose: () => void,
@@ -36,6 +38,9 @@ const ProfileDialog = ({ onClose }: Props) => {
   const badgesSeenNotificationTimeoutRef = React.useRef<?TimeoutID>(null);
   const badgesSeenNotificationSentRef = React.useRef<boolean>(false);
   const { isMobile } = useResponsiveWindowSize();
+  const [isPurchasesDialogOpen, setIsPurchasesDialogOpen] = React.useState(
+    false
+  );
 
   const isUserLoading = authenticatedUser.loginState !== 'done';
   const userAchievementsContainerRef = React.useRef<?HTMLDivElement>(null);
@@ -134,6 +139,8 @@ const ProfileDialog = ({ onClose }: Props) => {
     !!authenticatedUser.subscription &&
     !!authenticatedUser.subscription.benefitsFromEducationPlan &&
     !authenticatedUser.subscription.isTeacher;
+  // App stores provide the receipts of payments made in the mobile app.
+  const isMobileApp = isNativeMobileApp();
   const isTeacherAccount =
     !!authenticatedUser.subscription &&
     !!authenticatedUser.subscription.benefitsFromEducationPlan &&
@@ -201,6 +208,7 @@ const ProfileDialog = ({ onClose }: Props) => {
               <SubscriptionDetails
                 onManageSubscription={onManageSubscription}
                 isManageSubscriptionLoading={isManageSubscriptionLoading}
+                onOpenStore={onClose}
               />
             )}
             {!isStudentAccount && !isTeacherAccount && (
@@ -231,6 +239,26 @@ const ProfileDialog = ({ onClose }: Props) => {
                 <CreditsStatusBanner displayPurchaseAction />
               </Column>
             )}
+            {!isStudentAccount && !isMobileApp && (
+              <Line alignItems="center" justifyContent="space-between">
+                <Column noMargin>
+                  <Text size="block-title">
+                    <Trans>Purchases</Trans>
+                  </Text>
+                  <Text size="body" noMargin>
+                    <Trans>
+                      Download the invoices of your subscription and purchases,
+                      and find the links of the gifts you bought.
+                    </Trans>
+                  </Text>
+                </Column>
+                <FlatButton
+                  label={<Trans>See purchases</Trans>}
+                  primary
+                  onClick={() => setIsPurchasesDialogOpen(true)}
+                />
+              </Line>
+            )}
             {!isStudentAccount && (
               <ContributionsDetails userId={authenticatedUser.profile.id} />
             )}
@@ -260,6 +288,9 @@ const ProfileDialog = ({ onClose }: Props) => {
             }
           />
         </Column>
+      )}
+      {isPurchasesDialogOpen && (
+        <PurchasesDialog onClose={() => setIsPurchasesDialogOpen(false)} />
       )}
     </Dialog>
   );

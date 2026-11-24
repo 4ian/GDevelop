@@ -43,6 +43,16 @@ bool PropertyFolderOrProperty::HasPropertyNamed(const gd::String &name) {
   return property->GetName() == name;
 }
 
+void PropertyFolderOrProperty::AddPropertyNamesTo(
+    std::unordered_set<gd::String> &propertyNames) const {
+  if (IsFolder()) {
+    for (const auto &child : children)
+      child->AddPropertyNamesTo(propertyNames);
+  } else if (property) {
+    propertyNames.insert(property->GetName());
+  }
+}
+
 PropertyFolderOrProperty &
 PropertyFolderOrProperty::GetOrCreateChildFolder(const gd::String &name) {
   if (!IsFolder()) {
@@ -298,6 +308,21 @@ void PropertyFolderOrProperty::SerializeTo(SerializerElement &element) const {
 void PropertyFolderOrProperty::UnserializeFrom(
     gd::Project &project, const SerializerElement &element,
     gd::PropertiesContainer &propertiesContainer) {
+  // Index the properties by name once: searching the container for each
+  // property of the folders would be O(number of properties^2). Like
+  // PropertiesContainer::Get, the first property having a given name is used.
+  std::unordered_map<gd::String, gd::NamedPropertyDescriptor *>
+      propertiesByName;
+  for (const auto &namedProperty : propertiesContainer.GetInternalVector()) {
+    propertiesByName.emplace(namedProperty->GetName(), namedProperty.get());
+  }
+  DoUnserializeFrom(project, element, propertiesByName);
+}
+
+void PropertyFolderOrProperty::DoUnserializeFrom(
+    gd::Project &project, const SerializerElement &element,
+    const std::unordered_map<gd::String, gd::NamedPropertyDescriptor *>
+        &propertiesByName) {
   children.clear();
   gd::String potentialFolderName = element.GetStringAttribute("folderName", "");
 
@@ -313,8 +338,8 @@ void PropertyFolderOrProperty::UnserializeFrom(
         std::unique_ptr<PropertyFolderOrProperty>
             childPropertyFolderOrProperty =
                 make_unique<PropertyFolderOrProperty>();
-        childPropertyFolderOrProperty->UnserializeFrom(
-            project, childrenElements.GetChild(i), propertiesContainer);
+        childPropertyFolderOrProperty->DoUnserializeFrom(
+            project, childrenElements.GetChild(i), propertiesByName);
         childPropertyFolderOrProperty->parent = this;
         children.push_back(std::move(childPropertyFolderOrProperty));
       }
@@ -322,8 +347,9 @@ void PropertyFolderOrProperty::UnserializeFrom(
   } else {
     folderName = "";
     gd::String propertyName = element.GetStringAttribute("propertyName");
-    if (propertiesContainer.Has(propertyName)) {
-      property = &propertiesContainer.Get(propertyName);
+    auto foundProperty = propertiesByName.find(propertyName);
+    if (foundProperty != propertiesByName.end()) {
+      property = foundProperty->second;
     } else {
       gd::LogError("Property with name " + propertyName +
                    " not found in properties container.");

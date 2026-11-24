@@ -16,7 +16,7 @@ import { FlippingHelper } from "./GID";
  * This allows to support new file format with only a new parser.
  */
 export class EditableTileMap {
-  private _backgroundResourceName?: string;
+  private _backgroundResourceName: string | null = null;
   private _tileSet: Map<integer, TileDefinition>;
   private _layers: Array<AbstractEditableLayer>;
   /**
@@ -35,10 +35,12 @@ export class EditableTileMap {
    * The number of tile rows in the map.
    */
   private dimY: integer;
+
   /**
-   * True if is allowed to set a tile out of the tile map's bounds.
-   * Useful when editing the tile map easily.
+   * It can be useful for auto-tilling.
    */
+  private tileSetColumnCount: integer = 0;
+  private tileSetRowCount: integer = 0;
 
   /**
    * @param tileWidth The width of a tile.
@@ -62,6 +64,20 @@ export class EditableTileMap {
     this.dimY = dimY;
     this._tileSet = tileSet;
     this._layers = [];
+  }
+
+  clone(): EditableTileMap {
+    const tileMap = new EditableTileMap(
+      this.tileWidth,
+      this.tileHeight,
+      this.dimX,
+      this.dimY,
+      this._tileSet
+    );
+    for (const layer of this._layers) {
+      tileMap._layers.push(layer.clone(tileMap, layer.id));
+    }
+    return tileMap;
   }
 
   /**
@@ -261,17 +277,33 @@ export class EditableTileMap {
 
   /**
    * @param tileId The tile identifier
-   * @returns The tile definition form the tile set.
+   * @returns The tile definition from the tile set.
    */
   getTileDefinition(tileId: integer): TileDefinition | undefined {
     return this._tileSet.get(tileId);
   }
 
   /**
-   * @returns All the tile definitions form the tile set.
+   * @returns All the tile definitions from the tile set.
    */
   getTileDefinitions(): Iterable<TileDefinition> {
     return this._tileSet.values();
+  }
+
+  getTileSetColumnCount(): integer {
+    return this.tileSetColumnCount;
+  }
+
+  getTileSetRowCount(): integer {
+    return this.tileSetRowCount;
+  }
+
+  setTileSetColumnCount(tileSetColumnCount: integer) {
+    this.tileSetColumnCount = tileSetColumnCount;
+  }
+
+  setTileSetRowCount(tileSetRowCount: integer) {
+    this.tileSetRowCount = tileSetRowCount;
   }
 
   /**
@@ -310,7 +342,7 @@ export class EditableTileMap {
   /**
    * @returns The resource name of the background
    */
-  getBackgroundResourceName(): string {
+  getBackgroundResourceName(): string | null {
     return this._backgroundResourceName;
   }
 
@@ -423,20 +455,7 @@ export class EditableTileMap {
     if (!layer) return;
     const initialRowCount = this.dimY;
     const initialColumnCount = this.dimX;
-    if (layer.isEmpty() && this._layers.length === 1) {
-      // The tile map is empty. Instead of having an object with null width and height,
-      // the tile map is resized to have a size of 1x1 with an empty tile. This is useful
-      // in the editor. It might need to have a different behavior in the runtime.
-      layer.buildEmptyLayer(1, 1);
-      this.dimX = 1;
-      this.dimY = 1;
-      return {
-        shiftedRows: 0,
-        shiftedColumns: 0,
-        poppedRows: initialRowCount - 1,
-        poppedColumns: initialColumnCount - 1,
-      };
-    }
+
     const trimmingData = layer.getTrimmingData();
 
     for (const layer of this.getLayers()) {
@@ -456,6 +475,21 @@ export class EditableTileMap {
       trimmingData.columnsToShift;
     this.dimY =
       initialRowCount - trimmingData.rowsToPop - trimmingData.rowsToShift;
+
+    if (this.dimX === 0 && this.dimY === 0 && this._layers.length === 1) {
+      // The tile map is empty. Instead of having an object with null width and height,
+      // the tile map is resized to have a size of 1x1 with an empty tile. This is useful
+      // in the editor. It might need to have a different behavior in the runtime.
+      layer.increaseDimensions(1, 0, 1, 0);
+      this.dimX = 1;
+      this.dimY = 1;
+      return {
+        shiftedRows: 0,
+        shiftedColumns: 0,
+        poppedRows: initialRowCount - 1,
+        poppedColumns: initialColumnCount - 1,
+      };
+    }
 
     return {
       poppedRows: trimmingData.rowsToPop,
@@ -488,6 +522,8 @@ abstract class AbstractEditableLayer {
     this.tileMap = tileMap;
     this.id = id;
   }
+
+  abstract clone(tileMap: EditableTileMap, id: integer): AbstractEditableLayer;
 
   setVisible(visible: boolean): void {
     this.visible = visible;
@@ -526,6 +562,12 @@ export class EditableObjectLayer extends AbstractEditableLayer {
   constructor(tileMap: EditableTileMap, id: integer) {
     super(tileMap, id);
     this.objects = [];
+  }
+
+  clone(tileMap: EditableTileMap, id: integer): EditableObjectLayer {
+    const layer = new EditableObjectLayer(tileMap, id);
+    layer.objects.push.apply(this.objects);
+    return layer;
   }
 
   add(object: TileObject): void {
@@ -628,19 +670,23 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
    */
   constructor(tileMap: EditableTileMap, id: integer) {
     super(tileMap, id);
-    this.buildEmptyLayer(
-      this.tileMap.getDimensionX(),
-      this.tileMap.getDimensionY()
-    );
-    this._alpha = 1;
-  }
-
-  buildEmptyLayer(dimensionX: number, dimensionY: number) {
+    const dimensionX = this.tileMap.getDimensionX();
+    const dimensionY = this.tileMap.getDimensionY();
     this._tiles = [];
     this._tiles.length = dimensionY;
     for (let index = 0; index < this._tiles.length; index++) {
       this._tiles[index] = new Int32Array(dimensionX);
     }
+    this._alpha = 1;
+  }
+
+  clone(tileMap: EditableTileMap, id: integer): EditableTileMapLayer {
+    const layer = new EditableTileMapLayer(tileMap, id);
+    for (let index = 0; index < layer._tiles.length; index++) {
+      layer._tiles[index].set(this._tiles[index]);
+    }
+    layer._alpha = this._alpha;
+    return layer;
   }
 
   static from(
@@ -812,54 +858,92 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
     rowsToPop: number;
     columnsToPop: number;
   } {
-    let rowsToShift = 0,
-      rowsToPop = 0;
-    const initialDimensionX = this.getDimensionX();
-    const initialDimensionY = this.getDimensionY();
-    const columnsToShiftByRow = new Array(this._tiles.length).fill(
-      this._tiles[0].length
-    );
-    const columnsToPopByRow = new Array(this._tiles.length).fill(
-      this._tiles[0].length
-    );
-    let isFirstNonEmptyRowFound = false;
-    for (let y = 0; y < this._tiles.length; y++) {
+    let minX = this.getDimensionX();
+    let minY = this.getDimensionY();
+    let maxX = -1;
+    let maxY = -1;
+
+    // Scan from the bottom
+    for (let y = this._tiles.length - 1; y >= 0; y--) {
       const row = this._tiles[y];
-      let isFirstNonEmptyColumnFound = false;
-      for (let x = 0; x < row.length; x++) {
-        const cell = row[x];
+      let cell = 0;
+      // from right to left
+      for (let x = row.length - 1; x >= 0; x--) {
+        cell = row[x];
         if (cell !== 0) {
-          columnsToPopByRow[y] = row.length - 1 - x;
-          if (!isFirstNonEmptyColumnFound) {
-            columnsToShiftByRow[y] = x;
-            isFirstNonEmptyColumnFound = true;
-          }
+          maxX = x;
+          maxY = y;
+          break;
         }
       }
-      const isRowEmpty = !isFirstNonEmptyColumnFound;
-      if (!isRowEmpty) {
-        rowsToPop = this._tiles.length - 1 - y;
-        if (!isFirstNonEmptyRowFound) {
-          rowsToShift = y;
-          isFirstNonEmptyRowFound = true;
-        }
+      if (cell !== 0) {
+        break;
       }
     }
-    if (!isFirstNonEmptyRowFound) {
+    // The layer is empty.
+    if (maxY === -1) {
       return {
         columnsToShift: 0,
         rowsToShift: 0,
-        columnsToPop: initialDimensionX - 1,
-        rowsToPop: initialDimensionY - 1,
+        columnsToPop: this.getDimensionX() - 1,
+        rowsToPop: this.getDimensionY() - 1,
       };
     }
-    const columnsToShift = Math.min(...columnsToShiftByRow);
-    const columnsToPop = Math.min(...columnsToPopByRow);
+    // Scan from the top
+    for (let y = 0; y <= maxY; y++) {
+      const row = this._tiles[y];
+      let cell = 0;
+      // from left to right
+      for (let x = 0; x < row.length; x++) {
+        cell = row[x];
+        if (cell !== 0) {
+          minX = x;
+          minY = y;
+          break;
+        }
+      }
+      if (cell !== 0) {
+        break;
+      }
+    }
+    // When only 1 row remains, we already found the bounds.
+    if (minY !== maxY) {
+      let cell = 0;
+      // Scan from the right
+      for (let x = this.getDimensionX() - 1; x > maxX; x--) {
+        // maxY is already covered
+        for (let y = minY; y < maxY; y++) {
+          cell = this._tiles[y][x];
+          if (cell !== 0) {
+            maxX = x;
+            break;
+          }
+        }
+        if (cell !== 0) {
+          break;
+        }
+      }
+      // Scan from the left
+      for (let x = 0; x < minX; x++) {
+        let cell = 0;
+        // minY is already covered
+        for (let y = minY + 1; y <= maxY; y++) {
+          cell = this._tiles[y][x];
+          if (cell !== 0) {
+            minX = x;
+            break;
+          }
+        }
+        if (cell !== 0) {
+          break;
+        }
+      }
+    }
     return {
-      rowsToShift,
-      columnsToShift,
-      rowsToPop,
-      columnsToPop,
+      rowsToShift: minY,
+      columnsToShift: minX,
+      rowsToPop: this.getDimensionY() - 1 - maxY,
+      columnsToPop: this.getDimensionX() - 1 - maxX,
     };
   }
 
@@ -1140,7 +1224,7 @@ export class TileDefinition {
     const taggedHitBox = this.taggedHitBoxes.find(
       (hitbox) => hitbox.tag === tag
     );
-    return taggedHitBox && taggedHitBox.hasFullHitBox;
+    return !!taggedHitBox && taggedHitBox.hasFullHitBox;
   }
 
   /**

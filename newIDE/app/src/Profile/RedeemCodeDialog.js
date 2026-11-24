@@ -8,7 +8,10 @@ import AuthenticatedUserContext from './AuthenticatedUserContext';
 import { ColumnStackLayout } from '../UI/Layout';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import LeftLoader from '../UI/LeftLoader';
-import { redeemCode } from '../Utils/GDevelopServices/Usage';
+import {
+  redeemCode,
+  hasMobileAppStoreSubscriptionPlan,
+} from '../Utils/GDevelopServices/Usage';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 import AlertMessage from '../UI/AlertMessage';
 import Form from '../UI/Form';
@@ -58,6 +61,17 @@ export const getRedeemCodeErrorText = (error: ?Error): void | React.Node => {
       return (
         <Trans>
           You already used this code - you can't reuse a code multiple times.
+        </Trans>
+      );
+    if (
+      extractedStatusAndCode.code ===
+      'redemption-code/subscription-handled-by-purchasely'
+    )
+      return (
+        <Trans>
+          You have a subscription bought from the App Store or Google Play,
+          which can't be cancelled automatically. Cancel it from the store
+          first, then redeem your code.
         </Trans>
       );
   }
@@ -133,7 +147,6 @@ export default function RedeemCodeDialog({
     [authenticatedUser, redemptionCode, onClose, openSubscriptionDialog]
   );
 
-  const canRedeem = !!redemptionCode && !isLoading;
   const { subscription } = authenticatedUser;
 
   const hasAValidSubscriptionFromRedemptionCode =
@@ -145,6 +158,15 @@ export default function RedeemCodeDialog({
     !!subscription &&
     subscription.planId &&
     !subscription.redemptionCodeValidUntil;
+  // A subscription bought on the App Store or Google Play can't be cancelled by
+  // our server: redeeming a code would leave the user with two subscriptions,
+  // still billed by the store. Prevent redemption until they cancel it there.
+  const hasSubscriptionHandledByMobileAppStore = hasMobileAppStoreSubscriptionPlan(
+    subscription
+  );
+
+  const canRedeem =
+    !!redemptionCode && !isLoading && !hasSubscriptionHandledByMobileAppStore;
 
   // Auto-submit if autoSubmit and codeToPrefill are provided,
   // and if there isn't an existing subscription as it would replace it.
@@ -155,6 +177,7 @@ export default function RedeemCodeDialog({
         codeToPrefill &&
         !hasAValidSubscriptionFromRedemptionCode &&
         !hasAValidSubscriptionNotFromRedemptionCode &&
+        !hasSubscriptionHandledByMobileAppStore &&
         redemptionCode &&
         !hasAutoSubmitted.current &&
         !isLoading
@@ -171,6 +194,7 @@ export default function RedeemCodeDialog({
       onRedeemCode,
       hasAValidSubscriptionFromRedemptionCode,
       hasAValidSubscriptionNotFromRedemptionCode,
+      hasSubscriptionHandledByMobileAppStore,
     ]
   );
 
@@ -227,7 +251,15 @@ export default function RedeemCodeDialog({
                   autoFocus="desktop"
                   disabled={isLoading}
                 />
-                {hasAValidSubscriptionFromRedemptionCode ? (
+                {hasSubscriptionHandledByMobileAppStore ? (
+                  <AlertMessage kind="error">
+                    <Trans>
+                      You have a subscription bought from the App Store or
+                      Google Play, which can't be cancelled automatically.
+                      Cancel it from the store first, then redeem your code.
+                    </Trans>
+                  </AlertMessage>
+                ) : hasAValidSubscriptionFromRedemptionCode ? (
                   <AlertMessage kind="warning">
                     <Trans>
                       You currently have a subscription, applied thanks to a

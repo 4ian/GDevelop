@@ -8,6 +8,7 @@ import {
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
   type WillDeleteObjectChanges,
+  type ExtensionsOutsideEditorChanges,
 } from '../../../EditorFunctions/OutsideEditorChanges';
 import {
   type FileMetadataAndStorageProviderName,
@@ -55,6 +56,7 @@ import {
 import { type CreateProjectResult } from '../../../Utils/UseCreateProject';
 import { CreditsPackageStoreContext } from '../../../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 import { type OpenAskAiOptions } from '../../../AiGeneration/Utils';
+import ClaimableProductsDialogContainer from '../../../AssetStore/ClaimableProducts/ClaimableProductsDialogContainer';
 
 const noop = () => {};
 
@@ -222,6 +224,9 @@ export type HomePageEditorInterface = {|
   onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
+  ) => void,
+  onExtensionsModifiedOutsideEditor: (
+    changes: ExtensionsOutsideEditorChanges
   ) => void,
   selectAllInsideEditor: () => void,
 |};
@@ -568,6 +573,7 @@ export const HomePage: React.ComponentType<Props> = React.memo<Props>(
         onObjectsModifiedOutsideEditor: noop,
         onWillDeleteObject: noop,
         onObjectGroupsModifiedOutsideEditor: noop,
+        onExtensionsModifiedOutsideEditor: noop,
         selectAllInsideEditor: noop,
       }));
 
@@ -742,6 +748,7 @@ export const HomePage: React.ComponentType<Props> = React.memo<Props>(
                   onOpenAbout={onOpenAbout}
                 />
               </div>
+              <ClaimableProductsDialogContainer isActive={isActive} />
             </TeamProvider>
           )}
         </I18n>

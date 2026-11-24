@@ -55,8 +55,14 @@ export const addDefaultLightToLayer = (layer: gdLayer): void => {
   directionalLight.setBooleanParameter('isCastingShadow', true);
   directionalLight.setStringParameter('shadowQuality', 'medium');
   directionalLight.setDoubleParameter('minimumShadowBias', 0);
+  directionalLight.setDoubleParameter('shadowNormalBias', 1);
   directionalLight.setDoubleParameter('distanceFromCamera', 1500);
   directionalLight.setDoubleParameter('frustumSize', 4000);
+  directionalLight.setStringParameter(
+    'shadowRenderingMode',
+    'fittedToCameraView'
+  );
+  directionalLight.setDoubleParameter('shadowDistance', 2000);
 
   const ambientLight = layer
     .getEffects()
@@ -81,10 +87,9 @@ const getCompositeSlug = (
   creationSource: NewProjectCreationSource,
   exampleShortHeaderSlug: string
 ) => {
-  if (creationSource === 'quick-customization')
-    return `qc-${exampleShortHeaderSlug}`;
   if (creationSource === 'ai-agent-request')
     return `ai-${exampleShortHeaderSlug}`;
+  if (creationSource === 'mcp') return `mcp-${exampleShortHeaderSlug}`;
   if (creationSource === 'course-chapter')
     return `course-${exampleShortHeaderSlug}`;
   if (creationSource === 'in-app-tutorial')
@@ -168,7 +173,7 @@ export const createNewProjectFromExampleShortHeader = async ({
     const creationSource = newProjectSetup.creationSource;
 
     const newProjectSource = getNewProjectSourceFromUrl(
-      example.projectFileUrl,
+      newProjectSetup.projectFileUrl || example.projectFileUrl,
       {
         exampleUrl: example.projectFileUrl,
         exampleSlug: exampleShortHeader.slug,

@@ -6,7 +6,6 @@ import AuthenticatedUserContext from '../../AuthenticatedUserContext';
 import {
   getRedirectToCheckoutUrl,
   type SubscriptionPlanPricingSystem,
-  changeUserSubscription,
 } from '../../../Utils/GDevelopServices/Usage';
 import {
   sendCancelSubscriptionToChange,
@@ -14,33 +13,28 @@ import {
 } from '../../../Utils/Analytics/EventSender';
 import Window from '../../../Utils/Window';
 import useAlertDialog from '../../../UI/Alert/useAlertDialog';
+import PreferencesContext from '../../../MainFrame/Preferences/PreferencesContext';
+import PasswordPromptDialog from '../../../AssetStore/PasswordPromptDialog';
 
-const cancelConfirmationTexts = {
-  level: 'normal',
-  dialogTexts: {
-    title: t`Cancel your subscription?`,
-    message: t`By canceling your subscription, you will lose all your premium features at the end of the period you already paid for. Continue?`,
-    confirmButtonLabel: t`Continue`,
-    dismissButtonLabel: t`Keep subscription`,
-    maxWidth: 'sm',
-  },
-};
-const cancelAndChangeConfirmationTexts = {
+// When changing subscription, the existing one is kept until the payment for the
+// new one is completed: it's then replaced by the new one (and cancelled at the payment
+// provider by the backend). Nothing is cancelled if the user does not complete the payment.
+const changeConfirmationTexts = {
   level: 'normal',
   dialogTexts: {
     title: t`Update your subscription`,
-    message: t`To get this new subscription, we need to stop your existing one before you can pay for the new one. This is immediate but your payment will NOT be pro-rated (you will pay the full price for the new subscription). You won't lose any project, game or other data.`,
-    confirmButtonLabel: t`Cancel and change my subscription`,
+    message: t`Your current subscription will be replaced by the new one as soon as the payment is completed. The remaining time of your current subscription will NOT be refunded or pro-rated (you will pay the full price for the new subscription). You won't lose any project, game or other data.`,
+    confirmButtonLabel: t`Continue to payment`,
     dismissButtonLabel: t`Go back`,
     maxWidth: 'sm',
   },
 };
-const cancelAndChangeWithValidRedeemedCodeConfirmationTexts = {
+const changeWithValidRedeemedCodeConfirmationTexts = {
   level: 'danger',
   dialogTexts: {
     title: t`Update your subscription`,
-    message: t`To buy this new subscription, we need to stop your existing one before you can pay for the new one. This means the redemption code you're currently used won't be usable anymore.`,
-    confirmButtonLabel: t`Forfeit my redeemed subscription and continue`,
+    message: t`Your current subscription comes from a redemption code. As soon as the payment for the new subscription is completed, it will replace it and the redemption code won't be usable anymore.`,
+    confirmButtonLabel: t`Continue and forfeit my redeemed subscription`,
     dismissButtonLabel: t`Go back`,
     maxWidth: 'sm',
   },
@@ -56,14 +50,21 @@ type Props = {|
   dialogVariant?: string,
 |};
 
+type CheckoutOptions = {|
+  pricingSystemId: string,
+  quantity?: number,
+|};
+
 type BuyUpdateOrCancelPlanState = {|
   buyUpdateOrCancelPlan: (
     i18n: I18nType,
     subscriptionPlanPricingSystem: SubscriptionPlanPricingSystem | null
   ) => Promise<void>,
-  isChangingSubscription: boolean,
+  cancelConfirmationDialogOpen: boolean,
+  setCancelConfirmationDialogOpen: (open: boolean) => void,
   cancelReasonDialogOpen: boolean,
   setCancelReasonDialogOpen: (open: boolean) => void,
+  passwordPromptDialog: React.Node,
 |};
 
 /**
@@ -78,18 +79,48 @@ export const useBuyUpdateOrCancelPlan = ({
   dialogVariant,
 }: Props): BuyUpdateOrCancelPlanState => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
-  const { getAuthorizationHeader, subscription, profile } = authenticatedUser;
-  const {
-    showAlert,
-    showConfirmation,
-    showDeleteConfirmation,
-  } = useAlertDialog();
-  const [isChangingSubscription, setIsChangingSubscription] = React.useState(
-    false
-  );
+  const { subscription, profile } = authenticatedUser;
+  const preferences = React.useContext(PreferencesContext);
+  const { showConfirmation, showDeleteConfirmation } = useAlertDialog();
+  const [
+    cancelConfirmationDialogOpen,
+    setCancelConfirmationDialogOpen,
+  ] = React.useState(false);
   const [cancelReasonDialogOpen, setCancelReasonDialogOpen] = React.useState(
     false
   );
+  const [
+    checkoutOptionsWaitingForPassword,
+    setCheckoutOptionsWaitingForPassword,
+  ] = React.useState<?CheckoutOptions>(null);
+  const [password, setPassword] = React.useState<string>('');
+
+  const openCheckout = (
+    { pricingSystemId, quantity }: CheckoutOptions,
+    checkoutPassword?: string
+  ) => {
+    if (!profile) return;
+    onOpenPendingDialog(true);
+    Window.openExternalURL(
+      getRedirectToCheckoutUrl({
+        pricingSystemId,
+        userId: profile.id,
+        userEmail: profile.email,
+        quantity,
+        couponCode: couponCode || undefined,
+        language: preferences.values.language,
+        password: checkoutPassword,
+      })
+    );
+  };
+
+  const startCheckout = (checkoutOptions: CheckoutOptions) => {
+    if (Window.isDev()) {
+      setCheckoutOptionsWaitingForPassword(checkoutOptions);
+      return;
+    }
+    openCheckout(checkoutOptions);
+  };
 
   const buyUpdateOrCancelPlan = async (
     i18n: I18nType,
@@ -108,7 +139,6 @@ export const useBuyUpdateOrCancelPlan = ({
 
     // Subscribing from an account without a subscription
     if (!subscription.planId && subscriptionPlanPricingSystem) {
-      onOpenPendingDialog(true);
       const isEducationPlan =
         subscriptionPlanPricingSystem &&
         subscriptionPlanPricingSystem.planId === 'gdevelop_education';
@@ -116,27 +146,16 @@ export const useBuyUpdateOrCancelPlan = ({
         isEducationPlan && getEducationPlanSeatsCount
           ? getEducationPlanSeatsCount()
           : undefined;
-      Window.openExternalURL(
-        getRedirectToCheckoutUrl({
-          pricingSystemId: subscriptionPlanPricingSystem.id,
-          userId: profile.id,
-          userEmail: profile.email,
-          quantity,
-          couponCode: couponCode || undefined,
-        })
-      );
+      startCheckout({
+        pricingSystemId: subscriptionPlanPricingSystem.id,
+        quantity,
+      });
       return;
     }
 
     if (!subscriptionPlanPricingSystem) {
       // Cancelling the existing subscription.
-      const answer = await showConfirmation(
-        // $FlowFixMe[incompatible-type]
-        cancelConfirmationTexts.dialogTexts
-      );
-      if (!answer) return;
-
-      setCancelReasonDialogOpen(true);
+      setCancelConfirmationDialogOpen(true);
       return;
     }
 
@@ -151,8 +170,8 @@ export const useBuyUpdateOrCancelPlan = ({
     const confirmDialogTexts = hasExpiredRedeemedSubscription
       ? null // We don't show an alert if the redeemed code is expired.
       : hasValidRedeemedSubscription
-      ? cancelAndChangeWithValidRedeemedCodeConfirmationTexts
-      : cancelAndChangeConfirmationTexts;
+      ? changeWithValidRedeemedCodeConfirmationTexts
+      : changeConfirmationTexts;
 
     if (confirmDialogTexts) {
       const { level, dialogTexts } = confirmDialogTexts;
@@ -170,54 +189,35 @@ export const useBuyUpdateOrCancelPlan = ({
       if (!answer) return;
     }
 
-    // Changing the existing subscription by cancelling first.
-    setIsChangingSubscription(true);
+    // Changing the existing subscription: the existing subscription is NOT cancelled
+    // here. It's kept until the new one is paid - the backend then replaces it with the
+    // new one and cancels it at the payment provider (see the Stripe/PayPal webhooks).
+    // If the user does not complete the payment, nothing changes.
     await sendCancelSubscriptionToChange({
       planId: subscriptionPlanPricingSystem.planId,
       pricingSystemId: subscriptionPlanPricingSystem.id,
     });
-    try {
-      await changeUserSubscription(
-        getAuthorizationHeader,
-        profile.id,
-        {
-          planId: null,
-        },
-        {
-          cancelImmediately: true,
-          cancelReasons: {
-            'changing-subscription': true,
-          },
-        }
-      );
-      await authenticatedUser.onRefreshSubscription();
-    } catch (rawError) {
-      showAlert({
-        title: t`Could not change subscription`,
-        message: t`Something went wrong while changing your subscription. Please try again.`,
-      });
-      console.error('Error while changing subscription:', rawError);
-      return;
-    } finally {
-      setIsChangingSubscription(false);
-    }
 
-    // Then redirect as if a new subscription is being chosen.
-    onOpenPendingDialog(true);
-    Window.openExternalURL(
-      getRedirectToCheckoutUrl({
-        pricingSystemId: subscriptionPlanPricingSystem.id,
-        userId: profile.id,
-        userEmail: profile.email,
-        couponCode: couponCode || undefined,
-      })
-    );
+    // Redirect as if a new subscription is being chosen.
+    startCheckout({ pricingSystemId: subscriptionPlanPricingSystem.id });
   };
 
   return {
     buyUpdateOrCancelPlan,
-    isChangingSubscription,
+    cancelConfirmationDialogOpen,
+    setCancelConfirmationDialogOpen,
     cancelReasonDialogOpen,
     setCancelReasonDialogOpen,
+    passwordPromptDialog: checkoutOptionsWaitingForPassword ? (
+      <PasswordPromptDialog
+        passwordValue={password}
+        setPasswordValue={setPassword}
+        onClose={() => setCheckoutOptionsWaitingForPassword(null)}
+        onApply={() => {
+          setCheckoutOptionsWaitingForPassword(null);
+          openCheckout(checkoutOptionsWaitingForPassword, password);
+        }}
+      />
+    ) : null,
   };
 };

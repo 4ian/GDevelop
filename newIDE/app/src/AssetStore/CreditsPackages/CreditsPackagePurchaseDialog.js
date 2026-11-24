@@ -24,6 +24,7 @@ import {
 } from '../../Utils/AppStorePurchases';
 import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
 import PasswordPromptDialog from '../PasswordPromptDialog';
+import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 
 type Props = {|
   creditsPackageListingData: CreditsPackageListingData,
@@ -45,6 +46,7 @@ const CreditsPackagePurchaseDialog = ({
     limits,
     onRefreshLimits,
   } = React.useContext(AuthenticatedUserContext);
+  const preferences = React.useContext(PreferencesContext);
   const [initialCreditsAmount, setInitialCreditsAmount] = React.useState(null);
   const [isPurchasing, setIsPurchasing] = React.useState(false);
   const [purchaseSuccessful, setPurchaseSuccessful] = React.useState(false);
@@ -83,6 +85,7 @@ const CreditsPackagePurchaseDialog = ({
         priceName: creditsPackageListingData.prices[0].name,
         userId: profile.id,
         userEmail: profile.email,
+        language: preferences.values.language,
         password,
       });
       Window.openExternalURL(checkoutUrl);

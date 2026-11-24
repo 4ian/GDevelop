@@ -41,6 +41,8 @@ declare class gdEventsFunctionsExtension {
   getSceneVariables(): gdVariablesContainer;
   getEventsBasedBehaviors(): gdEventsBasedBehaviorsList;
   getEventsBasedObjects(): gdEventsBasedObjectsList;
+  getTests(): gdTestsContainer;
+  getNamedEasings(): gdNamedEasingsContainer;
   serializeTo(element: gdSerializerElement): void;
   serializeToExternal(element: gdSerializerElement): void;
   unserializeFrom(project: gdProject, element: gdSerializerElement): void;

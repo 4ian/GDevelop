@@ -20,6 +20,8 @@ namespace gdjs {
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
       makePIXIFilter(layer, effectData) {
         const filter = new PIXI.filters.OldFilmFilter();
+        gdjs.PixiFiltersTools.applyFilterOnlyOnContentBounds(filter);
+        gdjs.PixiFiltersTools.useHighPrecisionFragmentShader(filter);
         const oldFilmFilter = filter as unknown as PIXI.filters.OldFilmFilter &
           OldFilmFilterExtra;
         oldFilmFilter._animationTimer = 0;

@@ -3,7 +3,7 @@ describe('gdjs.VariablesContainer', function() {
     this.timeout(20000);
     var container = new gdjs.VariablesContainer();
 
-    const benchmarkSuite = makeBenchmarkSuite();
+    const benchmarkSuite = makeBenchmarkSuite({ iterationsCount: 400000 });
     benchmarkSuite
       .add('get', () => {
         container.get('Var1');

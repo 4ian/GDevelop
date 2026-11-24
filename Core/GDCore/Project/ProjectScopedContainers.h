@@ -19,6 +19,7 @@ class EventsFunctionsExtension;
 class EventsFunction;
 class EventsBasedBehavior;
 class EventsBasedObject;
+class NamedEasingsContainer;
 } // namespace gd
 
 namespace gd {
@@ -46,6 +47,7 @@ class ProjectScopedContainers {
         variablesContainersList(variablesContainersList_),
         legacyGlobalVariables(legacyGlobalVariables_),
         legacySceneVariables(legacySceneVariables_),
+        namedEasings(nullptr),
         propertiesContainersList(propertiesContainersList_),
         resourcesContainersList(resourcesContainersList_){};
   virtual ~ProjectScopedContainers(){};
@@ -243,6 +245,12 @@ class ProjectScopedContainers {
   };
 
   /**
+   * \brief Named easings in this scope (project or the current extension).
+   * Empty when not built by a `MakeNew...` factory.
+   */
+  const gd::NamedEasingsContainer &GetNamedEasings() const;
+
+  /**
    * \brief Return the name of the scene (layout) in scope, or an empty string
    * if the scope is not a scene.
    */
@@ -303,13 +311,16 @@ class ProjectScopedContainers {
   /** Do not use - should be private but accessible to let Emscripten create a
    * temporary. */
   ProjectScopedContainers()
-      : legacyGlobalVariables(nullptr), legacySceneVariables(nullptr){};
+      : legacyGlobalVariables(nullptr),
+        legacySceneVariables(nullptr),
+        namedEasings(nullptr){};
 
 private:
   gd::ObjectsContainersList objectsContainersList;
   gd::VariablesContainersList variablesContainersList;
   const gd::VariablesContainer *legacyGlobalVariables;
   const gd::VariablesContainer *legacySceneVariables;
+  const gd::NamedEasingsContainer *namedEasings;
   gd::PropertiesContainersList propertiesContainersList;
   std::vector<const ParameterMetadataContainer *> parametersVectorsList;
   gd::ResourcesContainersList resourcesContainersList;

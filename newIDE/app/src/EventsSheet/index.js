@@ -180,10 +180,7 @@ type Props = {|
   onOpenExternalEvents: string => void,
   onOpenLayout: string => void,
   resourceManagementProps: ResourceManagementProps,
-  openInstructionOrExpression: (
-    extension: gdPlatformExtension,
-    type: string
-  ) => void,
+  openInstructionOrExpression: (type: string) => void,
   onCreateEventsFunction: (
     extensionName: string,
     eventsFunction: gdEventsFunction
@@ -194,8 +191,13 @@ type Props = {|
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
-  editEventsFunctionParameter: VariableDialogOpeningProps => void,
-  openEventsBasedEntityPropertyEditorDialog: VariableDialogOpeningProps => void,
+  onCreateNewExtensionWithBehavior:
+    | ((project: gdProject, object: gdObject) => void)
+    | null,
+  editEventsFunctionParameter: (VariableDialogOpeningProps => void) | null,
+  openEventsBasedEntityPropertyEditorDialog:
+    | (VariableDialogOpeningProps => void)
+    | null,
 |};
 
 type ComponentProps = {|
@@ -1652,7 +1654,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           // instruction in case of cancellation.
           // As the state change is applied, the inline popover is already
           // gone and we can change the focus without worries.
-          inlineEditingAnchorEl.focus();
+          //
+          // Don't scroll back to it if it was scrolled out of the view.
+          inlineEditingAnchorEl.focus({ preventScroll: true });
         }
       }
     );
@@ -2513,9 +2517,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
               if (this._eventsTree) this._eventsTree.forceEventsUpdate();
             }}
             resourceManagementProps={this.props.resourceManagementProps}
-            openInstructionOrExpression={(extension, type) => {
+            openInstructionOrExpression={type => {
               this.closeInstructionEditor();
-              this.props.openInstructionOrExpression(extension, type);
+              this.props.openInstructionOrExpression(type);
             }}
             canPasteInstructions={
               this.state.editedInstruction.isCondition
@@ -2538,6 +2542,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             }}
             onWillInstallExtension={this.props.onWillInstallExtension}
             onExtensionInstalled={this.props.onExtensionInstalled}
+            onCreateNewExtensionWithBehavior={
+              this.props.onCreateNewExtensionWithBehavior
+            }
             editEventsFunctionParameter={this.props.editEventsFunctionParameter}
             openEventsBasedEntityPropertyEditorDialog={
               this.props.openEventsBasedEntityPropertyEditorDialog

@@ -1,4 +1,9 @@
-import { GLTFLoader, GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
+import {
+  GLTFLoader,
+  GLTF,
+  GLTFParser,
+  GLTFLoaderPlugin,
+} from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils';
 
@@ -17,11 +22,18 @@ import { ColorCorrectionShader } from 'three/examples/jsm/shaders/ColorCorrectio
 import { HueSaturationShader } from 'three/examples/jsm/shaders/HueSaturationShader';
 import { ExposureShader } from 'three/examples/jsm/shaders/ExposureShader';
 
+import { N8AOPass } from '../../../SharedLibs/ThreeAddons/src/n8ao/N8AOPass.js';
+import { SceneDepthRenderPass } from '../../../SharedLibs/ThreeAddons/src/SceneDepthRenderPass.js';
+import { DepthOfFieldPass } from '../../../SharedLibs/ThreeAddons/src/DepthOfFieldPass.js';
+import { LowResolutionBloomPass } from '../../../SharedLibs/ThreeAddons/src/LowResolutionBloomPass.js';
+
 declare global {
   namespace THREE_ADDONS {
     export {
       GLTFLoader,
       GLTF,
+      GLTFParser,
+      GLTFLoaderPlugin,
       DRACOLoader,
       SkeletonUtils,
       TransformControls,
@@ -38,6 +50,10 @@ declare global {
       ColorCorrectionShader,
       HueSaturationShader,
       ExposureShader,
+      N8AOPass,
+      SceneDepthRenderPass,
+      DepthOfFieldPass,
+      LowResolutionBloomPass,
     };
   }
 }

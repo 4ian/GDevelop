@@ -10,7 +10,6 @@
 #include "GDCore/Project/NamedPropertyDescriptor.h"
 #include "GDCore/Project/PropertiesContainer.h"
 #include "GDCore/Project/EventsFunctionsContainer.h"
-#include "GDCore/Project/QuickCustomization.h"
 #include "GDCore/String.h"
 namespace gd {
 class SerializerElement;
@@ -102,18 +101,28 @@ class GD_CORE_API EventsBasedBehavior: public AbstractEventsBasedEntity {
     return *this;
   }
 
-  QuickCustomization::Visibility GetQuickCustomizationVisibility() const {
-    return quickCustomizationVisibility;
-  }
-
-  EventsBasedBehavior& SetQuickCustomizationVisibility(QuickCustomization::Visibility visibility) {
-    quickCustomizationVisibility = visibility;
-    return *this;
-  }
-
   /**
    * \brief Return a reference to the list of shared properties.
    */
+  /**
+   * \brief Check if the behavior is synchronized over the network by default,
+   * when its object is synchronized with other players (multiplayer).
+   */
+  bool IsSynchronizedOverNetworkByDefault() const {
+    return isSynchronizedOverNetworkByDefault;
+  }
+
+  /**
+   * \brief Set if the behavior is synchronized over the network by default.
+   * Behaviors reacting to the inputs of the player should not be synchronized:
+   * only the game of the player owning the object should run them.
+   */
+  EventsBasedBehavior &SetSynchronizedOverNetworkByDefault(
+      bool isSynchronizedOverNetworkByDefault_) {
+    isSynchronizedOverNetworkByDefault = isSynchronizedOverNetworkByDefault_;
+    return *this;
+  }
+
   gd::PropertiesContainer& GetSharedPropertyDescriptors() {
     return sharedPropertyDescriptors;
   }
@@ -162,8 +171,8 @@ class GD_CORE_API EventsBasedBehavior: public AbstractEventsBasedEntity {
 
  private:
   gd::String objectType;
+  bool isSynchronizedOverNetworkByDefault = true;
   gd::PropertiesContainer sharedPropertyDescriptors;
-  QuickCustomization::Visibility quickCustomizationVisibility;
 };
 
 }  // namespace gd

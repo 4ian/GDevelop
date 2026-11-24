@@ -61,6 +61,31 @@ const defaultShortcuts: ShortcutMap = {
   CHOOSE_AND_ADD_EVENT: 'Shift+KeyW',
   MOVE_EVENTS_IN_NEW_GROUP: 'CmdOrCtrl+KeyG',
   OPEN_EXTENSION_SETTINGS: '',
+
+  // Tile map painting tools. Inspired by Godot and Aseprite, but the letters
+  // E, P, G, I and V are already used by the scene editor commands above, so
+  // these tools use Shift with their first letter.
+  TILEMAP_FREEHAND_BRUSH: 'KeyB',
+  TILEMAP_RECTANGLE_PAINT: 'KeyR',
+  TILEMAP_FILL_BUCKET: 'Shift+KeyF',
+  TILEMAP_TILE_PICKER: 'Shift+KeyP',
+  TILEMAP_ERASE: 'Shift+KeyE',
+  TILEMAP_FLIP_HORIZONTALLY: 'Shift+KeyH',
+  TILEMAP_FLIP_VERTICALLY: 'Shift+KeyY',
+
+  // In-game (3D) editor. These shortcuts are only active when the game
+  // preview has the focus, so they can reuse letters of the IDE commands.
+  IN_GAME_EDITOR_TRANSLATE_MODE: 'Digit1',
+  IN_GAME_EDITOR_ROTATE_MODE: 'Digit2',
+  IN_GAME_EDITOR_SCALE_MODE: 'Digit3',
+  IN_GAME_EDITOR_FOCUS_ON_SELECTION: 'KeyF',
+  IN_GAME_EDITOR_MOVE_CAMERA_FORWARD: 'KeyW',
+  IN_GAME_EDITOR_MOVE_CAMERA_BACKWARD: 'KeyS',
+  IN_GAME_EDITOR_MOVE_CAMERA_LEFT: 'KeyA',
+  IN_GAME_EDITOR_MOVE_CAMERA_RIGHT: 'KeyD',
+  IN_GAME_EDITOR_MOVE_CAMERA_UP: 'KeyE',
+  IN_GAME_EDITOR_MOVE_CAMERA_DOWN: 'KeyQ',
+  IN_GAME_EDITOR_ORBIT_CAMERA: 'KeyO',
 };
 
 /**

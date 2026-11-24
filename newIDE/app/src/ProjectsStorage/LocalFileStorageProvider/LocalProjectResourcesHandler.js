@@ -9,6 +9,7 @@ import { mapVector } from '../../Utils/MapFor';
 import newNameGenerator from '../../Utils/NewNameGenerator';
 import optionalLazyRequire from '../../Utils/OptionalLazyRequire';
 import optionalRequire from '../../Utils/OptionalRequire';
+import { copyTextToClipboard } from '../../Utils/Clipboard';
 
 const gd: libGDevelop = global.gd;
 
@@ -61,7 +62,7 @@ export const copyResourceFilePath = ({
     project,
     resource.getName()
   );
-  remote.clipboard.writeText(path.resolve(resourceFilePath));
+  copyTextToClipboard(path.resolve(resourceFilePath));
 };
 
 export const scanForNewResources = async ({

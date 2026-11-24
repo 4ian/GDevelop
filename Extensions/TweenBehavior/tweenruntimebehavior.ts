@@ -1437,6 +1437,7 @@ namespace gdjs {
 
     /**
      * Tween an object opacity.
+     * @deprecated Use addObjectOpacityTween3 instead.
      * @param identifier Unique id to identify the tween
      * @param toOpacity The target opacity
      * @param easing Easing function identifier
@@ -1444,6 +1445,33 @@ namespace gdjs {
      * @param destroyObjectWhenFinished Destroy this object when the tween ends
      */
     addObjectOpacityTween2(
+      identifier: string,
+      toOpacity: float,
+      easing: string,
+      duration: float,
+      destroyObjectWhenFinished: boolean
+    ) {
+      this._addObjectOpacityTween(
+        identifier,
+        toOpacity,
+        easing,
+        duration,
+        destroyObjectWhenFinished,
+        this.owner
+      );
+    }
+
+    /**
+     * Tween an object opacity.
+     * @param opacityBehavior Only used by events can be set to null
+     * @param identifier Unique id to identify the tween
+     * @param toOpacity The target opacity
+     * @param easing Easing function identifier
+     * @param duration Duration in second
+     * @param destroyObjectWhenFinished Destroy this object when the tween ends
+     */
+    addObjectOpacityTween3(
+      opacityBehavior: any,
       identifier: string,
       toOpacity: float,
       easing: string,

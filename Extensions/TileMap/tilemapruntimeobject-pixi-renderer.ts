@@ -12,7 +12,9 @@ namespace gdjs {
       | gdjs.TileMapRuntimeObject
       | gdjs.SimpleTileMapRuntimeObject;
 
-    private _pixiObject: PIXI.tilemap.CompositeTilemap;
+    private _pixiObject: PIXI.tilemap.CompositeTilemap | PIXI.Sprite;
+    private _pixiTileMap: PIXI.tilemap.CompositeTilemap;
+    private _errorSprite: PIXI.Sprite | null = null;
     private _lastCullingLeftBound = 0;
     private _lastCullingRightBound = 0;
     private _lastCullingTopBound = 0;
@@ -34,8 +36,9 @@ namespace gdjs {
       PIXI.tilemap.settings.use32bitIndex = true;
 
       // Load (or reset)
-      this._pixiObject = new PIXI.tilemap.CompositeTilemap();
-      this._pixiObject.tileAnim = [0, 0];
+      this._pixiTileMap = new PIXI.tilemap.CompositeTilemap();
+      this._pixiTileMap.tileAnim = [0, 0];
+      this._pixiObject = this._pixiTileMap;
 
       instanceContainer
         .getLayer('')
@@ -51,12 +54,12 @@ namespace gdjs {
     }
 
     incrementAnimationFrameX(instanceContainer: gdjs.RuntimeInstanceContainer) {
-      this._pixiObject.tileAnim[0] += 1;
+      this._pixiTileMap.tileAnim[0] += 1;
     }
 
     updatePosition(): void {
-      this._pixiObject.pivot.x = this._object.getTileMapWidth() / 2;
-      this._pixiObject.pivot.y = this._object.getTileMapHeight() / 2;
+      this._pixiObject.pivot.x = this._object.getOriginalWidth() / 2;
+      this._pixiObject.pivot.y = this._object.getOriginalHeight() / 2;
       this._pixiObject.position.x = this._object.x + this.getWidth() / 2;
       this._pixiObject.position.y = this._object.y + this.getHeight() / 2;
     }
@@ -76,9 +79,9 @@ namespace gdjs {
       if (!tileMap) return;
       for (const layer of tileMap.getLayers()) {
         const isLayerHidden =
-          (this._object._displayMode === 'index' &&
-            this._object._layerIndex !== layer.id) ||
-          (this._object._displayMode === 'visible' && !layer.isVisible());
+          (this._object.getDisplayMode() === 'index' &&
+            this._object.getDisplayedLayerIndex() !== layer.id) ||
+          (this._object.getDisplayMode() === 'visible' && !layer.isVisible());
 
         // Only set alpha on editable layers that are not hidden,
         // as others are not rendered.
@@ -93,33 +96,33 @@ namespace gdjs {
     }
 
     setWidth(width: float): void {
-      this._pixiObject.scale.x = width / this._object.getTileMapWidth();
+      this._pixiObject.scale.x = width / this._object.getOriginalWidth();
       this._pixiObject.position.x = this._object.x + width / 2;
     }
 
     setHeight(height: float): void {
-      this._pixiObject.scale.y = height / this._object.getTileMapHeight();
+      this._pixiObject.scale.y = height / this._object.getOriginalHeight();
       this._pixiObject.position.y = this._object.y + height / 2;
     }
 
     setScaleX(scaleX: float): void {
       this._pixiObject.scale.x = scaleX;
-      const width = scaleX * this._object.getTileMapWidth();
+      const width = scaleX * this._object.getOriginalWidth();
       this._pixiObject.position.x = this._object.x + width / 2;
     }
 
     setScaleY(scaleY: float): void {
       this._pixiObject.scale.y = scaleY;
-      const height = scaleY * this._object.getTileMapHeight();
+      const height = scaleY * this._object.getOriginalHeight();
       this._pixiObject.position.y = this._object.y + height / 2;
     }
 
     getWidth(): float {
-      return this._object.getTileMapWidth() * this._pixiObject.scale.x;
+      return this._object.getOriginalWidth() * this._pixiObject.scale.x;
     }
 
     getHeight(): float {
-      return this._object.getTileMapHeight() * this._pixiObject.scale.y;
+      return this._object.getOriginalHeight() * this._pixiObject.scale.y;
     }
 
     getScaleX(): float {
@@ -128,6 +131,31 @@ namespace gdjs {
 
     getScaleY(): float {
       return this._pixiObject.scale.y;
+    }
+
+    showErrorTexture() {
+      if (this._errorSprite) {
+        return;
+      }
+      const instanceContainer = this._object.getInstanceContainer();
+      const imageManager = instanceContainer.getGame().getImageManager();
+      this._errorSprite = new PIXI.Sprite(imageManager.getInvalidPIXITexture());
+
+      this._pixiObject.removeFromParent();
+      const hasCustomSize =
+        this._pixiObject.scale.x !== 1 && this._pixiObject.scale.y !== 1;
+      if (hasCustomSize) {
+        this._errorSprite.width = this._pixiObject.width;
+        this._errorSprite.height = this._pixiObject.height;
+      }
+      this._pixiObject = this._errorSprite;
+      instanceContainer
+        .getLayer('')
+        .getRenderer()
+        .addRendererObject(this._pixiObject, this._object.getZOrder());
+      this.updateAngle();
+      this.updateOpacity();
+      this.updatePosition();
     }
 
     refreshPixiTileMap(
@@ -197,23 +225,55 @@ namespace gdjs {
         this._lastCullingBottomBound = bottomBound;
 
         TileMapHelper.PixiTileMapHelper.updatePixiTileMap(
-          this._pixiObject,
+          this._pixiTileMap,
           tileMap,
           textureCache,
           // @ts-ignore
-          this._object._displayMode,
-          this._object._layerIndex,
+          this._object.getDisplayMode(),
+          this._object.getDisplayedLayerIndex(),
           leftBound,
           rightBound,
           topBound,
           bottomBound
         );
       }
+
+      if (this._errorSprite) {
+        this._pixiObject.removeFromParent();
+        const hasCustomSize =
+          this._pixiObject.scale.x !== 1 && this._pixiObject.scale.y !== 1;
+        if (hasCustomSize) {
+          this._pixiTileMap.width = this._pixiObject.width;
+          this._pixiTileMap.height = this._pixiObject.height;
+        } else {
+          this._pixiTileMap.scale.x = 1;
+          this._pixiTileMap.scale.y = 1;
+        }
+        this._pixiObject = this._pixiTileMap;
+        const instanceContainer = this._object.getInstanceContainer();
+        instanceContainer
+          .getLayer('')
+          .getRenderer()
+          .addRendererObject(this._pixiObject, this._object.getZOrder());
+        this.updateAngle();
+        this.updateOpacity();
+        this.updatePosition();
+
+        this._errorSprite.removeFromParent();
+        this._errorSprite.destroy();
+        this._errorSprite = null;
+      }
     }
 
     destroy(): void {
-      // Keep textures because they are shared by all tile maps.
-      this._pixiObject.destroy(false);
+      // Destroy the children too, as each one holds a vertex buffer in the
+      // GPU memory. Keep textures because they are shared by all tile maps.
+      this._pixiTileMap.destroy({ children: true });
+      if (this._errorSprite) {
+        this._errorSprite.removeFromParent();
+        this._errorSprite.destroy();
+        this._errorSprite = null;
+      }
     }
   }
 

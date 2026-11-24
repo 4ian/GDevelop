@@ -31,7 +31,7 @@ const SaveAsOptionsDialog = (props: Props): React.Node => {
 
   const onSave = (i18n: I18nType) => {
     setError(null);
-    if (!name) {
+    if (!name.trim()) {
       setError(i18n._(t`Project name cannot be empty.`));
       return;
     }

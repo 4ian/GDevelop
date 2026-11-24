@@ -266,7 +266,11 @@ module.exports = {
           return true;
         }
 
-        if (propertyName === 'layers') {
+        // Both edit the layers of the static and of the moving objects.
+        if (
+          propertyName === 'layers' ||
+          propertyName === 'layersIfDynamicOrKinematic'
+        ) {
           behaviorContent
             .getOrCreateChild('layers')
             .setIntValue(parseInt(newValue, 10));
@@ -285,12 +289,17 @@ module.exports = {
       behavior.getProperties = function (behaviorContent) {
         const behaviorProperties = new gd.MapStringPropertyDescriptor();
 
+        // The shape decides which dimensions are meaningful and how they
+        // should be labelled, so these properties adapt themselves to it.
+        const shape = behaviorContent.getChild('shape').getStringValue();
+        const isBoxShape = shape === 'Box';
+        const isMeshShape = shape === 'Mesh';
+
         behaviorProperties
           .getOrCreate('object3D')
           .setValue(behaviorContent.getChild('object3D').getStringValue())
           .setType('Behavior')
           .setLabel('3D capability')
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .addExtraInfo('Scene3D::Base3DBehavior');
 
         behaviorProperties
@@ -298,13 +307,12 @@ module.exports = {
           .setValue(behaviorContent.getChild('bodyType').getStringValue())
           .setType('Choice')
           .setLabel('Type')
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .addChoice('Static', _('Static'))
           .addChoice('Dynamic', _('Dynamic'))
           .addChoice('Kinematic', _('Kinematic'))
           .setDescription(
             _(
-              "A static object won't move (perfect for obstacles). Dynamic objects can move. Kinematic will move according to forces applied to it only (useful for characters or specific mechanisms)."
+              'A static object won\'t move (perfect for obstacles). Dynamic objects are moved by the physics engine (gravity, forces and collisions). Kinematic objects are only moved by their velocity or by other behaviors, and push dynamic objects without being pushed (useful for moving platforms, or characters moved by a pathfinding behavior). The type can be changed during the game with the "Body type" action.'
             )
           )
           .setHasImpactOnOtherProperties(true);
@@ -313,7 +321,6 @@ module.exports = {
           .setValue(
             behaviorContent.getChild('bullet').getBoolValue() ? 'true' : 'false'
           )
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .setType('Boolean')
           .setLabel(_('Considered as a bullet'))
           .setDescription(
@@ -330,7 +337,6 @@ module.exports = {
               ? 'true'
               : 'false'
           )
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .setType('Boolean')
           .setLabel('Fixed Rotation')
           .setDescription(
@@ -343,13 +349,18 @@ module.exports = {
           .getOrCreate('shape')
           .setValue(behaviorContent.getChild('shape').getStringValue())
           .setType('Choice')
-          .setLabel('Shape')
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+          .setLabel(_('Shape'))
+          .setDescription(
+            _(
+              'The shape used for collisions. It gives their meaning to the dimension properties. A capsule or a cylinder is extended along the axis given by "Shape orientation" and a mesh uses the model given by "Simplified 3D model". Objects giving their own surface, like terrains, always use it and are static.'
+            )
+          )
           .addChoice('Box', _('Box'))
           .addChoice('Capsule', _('Capsule'))
           .addChoice('Sphere', _('Sphere'))
           .addChoice('Cylinder', _('Cylinder'))
-          .addChoice('Mesh', _('Mesh (works for Static only)'));
+          .addChoice('Mesh', _('Mesh (works for Static only)'))
+          .setHasImpactOnOtherProperties(true);
         behaviorProperties
           .getOrCreate('meshShapeResourceName')
           .setValue(
@@ -357,9 +368,10 @@ module.exports = {
           )
           .setType('resource')
           .addExtraInfo('model3D')
-          .setLabel(_("Simplified 3D model (leave empty to use object's one)"))
-          // Hidden as required to be changed in the full editor.
-          .setHidden(true)
+          .setLabel(_('Simplified 3D model'))
+          .setDescription(_("Leave empty to use object's one"))
+          // Only used by the "Mesh" shape.
+          .setHidden(!isMeshShape)
           .setHasImpactOnOtherProperties(true);
         behaviorProperties
           .getOrCreate('shapeOrientation')
@@ -367,11 +379,15 @@ module.exports = {
             behaviorContent.getChild('shapeOrientation').getStringValue()
           )
           .setType('Choice')
-          .setLabel('Shape orientation')
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+          .setLabel(_('Shape orientation'))
+          .setDescription(
+            _('Axis along which the capsule or cylinder is extended.')
+          )
           .addChoice('Z', _('Z'))
           .addChoice('Y', _('Y'))
-          .addChoice('X', _('X'));
+          .addChoice('X', _('X'))
+          // Only capsules and cylinders can be oriented.
+          .setHidden(shape !== 'Capsule' && shape !== 'Cylinder');
         behaviorProperties
           .getOrCreate('shapeDimensionA')
           .setValue(
@@ -382,9 +398,14 @@ module.exports = {
           )
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-          .setLabel('Shape Dimension A')
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .setHidden(true); // Hidden as required to be changed in the full editor.
+          .setLabel(isBoxShape ? _('Width') : _('Radius'))
+          .setDescription(
+            _(
+              'Width of the box, or radius of the sphere, capsule or cylinder. Use 0 to follow the object size.'
+            )
+          )
+          // The "Mesh" shape uses a 3D model instead of dimensions.
+          .setHidden(isMeshShape);
         behaviorProperties
           .getOrCreate('shapeDimensionB')
           .setValue(
@@ -395,9 +416,14 @@ module.exports = {
           )
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-          .setLabel('Shape Dimension B')
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .setHidden(true); // Hidden as required to be changed in the full editor.
+          .setLabel(isBoxShape ? _('Height') : _('Depth'))
+          .setDescription(
+            _(
+              'Height of the box, or size of the capsule or cylinder along its orientation axis. Not used by a sphere. Use 0 to follow the object size.'
+            )
+          )
+          // A sphere only needs a radius and a mesh uses a 3D model.
+          .setHidden(isMeshShape || shape === 'Sphere');
         behaviorProperties
           .getOrCreate('shapeDimensionC')
           .setValue(
@@ -408,9 +434,14 @@ module.exports = {
           )
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-          .setLabel('Shape Dimension C')
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .setHidden(true); // Hidden as required to be changed in the full editor.
+          .setLabel(_('Depth'))
+          .setDescription(
+            _(
+              'Depth of the box. Only used by a box. Use 0 to follow the object depth.'
+            )
+          )
+          // Only a box has a third dimension to configure.
+          .setHidden(!isBoxShape);
         if (!behaviorContent.hasChild('shapeOffsetX')) {
           behaviorContent.addChild('shapeOffsetX').setDoubleValue(0);
         }
@@ -424,10 +455,13 @@ module.exports = {
           )
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-          .setLabel('Shape offset X')
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .setAdvanced(true)
-          .setHidden(true); // Hidden as required to be changed in the full editor.
+          .setLabel(_('Shape offset X'))
+          .setDescription(
+            _(
+              'Offset of the collision shape relative to the object center, on the X axis.'
+            )
+          )
+          .setAdvanced(true);
         if (!behaviorContent.hasChild('shapeOffsetY')) {
           behaviorContent.addChild('shapeOffsetY').setDoubleValue(0);
         }
@@ -441,9 +475,13 @@ module.exports = {
           )
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-          .setLabel('Shape offset Y')
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .setHidden(true); // Hidden as required to be changed in the full editor.
+          .setLabel(_('Shape offset Y'))
+          .setDescription(
+            _(
+              'Offset of the collision shape relative to the object center, on the Y axis.'
+            )
+          )
+          .setAdvanced(true);
         if (!behaviorContent.hasChild('shapeOffsetZ')) {
           behaviorContent.addChild('shapeOffsetZ').setDoubleValue(0);
         }
@@ -457,10 +495,13 @@ module.exports = {
           )
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-          .setLabel('Shape offset Z')
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .setAdvanced(true)
-          .setHidden(true); // Hidden as required to be changed in the full editor.
+          .setLabel(_('Shape offset Z'))
+          .setDescription(
+            _(
+              'Offset of the collision shape relative to the object center, on the Z axis.'
+            )
+          )
+          .setAdvanced(true);
         if (!behaviorContent.hasChild('massCenterOffsetX')) {
           behaviorContent.addChild('massCenterOffsetX').setDoubleValue(0);
         }
@@ -474,10 +515,13 @@ module.exports = {
           )
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-          .setLabel('Center of mass offset X')
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .setAdvanced(true)
-          .setHidden(true); // Hidden as required to be changed in the full editor.
+          .setLabel(_('Center of mass X'))
+          .setDescription(
+            _(
+              'Offset of the center of mass relative to the object center, on the X axis.'
+            )
+          )
+          .setAdvanced(true);
         if (!behaviorContent.hasChild('massCenterOffsetY')) {
           behaviorContent.addChild('massCenterOffsetY').setDoubleValue(0);
         }
@@ -491,10 +535,13 @@ module.exports = {
           )
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-          .setLabel('Center of mass offset Y')
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .setAdvanced(true)
-          .setHidden(true); // Hidden as required to be changed in the full editor.
+          .setLabel(_('Center of mass Y'))
+          .setDescription(
+            _(
+              'Offset of the center of mass relative to the object center, on the Y axis.'
+            )
+          )
+          .setAdvanced(true);
         if (!behaviorContent.hasChild('massCenterOffsetZ')) {
           behaviorContent.addChild('massCenterOffsetZ').setDoubleValue(0);
         }
@@ -508,10 +555,13 @@ module.exports = {
           )
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-          .setLabel('Center of mass offset Z')
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .setAdvanced(true)
-          .setHidden(true); // Hidden as required to be changed in the full editor.
+          .setLabel(_('Center of mass Z'))
+          .setDescription(
+            _(
+              'Offset of the center of mass relative to the object center, on the Z axis.'
+            )
+          )
+          .setAdvanced(true);
         behaviorProperties
           .getOrCreate('density')
           .setValue(
@@ -600,7 +650,6 @@ module.exports = {
               "Angular damping reduces an object's rotational speed over time, making its spins slow down smoothly."
             )
           )
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .setGroup(_('Movement'));
         behaviorProperties
           .getOrCreate('gravityScale')
@@ -618,27 +667,62 @@ module.exports = {
             )
           )
 
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .setGroup(_('Gravity'))
           .setAdvanced(true);
+        // Static objects use the layers 1 to 4 and moving ones the layers 5 to
+        // 8, so that they never register in the wrong layer group. Both are
+        // shown, as the type can be changed during the game.
+        const staticCollisionFilteringGroup =
+          _('Collision filtering') + ' > ' + _('If static');
+        const movingCollisionFilteringGroup =
+          _('Collision filtering') + ' > ' + _('If dynamic or kinematic');
+        const layersValue = behaviorContent
+          .getChild('layers')
+          .getIntValue()
+          .toString(10);
         behaviorProperties
           .getOrCreate('layers')
-          .setValue(
-            behaviorContent.getChild('layers').getIntValue().toString(10)
+          .setValue(layersValue)
+          .setType('Bitmask')
+          .addExtraInfo('bitCount=4')
+          .addExtraInfo('firstBit=0')
+          .setLabel(_('Layers'))
+          .setDescription(
+            _(
+              'Layers the object belongs to while it is static: the layers 1 to 4. A static object collides with the dynamic and kinematic objects whose masks include its layers.'
+            )
           )
-          .setType('Number')
-          .setLabel('Layers')
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .setHidden(true); // Hidden as required to be changed in the full editor.
+          .setGroup(staticCollisionFilteringGroup)
+          .setAdvanced(true);
+        behaviorProperties
+          .getOrCreate('layersIfDynamicOrKinematic')
+          .setValue(layersValue)
+          .setType('Bitmask')
+          .addExtraInfo('bitCount=4')
+          .addExtraInfo('firstBit=4')
+          .setLabel(_('Layers'))
+          .setDescription(
+            _(
+              'Layers the object belongs to while it is dynamic or kinematic: the layers 5 to 8.'
+            )
+          )
+          .setGroup(movingCollisionFilteringGroup)
+          .setAdvanced(true);
         behaviorProperties
           .getOrCreate('masks')
           .setValue(
             behaviorContent.getChild('masks').getIntValue().toString(10)
           )
-          .setType('Number')
-          .setLabel('Masks')
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .setHidden(true); // Hidden as required to be changed in the full editor.
+          .setType('Bitmask')
+          .addExtraInfo('bitCount=8')
+          .setLabel(_('Masks (collides with)'))
+          .setDescription(
+            _(
+              'Layers the object collides with while it is dynamic or kinematic: the layers 1 to 4 of the static objects, and the layers 5 to 8 of the dynamic and kinematic objects. A static object has no masks: it collides with the dynamic and kinematic objects whose masks include its layers.'
+            )
+          )
+          .setGroup(movingCollisionFilteringGroup)
+          .setAdvanced(true);
 
         return behaviorProperties;
       };
@@ -910,6 +994,29 @@ module.exports = {
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
         .getCodeExtraInformation()
         .setFunctionName('isKinematic');
+
+      aut
+        .addScopedAction(
+          'SetBodyType',
+          _('Body type'),
+          _(
+            'Change the type of the body: static, dynamic or kinematic. For instance, an enemy moved by a pathfinding behavior can be kinematic, and become dynamic to be thrown by an impulse when it is hit. The velocities are kept. Static bodies are in the layers 1 to 4, dynamic and kinematic bodies in the layers 5 to 8: with the default layers (1 and 5), the object collides with the same objects after the change. Nothing is changed while a 3D character or 3D car behavior of the object is activated (it gets back its type from the editor when activated again), and for mesh shapes (only static).'
+          ),
+          _('Change the body type of _PARAM0_ to _PARAM2_'),
+          _('Dynamics'),
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+        .addParameter(
+          'stringWithSelector',
+          _('Body type'),
+          '["Static", "Dynamic", "Kinematic"]',
+          false
+        )
+        .getCodeExtraInformation()
+        .setFunctionName('setBodyType');
 
       aut
         .addScopedCondition(
@@ -1914,7 +2021,6 @@ module.exports = {
           .setValue(behaviorContent.getChild('physics3D').getStringValue())
           .setType('Behavior')
           .setLabel('3D physics')
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .addExtraInfo('Physics3D::Physics3DBehavior');
 
         behaviorProperties
@@ -1930,7 +2036,6 @@ module.exports = {
         behaviorProperties
           .getOrCreate('jumpSustainTime')
           .setLabel(_('Jump sustain time'))
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .setGroup(_('Jump'))
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getSecond())
@@ -2052,7 +2157,7 @@ module.exports = {
 
         behaviorProperties
           .getOrCreate('slopeMaxAngle')
-          .setLabel('Slope max. angle')
+          .setLabel(_('Slope max. angle'))
           .setGroup(_('Walk'))
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
@@ -2062,15 +2167,14 @@ module.exports = {
               .getDoubleValue()
               .toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         if (!behaviorContent.hasChild('stairHeightMax')) {
           behaviorContent.addChild('stairHeightMax').setDoubleValue(20);
         }
         behaviorProperties
           .getOrCreate('stairHeightMax')
-          .setLabel('Max. stair height')
+          .setLabel(_('Max. stair height'))
           .setGroup(_('Walk'))
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
@@ -2080,12 +2184,11 @@ module.exports = {
               .getDoubleValue()
               .toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         behaviorProperties
           .getOrCreate('shouldBindObjectAndForwardAngle')
-          .setLabel('Keep object angle and forward direction the same')
+          .setLabel(_('Keep object angle and forward direction the same'))
           .setGroup(_('Walk'))
           .setType('Boolean')
           .setValue(
@@ -2095,15 +2198,14 @@ module.exports = {
               ? 'true'
               : 'false'
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         if (!behaviorContent.hasChild('canBePushed')) {
           behaviorContent.addChild('canBePushed').setBoolValue(true);
         }
         behaviorProperties
           .getOrCreate('canBePushed')
-          .setLabel('Can be pushed by other characters')
+          .setLabel(_('Can be pushed by other characters'))
           .setGroup(_('Walk'))
           .setType('Boolean')
           .setValue(
@@ -2111,8 +2213,7 @@ module.exports = {
               ? 'true'
               : 'false'
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         return behaviorProperties;
       };
@@ -3048,6 +3149,78 @@ module.exports = {
           return true;
         }
 
+        if (propertyName === 'steerReturnSpeed') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getOrCreateChild('steerReturnSpeed')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'corneringForceMax') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getOrCreateChild('corneringForceMax')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'suspensionTravel') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getOrCreateChild('suspensionTravel')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'suspensionFrequency') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getOrCreateChild('suspensionFrequency')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'suspensionDamping') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getOrCreateChild('suspensionDamping')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'gearSwitchDuration') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getOrCreateChild('gearSwitchDuration')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'gearShiftUpEngineSpeed') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getOrCreateChild('gearShiftUpEngineSpeed')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'gearShiftDownEngineSpeed') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getOrCreateChild('gearShiftDownEngineSpeed')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
         return false;
       };
       behavior.getProperties = function (behaviorContent) {
@@ -3058,7 +3231,6 @@ module.exports = {
           .setValue(behaviorContent.getChild('physics3D').getStringValue())
           .setType('Behavior')
           .setLabel('3D physics')
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .addExtraInfo('Physics3D::Physics3DBehavior');
 
         behaviorProperties
@@ -3072,8 +3244,7 @@ module.exports = {
               .getChild('steerAngleMax')
               .getDoubleValue()
               .toString(10)
-          )
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          );
 
         behaviorProperties
           .getOrCreate('beginningSteerSpeed')
@@ -3086,8 +3257,7 @@ module.exports = {
               .getChild('beginningSteerSpeed')
               .getDoubleValue()
               .toString(10)
-          )
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          );
 
         behaviorProperties
           .getOrCreate('endSteerSpeed')
@@ -3100,8 +3270,7 @@ module.exports = {
               .getChild('endSteerSpeed')
               .getDoubleValue()
               .toString(10)
-          )
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          );
 
         behaviorProperties
           .getOrCreate('engineTorqueMax')
@@ -3154,8 +3323,7 @@ module.exports = {
               .getDoubleValue()
               .toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         behaviorProperties
           .getOrCreate('gearRatio1')
@@ -3165,8 +3333,7 @@ module.exports = {
           .setValue(
             behaviorContent.getChild('gearRatio1').getDoubleValue().toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         behaviorProperties
           .getOrCreate('gearRatio2')
@@ -3176,8 +3343,7 @@ module.exports = {
           .setValue(
             behaviorContent.getChild('gearRatio2').getDoubleValue().toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         behaviorProperties
           .getOrCreate('gearRatio3')
@@ -3187,8 +3353,7 @@ module.exports = {
           .setValue(
             behaviorContent.getChild('gearRatio3').getDoubleValue().toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         behaviorProperties
           .getOrCreate('gearRatio4')
@@ -3198,8 +3363,7 @@ module.exports = {
           .setValue(
             behaviorContent.getChild('gearRatio4').getDoubleValue().toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         behaviorProperties
           .getOrCreate('gearRatio5')
@@ -3209,8 +3373,7 @@ module.exports = {
           .setValue(
             behaviorContent.getChild('gearRatio5').getDoubleValue().toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         behaviorProperties
           .getOrCreate('gearRatio6')
@@ -3220,8 +3383,7 @@ module.exports = {
           .setValue(
             behaviorContent.getChild('gearRatio6').getDoubleValue().toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         behaviorProperties
           .getOrCreate('wheelRadius')
@@ -3234,8 +3396,7 @@ module.exports = {
               .getChild('wheelRadius')
               .getDoubleValue()
               .toString(10)
-          )
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          );
 
         behaviorProperties
           .getOrCreate('wheelWidth')
@@ -3245,8 +3406,7 @@ module.exports = {
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
           .setValue(
             behaviorContent.getChild('wheelWidth').getDoubleValue().toString(10)
-          )
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          );
 
         behaviorProperties
           .getOrCreate('backWheelOffsetX')
@@ -3261,8 +3421,7 @@ module.exports = {
               .getDoubleValue()
               .toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         behaviorProperties
           .getOrCreate('frontWheelOffsetX')
@@ -3277,8 +3436,7 @@ module.exports = {
               .getDoubleValue()
               .toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         behaviorProperties
           .getOrCreate('wheelOffsetY')
@@ -3293,8 +3451,7 @@ module.exports = {
               .getDoubleValue()
               .toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         behaviorProperties
           .getOrCreate('wheelOffsetZ')
@@ -3309,8 +3466,7 @@ module.exports = {
               .getDoubleValue()
               .toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         behaviorProperties
           .getOrCreate('brakeTorqueMax')
@@ -3322,8 +3478,7 @@ module.exports = {
               .getChild('brakeTorqueMax')
               .getDoubleValue()
               .toString(10)
-          )
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          );
 
         behaviorProperties
           .getOrCreate('handBrakeTorqueMax')
@@ -3335,8 +3490,7 @@ module.exports = {
               .getChild('handBrakeTorqueMax')
               .getDoubleValue()
               .toString(10)
-          )
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          );
 
         behaviorProperties
           .getOrCreate('hasBackWheelDrive')
@@ -3345,12 +3499,10 @@ module.exports = {
               ? 'true'
               : 'false'
           )
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .setType('Boolean')
           .setLabel(_('Back wheel drive'))
           .setGroup(_('Wheels'))
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         behaviorProperties
           .getOrCreate('hasFrontWheelDrive')
@@ -3359,12 +3511,10 @@ module.exports = {
               ? 'true'
               : 'false'
           )
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .setType('Boolean')
           .setLabel(_('Front wheel drive'))
           .setGroup(_('Wheels'))
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         behaviorProperties
           .getOrCreate('pitchRollAngleMax')
@@ -3378,8 +3528,174 @@ module.exports = {
               .getDoubleValue()
               .toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
+
+        if (!behaviorContent.hasChild('steerReturnSpeed')) {
+          behaviorContent.addChild('steerReturnSpeed').setDoubleValue(0);
+        }
+        behaviorProperties
+          .getOrCreate('steerReturnSpeed')
+          .setLabel(_('Steer return speed'))
+          .setDescription(
+            _(
+              'How fast the wheels straighten when the steering is released. 0 straightens them instantly.'
+            )
+          )
+          .setGroup(_('Steering'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getAngularSpeed())
+          .setValue(
+            behaviorContent
+              .getChild('steerReturnSpeed')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setAdvanced(true);
+
+        if (!behaviorContent.hasChild('corneringForceMax')) {
+          behaviorContent.addChild('corneringForceMax').setDoubleValue(0);
+        }
+        behaviorProperties
+          .getOrCreate('corneringForceMax')
+          .setLabel(_('Max cornering force (in g)'))
+          .setDescription(
+            _(
+              'Reduces the steer angle as the speed increases, to keep turning under this force. Around 2 feels like an arcade racing game. 0 for no limit.'
+            )
+          )
+          .setGroup(_('Steering'))
+          .setType('Number')
+          .setValue(
+            behaviorContent
+              .getChild('corneringForceMax')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setAdvanced(true);
+
+        if (!behaviorContent.hasChild('suspensionTravel')) {
+          behaviorContent.addChild('suspensionTravel').setDoubleValue(0);
+        }
+        behaviorProperties
+          .getOrCreate('suspensionTravel')
+          .setLabel(_('Suspension travel'))
+          .setDescription(
+            _(
+              'How much the wheels can move up and down. 0 uses half of the wheel radius.'
+            )
+          )
+          .setGroup(_('Wheels'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setValue(
+            behaviorContent
+              .getChild('suspensionTravel')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setAdvanced(true);
+
+        if (!behaviorContent.hasChild('suspensionFrequency')) {
+          behaviorContent.addChild('suspensionFrequency').setDoubleValue(1.5);
+        }
+        behaviorProperties
+          .getOrCreate('suspensionFrequency')
+          .setLabel(_('Suspension frequency (in Hz)'))
+          .setDescription(
+            _(
+              'The stiffness of the suspension. Increase it with the gravity scale, otherwise the car rests on its suspension stops.'
+            )
+          )
+          .setGroup(_('Wheels'))
+          .setType('Number')
+          .setValue(
+            behaviorContent
+              .getChild('suspensionFrequency')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setAdvanced(true);
+
+        if (!behaviorContent.hasChild('suspensionDamping')) {
+          behaviorContent.addChild('suspensionDamping').setDoubleValue(0.5);
+        }
+        behaviorProperties
+          .getOrCreate('suspensionDamping')
+          .setLabel(_('Suspension damping'))
+          .setDescription(
+            _('How fast the suspension stops bouncing. 1 removes any bounce.')
+          )
+          .setGroup(_('Wheels'))
+          .setType('Number')
+          .setValue(
+            behaviorContent
+              .getChild('suspensionDamping')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setAdvanced(true);
+
+        if (!behaviorContent.hasChild('gearSwitchDuration')) {
+          behaviorContent.addChild('gearSwitchDuration').setDoubleValue(0.5);
+        }
+        behaviorProperties
+          .getOrCreate('gearSwitchDuration')
+          .setLabel(_('Gear switch duration'))
+          .setDescription(
+            _('The time without engine power when switching gears.')
+          )
+          .setGroup(_('Speed'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getSecond())
+          .setValue(
+            behaviorContent
+              .getChild('gearSwitchDuration')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setAdvanced(true);
+
+        if (!behaviorContent.hasChild('gearShiftUpEngineSpeed')) {
+          behaviorContent
+            .addChild('gearShiftUpEngineSpeed')
+            .setDoubleValue(4000);
+        }
+        behaviorProperties
+          .getOrCreate('gearShiftUpEngineSpeed')
+          .setLabel(_('Engine speed to shift up'))
+          .setDescription(
+            _('The engine speed from which a higher gear is used.')
+          )
+          .setGroup(_('Speed'))
+          .setType('Number')
+          .setValue(
+            behaviorContent
+              .getChild('gearShiftUpEngineSpeed')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setAdvanced(true);
+
+        if (!behaviorContent.hasChild('gearShiftDownEngineSpeed')) {
+          behaviorContent
+            .addChild('gearShiftDownEngineSpeed')
+            .setDoubleValue(2000);
+        }
+        behaviorProperties
+          .getOrCreate('gearShiftDownEngineSpeed')
+          .setLabel(_('Engine speed to shift down'))
+          .setDescription(
+            _('The engine speed under which a lower gear is used.')
+          )
+          .setGroup(_('Speed'))
+          .setType('Number')
+          .setValue(
+            behaviorContent
+              .getChild('gearShiftDownEngineSpeed')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setAdvanced(true);
 
         return behaviorProperties;
       };
@@ -3410,6 +3726,16 @@ module.exports = {
         behaviorContent.addChild('hasBackWheelDrive').setBoolValue(false);
         behaviorContent.addChild('hasFrontWheelDrive').setBoolValue(true);
         behaviorContent.addChild('pitchRollAngleMax').setDoubleValue(90);
+        behaviorContent.addChild('steerReturnSpeed').setDoubleValue(0);
+        behaviorContent.addChild('corneringForceMax').setDoubleValue(0);
+        behaviorContent.addChild('suspensionTravel').setDoubleValue(0);
+        behaviorContent.addChild('suspensionFrequency').setDoubleValue(1.5);
+        behaviorContent.addChild('suspensionDamping').setDoubleValue(0.5);
+        behaviorContent.addChild('gearSwitchDuration').setDoubleValue(0.5);
+        behaviorContent.addChild('gearShiftUpEngineSpeed').setDoubleValue(4000);
+        behaviorContent
+          .addChild('gearShiftDownEngineSpeed')
+          .setDoubleValue(2000);
       };
       const aut = extension
         .addBehavior(

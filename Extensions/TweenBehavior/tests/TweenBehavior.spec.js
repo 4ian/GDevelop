@@ -244,6 +244,42 @@ describe('gdjs.TweenRuntimeBehavior', () => {
     expect(object.getX()).to.be(123);
   });
 
+  it('can play a tween with a duration of 0', () => {
+    object.setPosition(200, 300);
+
+    behavior.addObjectPositionXTween2('MyTween', 600, 'linear', 0, false);
+
+    // Tween actions don't change the value directly.
+    expect(object.getX()).to.be(200);
+    expect(behavior.getValue('MyTween')).to.be(200);
+    expect(behavior.isPlaying('MyTween')).to.be(true);
+    expect(behavior.hasFinished('MyTween')).to.be(false);
+
+    // The tween reaches the end on its first step.
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(behavior.isPlaying('MyTween')).to.be(false);
+    expect(behavior.hasFinished('MyTween')).to.be(true);
+    expect(object.getX()).to.be(600);
+    expect(behavior.getValue('MyTween')).to.be(600);
+    expect(behavior.getProgress('MyTween')).to.be(1);
+
+    // The value is not set to the targeted value over and over
+    // after the tween is finished.
+    object.setX(123);
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(object.getX()).to.be(123);
+  });
+
+  it('can remove the object at the end of a tween with a duration of 0', () => {
+    object.setPosition(200, 300);
+
+    behavior.addObjectPositionXTween2('MyTween', 600, 'linear', 0, true);
+
+    expect(runtimeScene.getInstancesCountOnScene('Object')).to.be(1);
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(runtimeScene.getInstancesCountOnScene('Object')).to.be(0);
+  });
+
   it('can remove the object at the end', () => {
     object.setPosition(200, 300);
 
@@ -577,7 +613,8 @@ describe('gdjs.TweenRuntimeBehavior', () => {
 
   it('can tween the opacity', () => {
     sprite.setOpacity(128);
-    spriteBehavior.addObjectOpacityTween2(
+    spriteBehavior.addObjectOpacityTween3(
+      null,
       'MyTween',
       255,
       'linear',
@@ -916,6 +953,96 @@ describe('gdjs.TweenRuntimeBehavior', () => {
     expect(cube.getX()).to.be(100);
     expect(cube.getY()).to.be(400);
     expect(cube.getZ()).to.be(800);
+  });
+
+  it('moves an object with cubic-bezier(0,0,1,1) as linear does', () => {
+    object.setPosition(200, 300);
+    behavior.addObjectPositionXTween2(
+      'MyTween',
+      600,
+      'cubic-bezier(0,0,1,1)',
+      0.25,
+      false
+    );
+
+    const linearScene = createScene();
+    linearScene.getLayer('').setTimeScale(1.5);
+    const linearObject = addObject(linearScene);
+    linearObject.setPosition(200, 300);
+    const linearBehavior = /** @type {gdjs.TweenRuntimeBehavior} */ (
+      linearObject.getBehavior(behaviorName)
+    );
+    linearBehavior.addObjectPositionXTween2(
+      'MyTween',
+      600,
+      'linear',
+      0.25,
+      false
+    );
+
+    for (let i = 0; i < 12; i++) {
+      runtimeScene.renderAndStep(1000 / 60);
+      linearScene.renderAndStep(1000 / 60);
+      expect(object.getX()).to.be(linearObject.getX());
+    }
+  });
+
+  it('moves an object with a custom easing as ease() does', () => {
+    const easingIdentifier = 'cubic-bezier(.42,0,.58,1)';
+    object.setPosition(200, 300);
+    behavior.addObjectPositionXTween2(
+      'MyTween',
+      600,
+      easingIdentifier,
+      0.25,
+      false
+    );
+
+    for (let i = 0; i < 3; i++) {
+      runtimeScene.renderAndStep(1000 / 60);
+    }
+
+    const progress = behavior.getProgress('MyTween');
+    expect(object.getX()).to.be(
+      gdjs.evtTools.tween.ease(easingIdentifier, 200, 600, progress)
+    );
+    expect(object.getX()).not.to.be(
+      gdjs.evtTools.tween.ease('linear', 200, 600, progress)
+    );
+  });
+
+  it('does not start a tween when the custom easing is invalid', () => {
+    object.setPosition(200, 300);
+    behavior.addObjectPositionXTween2(
+      'MyTween',
+      600,
+      'cubic-bezier(2,0,1,1)',
+      0.25,
+      false
+    );
+    expect(behavior.exists('MyTween')).to.be(false);
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(object.getX()).to.be(200);
+  });
+
+  it('goes past the target with a custom easing that overshoots', () => {
+    object.setPosition(200, 300);
+    behavior.addObjectPositionXTween2(
+      'MyTween',
+      600,
+      'cubic-bezier(.34,1.56,.64,1)',
+      0.25,
+      false
+    );
+
+    let wentPastTarget = false;
+    for (let i = 0; i < 30 && !behavior.hasFinished('MyTween'); i++) {
+      runtimeScene.renderAndStep(1000 / 60);
+      if (object.getX() > 600) wentPastTarget = true;
+    }
+    expect(wentPastTarget).to.be(true);
+    expect(behavior.hasFinished('MyTween')).to.be(true);
+    expect(object.getX()).to.be(600);
   });
 
   it('can tween the scales of a cube from center', () => {

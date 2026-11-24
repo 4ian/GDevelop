@@ -28,6 +28,7 @@ const instancesEditorSettings: InstancesEditorSettings = {
   windowMask: false,
   selectedLayer: '',
   gameEditorMode: 'instances-editor',
+  editorMode: '2d-editor',
 };
 
 export default {
@@ -74,6 +75,7 @@ export const Default = (): React.Node => (
           onShift1: () => {},
           onShift2: () => {},
           onShift3: () => {},
+          onFocusOnSelection: () => {},
         }}
         wrappedEditorRef={() => {}}
         pauseRendering={false}

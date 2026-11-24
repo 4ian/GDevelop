@@ -24,6 +24,8 @@ import {
   type Course,
   doesAssetPackContainAudio,
   isAssetPackAudioOnly,
+  isEffectAssetMadeFor,
+  type EffectTarget,
 } from '../Utils/GDevelopServices/Asset';
 import {
   type PrivateAssetPackListingData,
@@ -82,7 +84,11 @@ type Props = {|
   onCourseOpen?: (courseId: string) => void,
   getCourseCompletion?: (courseId: string) => CourseCompletion | null,
   assetSwappedObject?: ?gdObject,
-  minimalUI?: boolean,
+  // Only list the assets of these object types, without packs.
+  fixedObjectTypes?: ?Array<string>,
+  // Only list the effect assets made for objects, or for layers.
+  fixedEffectTarget?: EffectTarget,
+  noResultsPlaceholder?: React.Node,
 |};
 
 export type AssetStoreInterface = {|
@@ -128,7 +134,9 @@ export const AssetStore: React.ComponentType<{
       onCourseOpen,
       getCourseCompletion,
       assetSwappedObject,
-      minimalUI,
+      fixedObjectTypes,
+      fixedEffectTarget,
+      noResultsPlaceholder,
     }: Props,
     ref
   ) => {
@@ -194,6 +202,53 @@ export const AssetStore: React.ComponentType<{
       ]
     );
 
+    const hasFixedObjectTypes = !!fixedObjectTypes;
+    const fixedObjectTypesKey = fixedObjectTypes
+      ? fixedObjectTypes.join(',')
+      : null;
+    const appliedFixedObjectTypesKey = React.useRef<?string>(null);
+    React.useEffect(
+      () => {
+        if (appliedFixedObjectTypesKey.current === fixedObjectTypesKey) return;
+        appliedFixedObjectTypesKey.current = fixedObjectTypesKey;
+        if (fixedObjectTypesKey === null) return;
+
+        // Same page as when swapping an asset: a list of assets with no packs.
+        shopNavigationState.openAssetSwapping();
+        setAssetStoreSearchText('');
+        clearAllAssetStoreFilters();
+        const assetsListInterface = assetsList.current;
+        if (assetsListInterface) {
+          assetsListInterface.scrollToPosition(0);
+          assetsListInterface.setPageBreakIndex(0);
+        }
+      },
+      [
+        fixedObjectTypesKey,
+        clearAllAssetStoreFilters,
+        setAssetStoreSearchText,
+        shopNavigationState,
+      ]
+    );
+    // The filters are shared by all the stores of the editor (and can be
+    // cleared by the user), so the fixed object types are applied here instead.
+    const displayedAssetShortHeaders = React.useMemo(
+      () => {
+        if (fixedObjectTypesKey === null || !assetShortHeadersSearchResults)
+          return assetShortHeadersSearchResults;
+
+        const fixedObjectTypesSet = new Set(fixedObjectTypesKey.split(','));
+        return assetShortHeadersSearchResults.filter(
+          assetShortHeader =>
+            fixedObjectTypesSet.has(assetShortHeader.objectType) &&
+            (!fixedEffectTarget ||
+              isEffectAssetMadeFor(assetShortHeader, fixedEffectTarget))
+        );
+      },
+      [assetShortHeadersSearchResults, fixedObjectTypesKey, fixedEffectTarget]
+    );
+    const hidePacks = !!assetSwappedObject || hasFixedObjectTypes;
+
     const {
       privateGameTemplateListingDatas,
       error: privateGameTemplateStoreError,
@@ -224,18 +279,20 @@ export const AssetStore: React.ComponentType<{
 
     const { isMobile } = useResponsiveWindowSize();
 
+    // The filters (animations, colors, sizes...) only make sense for objects.
+    const hasFilters = !fixedEffectTarget;
     // Don't open the filters panel automatically.
     const [isFiltersPanelOpen, setIsFiltersPanelOpen] = React.useState(false);
     const openFiltersPanelIfAppropriate = React.useCallback(
       () => {
-        if (isMobile) {
+        if (isMobile || !hasFilters) {
           // Never open automatically the filters on small screens
           return;
         }
 
         setIsFiltersPanelOpen(true);
       },
-      [isMobile]
+      [isMobile, hasFilters]
     );
 
     const { receivedAssetPacks, receivedGameTemplates } = React.useContext(
@@ -289,6 +346,7 @@ export const AssetStore: React.ComponentType<{
     );
 
     const canShowFiltersPanel =
+      hasFilters &&
       !openedAssetShortHeader && // Don't show filters on asset page.
       !openedPrivateAssetPackListingData && // Don't show filters on private asset pack information page.
       !openedPrivateGameTemplateListingData && // Don't show filters on private game template information page.
@@ -730,34 +788,31 @@ export const AssetStore: React.ComponentType<{
           >
             <>
               <LineStackLayout alignItems="center">
-                {!(assetSwappedObject && minimalUI) && (
-                  <TextButton
-                    icon={<ChevronArrowLeft />}
-                    label={<Trans>Back</Trans>}
-                    onClick={onBack}
-                    disabled={shopNavigationState.isRootPage}
-                  />
-                )}
-                {!(assetSwappedObject && minimalUI) && (
-                  <IconButton
-                    id="home-button"
-                    key="back-discover"
-                    tooltip={t`Back to discover`}
-                    onClick={() => {
-                      setSearchText('');
-                      const page = assetSwappedObject
+                <TextButton
+                  icon={<ChevronArrowLeft />}
+                  label={<Trans>Back</Trans>}
+                  onClick={onBack}
+                  disabled={shopNavigationState.isRootPage}
+                />
+                <IconButton
+                  id="home-button"
+                  key="back-discover"
+                  tooltip={t`Back to discover`}
+                  onClick={() => {
+                    setSearchText('');
+                    const page =
+                      assetSwappedObject || hasFixedObjectTypes
                         ? shopNavigationState.openAssetSwapping()
                         : shopNavigationState.openHome();
-                      setScrollUpdateIsNeeded(page);
-                      clearAllAssetStoreFilters();
-                      setIsFiltersPanelOpen(false);
-                    }}
-                    size="small"
-                    color="default"
-                  >
-                    <Home />
-                  </IconButton>
-                )}
+                    setScrollUpdateIsNeeded(page);
+                    clearAllAssetStoreFilters();
+                    setIsFiltersPanelOpen(false);
+                  }}
+                  size="small"
+                  color="default"
+                >
+                  <Home />
+                </IconButton>
                 <Column expand useFullHeight noMargin>
                   <SearchBar
                     placeholder={
@@ -793,7 +848,7 @@ export const AssetStore: React.ComponentType<{
                     id="asset-store-search-bar"
                   />
                 </Column>
-                {!(assetSwappedObject && minimalUI) && (
+                {hasFilters && (
                   <IconButton
                     onClick={() => setIsFiltersPanelOpen(!isFiltersPanelOpen)}
                     disabled={!canShowFiltersPanel}
@@ -808,48 +863,45 @@ export const AssetStore: React.ComponentType<{
             </>
             {(openedAssetPack ||
               openedPrivateAssetPackListingData ||
-              filtersState.chosenCategory) &&
-              !(assetSwappedObject && minimalUI) && (
-                <Column noMargin>
-                  <Line
-                    justifyContent="space-between"
+              filtersState.chosenCategory) && (
+              <Column noMargin>
+                <Line
+                  justifyContent="space-between"
+                  noMargin
+                  alignItems="center"
+                >
+                  {!openedAssetPack && !openedPrivateAssetPackListingData && (
+                    // Only show the category name if we're not on an asset pack page.
+                    <>
+                      {/* Empty column to keep the category name centered. */}
+                      <Column expand noMargin />
+                      <Column expand alignItems="center">
+                        <Text size="block-title" noMargin>
+                          {filtersState.chosenCategory
+                            ? capitalize(filtersState.chosenCategory.node.name)
+                            : ''}
+                        </Text>
+                      </Column>
+                    </>
+                  )}
+                  <Column
+                    expand
+                    alignItems="flex-end"
                     noMargin
-                    alignItems="center"
+                    justifyContent="center"
                   >
-                    {!openedAssetPack && !openedPrivateAssetPackListingData && (
-                      // Only show the category name if we're not on an asset pack page.
-                      <>
-                        {/* Empty column to keep the category name centered. */}
-                        <Column expand noMargin />
-                        <Column expand alignItems="center">
-                          <Text size="block-title" noMargin>
-                            {filtersState.chosenCategory
-                              ? capitalize(
-                                  filtersState.chosenCategory.node.name
-                                )
-                              : ''}
-                          </Text>
-                        </Column>
-                      </>
-                    )}
-                    <Column
-                      expand
-                      alignItems="flex-end"
-                      noMargin
-                      justifyContent="center"
-                    >
-                      {openedAssetPack &&
-                      openedAssetPack.content &&
-                      doesAssetPackContainAudio(openedAssetPack) &&
-                      !isAssetPackAudioOnly(openedAssetPack) ? (
-                        <PrivateAssetPackAudioFilesDownloadButton
-                          assetPack={openedAssetPack}
-                        />
-                      ) : null}
-                    </Column>
-                  </Line>
-                </Column>
-              )}
+                    {openedAssetPack &&
+                    openedAssetPack.content &&
+                    doesAssetPackContainAudio(openedAssetPack) &&
+                    !isAssetPackAudioOnly(openedAssetPack) ? (
+                      <PrivateAssetPackAudioFilesDownloadButton
+                        assetPack={openedAssetPack}
+                      />
+                    ) : null}
+                  </Column>
+                </Line>
+              </Column>
+            )}
             <Line
               expand
               noMargin
@@ -894,23 +946,22 @@ export const AssetStore: React.ComponentType<{
                 )
               ) : isOnSearchResultPage ? (
                 <AssetsList
+                  noResultsPlaceHolder={noResultsPlaceholder}
                   publicAssetPacks={
-                    assetSwappedObject ? [] : publicAssetPacksSearchResults
+                    hidePacks ? [] : publicAssetPacksSearchResults
                   }
                   privateAssetPackListingDatas={
-                    assetSwappedObject
-                      ? []
-                      : privateAssetPackListingDatasSearchResults
+                    hidePacks ? [] : privateAssetPackListingDatasSearchResults
                   }
                   privateGameTemplateListingDatas={
-                    assetSwappedObject
+                    hidePacks
                       ? []
                       : privateGameTemplateListingDatasSearchResults
                   }
                   bundleListingDatas={
-                    assetSwappedObject ? [] : bundleListingDatasSearchResults
+                    hidePacks ? [] : bundleListingDatasSearchResults
                   }
-                  assetShortHeaders={assetShortHeadersSearchResults}
+                  assetShortHeaders={displayedAssetShortHeaders}
                   ref={assetsList}
                   error={storeError}
                   onOpenDetails={onOpenDetails}
@@ -922,10 +973,8 @@ export const AssetStore: React.ComponentType<{
                   onGoBackToFolderIndex={goBackToFolderIndex}
                   currentPage={shopNavigationState.getCurrentPage()}
                   onlyShowAssets={onlyShowAssets}
-                  hideDetails={!!assetSwappedObject && !!minimalUI}
                 />
-              ) : // Do not show the asset details if we're swapping an asset.
-              openedAssetShortHeader && !(assetSwappedObject && minimalUI) ? (
+              ) : openedAssetShortHeader ? (
                 <AssetDetails
                   ref={assetDetails}
                   onTagSelection={selectTag}
@@ -969,7 +1018,6 @@ export const AssetStore: React.ComponentType<{
                 <BundleInformationPage
                   bundleListingData={openedBundleListingData}
                   noPadding
-                  onBack={onBack}
                   onBundleOpen={selectBundle}
                   onGameTemplateOpen={selectPrivateGameTemplate}
                   onAssetPackOpen={selectPrivateAssetPack}
@@ -996,6 +1044,7 @@ export const AssetStore: React.ComponentType<{
                       <Line justifyContent="space-between" alignItems="center">
                         <AssetStoreFilterPanel
                           assetSwappedObject={assetSwappedObject}
+                          hideObjectTypeFilter={hasFixedObjectTypes}
                         />
                       </Line>
                     </Column>

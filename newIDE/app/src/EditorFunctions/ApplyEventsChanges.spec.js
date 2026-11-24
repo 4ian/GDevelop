@@ -2,14 +2,27 @@
 import {
   applyEventsChanges,
   addMissingObjectBehaviors,
+  addUndeclaredVariables,
+  addObjectUndeclaredVariables,
 } from './ApplyEventsChanges';
 import { type AiGeneratedEventChange } from '../Utils/GDevelopServices/Generation';
+import { resolveScope, type ResolvedScope } from './Scope';
 import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 
 const gd: libGDevelop = global.gd;
+
+/** The resolved scope of a scene, as the editor functions build it. */
+const makeSceneScope = (project: gdProject, scene: gdLayout): ResolvedScope => {
+  const resolvedScope = resolveScope(project, {
+    type: 'scene',
+    scene_name: scene.getName(),
+  });
+  if (resolvedScope.success === false) throw new Error(resolvedScope.message);
+  return resolvedScope;
+};
 
 describe('applyEventsChanges', () => {
   let project: gdProject;
@@ -46,6 +59,81 @@ describe('applyEventsChanges', () => {
   // so that tests can check which event ended up where.
   const makeStandardEventJson = (actionType: string) =>
     `{"type":"BuiltinCommonInstructions::Standard","conditions":[],"actions":[{"type":{"value":"${actionType}"}}]}`;
+
+  // A JavaScript code event as the events generation serializes it (the
+  // EventScript `js` fence compiles to exactly this shape).
+  const makeJsCodeEventJson = ({
+    inlineCode,
+    parameterObjects,
+  }: {|
+    inlineCode: string,
+    parameterObjects: string,
+  |}) =>
+    JSON.stringify({
+      type: 'BuiltinCommonInstructions::JsCode',
+      inlineCode,
+      parameterObjects,
+      useStrict: true,
+      eventsSheetExpanded: false,
+    });
+
+  const insertJsCodeEvent = ({
+    inlineCode,
+    parameterObjects,
+    index,
+  }: {|
+    inlineCode: string,
+    parameterObjects: string,
+    index: number,
+  |}) => {
+    const jsCodeEvent = gd.asJsCodeEvent(
+      sceneEventsList.insertNewEvent(
+        project,
+        'BuiltinCommonInstructions::JsCode',
+        index
+      )
+    );
+    jsCodeEvent.setInlineCode(inlineCode);
+    jsCodeEvent.setParameterObjects(parameterObjects);
+  };
+
+  // A JavaScript code event with non default settings can only be set up by
+  // unserializing it: the editor has no setter for `useStrict`.
+  const setupSceneEventsWithJsCodeEvent = ({
+    inlineCode,
+    useStrict,
+    eventsSheetExpanded,
+  }: {|
+    inlineCode: string,
+    useStrict: boolean,
+    eventsSheetExpanded: boolean,
+  |}) => {
+    sceneEventsList.clear();
+    unserializeFromJSObject(
+      sceneEventsList,
+      [
+        {
+          type: 'BuiltinCommonInstructions::JsCode',
+          inlineCode,
+          parameterObjects: '',
+          useStrict,
+          eventsSheetExpanded,
+        },
+      ],
+      'unserializeFrom',
+      project
+    );
+  };
+
+  const getJsCodeEventSettings = (
+    index: number
+  ): {| useStrict: boolean, eventsSheetExpanded: boolean |} => {
+    const serializedEvent = serializeToJSObject(sceneEventsList)[index];
+    return {
+      useStrict: serializedEvent.useStrict,
+      eventsSheetExpanded: serializedEvent.eventsSheetExpanded,
+    };
+  };
 
   const setupMarkedSceneEvents = (actionTypes: Array<string>) => {
     sceneEventsList.clear();
@@ -965,6 +1053,306 @@ describe('applyEventsChanges', () => {
     ]);
     expect(result.applied).toBe(2);
     expect(result.errors).toEqual([]);
+  });
+
+  it('should insert a generated JavaScript code event like any other event', () => {
+    setupInitialSceneEvents(['BuiltinCommonInstructions::Standard']);
+    const inlineCode = [
+      'for (const enemy of objects) {',
+      '  enemy.setX(enemy.getX() + 10);',
+      '}',
+    ].join('\n');
+    const eventOperations = [
+      makeChange({
+        operationName: 'insert_at_end',
+        operationTargetEvent: null,
+        generatedEvents: `[${makeJsCodeEventJson({
+          inlineCode,
+          parameterObjects: 'Enemies',
+        })}]`,
+      }),
+    ];
+
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+
+    expect(result.applied).toBe(1);
+    expect(result.errors).toEqual([]);
+    expect(getEventTypes(sceneEventsList)).toEqual([
+      'BuiltinCommonInstructions::Standard',
+      'BuiltinCommonInstructions::JsCode',
+    ]);
+    const insertedEvent = sceneEventsList.getEventAt(1);
+    const jsCodeEvent = gd.asJsCodeEvent(insertedEvent);
+    // The code is stored exactly as generated (nothing is reformatted).
+    expect(jsCodeEvent.getInlineCode()).toBe(inlineCode);
+    expect(jsCodeEvent.getParameterObjects()).toBe('Enemies');
+    expect(insertedEvent.canHaveSubEvents()).toBe(false);
+    expect(insertedEvent.getAiGeneratedEventId()).toBe(fakeGeneratedEventId);
+    // `useStrict` is always written by the generation: without it the
+    // unserialization would default it to false.
+    const serializedEvents = serializeToJSObject(sceneEventsList);
+    expect(serializedEvents[1].useStrict).toBe(true);
+  });
+
+  it('should replace an existing JavaScript code event with a generated one', () => {
+    sceneEventsList.clear();
+    insertJsCodeEvent({
+      inlineCode: 'runtimeScene.getGame().pause(true);',
+      parameterObjects: '',
+      index: 0,
+    });
+    const eventOperations = [
+      makeChange({
+        operationName: 'replace_entire_event_and_sub_events',
+        operationTargetEvent: 'event-0',
+        generatedEvents: `[${makeJsCodeEventJson({
+          inlineCode: 'runtimeScene.getGame().pause(false);',
+          parameterObjects: 'MyObject',
+        })}]`,
+      }),
+    ];
+
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+
+    // A delete + an insert: two applied operations, like any replacement.
+    expect(result.applied).toBe(2);
+    expect(result.errors).toEqual([]);
+    expect(sceneEventsList.getEventsCount()).toBe(1);
+    const jsCodeEvent = gd.asJsCodeEvent(sceneEventsList.getEventAt(0));
+    expect(jsCodeEvent.getInlineCode()).toBe(
+      'runtimeScene.getGame().pause(false);'
+    );
+    expect(jsCodeEvent.getParameterObjects()).toBe('MyObject');
+  });
+
+  it('should replace a JavaScript code event keeping the sub-events it cannot have', () => {
+    sceneEventsList.clear();
+    insertJsCodeEvent({
+      inlineCode: 'console.log("before");',
+      parameterObjects: '',
+      index: 0,
+    });
+    const eventOperations = [
+      makeChange({
+        operationName: 'replace_event_but_keep_existing_sub_events',
+        operationTargetEvent: 'event-0',
+        generatedEvents: `[${makeJsCodeEventJson({
+          inlineCode: 'console.log("after");',
+          parameterObjects: '',
+        })}]`,
+      }),
+    ];
+
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+
+    // A `js` event has no sub-events: there is nothing to keep, and the
+    // replacement still works.
+    expect(result.applied).toBe(1);
+    expect(result.errors).toEqual([]);
+    expect(sceneEventsList.getEventsCount()).toBe(1);
+    expect(
+      gd.asJsCodeEvent(sceneEventsList.getEventAt(0)).getInlineCode()
+    ).toBe('console.log("after");');
+  });
+
+  it('should keep the settings of the JavaScript code event replaced by a generated one', () => {
+    setupSceneEventsWithJsCodeEvent({
+      inlineCode: 'console.log("before");',
+      useStrict: false,
+      eventsSheetExpanded: true,
+    });
+    const eventOperations = [
+      makeChange({
+        operationName: 'replace_entire_event_and_sub_events',
+        operationTargetEvent: 'event-0',
+        generatedEvents: `[${makeJsCodeEventJson({
+          inlineCode: 'console.log("after");',
+          parameterObjects: 'MyObject',
+        })}]`,
+      }),
+    ];
+
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+
+    expect(result.applied).toBe(2);
+    expect(result.errors).toEqual([]);
+    expect(sceneEventsList.getEventsCount()).toBe(1);
+    const jsCodeEvent = gd.asJsCodeEvent(sceneEventsList.getEventAt(0));
+    expect(jsCodeEvent.getInlineCode()).toBe('console.log("after");');
+    expect(jsCodeEvent.getParameterObjects()).toBe('MyObject');
+    // The generation always writes the default settings: the ones of the
+    // replaced event are kept.
+    expect(getJsCodeEventSettings(0)).toEqual({
+      useStrict: false,
+      eventsSheetExpanded: true,
+    });
+  });
+
+  it('should keep the settings of the JavaScript code event replaced while keeping its sub-events', () => {
+    setupSceneEventsWithJsCodeEvent({
+      inlineCode: 'console.log("before");',
+      useStrict: false,
+      eventsSheetExpanded: true,
+    });
+    const eventOperations = [
+      makeChange({
+        operationName: 'replace_event_but_keep_existing_sub_events',
+        operationTargetEvent: 'event-0',
+        generatedEvents: `[${makeJsCodeEventJson({
+          inlineCode: 'console.log("after");',
+          parameterObjects: '',
+        })}]`,
+      }),
+    ];
+
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+
+    expect(result.applied).toBe(1);
+    expect(result.errors).toEqual([]);
+    expect(sceneEventsList.getEventsCount()).toBe(1);
+    expect(
+      gd.asJsCodeEvent(sceneEventsList.getEventAt(0)).getInlineCode()
+    ).toBe('console.log("after");');
+    expect(getJsCodeEventSettings(0)).toEqual({
+      useStrict: false,
+      eventsSheetExpanded: true,
+    });
+  });
+
+  it('should keep the settings of the JavaScript code event replaced by "insert_and_replace_event"', () => {
+    setupSceneEventsWithJsCodeEvent({
+      inlineCode: 'console.log("before");',
+      useStrict: false,
+      eventsSheetExpanded: false,
+    });
+    const eventOperations = [
+      makeChange({
+        operationName: 'insert_and_replace_event',
+        operationTargetEvent: 'event-0',
+        generatedEvents: `[${makeJsCodeEventJson({
+          inlineCode: 'console.log("after");',
+          parameterObjects: '',
+        })}]`,
+      }),
+    ];
+
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+
+    expect(result.applied).toBe(2);
+    expect(result.errors).toEqual([]);
+    expect(getJsCodeEventSettings(0)).toEqual({
+      useStrict: false,
+      eventsSheetExpanded: false,
+    });
+  });
+
+  it('should use the generated settings when the replaced event is not a JavaScript code event', () => {
+    setupInitialSceneEvents(['BuiltinCommonInstructions::Standard']);
+    const eventOperations = [
+      makeChange({
+        operationName: 'replace_entire_event_and_sub_events',
+        operationTargetEvent: 'event-0',
+        generatedEvents: `[${makeJsCodeEventJson({
+          inlineCode: 'console.log("new");',
+          parameterObjects: '',
+        })}]`,
+      }),
+    ];
+
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+
+    expect(result.applied).toBe(2);
+    expect(result.errors).toEqual([]);
+    expect(getJsCodeEventSettings(0)).toEqual({
+      useStrict: true,
+      eventsSheetExpanded: false,
+    });
+  });
+
+  it('should keep the settings of a JavaScript code event replaced deeper in the events tree', () => {
+    sceneEventsList.clear();
+    unserializeFromJSObject(
+      sceneEventsList,
+      [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [],
+          events: [
+            {
+              type: 'BuiltinCommonInstructions::JsCode',
+              inlineCode: 'console.log("before");',
+              parameterObjects: '',
+              useStrict: false,
+              eventsSheetExpanded: true,
+            },
+          ],
+        },
+      ],
+      'unserializeFrom',
+      project
+    );
+    const eventOperations = [
+      makeChange({
+        operationName: 'replace_entire_event_and_sub_events',
+        operationTargetEvent: 'event-0.0',
+        generatedEvents: `[${makeJsCodeEventJson({
+          inlineCode: 'console.log("after");',
+          parameterObjects: '',
+        })}]`,
+      }),
+    ];
+
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+
+    expect(result.applied).toBe(2);
+    expect(result.errors).toEqual([]);
+    const serializedEvents = serializeToJSObject(sceneEventsList);
+    expect(serializedEvents[0].events[0].inlineCode).toBe(
+      'console.log("after");'
+    );
+    expect(serializedEvents[0].events[0].useStrict).toBe(false);
+    expect(serializedEvents[0].events[0].eventsSheetExpanded).toBe(true);
   });
 
   it('should process deletions before insertions when paths are sorted', () => {
@@ -2754,6 +3142,105 @@ describe('applyEventsChanges', () => {
     );
   });
 
+  const makeOperation = (
+    operationName: string,
+    operationTargetEvent: string,
+    generatedEvents: string | null
+  ): AiGeneratedEventChange => ({
+    operationName,
+    operationTargetEvent,
+    generatedEvents,
+    isEventsJsonValid: generatedEvents ? true : null,
+    areEventsValid: generatedEvents ? true : null,
+    diagnosticLines: [],
+    extensionNames: [],
+    undeclaredVariables: [],
+    undeclaredObjectVariables: {},
+    missingObjectBehaviors: {},
+    missingResources: [],
+  });
+
+  const insertGroupEvent = (
+    eventsList: gdEventsList,
+    name: string,
+    index: number
+  ): gdGroupEvent => {
+    const groupEvent = gd.asGroupEvent(
+      eventsList.insertNewEvent(
+        project,
+        'BuiltinCommonInstructions::Group',
+        index
+      )
+    );
+    groupEvent.setName(name);
+    return groupEvent;
+  };
+
+  it('should target a group event by its name', () => {
+    sceneEventsList.clear();
+    insertGroupEvent(sceneEventsList, 'Race', 0);
+    const controlsGroup = insertGroupEvent(sceneEventsList, 'Controls', 1);
+    insertGroupEvent(controlsGroup.getSubEvents(), 'Keyboard', 0);
+
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      [
+        makeOperation(
+          'insert_before_event',
+          'controls',
+          '[{"type":"BuiltinCommonInstructions::Comment","conditions":[],"actions":[]}]'
+        ),
+        makeOperation(
+          'insert_as_sub_event',
+          'Keyboard',
+          '[{"type":"BuiltinCommonInstructions::Standard","conditions":[],"actions":[]}]'
+        ),
+        makeOperation('delete_event', 'Race', null),
+      ],
+      fakeGeneratedEventId
+    );
+
+    expect(result.errors).toEqual([]);
+    expect(result.applied).toBe(3);
+    expect(getEventTypes(sceneEventsList)).toEqual([
+      'BuiltinCommonInstructions::Comment',
+      'BuiltinCommonInstructions::Group',
+    ]);
+    const keyboardGroup = gd.asGroupEvent(
+      gd
+        .asGroupEvent(sceneEventsList.getEventAt(1))
+        .getSubEvents()
+        .getEventAt(0)
+    );
+    expect(keyboardGroup.getName()).toBe('Keyboard');
+    expect(getEventTypes(keyboardGroup.getSubEvents())).toEqual([
+      'BuiltinCommonInstructions::Standard',
+    ]);
+  });
+
+  it('should skip operation when several group events have the targeted name', () => {
+    sceneEventsList.clear();
+    insertGroupEvent(sceneEventsList, 'HUD', 0);
+    const otherGroup = insertGroupEvent(sceneEventsList, 'Other', 1);
+    insertGroupEvent(otherGroup.getSubEvents(), 'HUD', 0);
+
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      [makeOperation('delete_event', 'HUD', null)],
+      fakeGeneratedEventId
+    );
+
+    expect(sceneEventsList.getEventsCount()).toBe(2);
+    expect(result.applied).toBe(0);
+    expect(result.errors).toEqual([
+      expect.stringContaining(
+        '2 group events are named "HUD". Target a single one by its path ("event-0", "event-1.0") instead.'
+      ),
+    ]);
+  });
+
   it('should skip operation if event with aiGeneratedEventId is not found and return error', () => {
     setupInitialSceneEvents(['BuiltinCommonInstructions::Standard']);
 
@@ -2819,7 +3306,7 @@ describe('addMissingObjectBehaviors', () => {
     // Add the PlatformerObjectBehavior
     addMissingObjectBehaviors({
       project,
-      scene: testScene,
+      resolvedScope: makeSceneScope(project, testScene),
       objectName: 'Player',
       missingBehaviors: [
         {
@@ -2866,7 +3353,7 @@ describe('addMissingObjectBehaviors', () => {
     // Add the PlatformerObjectBehavior to the group
     addMissingObjectBehaviors({
       project,
-      scene: testScene,
+      resolvedScope: makeSceneScope(project, testScene),
       objectName: 'Players',
       missingBehaviors: [
         {
@@ -2886,5 +3373,232 @@ describe('addMissingObjectBehaviors', () => {
     expect(player2.getBehavior('PlatformerObject').getTypeName()).toBe(
       'PlatformBehavior::PlatformerObjectBehavior'
     );
+  });
+});
+
+describe('addUndeclaredVariables', () => {
+  let project: gdProject;
+  let testScene: gdLayout;
+
+  beforeEach(() => {
+    // $FlowFixMe[invalid-constructor]
+    project = new gd.ProjectHelper.createNewGDJSProject();
+    testScene = project.insertNewLayout('TestScene', 0);
+  });
+
+  afterEach(() => {
+    project.delete();
+  });
+
+  it('adds scene, global and unscoped variables with their type', () => {
+    addUndeclaredVariables({
+      project,
+      resolvedScope: makeSceneScope(project, testScene),
+      undeclaredVariables: [
+        { name: 'score', type: 'number', requiredScope: 'scene' },
+        { name: 'playerName', type: 'string', requiredScope: 'none' },
+        { name: 'settings', type: 'structure', requiredScope: 'global' },
+        { name: 'inventory', type: 'array', requiredScope: 'global' },
+        { name: 'isPaused', type: 'boolean', requiredScope: 'scene' },
+      ],
+    });
+
+    expect(
+      testScene
+        .getVariables()
+        .get('score')
+        .getType()
+    ).toBe(gd.Variable.Number);
+    // 'none' scope defaults to the scene.
+    expect(
+      testScene
+        .getVariables()
+        .get('playerName')
+        .getType()
+    ).toBe(gd.Variable.String);
+    expect(
+      testScene
+        .getVariables()
+        .get('isPaused')
+        .getType()
+    ).toBe(gd.Variable.Boolean);
+    expect(
+      project
+        .getVariables()
+        .get('settings')
+        .getType()
+    ).toBe(gd.Variable.Structure);
+    expect(
+      project
+        .getVariables()
+        .get('inventory')
+        .getType()
+    ).toBe(gd.Variable.Array);
+  });
+
+  it('leaves an already-declared variable untouched', () => {
+    testScene
+      .getVariables()
+      .insertNew('score', 0)
+      .setValue(42);
+
+    addUndeclaredVariables({
+      project,
+      resolvedScope: makeSceneScope(project, testScene),
+      undeclaredVariables: [
+        { name: 'score', type: 'string', requiredScope: 'scene' },
+      ],
+    });
+
+    // Neither re-created nor re-typed.
+    expect(
+      testScene
+        .getVariables()
+        .get('score')
+        .getType()
+    ).toBe(gd.Variable.Number);
+    expect(
+      testScene
+        .getVariables()
+        .get('score')
+        .getValue()
+    ).toBe(42);
+  });
+
+  it('skips a variable with an unknown scope', () => {
+    addUndeclaredVariables({
+      project,
+      resolvedScope: makeSceneScope(project, testScene),
+      undeclaredVariables: [
+        // $FlowFixMe[incompatible-type] - invalid scope on purpose.
+        { name: 'mystery', type: 'number', requiredScope: 'galaxy' },
+      ],
+    });
+
+    expect(testScene.getVariables().has('mystery')).toBe(false);
+    expect(project.getVariables().has('mystery')).toBe(false);
+  });
+});
+
+describe('addObjectUndeclaredVariables', () => {
+  let project: gdProject;
+  let testScene: gdLayout;
+
+  beforeEach(() => {
+    // $FlowFixMe[invalid-constructor]
+    project = new gd.ProjectHelper.createNewGDJSProject();
+    testScene = project.insertNewLayout('TestScene', 0);
+  });
+
+  afterEach(() => {
+    project.delete();
+  });
+
+  it('adds a typed variable to a scene object', () => {
+    const object = testScene
+      .getObjects()
+      .insertNewObject(project, 'Sprite', 'Player', 0);
+
+    addObjectUndeclaredVariables({
+      project,
+      resolvedScope: makeSceneScope(project, testScene),
+      objectName: 'Player',
+      undeclaredVariables: [
+        { name: 'health', type: 'number', requiredScope: 'none' },
+      ],
+    });
+
+    expect(object.getVariables().has('health')).toBe(true);
+    expect(
+      object
+        .getVariables()
+        .get('health')
+        .getType()
+    ).toBe(gd.Variable.Number);
+  });
+
+  it('adds a variable to a global object', () => {
+    const object = project
+      .getObjects()
+      .insertNewObject(project, 'Sprite', 'GlobalHud', 0);
+
+    addObjectUndeclaredVariables({
+      project,
+      resolvedScope: makeSceneScope(project, testScene),
+      objectName: 'GlobalHud',
+      undeclaredVariables: [
+        { name: 'visible', type: 'boolean', requiredScope: 'none' },
+      ],
+    });
+
+    expect(object.getVariables().has('visible')).toBe(true);
+    expect(
+      object
+        .getVariables()
+        .get('visible')
+        .getType()
+    ).toBe(gd.Variable.Boolean);
+  });
+
+  it('adds the variable to every member of a group', () => {
+    const sceneObjects = testScene.getObjects();
+    const enemy1 = sceneObjects.insertNewObject(project, 'Sprite', 'Enemy1', 0);
+    const enemy2 = sceneObjects.insertNewObject(project, 'Sprite', 'Enemy2', 1);
+    const group = sceneObjects.getObjectGroups().insertNew('Enemies', 0);
+    group.addObject('Enemy1');
+    group.addObject('Enemy2');
+
+    addObjectUndeclaredVariables({
+      project,
+      resolvedScope: makeSceneScope(project, testScene),
+      objectName: 'Enemies',
+      undeclaredVariables: [
+        { name: 'health', type: 'number', requiredScope: 'none' },
+      ],
+    });
+
+    expect(enemy1.getVariables().has('health')).toBe(true);
+    expect(enemy2.getVariables().has('health')).toBe(true);
+  });
+
+  it('leaves an already-declared object variable untouched and skips unknown objects', () => {
+    const object = testScene
+      .getObjects()
+      .insertNewObject(project, 'Sprite', 'Player', 0);
+    object
+      .getVariables()
+      .insertNew('health', 0)
+      .setValue(100);
+
+    addObjectUndeclaredVariables({
+      project,
+      resolvedScope: makeSceneScope(project, testScene),
+      objectName: 'Player',
+      undeclaredVariables: [
+        { name: 'health', type: 'string', requiredScope: 'none' },
+      ],
+    });
+    // Does not throw for an object that does not exist.
+    addObjectUndeclaredVariables({
+      project,
+      resolvedScope: makeSceneScope(project, testScene),
+      objectName: 'Ghost',
+      undeclaredVariables: [
+        { name: 'health', type: 'number', requiredScope: 'none' },
+      ],
+    });
+
+    expect(
+      object
+        .getVariables()
+        .get('health')
+        .getType()
+    ).toBe(gd.Variable.Number);
+    expect(
+      object
+        .getVariables()
+        .get('health')
+        .getValue()
+    ).toBe(100);
   });
 });

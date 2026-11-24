@@ -433,6 +433,52 @@ describe('MetadataDeclarationHelper', () => {
     project.delete();
   });
 
+  it('can create metadata for behaviors not synchronized by default', () => {
+    const extension = new gd.PlatformExtension();
+    const project = new gd.Project();
+
+    const eventExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const synchronizedEventBehavior = eventExtension
+      .getEventsBasedBehaviors()
+      .insertNew('MyBehavior', 0);
+    const notSynchronizedEventBehavior = eventExtension
+      .getEventsBasedBehaviors()
+      .insertNew('MyKeyboardMapper', 1);
+    notSynchronizedEventBehavior.setSynchronizedOverNetworkByDefault(false);
+
+    const behaviorMethodMangledNames = new gd.MapStringString();
+    gd.MetadataDeclarationHelper.generateBehaviorMetadata(
+      project,
+      extension,
+      eventExtension,
+      synchronizedEventBehavior,
+      behaviorMethodMangledNames
+    );
+    gd.MetadataDeclarationHelper.generateBehaviorMetadata(
+      project,
+      extension,
+      eventExtension,
+      notSynchronizedEventBehavior,
+      behaviorMethodMangledNames
+    );
+    behaviorMethodMangledNames.delete();
+
+    expect(
+      extension.getBehaviorMetadata('MyBehavior').isSynchronizedByDefault()
+    ).toBe(true);
+    expect(
+      extension
+        .getBehaviorMetadata('MyKeyboardMapper')
+        .isSynchronizedByDefault()
+    ).toBe(false);
+
+    extension.delete();
+    project.delete();
+  });
+
   it('can create metadata for behavior conditions', () => {
     const extension = new gd.PlatformExtension();
     const project = new gd.Project();
@@ -1211,7 +1257,44 @@ describe('MetadataDeclarationHelper', () => {
       objectMetadata.getAllExpressions().keys().toJSArray()
     ).toContainAll([
       // Deprecated
-      'ScaleX', 'ScaleY', 'Opacity']);
+      'ScaleX',
+      'ScaleY',
+      'Opacity',
+      // Crossing the boundary of the object, with a point of its own plane.
+      'ToParentX',
+      'ToParentY',
+      'FromParentX',
+      'FromParentY',
+      'ToParentAngle',
+      'FromParentAngle',
+    ]);
+    const toParentX = objectMetadata.getAllExpressions().get('ToParentX');
+    // The object, then the X and the Y of the point.
+    expect(toParentX.getParametersCount()).toBe(3);
+    // The object, then the angle.
+    expect(
+      objectMetadata
+        .getAllExpressions()
+        .get('ToParentAngle')
+        .getParametersCount()
+    ).toBe(2);
+    // Only the events of the object know what is inside it.
+    [
+      'ToParentX',
+      'ToParentY',
+      'FromParentX',
+      'FromParentY',
+      'ToParentAngle',
+      'FromParentAngle',
+    ].forEach((expressionName) =>
+      expect(
+        objectMetadata.getAllExpressions().get(expressionName).isPrivate()
+      ).toBe(true)
+    );
+    // A 2D object converts directions as angles.
+    expect(
+      objectMetadata.getAllExpressions().has('ToParentDirectionX')
+    ).toBe(false);
 
     expectArray(
       objectMetadata.getAllStrExpressions().keys().toJSArray()
@@ -1250,6 +1333,38 @@ describe('MetadataDeclarationHelper', () => {
     expect(extension.getExtensionObjectsTypes().at(0)).toBe('MyObject');
     const objectMetadata = extension.getObjectMetadata('MyObject');
 
+    const expressionNames = objectMetadata
+      .getAllExpressions()
+      .keys()
+      .toJSArray();
+    // A 3D custom object converts a point of 3 coordinates, on 3 axes.
+    ['ToParent', 'FromParent'].forEach((conversion) =>
+      ['X', 'Y', 'Z'].forEach((axis) => {
+        const expressionName = conversion + axis;
+        expect(expressionNames).toContain(expressionName);
+        expect(
+          objectMetadata
+            .getAllExpressions()
+            .get(expressionName)
+            .getParametersCount()
+        ).toBe(4);
+      })
+    );
+    // A direction is converted as a vector in 3D: an angle around Z alone
+    // cannot follow a tilted object.
+    expect(expressionNames).not.toContain('ToParentAngle');
+    expect(expressionNames).not.toContain('FromParentAngle');
+    ['ToParentDirection', 'FromParentDirection'].forEach((conversion) =>
+      ['X', 'Y', 'Z'].forEach((axis) => {
+        const expression = objectMetadata
+          .getAllExpressions()
+          .get(conversion + axis);
+        // The object, then the X, Y and Z of the direction.
+        expect(expression.getParametersCount()).toBe(4);
+        expect(expression.isPrivate()).toBe(true);
+      })
+    );
+
     expectArray(
       objectMetadata.getDefaultBehaviors().toNewVectorString().toJSArray()
     ).toContainAll([
@@ -1260,6 +1375,102 @@ describe('MetadataDeclarationHelper', () => {
       "Scene3D::Base3DBehavior",
       "AnimatableCapability::AnimatableBehavior",
       "TextContainerCapability::TextContainerBehavior",
+    ]);
+
+    extension.delete();
+    project.delete();
+  });
+
+  it('declares the property groups of a behavior in the order of their folders', () => {
+    const extension = new gd.PlatformExtension();
+    const project = new gd.Project();
+
+    const eventExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const eventBehavior = eventExtension
+      .getEventsBasedBehaviors()
+      .insertNew('MyBehavior', 0);
+    const properties = eventBehavior.getPropertyDescriptors();
+    const rootFolder = properties.getRootFolder();
+    properties.insertNewPropertyInFolder(
+      'Speed',
+      rootFolder.insertNewFolder('Movement', 0),
+      0
+    );
+    properties.insertNewPropertyInFolder(
+      'Color',
+      rootFolder.insertNewFolder('Appearance', 1),
+      0
+    );
+    properties.insertNewPropertyInFolder('Ungrouped', rootFolder, 2);
+    const sharedProperties = eventBehavior.getSharedPropertyDescriptors();
+    sharedProperties.insertNewPropertyInFolder(
+      'Gravity',
+      sharedProperties.getRootFolder().insertNewFolder('World', 0),
+      0
+    );
+
+    const behaviorMethodMangledNames = new gd.MapStringString();
+    gd.MetadataDeclarationHelper.generateBehaviorMetadata(
+      project,
+      extension,
+      eventExtension,
+      eventBehavior,
+      behaviorMethodMangledNames
+    );
+    behaviorMethodMangledNames.delete();
+
+    const behaviorMetadata = extension.getBehaviorMetadata('MyBehavior');
+    expect(behaviorMetadata.getPropertyGroups().toJSArray()).toEqual([
+      'Movement',
+      'Appearance',
+      'World',
+    ]);
+
+    extension.delete();
+    project.delete();
+  });
+
+  it('declares the property groups of an object in the order of their folders', () => {
+    const extension = new gd.PlatformExtension();
+    const project = new gd.Project();
+
+    const eventExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const eventsBasedObject = eventExtension
+      .getEventsBasedObjects()
+      .insertNew('MyObject', 0);
+    const properties = eventsBasedObject.getPropertyDescriptors();
+    const rootFolder = properties.getRootFolder();
+    properties.insertNewPropertyInFolder(
+      'Text',
+      rootFolder.insertNewFolder('Content', 0),
+      0
+    );
+    properties.insertNewPropertyInFolder(
+      'Color',
+      rootFolder.insertNewFolder('Appearance', 0),
+      0
+    );
+
+    const objectMethodMangledNames = new gd.MapStringString();
+    gd.MetadataDeclarationHelper.generateObjectMetadata(
+      project,
+      extension,
+      eventExtension,
+      eventsBasedObject,
+      objectMethodMangledNames
+    );
+    objectMethodMangledNames.delete();
+
+    const objectMetadata = extension.getObjectMetadata('MyObject');
+    expect(objectMetadata.getPropertyGroups().toJSArray()).toEqual([
+      'Appearance',
+      'Content',
     ]);
 
     extension.delete();

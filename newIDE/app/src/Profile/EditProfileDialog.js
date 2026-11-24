@@ -287,6 +287,9 @@ const EditProfileDialog = ({
   const [facebookUsername, setFacebookUsername] = React.useState(
     communityLinks.facebookUsername || ''
   );
+  const [blueskyUsername, setBlueskyUsername] = React.useState(
+    communityLinks.blueskyUsername || ''
+  );
   const [youtubeUsername, setYoutubeUsername] = React.useState(
     communityLinks.youtubeUsername || ''
   );
@@ -353,6 +356,7 @@ const EditProfileDialog = ({
     personalWebsite2Link,
     twitterUsername,
     facebookUsername,
+    blueskyUsername,
     youtubeUsername,
     tiktokUsername,
     instagramUsername,
@@ -636,6 +640,15 @@ const EditProfileDialog = ({
                     translatableHintText={t`username`}
                     onChange={(e, value) => {
                       setFacebookUsername(value);
+                    }}
+                    disabled={actionInProgress}
+                  />
+                  <CommunityLinkLine
+                    id="blueskyUsername"
+                    value={blueskyUsername}
+                    translatableHintText={t`handle (e.g. name.bsky.social)`}
+                    onChange={(e, value) => {
+                      setBlueskyUsername(value);
                     }}
                     disabled={actionInProgress}
                   />

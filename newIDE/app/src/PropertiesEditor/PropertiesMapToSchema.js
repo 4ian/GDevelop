@@ -12,9 +12,8 @@ import {
 import { type ResourceKind } from '../ResourcesList/ResourceSource';
 import MeasurementUnitDocumentation from '../PropertiesEditor/MeasurementUnitDocumentation';
 import { keyNames } from '../Utils/KeyboardKeyNames';
+import { getChoiceDisplayLabel } from '../Utils/ChoiceLabel';
 import Restore from '../UI/CustomSvgIcons/Restore';
-
-const gd: libGDevelop = global.gd;
 
 const createField = (
   name: string,
@@ -193,11 +192,7 @@ const createField = (
       property.getChoices(),
       choice => ({
         value: choice.getValue(),
-        label:
-          choice.getValue() +
-          (choice.getLabel() && choice.getLabel() !== choice.getValue()
-            ? ` — ${choice.getLabel()}`
-            : ''),
+        label: getChoiceDisplayLabel(choice.getValue(), choice.getLabel()),
       })
     );
     // TODO Remove this once we made sure no built-in extension still use `addExtraInfo` instead of `addChoice`.
@@ -321,6 +316,34 @@ const createField = (
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
       isHighlighted: isHighlightedForString,
+      disabled,
+    };
+  } else if (valueType === 'bitmask') {
+    // A bitmask is a number where each bit is a flag. The extra information
+    // tells which bits are meaningful, for example: "bitCount=4", "firstBit=4".
+    const extraInfo = property.getExtraInfo().toJSArray();
+    const getExtraInfoNumber = (key: string, defaultValue: number): number => {
+      const entry = extraInfo.find(info => info.startsWith(`${key}=`));
+      if (!entry) return defaultValue;
+      const parsedValue = parseInt(entry.substring(key.length + 1), 10);
+      return Number.isFinite(parsedValue) ? parsedValue : defaultValue;
+    };
+
+    return {
+      name,
+      valueType: 'bitmask',
+      getValue: getValueForNumber,
+      setValue: (instance: Instance, newValue: number) => {
+        setNumberValue(instance, name, newValue);
+      },
+      firstBit: getExtraInfoNumber('firstBit', 0),
+      bitCount: getExtraInfoNumber('bitCount', 8),
+      defaultValue: defaultValueNumber,
+      getLabel,
+      getDescription,
+      hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
+      visibility,
+      isHighlighted: isHighlightedForNumber,
       disabled,
     };
   } else if (valueType === 'multilinestring') {
@@ -466,6 +489,9 @@ const propertyKeywordCouples: Array<Array<string>> = [
   ['Width', 'Height', 'Depth'],
 ];
 
+/** Separates a group from its sub-group in a property group name. */
+const subgroupSeparator = ' > ';
+
 const uncapitalize = (str: string) => {
   if (!str) return str;
   return str[0].toLowerCase() + str.substr(1);
@@ -483,12 +509,10 @@ const isPropertyVisible = ({
   properties,
   name,
   visibility,
-  quickCustomizationVisibilities,
 }: {
   properties: gdMapStringPropertyDescriptor,
   name: string,
-  visibility: 'All' | 'Basic' | 'Advanced' | 'Deprecated' | 'Basic-Quick',
-  quickCustomizationVisibilities?: gdQuickCustomizationVisibilitiesContainer,
+  visibility: 'All' | 'Basic' | 'Advanced' | 'Deprecated',
 }): boolean => {
   if (!properties.has(name)) {
     return false;
@@ -509,34 +533,6 @@ const isPropertyVisible = ({
   if (visibility === 'Basic') {
     return !property.isAdvanced() && !property.isDeprecated();
   }
-  if (visibility === 'Basic-Quick') {
-    // "Basic":
-    if (property.isDeprecated()) return false;
-    if (property.isAdvanced()) return false;
-
-    // Honor visibility if set on the property.
-    if (
-      property.getQuickCustomizationVisibility() ===
-      gd.QuickCustomization.Hidden
-    )
-      return false;
-    if (
-      property.getQuickCustomizationVisibility() ===
-      gd.QuickCustomization.Visible
-    )
-      return true;
-
-    // Honor visibility if set on the container.
-    if (quickCustomizationVisibilities) {
-      const visibility = quickCustomizationVisibilities.get(name);
-      if (visibility === gd.QuickCustomization.Hidden) return false;
-      if (visibility === gd.QuickCustomization.Visible) return true;
-    }
-
-    // Otherwise, hide some properties that we know are complex.
-    const propertyType = property.getType();
-    if (propertyType === 'Behavior') return false; // Hide "required behaviors".
-  }
   return true;
 };
 
@@ -546,17 +542,17 @@ type CommonProps = {|
     | gdMapStringPropertyDescriptor
     | null,
   object?: ?gdObject,
-  visibility?: 'All' | 'Basic' | 'Advanced' | 'Deprecated' | 'Basic-Quick',
-  quickCustomizationVisibilities?: gdQuickCustomizationVisibilitiesContainer,
+  visibility?: 'All' | 'Basic' | 'Advanced' | 'Deprecated',
   showcaseNonDefaultValues?: boolean,
   hideResourceProperties?: boolean,
+  /** The groups to show first, in this order (from the object or behavior metadata). */
+  propertyGroups?: ?gdVectorString,
 |};
 
 export const effectPropertiesMapToSchema = ({
   defaultValueProperties,
   object,
   visibility = 'All',
-  quickCustomizationVisibilities,
   hideResourceProperties,
   showcaseNonDefaultValues,
 }: {
@@ -569,7 +565,6 @@ export const effectPropertiesMapToSchema = ({
     object,
     layersContainer: null,
     visibility,
-    quickCustomizationVisibilities,
     hideResourceProperties,
     showcaseNonDefaultValues,
     shouldDisabledFieldsWithMixedValues: false,
@@ -622,10 +617,10 @@ const propertiesMapToSchema = ({
   object,
   layersContainer,
   visibility = 'All',
-  quickCustomizationVisibilities,
   showcaseNonDefaultValues,
   hideResourceProperties,
   shouldDisabledFieldsWithMixedValues,
+  propertyGroups,
 }: {
   ...CommonProps,
   getPropertyValue: (instance: Instance, propertyName: string) => string,
@@ -644,10 +639,10 @@ const propertiesMapToSchema = ({
     object,
     layersContainer,
     visibility,
-    quickCustomizationVisibilities,
     showcaseNonDefaultValues,
     hideResourceProperties,
     shouldDisabledFieldsWithMixedValues,
+    propertyGroups,
     getNumberValue: (instance: Instance, propertyName: string): number => {
       // Consider a missing value as 0 to avoid propagating NaN.
       return parseFloat(getPropertyValue(instance, propertyName)) || 0;
@@ -676,7 +671,6 @@ const adaptablePropertiesMapToSchema = ({
   object,
   layersContainer,
   visibility = 'All',
-  quickCustomizationVisibilities,
   showcaseNonDefaultValues,
   hideResourceProperties,
   getNumberValue,
@@ -686,6 +680,7 @@ const adaptablePropertiesMapToSchema = ({
   setStringValue,
   setBooleanValue,
   shouldDisabledFieldsWithMixedValues,
+  propertyGroups,
 }: {|
   ...CommonProps,
   properties: gdMapStringPropertyDescriptor,
@@ -722,7 +717,6 @@ const adaptablePropertiesMapToSchema = ({
         properties,
         name,
         visibility,
-        quickCustomizationVisibilities,
       })
     ) {
       return null;
@@ -753,7 +747,6 @@ const adaptablePropertiesMapToSchema = ({
                 properties,
                 name: rowPropertyName,
                 visibility,
-                quickCustomizationVisibilities,
               })
             ) {
               rowPropertyNames.push(rowPropertyName);
@@ -771,7 +764,6 @@ const adaptablePropertiesMapToSchema = ({
                   properties,
                   name: rowPropertyName,
                   visibility,
-                  quickCustomizationVisibilities,
                 })
               ) {
                 rowPropertyNames.push(rowPropertyName);
@@ -825,11 +817,19 @@ const adaptablePropertiesMapToSchema = ({
             }
           }
           if (rowFields.length === rowProperties.length) {
-            field = {
-              name: rowPropertyNames.join('-'),
-              type: 'row',
-              children: rowFields,
-            };
+            // Resource selectors are wide (text field + thumbnail), so always
+            // give them a full line instead of squeezing them in a row.
+            if (
+              rowProperties.some(property => property.getType() === 'resource')
+            ) {
+              fields.push(...rowFields);
+            } else {
+              field = {
+                name: rowPropertyNames.join('-'),
+                type: 'row',
+                children: rowFields,
+              };
+            }
             rowPropertyNames.forEach(propertyName => {
               alreadyHandledProperties.add(propertyName);
             });
@@ -839,7 +839,7 @@ const adaptablePropertiesMapToSchema = ({
         }
       }
     }
-    if (!field) {
+    if (!field && !alreadyHandledProperties.has(name)) {
       field = createField(
         name,
         property,
@@ -865,24 +865,66 @@ const adaptablePropertiesMapToSchema = ({
       fields.push(field);
     }
   });
-  if (fieldsByGroups.size === 0) {
+  // A group name can contain a sub-group, like "Collision filtering > If static":
+  // its fields are shown in a titled section inside the group. Sub-groups keep
+  // the order of their first property, after the fields of the group itself
+  // (otherwise these fields would look like they belong to the sub-group above them).
+  const fieldsByTopGroups = new Map<string, Array<Field>>();
+  const groupsThenSubgroups = [...fieldsByGroups].sort(
+    ([a], [b]) =>
+      Number(a.includes(subgroupSeparator)) -
+      Number(b.includes(subgroupSeparator))
+  );
+  for (const [groupName, fields] of groupsThenSubgroups) {
+    const separatorIndex = groupName.indexOf(subgroupSeparator);
+    const topGroupName =
+      separatorIndex === -1 ? groupName : groupName.slice(0, separatorIndex);
+    let topGroupFields = fieldsByTopGroups.get(topGroupName);
+    if (!topGroupFields) {
+      topGroupFields = [];
+      fieldsByTopGroups.set(topGroupName, topGroupFields);
+    }
+    if (separatorIndex === -1) {
+      topGroupFields.push(...fields);
+    } else {
+      const subgroupName = groupName.slice(
+        separatorIndex + subgroupSeparator.length
+      );
+      topGroupFields.push({
+        name: subgroupName,
+        type: 'column',
+        title: subgroupName,
+        isSubgroup: true,
+        children: fields,
+      });
+    }
+  }
+
+  if (fieldsByTopGroups.size === 0) {
     return [];
   }
-  const defaultGroupField = fieldsByGroups.get('');
-  if (fieldsByGroups.size === 1 && defaultGroupField) {
+  const defaultGroupField = fieldsByTopGroups.get('');
+  if (fieldsByTopGroups.size === 1 && defaultGroupField) {
     // Avoid to create a blank title
     return defaultGroupField;
   }
   // Create a group for the default one too because it would look weird with the indentation.
-  const groupNames = [...fieldsByGroups.keys()].sort((a, b) =>
-    a.localeCompare(b)
+  const orderedGroupNames = propertyGroups ? propertyGroups.toJSArray() : [];
+  const getGroupPosition = (groupName: string): number => {
+    // The default group stays first.
+    if (!groupName) return -1;
+    const position = orderedGroupNames.indexOf(groupName);
+    return position === -1 ? orderedGroupNames.length : position;
+  };
+  const groupNames = [...fieldsByTopGroups.keys()].sort(
+    (a, b) => getGroupPosition(a) - getGroupPosition(b) || a.localeCompare(b)
   );
   return groupNames.map(groupName => ({
     name: groupName,
     type: 'column',
     title: groupName,
     // The group actually always exists here.
-    children: fieldsByGroups.get(groupName) || [],
+    children: fieldsByTopGroups.get(groupName) || [],
   }));
 };
 

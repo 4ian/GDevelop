@@ -70,9 +70,12 @@ export const ChildObjectPropertiesEditor = ({
         visibility: 'All',
         layersContainer: null,
         shouldDisabledFieldsWithMixedValues: false,
+        propertyGroups: objectMetadata
+          ? objectMetadata.getPropertyGroups()
+          : null,
       });
     },
-    [schemaRecomputeTrigger, childObjectConfigurationAsGd]
+    [schemaRecomputeTrigger, childObjectConfigurationAsGd, objectMetadata]
   );
 
   return (

@@ -3,8 +3,7 @@
  * Copyright 2008-present Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDCORE_EXPRESSIONTYPEFINDER_H
-#define GDCORE_EXPRESSIONTYPEFINDER_H
+#pragma once
 
 #include <memory>
 #include <vector>
@@ -27,6 +26,11 @@ class ExpressionMetadata;
 }  // namespace gd
 
 namespace gd {
+
+struct TypeAndExtraInfo {
+  const gd::String type;
+  const gd::String extraInfo;
+};
 
 /**
  * \brief Find the type of the expression or sub-expression that a given node
@@ -54,25 +58,44 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
                       const gd::String &rootType,
                       gd::ExpressionNode& node) {
     gd::ExpressionTypeFinder typeFinder(
-        platform, projectScopedContainers, rootType);
+        platform, projectScopedContainers, rootType, emptyExtraInfo);
     node.Visit(typeFinder);
     return typeFinder.GetType();
+  }
+
+  /**
+   * \brief Helper function to find the type of the expression or
+   * sub-expression that a given node represents.
+   */
+  static const gd::TypeAndExtraInfo GetTypeAndExtraInfo(
+      const gd::Platform &platform,
+      const gd::ProjectScopedContainers &projectScopedContainers,
+      const gd::String &rootType, const gd::String &rootExtraInfo,
+      gd::ExpressionNode &node) {
+    gd::ExpressionTypeFinder typeFinder(platform, projectScopedContainers,
+                                        rootType, rootExtraInfo);
+    node.Visit(typeFinder);
+    return {.type = typeFinder.GetType(),
+            .extraInfo = typeFinder.GetExtraInfo()};
   }
 
   virtual ~ExpressionTypeFinder(){};
 
  protected:
-  ExpressionTypeFinder(const gd::Platform &platform_,
-                       const gd::ProjectScopedContainers &projectScopedContainers_,
-                       const gd::String &rootType_)
-      : platform(platform_),
-        projectScopedContainers(projectScopedContainers_),
-        rootType(rootType_),
-        type(ExpressionTypeFinder::unknownType),
-        child(nullptr) {};
+   ExpressionTypeFinder(
+       const gd::Platform &platform_,
+       const gd::ProjectScopedContainers &projectScopedContainers_,
+       const gd::String &rootType_, const gd::String &rootExtraInfo_)
+       : platform(platform_), projectScopedContainers(projectScopedContainers_),
+         rootType(rootType_), rootExtraInfo(rootExtraInfo_),
+         type(ExpressionTypeFinder::unknownType), child(nullptr) {};
 
-  const gd::String &GetType() {
-    return gd::ValueTypeMetadata::GetExpressionPrimitiveValueType(type);
+   const gd::String &GetType() {
+     return gd::ValueTypeMetadata::GetExpressionPrimitiveValueType(type);
+   };
+
+  const gd::String &GetExtraInfo() {
+    return extraInfo;
   };
 
   void OnVisitSubExpressionNode(SubExpressionNode& node) override {
@@ -149,6 +172,7 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
       }
       else {
         type = parameterMetadata->GetType();
+        extraInfo = parameterMetadata->GetExtraInfo();
       }
     }
   }
@@ -170,10 +194,12 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
       }
       else {
         type = rootType;
+        extraInfo = rootExtraInfo;
       }
     }
     else {
       type = rootType;
+      extraInfo = rootExtraInfo;
     }
   }
 
@@ -182,14 +208,17 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
   static const gd::String stringType;
   static const gd::String numberOrStringType;
 
+  static const gd::String emptyExtraInfo;
+
   gd::String type;
+  gd::String extraInfo = emptyExtraInfo;
   ExpressionNode *child;
 
   const gd::Platform &platform;
   const gd::ProjectScopedContainers &projectScopedContainers;
   const gd::String rootType;
+  const gd::String rootExtraInfo;
 };
 
 }  // namespace gd
 
-#endif  // GDCORE_EXPRESSIONTYPEFINDER_H

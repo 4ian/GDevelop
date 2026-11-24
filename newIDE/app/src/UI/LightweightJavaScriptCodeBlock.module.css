@@ -1,0 +1,64 @@
+.container {
+  position: relative;
+  background-color: var(--theme-surface-canvas-background-color);
+  /* So the block stays visible on a surface of the same color. */
+  border: 1px solid var(--theme-list-item-separator-color);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.code {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  align-items: start;
+  padding: 6px 0;
+  overflow: auto;
+  font-family: 'Lucida Console', Monaco, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  user-select: text;
+  cursor: text;
+  /* Room for the copy button, so the first lines are never hidden by it. */
+  padding-right: 24px;
+}
+
+.codeWithoutLineNumbers {
+  grid-template-columns: 1fr;
+  padding-left: 8px;
+}
+
+.lineNumber {
+  padding: 0 8px 0 6px;
+  text-align: right;
+  user-select: none;
+  opacity: 0.4;
+  font-variant-numeric: tabular-nums;
+}
+
+.line {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  padding-right: 4px;
+}
+
+.highlightedLineNumber,
+.highlightedLine {
+  /* A red tint that stays discreet on both light and dark themes. */
+  background-color: rgba(255, 82, 82, 0.15);
+}
+
+.highlightedLineNumber {
+  opacity: 0.8;
+  box-shadow: inset 2px 0 0 var(--theme-message-error-color);
+}
+
+.copyButtonContainer {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  opacity: 0.5;
+}
+
+.copyButtonContainer:hover {
+  opacity: 1;
+}

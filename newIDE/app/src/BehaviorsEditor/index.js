@@ -26,7 +26,9 @@ import { IconContainer } from '../UI/IconContainer';
 import { getBehaviorTutorialIds } from '../Utils/GDevelopServices/Tutorial';
 import {
   addBehaviorToObject,
+  isObjectSynchronizedOverNetwork,
   listObjectsBehaviorsTypes,
+  multiplayerObjectBehaviorType,
 } from '../Utils/Behavior';
 import { sendBehaviorAdded } from '../Utils/Analytics/EventSender';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
@@ -42,9 +44,10 @@ import {
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import PasteIcon from '../UI/CustomSvgIcons/Clipboard';
 import CopyIcon from '../UI/CustomSvgIcons/Copy';
+import NetworkSynchronized from '../UI/CustomSvgIcons/NetworkSynchronized';
+import NetworkNotSynchronized from '../UI/CustomSvgIcons/NetworkNotSynchronized';
 import ResponsiveFlatButton from '../UI/ResponsiveFlatButton';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
-import QuickCustomizationPropertiesVisibilityDialog from '../QuickCustomization/QuickCustomizationPropertiesVisibilityDialog';
 import Text from '../UI/Text';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { getAllVisibleBehaviorNames } from '../Utils/Behavior';
@@ -84,10 +87,8 @@ type BehaviorConfigurationEditorProps = {|
   canPasteBehaviors: boolean,
   pasteBehaviors: () => Promise<void>,
   openExtension: (behaviorType: string) => void,
-  openBehaviorPropertiesQuickCustomizationDialog: (
-    behaviorName: string
-  ) => void,
   isListLocked: boolean,
+  areObjectsSynchronizedOverNetwork: boolean,
   layersContainer: gdLayersContainer,
 |};
 
@@ -110,8 +111,8 @@ const BehaviorConfigurationEditor = React.forwardRef<
       canPasteBehaviors,
       pasteBehaviors,
       openExtension,
-      openBehaviorPropertiesQuickCustomizationDialog,
       isListLocked,
+      areObjectsSynchronizedOverNetwork,
       layersContainer,
     },
     ref
@@ -183,6 +184,7 @@ const BehaviorConfigurationEditor = React.forwardRef<
       tutorialId => !values.hiddenTutorialHints[tutorialId]
     );
     const iconUrl = behaviorMetadata.getIconFilename();
+    const isSynchronizedOverNetwork = behaviors[0].isSynchronizedOverNetwork();
 
     return (
       <Accordion
@@ -196,6 +198,37 @@ const BehaviorConfigurationEditor = React.forwardRef<
       >
         <AccordionHeader
           actions={[
+            ...(areObjectsSynchronizedOverNetwork &&
+            behaviorTypeName !== multiplayerObjectBehaviorType
+              ? [
+                  <IconButton
+                    key="network-synchronization"
+                    size="small"
+                    id={`behavior-${behaviorName}-network-synchronization-button`}
+                    tooltip={
+                      isSynchronizedOverNetwork
+                        ? t`Synchronized with other players`
+                        : t`Not synchronized: when this behavior is enabled, disabled or changed, other players are not affected. Useful for behaviors handling the player inputs.`
+                    }
+                    onClick={ev => {
+                      ev.stopPropagation();
+                      behaviors.forEach(behavior =>
+                        behavior.setSynchronizedOverNetwork(
+                          !isSynchronizedOverNetwork
+                        )
+                      );
+                      forceUpdate();
+                      onBehaviorsUpdated();
+                    }}
+                  >
+                    {isSynchronizedOverNetwork ? (
+                      <NetworkSynchronized />
+                    ) : (
+                      <NetworkNotSynchronized />
+                    )}
+                  </IconButton>,
+                ]
+              : []),
             <HelpIcon
               key="help"
               size="small"
@@ -233,18 +266,6 @@ const BehaviorConfigurationEditor = React.forwardRef<
                       },
                     ]
                   : []),
-                ...(!Window.isDev()
-                  ? []
-                  : [
-                      { type: 'separator' },
-                      {
-                        label: i18n._(t`Quick Customization settings`),
-                        click: () =>
-                          openBehaviorPropertiesQuickCustomizationDialog(
-                            behaviorName
-                          ),
-                      },
-                    ]),
               ]}
             />,
           ]}
@@ -342,6 +363,7 @@ export const useManageObjectBehaviors = ({
   onWillInstallExtension,
   onExtensionInstalled,
   allVisibleBehaviorNames,
+  onCreateNewExtensionWithBehavior,
 }: {
   project: gdProject,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
@@ -355,6 +377,9 @@ export const useManageObjectBehaviors = ({
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   allVisibleBehaviorNames: Array<string>,
+  onCreateNewExtensionWithBehavior:
+    | ((project: gdProject, object: gdObject) => void)
+    | null,
 }): UseManageBehaviorsState => {
   const [
     justAddedBehaviorName,
@@ -679,6 +704,14 @@ export const useManageObjectBehaviors = ({
       onWillInstallExtension={onWillInstallExtension}
       onExtensionInstalled={onExtensionInstalled}
       shouldShowCapabilityBehaviors={false}
+      onCreateNewExtensionWithBehavior={
+        onCreateNewExtensionWithBehavior
+          ? () => {
+              onCreateNewExtensionWithBehavior(project, objects[0]);
+              setNewBehaviorDialogOpen(false);
+            }
+          : null
+      }
     />
   );
 
@@ -716,6 +749,9 @@ type Props = {|
   ) => Promise<void>,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  onCreateNewExtensionWithBehavior:
+    | ((project: gdProject, object: gdObject) => void)
+    | null,
   isListLocked: boolean,
 |};
 
@@ -739,16 +775,14 @@ const BehaviorsEditor = (props: Props): React.Node => {
     openBehaviorEvents,
     onWillInstallExtension,
     onExtensionInstalled,
+    onCreateNewExtensionWithBehavior,
     isListLocked,
   } = props;
   const forceUpdate = useForceUpdate();
 
-  const [
-    selectedQuickCustomizationPropertiesBehavior,
-    setSelectedQuickCustomizationPropertiesBehavior,
-  ] = React.useState<?gdBehavior>(null);
-
   const allVisibleBehaviorNames = getAllVisibleBehaviorNames(objects);
+  const areObjectsSynchronizedOverNetwork =
+    objects.length > 0 && objects.every(isObjectSynchronizedOverNetwork);
   const {
     changeBehaviorName,
     removeBehavior,
@@ -772,6 +806,7 @@ const BehaviorsEditor = (props: Props): React.Node => {
     onWillInstallExtension,
     onExtensionInstalled,
     allVisibleBehaviorNames,
+    onCreateNewExtensionWithBehavior,
   });
 
   React.useEffect(
@@ -807,20 +842,6 @@ const BehaviorsEditor = (props: Props): React.Node => {
       openBehaviorEvents(extensionName, behaviorName);
     },
     [openBehaviorEvents, project]
-  );
-
-  const openBehaviorPropertiesQuickCustomizationDialog = React.useCallback(
-    (behaviorName: string) => {
-      const object = objects[0];
-      if (!object) {
-        return;
-      }
-      if (!object.hasBehaviorNamed(behaviorName)) return;
-      const behavior = object.getBehavior(behaviorName);
-
-      setSelectedQuickCustomizationPropertiesBehavior(behavior);
-    },
-    [objects]
   );
 
   const isClipboardContainingBehaviors = Clipboard.has(
@@ -892,9 +913,6 @@ const BehaviorsEditor = (props: Props): React.Node => {
                   onBehaviorsUpdated={onBehaviorsUpdated}
                   onChangeBehaviorName={changeBehaviorName}
                   openExtension={openExtension}
-                  openBehaviorPropertiesQuickCustomizationDialog={
-                    openBehaviorPropertiesQuickCustomizationDialog
-                  }
                   canPasteBehaviors={isClipboardContainingBehaviors}
                   pasteBehaviors={pasteBehaviors}
                   resourceManagementProps={props.resourceManagementProps}
@@ -902,6 +920,9 @@ const BehaviorsEditor = (props: Props): React.Node => {
                     props.projectScopedContainersAccessor
                   }
                   isListLocked={isListLocked}
+                  areObjectsSynchronizedOverNetwork={
+                    areObjectsSynchronizedOverNetwork
+                  }
                 />
               );
             })}
@@ -955,17 +976,6 @@ const BehaviorsEditor = (props: Props): React.Node => {
         </React.Fragment>
       )}
       {newBehaviorDialog}
-      {!!selectedQuickCustomizationPropertiesBehavior && (
-        <QuickCustomizationPropertiesVisibilityDialog
-          open={!!selectedQuickCustomizationPropertiesBehavior}
-          onClose={() => setSelectedQuickCustomizationPropertiesBehavior(null)}
-          propertyNames={selectedQuickCustomizationPropertiesBehavior
-            .getProperties()
-            .keys()
-            .toJSArray()}
-          propertiesQuickCustomizationVisibilities={selectedQuickCustomizationPropertiesBehavior.getPropertiesQuickCustomizationVisibilities()}
-        />
-      )}
     </Column>
   );
 };

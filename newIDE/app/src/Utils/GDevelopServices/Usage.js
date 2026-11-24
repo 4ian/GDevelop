@@ -51,6 +51,7 @@ export type Subscription = {|
 
   cancelAtPeriodEnd?: boolean,
   cancelReasons?: CancelReasons,
+  endOfPeriodAt?: number,
 
   purchaselyPlan?: string,
 
@@ -164,6 +165,12 @@ export type Quota = {|
   max: number,
   period: '1day' | '30days' | '7days',
   resetsAt?: number,
+  /** Only for the 30 days quota: when the credits of the oldest request come back. */
+  nextCreditsBackAt?: number,
+  /** Only for the 30 days quota: when the credits of all the requests are back. */
+  fullyRestoredAt?: number,
+  /** Only for the 30 days quota, when the limit is reached: when enough credits are back to make a request again. */
+  availableAgainAt?: number,
 |};
 
 export type Quotas = {
@@ -184,6 +191,21 @@ export type SubscriptionDialogDisplayConfig = {|
   placements: { [placementId: string]: SubscriptionDialogPlacementConfig },
 |};
 
+export type CreditsPackageDialogVariantConfig = {|
+  type: string,
+  weight: number,
+|};
+
+export type CreditsPackageDialogPlacementConfig = {|
+  variants: Array<CreditsPackageDialogVariantConfig>,
+|};
+
+export type CreditsPackageDialogDisplayConfig = {|
+  placements: {
+    [placementId: string]: CreditsPackageDialogPlacementConfig,
+  },
+|};
+
 /**
  * The limits communicated by the API for a user.
  */
@@ -197,6 +219,7 @@ export type Limits = {|
   },
   message: string | typeof undefined,
   subscriptionDialogDisplayConfig?: SubscriptionDialogDisplayConfig,
+  creditsPackageDialogDisplayConfig?: CreditsPackageDialogDisplayConfig,
 |};
 
 export type PlanDetails = {|
@@ -661,18 +684,71 @@ export const getRedirectToSubscriptionPortalUrl = async (
   return data.sessionPortalUrl;
 };
 
+export type SubscriptionPayment = {|
+  id: string,
+  createdAt: string,
+  amount: number,
+  currency: string,
+  planNameByLocale: MessageByLocale | null,
+  invoiceRequest:
+    | {| stripeInvoiceId: string |}
+    | {| paypalSubscriptionId: string, paypalTransactionId: string |},
+|};
+
+export const listSubscriptionPayments = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string
+): Promise<Array<SubscriptionPayment>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+
+  const response = await apiClient.get('/subscription-payment', {
+    params: { userId },
+    headers: { Authorization: authorizationHeader },
+  });
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/subscription-payment of Usage API',
+  });
+};
+
+export const generateSubscriptionPaymentInvoice = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  subscriptionPayment: SubscriptionPayment
+): Promise<Blob> => {
+  const authorizationHeader = await getAuthorizationHeader();
+
+  const response = await apiClient.post(
+    '/subscription-v2/action/generate-invoice',
+    subscriptionPayment.invoiceRequest,
+    {
+      params: { userId },
+      headers: {
+        Authorization: authorizationHeader,
+        Accept: 'application/pdf',
+      },
+      responseType: 'blob',
+    }
+  );
+  return response.data;
+};
+
 export const getRedirectToCheckoutUrl = ({
   pricingSystemId,
   userId,
   userEmail,
   quantity,
   couponCode,
+  language,
+  password,
 }: {|
   pricingSystemId: string,
   userId: string,
   userEmail: string,
   quantity?: number,
   couponCode?: string,
+  language: string,
+  password?: string,
 |}): string => {
   const url = new URL(
     `${GDevelopUsageApi.baseUrl}/subscription-v2/action/redirect-to-checkout-v2`
@@ -683,6 +759,8 @@ export const getRedirectToCheckoutUrl = ({
   if (quantity !== undefined && quantity > 1)
     url.searchParams.set('quantity', quantity.toString());
   if (couponCode) url.searchParams.set('couponCode', couponCode);
+  url.searchParams.set('language', language);
+  if (password) url.searchParams.set('password', password);
   return url.toString();
 };
 
@@ -712,15 +790,33 @@ export const redeemCode = async (
 export interface PricingSystemDiscount {
   pricingSystemId: string;
   discountMessage: string;
+  // The percentage taken off the price, or null for a fixed amount discount.
+  discountPercentage: number | null;
   originalAmountInCents: number;
   discountedAmountInCents: number;
   currency: string;
   discountedPaypalPlanId: string | null;
 }
 
+export type CouponValidationError =
+  | {|
+      code:
+        | 'missing-code'
+        | 'invalid-code'
+        | 'inactive'
+        | 'not-yet-valid'
+        | 'expired'
+        | 'not-applicable-to-plan'
+        | 'not-applicable'
+        | 'redemption-code',
+    |}
+  | {| code: 'not-applicable-to-period', period: 'week' | 'month' | 'year' |}
+  | {| code: 'wrong-currency', currency: string |};
+
 export type CouponValidationApiResponse = {
   isValid: boolean,
   pricingSystemDiscounts: PricingSystemDiscount[],
+  error?: CouponValidationError,
   errorMessage?: string,
 };
 

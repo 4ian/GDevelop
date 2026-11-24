@@ -49,6 +49,16 @@ describe('HelpLink', () => {
   });
 
   describe('getHelpLink', () => {
+    it('keeps an anchor contained in the path after the query string', () => {
+      expect(getHelpLink('/behaviors/tween#easing-functions')).toBe(
+        'https://wiki.gdevelop.io/gdevelop5/behaviors/tween?utm_source=gdevelop&utm_medium=help-link#easing-functions'
+      );
+      // An explicit anchor takes precedence.
+      expect(getHelpLink('/behaviors/tween#easing-functions', 'other')).toBe(
+        'https://wiki.gdevelop.io/gdevelop5/behaviors/tween?utm_source=gdevelop&utm_medium=help-link#other'
+      );
+    });
+
     it('returns wiki link for relative paths', () => {
       expect(getHelpLink('/test')).toBe(
         'https://wiki.gdevelop.io/gdevelop5/test?utm_source=gdevelop&utm_medium=help-link'

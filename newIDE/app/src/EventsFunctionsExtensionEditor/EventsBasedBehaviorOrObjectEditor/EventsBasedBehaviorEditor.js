@@ -13,18 +13,13 @@ import HelpButton from '../../UI/HelpButton';
 import { Line } from '../../UI/Grid';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
 import { type ExtensionItemConfigurationAttribute } from '../../EventsFunctionsExtensionEditor';
-import SelectOption from '../../UI/SelectOption';
-import Window from '../../Utils/Window';
 import CompactPropertiesEditorRowField from '../../CompactPropertiesEditor/CompactPropertiesEditorRowField';
 import { CompactTextAreaField } from '../../UI/CompactTextAreaField';
 import CompactSemiControlledTextField from '../../UI/CompactSemiControlledTextField';
-import CompactSelectField from '../../UI/CompactSelectField';
 import { CompactToggleField } from '../../UI/CompactToggleField';
 import { CompactIconField } from '../OptionsEditorDialog/CompactIconField';
 
 const gd: libGDevelop = global.gd;
-
-const isDev = Window.isDev();
 
 type Props = {|
   project: gdProject,
@@ -164,37 +159,6 @@ export default function EventsBasedBehaviorEditor({
               </Trans>
             </AlertMessage>
           )}
-          {isDev && (
-            <CompactPropertiesEditorRowField
-              label={i18n._(t`Visibility in quick customization dialog`)}
-              field={
-                <CompactSelectField
-                  value={eventsBasedBehavior
-                    .getQuickCustomizationVisibility()
-                    .toString()}
-                  onChange={valueString => {
-                    // $FlowFixMe[incompatible-type]
-                    const value: QuickCustomization_Visibility = valueString;
-                    eventsBasedBehavior.setQuickCustomizationVisibility(value);
-                    onChange();
-                  }}
-                >
-                  <SelectOption
-                    value={gd.QuickCustomization.Default}
-                    label={t`Default (visible)`}
-                  />
-                  <SelectOption
-                    value={gd.QuickCustomization.Visible}
-                    label={t`Always visible`}
-                  />
-                  <SelectOption
-                    value={gd.QuickCustomization.Hidden}
-                    label={t`Hidden`}
-                  />
-                </CompactSelectField>
-              }
-            />
-          )}
           <CompactToggleField
             label={i18n._(t`Private`)}
             checked={eventsBasedBehavior.isPrivate()}
@@ -212,6 +176,17 @@ export default function EventsBasedBehaviorEditor({
                     t`This behavior will be visible in the scene and events editors.`
                   )
             }
+          />
+          <CompactToggleField
+            label={i18n._(t`Synchronized over the network by default`)}
+            checked={eventsBasedBehavior.isSynchronizedOverNetworkByDefault()}
+            onCheck={checked => {
+              eventsBasedBehavior.setSynchronizedOverNetworkByDefault(checked);
+              onChange();
+            }}
+            markdownDescription={i18n._(
+              t`For multiplayer objects. Uncheck for behaviors reacting to the inputs of the player (keyboard, mouse or touch "mappers"): their state won't be sent to other players, so they can stay deactivated on the objects owned by other players.`
+            )}
           />
           {eventsBasedBehavior
             .getEventsFunctions()

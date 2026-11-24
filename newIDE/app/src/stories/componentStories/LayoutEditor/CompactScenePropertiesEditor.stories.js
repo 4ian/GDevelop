@@ -31,6 +31,9 @@ export const Default = (): React.Node => (
           }
           i18n={i18n}
           onBackgroundColorChanged={action('onBackgroundColorChanged')}
+          onRenderer3DWorldScaleFieldChanged={action(
+            'onRenderer3DWorldScaleFieldChanged'
+          )}
           openSceneVariables={action('openSceneVariables')}
         />
       )}
@@ -51,6 +54,9 @@ export const Empty = (): React.Node => (
           }
           i18n={i18n}
           onBackgroundColorChanged={action('onBackgroundColorChanged')}
+          onRenderer3DWorldScaleFieldChanged={action(
+            'onRenderer3DWorldScaleFieldChanged'
+          )}
           openSceneVariables={action('openSceneVariables')}
         />
       )}

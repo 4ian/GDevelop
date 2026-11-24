@@ -74,10 +74,12 @@ namespace gdjs {
       searchArea.maxY = y + radius;
       const nearbyObstacles: gdjs.BehaviorRBushAABB<gdjs.LightObstacleRuntimeBehavior>[] =
         this._obstacleRBush.search(searchArea);
-      result.length = 0;
-      nearbyObstacles.forEach((nearbyObstacle) =>
-        result.push(nearbyObstacle.behavior)
-      );
+      // Overwritten then truncated, rather than emptied then filled, to keep
+      // the memory of the array.
+      for (let i = 0; i < nearbyObstacles.length; i++) {
+        result[i] = nearbyObstacles[i].behavior;
+      }
+      result.length = nearbyObstacles.length;
     }
   }
 
@@ -85,10 +87,6 @@ namespace gdjs {
    * @category Behaviors > 2D Light Obstacle
    */
   export class LightObstacleRuntimeBehavior extends gdjs.RuntimeBehavior {
-    _oldX: float = 0;
-    _oldY: float = 0;
-    _oldWidth: float = 0;
-    _oldHeight: float = 0;
     currentRBushAABB: gdjs.BehaviorRBushAABB<LightObstacleRuntimeBehavior> | null =
       null;
     _manager: any;
@@ -115,21 +113,20 @@ namespace gdjs {
         }
       }
 
-      //Track changes in size or position
-      if (
-        this._oldX !== this.owner.getX() ||
-        this._oldY !== this.owner.getY() ||
-        this._oldWidth !== this.owner.getWidth() ||
-        this._oldHeight !== this.owner.getHeight()
-      ) {
-        if (this._registeredInManager) {
+      // Track changes of the obstacle bounding box: when it moves, is
+      // resized, rotated, flipped or changes of animation.
+      const rbushAABB = this.currentRBushAABB;
+      if (this._registeredInManager && rbushAABB) {
+        const aabb = this.owner.getAABB();
+        if (
+          rbushAABB.minX !== aabb.min[0] ||
+          rbushAABB.minY !== aabb.min[1] ||
+          rbushAABB.maxX !== aabb.max[0] ||
+          rbushAABB.maxY !== aabb.max[1]
+        ) {
           this._manager.removeObstacle(this);
           this._manager.addObstacle(this);
         }
-        this._oldX = this.owner.getX();
-        this._oldY = this.owner.getY();
-        this._oldWidth = this.owner.getWidth();
-        this._oldHeight = this.owner.getHeight();
       }
     }
 

@@ -3,10 +3,12 @@ import React, { Component } from 'react';
 import debounce from 'lodash/debounce';
 import panable, { type PanMoveEvent } from '../Utils/PixiSimpleGesture/pan';
 import KeyboardShortcuts, { MID_MOUSE_BUTTON } from '../UI/KeyboardShortcuts';
+import isUserTyping from '../KeyboardShortcuts/IsUserTyping';
 import InstancesRenderer from './InstancesRenderer';
 import ViewPosition from './ViewPosition';
 import SelectedInstances from './SelectedInstances';
 import HighlightedInstance from './HighlightedInstance';
+import HiddenInstancesDecorations from './HiddenInstancesDecorations';
 import SelectionRectangle from './SelectionRectangle';
 import InstancesResizer, {
   type ResizeGrabbingLocation,
@@ -57,6 +59,8 @@ import ClickInterceptor from './ClickInterceptor';
 import getObjectByName from '../Utils/GetObjectByName';
 import { AffineTransformation } from '../Utils/AffineTransformation';
 import { ErrorFallbackComponent } from '../UI/ErrorBoundary';
+import { startNativeAppActivity } from '../Utils/NativeAppLifecycle';
+import { isWebGL2Supported } from '../Utils/WebGL';
 import { Trans } from '@lingui/macro';
 import { generateUUID } from 'three/src/math/MathUtils';
 import {
@@ -93,6 +97,7 @@ export type InstancesEditorShortcutsCallbacks = {|
   onShift1: () => void,
   onShift2: () => void,
   onShift3: () => void,
+  onFocusOnSelection: () => void,
 |};
 
 export type InstancesEditorPropsWithoutSizeAndScroll = {|
@@ -169,6 +174,7 @@ export default class InstancesEditor extends Component<Props, State> {
   tileMapPaintingPreview: TileMapPaintingPreview;
   clickInterceptor: ClickInterceptor;
   highlightedInstance: HighlightedInstance;
+  hiddenInstancesDecorations: HiddenInstancesDecorations;
   instancesResizer: InstancesResizer;
   instancesRotator: InstancesRotator;
   instancesMover: InstancesMover;
@@ -188,10 +194,13 @@ export default class InstancesEditor extends Component<Props, State> {
   grid: Grid;
   background: Background;
   _unmounted = false;
+  _stopNativeAppActivity: (() => void) | null = null;
   _renderingPausedReasons: Set<string> = new Set();
   nextFrame: AnimationFrameID;
   contextMenuLongTouchTimeoutID: TimeoutID;
   hasCursorMovedSinceItIsDown = false;
+  _instanceUnderPointerDown: gdInitialInstance | null = null;
+  _isPointerOverCanvas = false;
   _showObjectInstancesIn3D: boolean = false;
   _previousToolBeforePicker: ?TileMapTileSelection = null;
 
@@ -242,26 +251,44 @@ export default class InstancesEditor extends Component<Props, State> {
     const { onMouseMove, onMouseLeave } = this.props;
 
     this.keyboardShortcuts = new KeyboardShortcuts({
+      isActive: this._shouldHandleKeyboardShortcuts,
       shortcutCallbacks: {
         onMove: this.moveSelection,
-        onEscape: this.onPressEscape,
         ...this.props.instancesEditorShortcutsCallbacks,
       },
     });
 
     let gameCanvas: HTMLCanvasElement;
-    this._showObjectInstancesIn3D = this.props.showObjectInstancesIn3D;
     // Ensure we don't initialize with 0 dimensions, which is invalid for PixiJS/WebGL
     // and can cause shader creation to fail on some platforms (e.g. Windows with ANGLE).
     const initialWidth = this.props.width || 1;
     const initialHeight = this.props.height || 1;
+    // Three.js requires WebGL2. The preference can still be enabled on devices
+    // without it (it was persisted before this requirement), so fall back to 2D.
+    let threeCanvas: HTMLCanvasElement | null = null;
+    // $FlowFixMe[value-as-type]
+    let threeRenderer: THREE.WebGLRenderer | null = null;
     // TODO (3D): Should it handle preference changes without needing to reopen tabs?
-    if (this._showObjectInstancesIn3D) {
-      gameCanvas = document.createElement('canvas');
-      const threeRenderer = new THREE.WebGLRenderer({
-        canvas: gameCanvas,
-      });
-      threeRenderer.useLegacyLights = true;
+    if (this.props.showObjectInstancesIn3D && isWebGL2Supported()) {
+      try {
+        threeCanvas = document.createElement('canvas');
+        threeRenderer = new THREE.WebGLRenderer({
+          canvas: threeCanvas,
+          // Ask for the discrete graphics card, if any.
+          powerPreference: 'high-performance',
+        });
+      } catch (error) {
+        console.error(
+          'Unable to create the Three.js renderer, falling back to 2D rendering:',
+          error
+        );
+        threeCanvas = null;
+        threeRenderer = null;
+      }
+    }
+    this._showObjectInstancesIn3D = !!threeRenderer;
+    if (threeCanvas && threeRenderer) {
+      gameCanvas = threeCanvas;
       threeRenderer.autoClear = false;
       threeRenderer.setSize(initialWidth, initialHeight);
 
@@ -300,6 +327,10 @@ export default class InstancesEditor extends Component<Props, State> {
       gameCanvas = this.pixiRenderer.view;
     }
 
+    // Each instances editor keeps a WebGL context and its textures alive.
+    if (this._stopNativeAppActivity) this._stopNativeAppActivity();
+    this._stopNativeAppActivity = startNativeAppActivity('instances-editor');
+
     // Deactivating accessibility support in PixiJS renderer, as we want to be in control of this.
     // See https://github.com/pixijs/pixijs/issues/5111#issuecomment-420047824
     this.pixiRenderer.plugins.accessibility.destroy();
@@ -307,6 +338,11 @@ export default class InstancesEditor extends Component<Props, State> {
 
     // Add the renderer view element to the DOM
     canvasArea.appendChild(gameCanvas);
+    this.statusBar = new StatusBar({
+      container: canvasArea,
+      getLastCursorSceneCoordinates: this.getLastCursorSceneCoordinates,
+      isPointerOverCanvas: () => this._isPointerOverCanvas,
+    });
 
     this.pixiRenderer.view.style.outline = 'none';
 
@@ -333,14 +369,13 @@ export default class InstancesEditor extends Component<Props, State> {
       event.preventDefault();
     };
     this.pixiRenderer.view.setAttribute('tabIndex', -1);
-    this.pixiRenderer.view.addEventListener(
-      'keydown',
-      this.keyboardShortcuts.onKeyDown
-    );
-    this.pixiRenderer.view.addEventListener(
-      'keyup',
-      this.keyboardShortcuts.onKeyUp
-    );
+    // Listened on the window (in the capture phase, as tree views stop the propagation)
+    // so that shortcuts also work when the canvas is only hovered, like the wheel zoom.
+    window.addEventListener('keydown', this.keyboardShortcuts.onKeyDown, true);
+    // Key releases are always handled, so that a key released outside the canvas or
+    // while the window is blurred is not considered as still pressed.
+    window.addEventListener('keyup', this.keyboardShortcuts.onKeyUp, true);
+    window.addEventListener('blur', this.keyboardShortcuts.resetModifiers);
     this.pixiRenderer.view.addEventListener(
       'mousedown',
       this.keyboardShortcuts.onMouseDown
@@ -349,14 +384,15 @@ export default class InstancesEditor extends Component<Props, State> {
       'mouseup',
       this.keyboardShortcuts.onMouseUp
     );
-    if (onMouseMove)
-      this.pixiRenderer.view.addEventListener('mousemove', event => {
-        onMouseMove(event);
-      });
-    if (onMouseLeave)
-      this.pixiRenderer.view.addEventListener('mouseout', event => {
-        onMouseLeave(event);
-      });
+    this.pixiRenderer.view.addEventListener('mousemove', event => {
+      this._isPointerOverCanvas = true;
+      this._onMouseMove(event.offsetX, event.offsetY);
+      if (onMouseMove) onMouseMove(event);
+    });
+    this.pixiRenderer.view.addEventListener('mouseout', event => {
+      this._isPointerOverCanvas = false;
+      if (onMouseLeave) onMouseLeave(event);
+    });
     this.pixiRenderer.view.addEventListener('focusout', event => {
       if (this.keyboardShortcuts) {
         this.keyboardShortcuts.resetModifiers();
@@ -411,11 +447,6 @@ export default class InstancesEditor extends Component<Props, State> {
       }
 
       this._onUpBackground(event.data.global.x, event.data.global.y);
-    });
-    this.backgroundArea.addEventListener('globalmousemove', event => {
-      const cursorX = event.data.global.x || 0;
-      const cursorY = event.data.global.y || 0;
-      this._onMouseMove(cursorX, cursorY);
     });
     this.backgroundArea.addEventListener('panmove', (event: PanMoveEvent) =>
       this._onPanMove(
@@ -493,6 +524,12 @@ export default class InstancesEditor extends Component<Props, State> {
         this.highlightedInstance.getPixiObject()
       );
     }
+    if (this.hiddenInstancesDecorations) {
+      this.uiPixiContainer.removeChild(
+        this.hiddenInstancesDecorations.getPixiObject()
+      );
+      this.hiddenInstancesDecorations.delete();
+    }
     if (this.tileMapPaintingPreview) {
       this.uiPixiContainer.removeChild(
         this.tileMapPaintingPreview.getPixiObject()
@@ -521,9 +558,6 @@ export default class InstancesEditor extends Component<Props, State> {
     }
     if (this.windowMask) {
       this.uiPixiContainer.removeChild(this.windowMask.getPixiObject());
-    }
-    if (this.statusBar) {
-      this.uiPixiContainer.removeChild(this.statusBar.getPixiObject());
     }
     if (this.background) {
       this.backgroundPixiContainer.removeChild(this.background.getPixiObject());
@@ -595,6 +629,12 @@ export default class InstancesEditor extends Component<Props, State> {
       toCanvasCoordinates: this.viewPosition.toCanvasCoordinates,
       isInstanceOf3DObject: this.props.isInstanceOf3DObject,
     });
+    this.hiddenInstancesDecorations = new HiddenInstancesDecorations({
+      instances: props.initialInstances,
+      layersContainer: props.layersContainer,
+      instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
+      toCanvasCoordinates: this.viewPosition.toCanvasCoordinates,
+    });
     this.instancesResizer = new InstancesResizer({
       instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
       instancesEditorSettings: this.props.instancesEditorSettings,
@@ -617,11 +657,6 @@ export default class InstancesEditor extends Component<Props, State> {
       viewPosition: this.viewPosition,
       instancesEditorSettings: this.props.instancesEditorSettings,
     });
-    this.statusBar = new StatusBar({
-      width: this.props.width,
-      height: this.props.height,
-      getLastCursorSceneCoordinates: this.getLastCursorSceneCoordinates,
-    });
     this.profilerBar = new ProfilerBar();
 
     this.uiPixiContainer.addChild(this.selectionRectangle.getPixiObject());
@@ -630,9 +665,11 @@ export default class InstancesEditor extends Component<Props, State> {
     this.uiPixiContainer.addChild(this.windowMask.getPixiObject());
     this.uiPixiContainer.addChild(this.selectedInstances.getPixiContainer());
     this.uiPixiContainer.addChild(this.highlightedInstance.getPixiObject());
+    this.uiPixiContainer.addChild(
+      this.hiddenInstancesDecorations.getPixiObject()
+    );
     this.uiPixiContainer.addChild(this.tileMapPaintingPreview.getPixiObject());
     this.uiPixiContainer.addChild(this.clickInterceptor.getPixiObject());
-    this.uiPixiContainer.addChild(this.statusBar.getPixiObject());
     this.uiPixiContainer.addChild(this.profilerBar.getPixiObject());
 
     this.background = new Background({
@@ -643,15 +680,45 @@ export default class InstancesEditor extends Component<Props, State> {
     this.backgroundPixiContainer.addChild(this.background.getPixiObject());
   }
 
+  /**
+   * Keyboard shortcuts are handled when the canvas is hovered by the cursor, or when it
+   * is focused - so that they can be used without having to click on the canvas first,
+   * consistently with the mouse wheel zoom that already works when only hovering.
+   */
+  _shouldHandleKeyboardShortcuts = (): boolean =>
+    !!this.pixiRenderer &&
+    // Don't handle shortcuts while a text is edited or a dialog is opened.
+    !isUserTyping() &&
+    !(
+      document.activeElement &&
+      document.activeElement.closest('[role="dialog"]')
+    ) &&
+    (this._isPointerOverCanvas ||
+      document.activeElement === this.pixiRenderer.view);
+
   componentWillUnmount() {
     // This is an antipattern and is theoretically not needed, but help
     // to protect against renders after the component is unmounted.
     this._unmounted = true;
 
+    if (this._stopNativeAppActivity) {
+      this._stopNativeAppActivity();
+      this._stopNativeAppActivity = null;
+    }
+    if (this.keyboardShortcuts) {
+      const { onKeyDown, onKeyUp, resetModifiers } = this.keyboardShortcuts;
+      window.removeEventListener('keydown', onKeyDown, true);
+      window.removeEventListener('keyup', onKeyUp, true);
+      window.removeEventListener('blur', resetModifiers);
+    }
+
     // We've seen all those elements being undefined in some cases, so
     // by security, check that they are defined before deleting them.
     if (this.selectionRectangle) {
       this.selectionRectangle.delete();
+    }
+    if (this.hiddenInstancesDecorations) {
+      this.hiddenInstancesDecorations.delete();
     }
     if (this.instancesRenderer) {
       this.instancesRenderer.delete();
@@ -675,6 +742,15 @@ export default class InstancesEditor extends Component<Props, State> {
     }
     if (this.pixiRenderer) {
       this.pixiRenderer.destroy();
+    }
+    const { threeRenderer } = this;
+    if (threeRenderer) {
+      // Release the WebGL context (shared with PixiJS) right away: otherwise its
+      // GPU memory is only freed when garbage collected, and a new one is
+      // created each time the editor is shown again.
+      threeRenderer.dispose();
+      threeRenderer.forceContextLoss();
+      this.threeRenderer = null;
     }
   }
 
@@ -715,7 +791,6 @@ export default class InstancesEditor extends Component<Props, State> {
         );
       }
       this.viewPosition.resize(width, height);
-      this.statusBar.resize(width, height);
       this.backgroundArea.hitArea = new PIXI.Rectangle(0, 0, width, height);
       this.background.resize(width, height);
 
@@ -1253,15 +1328,6 @@ export default class InstancesEditor extends Component<Props, State> {
     if (!shouldMoveView) {
       this.selectionRectangle.startSelectionRectangle(x, y);
     }
-
-    if (
-      !this.keyboardShortcuts.shouldMultiSelect() &&
-      !shouldMoveView &&
-      this.props.instancesSelection.hasSelectedInstances()
-    ) {
-      this.props.instancesSelection.clearSelection();
-      this.props.onInstancesSelected([]);
-    }
   };
 
   _onPanMove = (deltaX: number, deltaY: number, x: number, y: number) => {
@@ -1374,6 +1440,7 @@ export default class InstancesEditor extends Component<Props, State> {
     this.fpsLimiter.notifyInteractionHappened();
 
     this.hasCursorMovedSinceItIsDown = false;
+    this._instanceUnderPointerDown = instance;
 
     if (this.keyboardShortcuts.shouldMoveView()) {
       // If the user wants to move the view, discard the click on an instance:
@@ -1427,7 +1494,13 @@ export default class InstancesEditor extends Component<Props, State> {
     // but selecting the same instance twice has no side effect on the
     // selection.
     // - For MultiSelect, the selection is not done in _onDownInstance.
-    if (!this.hasCursorMovedSinceItIsDown) {
+    // Releasing the pointer after another interaction (rotating, resizing,
+    // dropping an object...) must not select the instance under the pointer.
+    const isUpOnInstanceUnderPointerDown =
+      !!this._instanceUnderPointerDown &&
+      this._instanceUnderPointerDown.ptr === instance.ptr;
+    this._instanceUnderPointerDown = null;
+    if (isUpOnInstanceUnderPointerDown && !this.hasCursorMovedSinceItIsDown) {
       this.props.instancesSelection.selectInstance({
         instance,
         multiSelect: this.keyboardShortcuts.shouldMultiSelect(),
@@ -1629,12 +1702,12 @@ export default class InstancesEditor extends Component<Props, State> {
     this.onInstancesMovedDebounced(unlockedSelectedInstances);
   };
 
-  onPressEscape = () => {
+  cancelClickInterception = (): boolean => {
     if (this.clickInterceptor && this.clickInterceptor.isIntercepting()) {
       this.clickInterceptor.cancelClickInterception();
-    } else if (this.props.tileMapTileSelection) {
-      this.props.onSelectTileMapTile(null);
+      return true;
     }
+    return false;
   };
 
   scrollBy(x: number, y: number) {
@@ -1805,6 +1878,7 @@ export default class InstancesEditor extends Component<Props, State> {
         this.canvasCursor.render();
         this.grid.render();
         this.highlightedInstance.render();
+        this.hiddenInstancesDecorations.render();
         this.tileMapPaintingPreview.render();
         this.clickInterceptor.render();
         this.selectedInstances.render();

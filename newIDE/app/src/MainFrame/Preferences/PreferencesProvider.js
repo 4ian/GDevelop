@@ -7,6 +7,7 @@ import PreferencesContext, {
   type AlertMessageIdentifier,
   type EditorStateForProject,
   type EditorStateForProjectUpdate,
+  type EditorStateForPropertyPanel,
 } from './PreferencesContext';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { getIDEVersion } from '../../Version';
@@ -29,6 +30,7 @@ import {
   selectLanguageOrLocale,
 } from '../../Utils/Language';
 import { type GamesDashboardOrderBy } from '../../GameDashboard/GamesList';
+import { isWebGL2Supported } from '../../Utils/WebGL';
 import {
   CHECK_APP_UPDATES_TIMEOUT,
   PERIODIC_APP_UPDATES_TIMEOUT,
@@ -78,6 +80,11 @@ export const loadPreferencesFromLocalStorage = (): ?PreferencesValues => {
         : 'no';
     }
 
+    // 3D rendering requires WebGL2 (the preference used to only require WebGL1).
+    if (values.use3DEditor && !isWebGL2Supported()) {
+      values.use3DEditor = false;
+    }
+
     return values;
   } catch (e) {
     return null;
@@ -89,6 +96,7 @@ export const getInitialPreferences = (): {
   autoDownloadUpdates: boolean,
   autoOpenMostRecentProject: boolean,
   automaticallyApplyAiRequestEditsByProjectId: { [string]: boolean },
+  preferredAiConfigurationPresetId: string | null,
   automaticallyUseCreditsForAiRequests: boolean,
   autosaveOnPreview: boolean,
   backdropClickBehavior: string,
@@ -114,9 +122,12 @@ export const getInitialPreferences = (): {
   isAlwaysOnTopInPreview: boolean,
   isMenuBarHiddenInPreview: boolean,
   language: string,
+  lastClaimableProductsDialogMonth: null,
+  autoDisplayClaimableProductsDialog: boolean,
   lastLaunchedVersion: void,
   newFeaturesAcknowledgements: {},
   newObjectDialogDefaultTab: any,
+  newEffectDialogDefaultTab: string,
   newProjectsDefaultFolder: any,
   newProjectsDefaultStorageProviderName: string,
   openDiagnosticReportAutomatically: boolean,
@@ -133,11 +144,15 @@ export const getInitialPreferences = (): {
   showExperimentalExtensions: boolean,
   showInAppTutorialDeveloperMode: boolean,
   takeScreenshotOnPreview: boolean,
+  gameplayTestFramePosition: {| left: number, bottom: number |} | null,
+  gameplayTestFrameZoomFactor: number | null,
   themeName: any,
-  use3DEditor: any,
+  use3DEditor: boolean,
+  useRealTime2DEditor: boolean,
   useBackgroundSerializerForSaving: boolean,
   showJsTypeError: boolean,
   canonicalEventSerialization: boolean,
+  showExtensionChangesToKeepOnUpdate: boolean,
   useGDJSDevelopmentWatcher: boolean,
   useShortcutToClosePreviewWindow: boolean,
   userShortcutMap: {},
@@ -273,6 +288,14 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       this
     ): any),
     // $FlowFixMe[method-unbinding]
+    getNewEffectDialogDefaultTab: (this._getNewEffectDialogDefaultTab.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setNewEffectDialogDefaultTab: (this._setNewEffectDialogDefaultTab.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
     getShareDialogDefaultTab: (this._getShareDialogDefaultTab.bind(this): any),
     // $FlowFixMe[method-unbinding]
     setShareDialogDefaultTab: (this._setShareDialogDefaultTab.bind(this): any),
@@ -343,6 +366,10 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     // $FlowFixMe[method-unbinding]
     getUse3DEditor: (this._getUse3DEditor.bind(this): any),
     // $FlowFixMe[method-unbinding]
+    setUseRealTime2DEditor: (this._setUseRealTime2DEditor.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    getUseRealTime2DEditor: (this._getUseRealTime2DEditor.bind(this): any),
+    // $FlowFixMe[method-unbinding]
     setShowBasicProfilingCounters: (this._setShowBasicProfilingCounters.bind(
       this
     ): any),
@@ -371,6 +398,14 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       this
     ): any),
     // $FlowFixMe[method-unbinding]
+    setLastClaimableProductsDialogMonth: (this._setLastClaimableProductsDialogMonth.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setAutoDisplayClaimableProductsDialog: (this._setAutoDisplayClaimableProductsDialog.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
     setNewFeaturesAcknowledgements: (this._setNewFeaturesAcknowledgements.bind(
       this
     ): any),
@@ -395,6 +430,14 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       this
     ): any),
     // $FlowFixMe[method-unbinding]
+    setGameplayTestFramePosition: (this._setGameplayTestFramePosition.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setGameplayTestFrameZoomFactor: (this._setGameplayTestFrameZoomFactor.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
     setShowAiAskButtonInTitleBar: (this._setShowAiAskButtonInTitleBar.bind(
       this
     ): any),
@@ -407,6 +450,10 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       this
     ): any),
     // $FlowFixMe[method-unbinding]
+    setPreferredAiConfigurationPresetId: (this._setPreferredAiConfigurationPresetId.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
     setUseBackgroundSerializerForSaving: (this._setUseBackgroundSerializerForSaving.bind(
       this
     ): any),
@@ -414,6 +461,10 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setShowJsTypeError: (this._setShowJsTypeError.bind(this): any),
     // $FlowFixMe[method-unbinding]
     setCanonicalEventSerialization: (this._setCanonicalEventSerialization.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setShowExtensionChangesToKeepOnUpdate: (this._setShowExtensionChangesToKeepOnUpdate.bind(
       this
     ): any),
   };
@@ -783,6 +834,22 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     return this.state.values.use3DEditor;
   }
 
+  _setUseRealTime2DEditor(useRealTime2DEditor: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          useRealTime2DEditor,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _getUseRealTime2DEditor(): any {
+    return this.state.values.useRealTime2DEditor;
+  }
+
   _setShowBasicProfilingCounters(showBasicProfilingCounters: boolean) {
     this.setState(
       state => ({
@@ -1140,6 +1207,21 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
+  _getNewEffectDialogDefaultTab(): any {
+    return this.state.values.newEffectDialogDefaultTab;
+  }
+
+  _setNewEffectDialogDefaultTab(
+    newEffectDialogDefaultTab: 'asset-store' | 'from-scratch'
+  ) {
+    this.setState(
+      state => ({
+        values: { ...state.values, newEffectDialogDefaultTab },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
   _getShareDialogDefaultTab(): any {
     return this.state.values.shareDialogDefaultTab;
   }
@@ -1243,6 +1325,32 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
+  _setAutoDisplayClaimableProductsDialog(
+    autoDisplayClaimableProductsDialog: boolean
+  ) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          autoDisplayClaimableProductsDialog,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setLastClaimableProductsDialogMonth(month: string) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          lastClaimableProductsDialogMonth: month,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
   _setNewFeaturesAcknowledgements(newFeaturesAcknowledgements: {
     [featureId: string]: {| dates: [number] |},
   }) {
@@ -1296,14 +1404,40 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
+  _setShowExtensionChangesToKeepOnUpdate(newValue: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          showExtensionChangesToKeepOnUpdate: newValue,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
   _getEditorStateForProject(projectId: string): any {
     const editorState = this.state.values.editorStateByProject[projectId];
     if (!editorState) return null;
 
+    const defaultState: EditorStateForPropertyPanel = {
+      scrollPosition: 0,
+      collapsedSections: {},
+    };
+    for (const panelType in editorState.propertiesPanel) {
+      const states = editorState.propertiesPanel[panelType];
+      for (const id in states) {
+        states[id] = {
+          ...defaultState,
+          ...states[id],
+        };
+      }
+    }
+
     return {
       editorTabs:
         editorState.editorTabs == null ? null : editorState.editorTabs,
-      propertiesPanelScroll: editorState.propertiesPanelScroll || {},
+      propertiesPanel: editorState.propertiesPanel || {},
     };
   }
 
@@ -1324,7 +1458,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
             projectId
           ] || {
             editorTabs: null,
-            propertiesPanelScroll: {},
+            propertiesPanel: {},
           };
           const mergedEditorState: EditorStateForProject = {
             ...previousEditorState,
@@ -1393,6 +1527,30 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
+  _setGameplayTestFramePosition(newValue: {| left: number, bottom: number |}) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          gameplayTestFramePosition: newValue,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setGameplayTestFrameZoomFactor(newValue: number) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          gameplayTestFrameZoomFactor: newValue,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
   _setShowAiAskButtonInTitleBar(newValue: boolean) {
     this.setState(
       state => ({
@@ -1429,6 +1587,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
             ...state.values.automaticallyApplyAiRequestEditsByProjectId,
             [projectId]: newValue,
           },
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setPreferredAiConfigurationPresetId(newValue: string) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          preferredAiConfigurationPresetId: newValue,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

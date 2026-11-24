@@ -4,7 +4,7 @@ import TabsTitlebar from './TabsTitlebar';
 import Toolbar, { type ToolbarInterface } from './Toolbar';
 import { TabContentContainer } from '../UI/ClosableTabs';
 import { DraggableEditorTabs } from './EditorTabs/DraggableEditorTabs';
-import CommandsContextScopedProvider from '../CommandPalette/CommandsScopedContext';
+import ActiveTabCommandsProvider from '../CommandPalette/ActiveTabCommandsProvider';
 import ErrorBoundary, {
   getEditorErrorBoundaryProps,
 } from '../UI/ErrorBoundary';
@@ -31,7 +31,10 @@ import {
   type ObjectGroupsOutsideEditorChanges,
   type ProjectItemRenamedOutsideEditorChanges,
   type WillDeleteSceneChanges,
+  type WillDeleteGameplayTestChanges,
   type WillDeleteObjectChanges,
+  type ExtensionsOutsideEditorChanges,
+  type WillDeleteExtensionItemChanges,
 } from '../EditorFunctions/OutsideEditorChanges';
 import { type NavigateToEventFromGlobalSearchParams } from '../Utils/Search';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
@@ -64,6 +67,7 @@ import DrawerTopBar from '../UI/DrawerTopBar';
 import { type FloatingPaneState } from './PanesContainer';
 import { type CreateProjectResult } from '../Utils/UseCreateProject';
 import { type OpenAskAiOptions } from '../AiGeneration/Utils';
+import { type GameplayTestsCallbacks } from '../GameplayTests/GameplayTestRunner';
 import { type ToolbarButtonConfig } from './CustomToolbarButton';
 import { type TriggerNpmScript } from './NpmScriptRunner/useNpmScriptRunner';
 
@@ -107,6 +111,7 @@ export type EditorTabsPaneCommonProps = {|
   gamesPlatformFrameTools: GamesPlatformFrameTools,
   gameEditorMode: 'embedded-game' | 'instances-editor',
   setGameEditorMode: ('embedded-game' | 'instances-editor') => void,
+  setEditorMode: ('2d-editor' | '3d-editor') => void,
   toolbarButtons: Array<ToolbarButtonConfig>,
   projectPath: ?string,
   triggerNpmScript: TriggerNpmScript,
@@ -145,6 +150,7 @@ export type EditorTabsPaneCommonProps = {|
   onQuitVersionHistory: () => Promise<void>,
   onOpenAskAi: (?OpenAskAiOptions) => void,
   onCloseAskAi: () => void,
+  gameplayTestsCallbacks: GameplayTestsCallbacks,
   getStorageProvider: () => StorageProvider,
   setPreviewedLayout: ({|
     layoutName: string | null,
@@ -165,6 +171,7 @@ export type EditorTabsPaneCommonProps = {|
         | 'none',
     |}
   ) => void,
+  openExternalLayout: (name: string) => void,
   openTemplateFromTutorial: (tutorialId: string) => Promise<void>,
   openTemplateFromCourseChapter: (
     courseChapter: CourseChapter,
@@ -181,10 +188,7 @@ export type EditorTabsPaneCommonProps = {|
       | 'extension-events-editor'
       | 'external-events-editor'
   ) => Promise<void>,
-  openInstructionOrExpression: (
-    extension: gdPlatformExtension,
-    type: string
-  ) => void,
+  openInstructionOrExpression: (type: string) => void,
   onOpenCustomObjectEditor: (
     eventsFunctionsExtension: gdEventsFunctionsExtension,
     eventsBasedObject: gdEventsBasedObject,
@@ -204,6 +208,24 @@ export type EditorTabsPaneCommonProps = {|
   onDeletedEventsBasedObject: (
     eventsFunctionsExtension: gdEventsFunctionsExtension,
     name: string
+  ) => void,
+  onEventsBasedObjectMoved: (
+    oldExtensionName: string,
+    newExtensionName: string,
+    oldObjectName: string,
+    newObjectName: string
+  ) => void,
+  onEventsBasedBehaviorMoved: (
+    oldExtensionName: string,
+    newExtensionName: string,
+    oldBehaviorName: string,
+    newBehaviorName: string
+  ) => void,
+  onEventsFunctionMoved: (
+    oldExtensionName: string,
+    newExtensionName: string,
+    oldFunctionName: string,
+    newFunctionName: string
   ) => void,
   openObjectEvents: (extensionName: string, objectName: string) => void,
   onNavigateToEventFromGlobalSearch: (
@@ -291,13 +313,26 @@ export type EditorTabsPaneCommonProps = {|
     changes: ProjectItemRenamedOutsideEditorChanges
   ) => void,
   onWillDeleteScene: (changes: WillDeleteSceneChanges) => Promise<void>,
+  onWillDeleteGameplayTest: (
+    changes: WillDeleteGameplayTestChanges
+  ) => Promise<void>,
   onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
+  onExtensionsModifiedOutsideEditor: (
+    changes: ExtensionsOutsideEditorChanges
+  ) => void,
+  onWillDeleteExtensionItem: (
+    changes: WillDeleteExtensionItemChanges
+  ) => Promise<void>,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  onCreateNewExtensionWithBehavior:
+    | ((project: gdProject, object: gdObject) => void)
+    | null,
   onLoadEventsFunctionsExtensions: ({|
     shouldHotReloadEditor: boolean,
   |}) => Promise<void>,
   onEffectAdded: () => void,
+  onLayerRenamedOrRemoved: () => void,
   onObjectListsModified: ({ isNewObjectTypeUsed: boolean }) => void,
   onExternalLayoutAssociationChanged: () => void,
   triggerHotReloadInGameEditorIfNeeded: () => void,
@@ -356,10 +391,12 @@ const EditorTabsPane: React.ComponentType<{
     onQuitVersionHistory,
     onOpenAskAi,
     onCloseAskAi,
+    gameplayTestsCallbacks,
     getStorageProvider,
     setPreviewedLayout,
     openExternalEvents,
     openLayout,
+    openExternalLayout,
     openTemplateFromTutorial,
     openTemplateFromCourseChapter,
     previewDebuggerServer,
@@ -371,6 +408,9 @@ const EditorTabsPane: React.ComponentType<{
     onOpenEventsFunctionsExtension,
     onRenamedEventsBasedObject,
     onDeletedEventsBasedObject,
+    onEventsBasedObjectMoved,
+    onEventsBasedBehaviorMoved,
+    onEventsFunctionMoved,
     openObjectEvents,
     onNavigateToEventFromGlobalSearch,
     onEditorTabClosing,
@@ -410,10 +450,15 @@ const EditorTabsPane: React.ComponentType<{
     onObjectGroupsModifiedOutsideEditor,
     onProjectItemRenamedOutsideEditor,
     onWillDeleteScene,
+    onWillDeleteGameplayTest,
     onWillDeleteObject,
+    onExtensionsModifiedOutsideEditor,
+    onWillDeleteExtensionItem,
     onWillInstallExtension,
     onExtensionInstalled,
+    onCreateNewExtensionWithBehavior,
     onEffectAdded,
+    onLayerRenamedOrRemoved,
     onObjectListsModified,
     onExternalLayoutAssociationChanged,
     triggerHotReloadInGameEditorIfNeeded,
@@ -428,6 +473,7 @@ const EditorTabsPane: React.ComponentType<{
     areSidePanesDrawers,
     gameEditorMode,
     setGameEditorMode,
+    setEditorMode,
     onRestartInGameEditor,
     showRestartInGameEditorAfterErrorButton,
     toolbarButtons,
@@ -708,6 +754,10 @@ const EditorTabsPane: React.ComponentType<{
             currentTab ? currentTab.key : null
           )
         }
+        showPreviewAndShareButtons={
+          // A gameplay test is run with its own button: no preview or share.
+          !currentTab || currentTab.kind !== 'gameplay-test'
+        }
         canSave={canSave}
         onSave={saveProject}
         openShareDialog={() =>
@@ -747,15 +797,17 @@ const EditorTabsPane: React.ComponentType<{
             );
 
             const editorContent = (
-              <CommandsContextScopedProvider active={isCurrentTab}>
+              <ActiveTabCommandsProvider active={isCurrentTab}>
                 <ErrorBoundary
                   componentTitle={errorBoundaryProps.componentTitle}
                   scope={errorBoundaryProps.scope}
                 >
                   {editorTab.renderEditorContainer({
                     editorId: editorTab.id,
+                    paneIdentifier,
                     gameEditorMode,
                     setGameEditorMode,
+                    setEditorMode,
                     isActive: isCurrentTab,
                     extraEditorProps: editorTab.extraEditorProps,
                     project: currentProject,
@@ -770,6 +822,7 @@ const EditorTabsPane: React.ComponentType<{
                     setPreviewedLayout,
                     onOpenAskAi,
                     onCloseAskAi,
+                    gameplayTestsCallbacks,
                     onOpenExternalEvents: openExternalEvents,
                     onOpenEvents: (sceneName: string) => {
                       openLayout(sceneName, {
@@ -779,6 +832,7 @@ const EditorTabsPane: React.ComponentType<{
                       });
                     },
                     onOpenLayout: openLayout,
+                    onOpenExternalLayout: openExternalLayout,
                     onOpenTemplateFromTutorial: openTemplateFromTutorial,
                     onOpenTemplateFromCourseChapter: openTemplateFromCourseChapter,
                     previewDebuggerServer,
@@ -797,6 +851,9 @@ const EditorTabsPane: React.ComponentType<{
                     onOpenEventsFunctionsExtension,
                     onRenamedEventsBasedObject: onRenamedEventsBasedObject,
                     onDeletedEventsBasedObject: onDeletedEventsBasedObject,
+                    onEventsBasedObjectMoved: onEventsBasedObjectMoved,
+                    onEventsBasedBehaviorMoved: onEventsBasedBehaviorMoved,
+                    onEventsFunctionMoved: onEventsFunctionMoved,
                     openObjectEvents,
                     onNavigateToEventFromGlobalSearch,
                     unsavedChanges: unsavedChanges,
@@ -878,10 +935,15 @@ const EditorTabsPane: React.ComponentType<{
                     onObjectGroupsModifiedOutsideEditor: onObjectGroupsModifiedOutsideEditor,
                     onProjectItemRenamedOutsideEditor: onProjectItemRenamedOutsideEditor,
                     onWillDeleteScene: onWillDeleteScene,
+                    onWillDeleteGameplayTest: onWillDeleteGameplayTest,
                     onWillDeleteObject: onWillDeleteObject,
+                    onExtensionsModifiedOutsideEditor: onExtensionsModifiedOutsideEditor,
+                    onWillDeleteExtensionItem: onWillDeleteExtensionItem,
                     onWillInstallExtension: onWillInstallExtension,
                     onExtensionInstalled: onExtensionInstalled,
+                    onCreateNewExtensionWithBehavior: onCreateNewExtensionWithBehavior,
                     onEffectAdded: onEffectAdded,
+                    onLayerRenamedOrRemoved: onLayerRenamedOrRemoved,
                     onObjectListsModified: onObjectListsModified,
                     onExternalLayoutAssociationChanged,
                     triggerHotReloadInGameEditorIfNeeded: triggerHotReloadInGameEditorIfNeeded,
@@ -889,7 +951,7 @@ const EditorTabsPane: React.ComponentType<{
                     gamesPlatformFrameTools,
                   })}
                 </ErrorBoundary>
-              </CommandsContextScopedProvider>
+              </ActiveTabCommandsProvider>
             );
 
             return (

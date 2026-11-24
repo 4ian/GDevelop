@@ -230,6 +230,15 @@ VariablesContainer& VariablesContainer::ResetPersistentUuid() {
   return *this;
 }
 
+VariablesContainer& VariablesContainer::EnsurePersistentUuids() {
+  if (persistentUuid.empty()) persistentUuid = UUID::MakeUuid4();
+  for (auto& variable : variables) {
+    variable.second->EnsurePersistentUuid();
+  }
+
+  return *this;
+}
+
 VariablesContainer& VariablesContainer::ClearPersistentUuid() {
   persistentUuid = "";
   for (auto& variable : variables) {

@@ -5,6 +5,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import classNames from 'classnames';
 import classes from './CompactSelectField.module.css';
 import { tooltipEnterDelay } from '../Tooltip';
+import PortalContainerContext from '../PortalContainerContext';
 type Props = {|
   onChange: string => void,
   value: string,
@@ -32,6 +33,7 @@ const CompactSelectField = ({
   rounded,
   onFocus,
 }: Props): React.MixedElement => {
+  const portalContainer = React.useContext(PortalContainerContext);
   return (
     <div
       className={classNames({
@@ -47,6 +49,8 @@ const CompactSelectField = ({
           enterDelay={tooltipEnterDelay}
           placement="bottom"
           PopperProps={{
+            // Passing PopperProps replaces the theme default container (see FullThemeProvider).
+            container: portalContainer,
             modifiers: {
               offset: {
                 enabled: true,

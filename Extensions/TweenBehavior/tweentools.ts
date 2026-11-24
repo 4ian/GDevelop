@@ -27,6 +27,22 @@ namespace gdjs {
       const getTweenLayerCameraZoomSetter = (layer: gdjs.RuntimeLayer) => {
         return (value: float) => layer.setCameraZoom(value);
       };
+      const assumedFovIn2D = 45;
+      const getLayerCameraFov = (layer: gdjs.RuntimeLayer): float | null => {
+        if (
+          layer.getCameraType() === gdjs.RuntimeLayerCameraType.ORTHOGRAPHIC
+        ) {
+          return null;
+        }
+        const threeCamera = layer.getRenderer().getThreeCamera();
+        return threeCamera && 'fov' in threeCamera
+          ? threeCamera.fov
+          : assumedFovIn2D;
+      };
+      const getTweenLayerCameraZSetter = (layer: gdjs.RuntimeLayer) => {
+        return (value: float) =>
+          layer.setCameraZ(value, getLayerCameraFov(layer));
+      };
       const getTweenNumberEffectPropertySetter = (
         effect: PixiFiltersTools.Filter,
         propertyName: string
@@ -90,6 +106,10 @@ namespace gdjs {
           if (type === 'cameraPosition' && layerName !== undefined) {
             const layer = runtimeScene.getLayer(layerName);
             return getTweenLayerCameraPositionSetter(layer);
+          }
+          if (type === 'cameraZ' && layerName !== undefined) {
+            const layer = runtimeScene.getLayer(layerName);
+            return getTweenLayerCameraZSetter(layer);
           }
           if (
             type === 'colorEffectProperty' &&
@@ -506,6 +526,40 @@ namespace gdjs {
           getTweenLayerCameraPositionSetter(layer),
           {
             type: 'cameraPosition',
+            layerName,
+          }
+        );
+      };
+
+      /**
+       * Tween a layer camera Z position.
+       * @param runtimeScene The scene
+       * @param identifier Unique id to identify the tween
+       * @param toZ The targeted Z position
+       * @param layerName The name of the layer to move
+       * @param easing Easing function identifier
+       * @param duration Duration in seconds
+       */
+      export const tweenCameraZ = (
+        runtimeScene: RuntimeScene,
+        identifier: string,
+        toZ: number,
+        layerName: string,
+        easing: string,
+        duration: number
+      ) => {
+        const layer = runtimeScene.getLayer(layerName);
+        getTweensMap(runtimeScene).addSimpleTween(
+          identifier,
+          layer,
+          duration,
+          easing,
+          linearInterpolation,
+          layer.getCameraZ(getLayerCameraFov(layer)),
+          toZ,
+          getTweenLayerCameraZSetter(layer),
+          {
+            type: 'cameraZ',
             layerName,
           }
         );

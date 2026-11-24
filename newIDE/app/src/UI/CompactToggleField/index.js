@@ -4,6 +4,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Text from '../../UI/Text';
 import { MarkdownText } from '../../UI/MarkdownText';
 import { tooltipEnterDelay } from '../../UI/Tooltip';
+import PortalContainerContext from '../PortalContainerContext';
 import classes from './CompactToggleField.module.css';
 import classNames from 'classnames';
 
@@ -16,9 +17,14 @@ const styles = {
   },
 };
 type Props = {|
+  /** The label displayed next to the toggle. Empty to display the toggle alone. */
   label: string,
   markdownDescription?: ?string,
   id?: string,
+  /** The id of the checkbox itself, to be targeted by an external label. */
+  inputId?: string,
+  /** The id of the element labelling the toggle, when `label` is empty. */
+  ariaLabelledBy?: string,
   checked: boolean,
   onCheck: (newValue: boolean) => void,
   disabled?: boolean,
@@ -28,6 +34,7 @@ type Props = {|
 |};
 
 export const CompactToggleField = (props: Props): React.MixedElement => {
+  const portalContainer = React.useContext(PortalContainerContext);
   const title = props.hideTooltip
     ? null
     : !props.markdownDescription
@@ -60,6 +67,8 @@ export const CompactToggleField = (props: Props): React.MixedElement => {
       <div className={classes.toggleSwitch}>
         <input
           type="checkbox"
+          id={props.inputId}
+          aria-labelledby={props.ariaLabelledBy}
           className={classes.checkbox}
           onChange={() => props.onCheck(!props.checked)}
           disabled={props.disabled}
@@ -88,7 +97,7 @@ export const CompactToggleField = (props: Props): React.MixedElement => {
           </span>
         </span>
       </div>
-      {props.hideTooltip ? (
+      {!props.label ? null : props.hideTooltip ? (
         label
       ) : (
         <Tooltip
@@ -96,6 +105,8 @@ export const CompactToggleField = (props: Props): React.MixedElement => {
           enterDelay={tooltipEnterDelay}
           placement="bottom"
           PopperProps={{
+            // Passing PopperProps replaces the theme default container (see FullThemeProvider).
+            container: portalContainer,
             modifiers: {
               offset: {
                 enabled: true,

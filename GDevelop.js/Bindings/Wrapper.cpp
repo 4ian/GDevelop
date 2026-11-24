@@ -52,8 +52,11 @@
 #include <GDCore/IDE/Events/UsedObjectTypeFinder.h>
 #include <GDCore/IDE/Events/ExampleExtensionUsagesFinder.h>
 #include <GDCore/IDE/EventsFunctionTools.h>
-#include <GDCore/IDE/ObjectRefactorer.h>
 #include <GDCore/IDE/EventsBasedObjectVariantHelper.h>
+#include <GDCore/IDE/ExtensionEditor/ChildObjectForwardFunctionGenerator.h>
+#include <GDCore/IDE/ExtensionEditor/EventsFunctionsExtensionExtractor.h>
+#include <GDCore/IDE/ExtensionEditor/PropertyFunctionGenerator.h>
+#include <GDCore/IDE/ObjectRefactorer.h>
 #include <GDCore/IDE/Project/ArbitraryResourceWorker.h>
 #include <GDCore/IDE/Project/ArbitraryObjectsWorker.h>
 #include <GDCore/IDE/Project/ObjectsUsingResourceCollector.h>
@@ -64,7 +67,6 @@
 #include <GDCore/IDE/Project/ResourcesRenamer.h>
 #include <GDCore/IDE/Project/EventsBasedObjectDependencyFinder.h>
 #include <GDCore/IDE/ProjectBrowserHelper.h>
-#include <GDCore/IDE/PropertyFunctionGenerator.h>
 #include <GDCore/IDE/UnfilledRequiredBehaviorPropertyProblem.h>
 #include <GDCore/IDE/VariableInstructionSwitcher.h>
 #include <GDCore/IDE/WholeProjectRefactorer.h>
@@ -78,10 +80,15 @@
 #include <GDCore/Project/EventsFunctionsExtension.h>
 #include <GDCore/Project/ExternalEvents.h>
 #include <GDCore/Project/ExternalLayout.h>
+#include <GDCore/Project/Test.h>
+#include <GDCore/Project/TestsContainer.h>
+#include <GDCore/Project/NamedEasing.h>
+#include <GDCore/Project/NamedEasingsContainer.h>
 #include <GDCore/Project/FunctionFolderOrFunction.h>
 #include <GDCore/Project/InitialInstance.h>
 #include <GDCore/Project/InitialInstancesContainer.h>
 #include <GDCore/Project/Layout.h>
+#include <GDCore/Project/ProjectItemFolderOrItem.h>
 #include <GDCore/Project/LayersContainer.h>
 #include <GDCore/Project/MeasurementBaseUnit.h>
 #include <GDCore/Project/MeasurementUnitElement.h>
@@ -101,7 +108,6 @@
 #include <GDCore/Project/Variable.h>
 #include <GDCore/Project/VariablesContainer.h>
 #include <GDCore/Project/VariablesContainersList.h>
-#include <GDCore/Project/QuickCustomization.h>
 #include <GDCore/Serialization/Serializer.h>
 #include <GDCore/Serialization/SerializerElement.h>
 #include <GDCore/Serialization/BinarySerializer.h>
@@ -533,8 +539,6 @@ typedef std::vector<const gd::ObjectFolderOrObject*> VectorObjectFolderOrObject;
 typedef std::vector<const gd::PropertyFolderOrProperty*> VectorPropertyFolderOrProperty;
 typedef std::vector<const gd::FunctionFolderOrFunction*> VectorFunctionFolderOrFunction;
 typedef std::vector<gd::Screenshot> VectorScreenshot;
-typedef QuickCustomization::Visibility
-    QuickCustomization_Visibility;
 typedef CustomObjectConfiguration::EdgeAnchor
     CustomObjectConfiguration_EdgeAnchor;
 
@@ -742,6 +746,7 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_FillBehaviorParameters FillBehaviorParameters
 #define STATIC_ValidateParameter ValidateParameter
 #define STATIC_IsParameterValid IsParameterValid
+#define STATIC_GetObjectNameForParameter GetObjectNameForParameter
 #define STATIC_FixInvalidRequiredBehaviorProperties \
   FixInvalidRequiredBehaviorProperties
 #define STATIC_RemoveLayerInScene RemoveLayerInScene
@@ -759,6 +764,9 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_CanGenerateGetterAndSetter CanGenerateGetterAndSetter
 #define STATIC_GenerateConditionSkeleton GenerateConditionSkeleton
 #define STATIC_GenerateExpressionSkeleton GenerateExpressionSkeleton
+#define STATIC_GenerateChildObjectForwardFunctions GenerateChildObjectForwardFunctions
+#define STATIC_HasAnyChildCustomObject HasAnyChildCustomObject
+#define STATIC_GetChildCustomObjectNames GetChildCustomObjectNames
 #define STATIC_UpdateReturnActionType UpdateReturnActionType
 #define STATIC_CreateRectangle CreateRectangle
 #define STATIC_SanityCheckBehaviorProperty SanityCheckBehaviorProperty
@@ -817,11 +825,13 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_ComplyVariantsToEventsBasedObject ComplyVariantsToEventsBasedObject
 #define STATIC_FindAllChildrenCustomObjectType FindAllChildrenCustomObjectType
 #define STATIC_RenameEventsFunctionsExtension RenameEventsFunctionsExtension
+#define STATIC_UpdateExtensionNameInExtension UpdateExtensionNameInExtension
 #define STATIC_UpdateExtensionNameInEventsBasedBehavior \
   UpdateExtensionNameInEventsBasedBehavior
 #define STATIC_UpdateExtensionNameInEventsBasedObject \
   UpdateExtensionNameInEventsBasedObject
 #define STATIC_RenameEventsFunction RenameEventsFunction
+#define STATIC_MoveEventsFunction MoveEventsFunction
 #define STATIC_RenameBehaviorEventsFunction RenameBehaviorEventsFunction
 #define STATIC_RenameObjectEventsFunction RenameObjectEventsFunction
 #define STATIC_RenameParameter RenameParameter
@@ -839,10 +849,16 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_ChangeEventsBasedBehaviorPropertyType ChangeEventsBasedBehaviorPropertyType
 #define STATIC_ChangeEventsBasedObjectPropertyType ChangeEventsBasedObjectPropertyType
 #define STATIC_RenameEventsBasedBehavior RenameEventsBasedBehavior
+#define STATIC_MoveEventsBasedBehavior MoveEventsBasedBehavior
 #define STATIC_UpdateBehaviorNameInEventsBasedBehavior UpdateBehaviorNameInEventsBasedBehavior
 #define STATIC_RenameEventsBasedObject RenameEventsBasedObject
+#define STATIC_RemoveEventsBasedObjectVariant RemoveEventsBasedObjectVariant
+#define STATIC_MoveEventsBasedObject MoveEventsBasedObject
 #define STATIC_UpdateObjectNameInEventsBasedObject UpdateObjectNameInEventsBasedObject
 #define STATIC_RenameLayout RenameLayout
+#define STATIC_RenameNamedEasing RenameNamedEasing
+#define STATIC_RenameNamedEasingInEventsFunctionsExtension \
+  RenameNamedEasingInEventsFunctionsExtension
 #define STATIC_RenameExternalLayout RenameExternalLayout
 #define STATIC_RenameExternalEvents RenameExternalEvents
 #define STATIC_RenameLayerInScene RenameLayerInScene
@@ -893,6 +909,7 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_IsObjectLifecycleEventsFunction IsObjectLifecycleEventsFunction
 #define STATIC_IsExtensionLifecycleEventsFunction \
   IsExtensionLifecycleEventsFunction
+#define STATIC_CreateCustomBehaviorForObject CreateCustomBehaviorForObject
 #define STATIC_ShiftSentenceParamIndexes ShiftSentenceParamIndexes
 
 #define STATIC_CopyAllResourcesTo CopyAllResourcesTo
@@ -960,6 +977,8 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define RemoveAt Remove
 #define GetEventsFunctionAt GetEventsFunction
 #define GetVariantAt GetVariant
+#define GetTestAt GetTest
+#define GetNamedEasingAt GetNamedEasing
 #define GetEffectAt GetEffect
 #define GetParameterAt GetParameter
 

@@ -5,11 +5,38 @@ namespace gdjs {
     ks: number;
     res: number | null;
   }
+  /**
+   * `PIXI.BlurFilter` reads the pixels around the area it blurs without
+   * clamping them. When this area is rendered in a bigger texture (which
+   * PixiJS does when the resolution of the filter is not the one of the game),
+   * it reads the empty part of the texture, which shows up as a seam on the
+   * right and bottom edges of the screen. Repeat the pixels of the edges instead.
+   */
+  const clampBlurredPixels = (blurFilterPass: PIXI.Filter) => {
+    const removeShaderName = (source: string) =>
+      source.replace(/#define SHADER_NAME .*\n/, '');
+    const { vertexSrc, fragmentSrc } = blurFilterPass.program;
+    blurFilterPass.program = PIXI.Program.from(
+      removeShaderName(vertexSrc),
+      removeShaderName(fragmentSrc)
+        .replace(
+          'uniform sampler2D uSampler;',
+          'uniform sampler2D uSampler;\nuniform vec4 inputClamp;'
+        )
+        .replace(
+          /texture2D\(uSampler, (vBlurTexCoords\[\d+\])\)/g,
+          'texture2D(uSampler, clamp($1, inputClamp.xy, inputClamp.zw))'
+        )
+    );
+  };
+
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Blur',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
       makePIXIFilter(target: EffectsTarget, effectData) {
         const blur = new PIXI.BlurFilter();
+        clampBlurredPixels(blur.blurXFilter);
+        clampBlurredPixels(blur.blurYFilter);
         return blur;
       }
       updatePreRender(filter: PIXI.Filter, target: EffectsTarget) {}

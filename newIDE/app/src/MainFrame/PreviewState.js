@@ -6,6 +6,14 @@ import {
   type HotReloaderLog,
   type DebuggerStatus,
 } from '../ExportAndShare/PreviewLauncher.flow';
+import {
+  type InGameEditorExtensionError,
+  setLatestInGameEditorExtensionErrors,
+} from '../InGameEditorExtensionErrors';
+import { setInGameEditorRendererCreationFailed } from '../EmbeddedGame/InGameEditorAvailability';
+
+const MAX_IN_GAME_EDITOR_EXTENSION_ERRORS = 20;
+let nextInGameEditorExtensionErrorId = 1;
 
 /** Represents what should be run when a preview is launched */
 export type PreviewState = {|
@@ -32,6 +40,10 @@ type PreviewDebuggerServerWatcherResults = {|
   clearEditorHotReloadLogs: () => void,
   editorUncaughtError: Error | null,
   clearEditorUncaughtError: () => void,
+  // Errors of the code of extensions since the last hot reload of the
+  // in-game editor, which went on working.
+  inGameEditorExtensionErrors: Array<InGameEditorExtensionError>,
+  clearInGameEditorExtensionErrors: () => void,
 
   hardReloadAllPreviews: () => void,
 |};
@@ -56,6 +68,10 @@ export const usePreviewDebuggerServerWatcher = (
     editorUncaughtError,
     setEditorUncaughtError,
   ] = React.useState<Error | null>(null);
+  const [
+    inGameEditorExtensionErrors,
+    setInGameEditorExtensionErrors,
+  ] = React.useState<Array<InGameEditorExtensionError>>([]);
   React.useEffect(
     () => {
       if (!previewDebuggerServer) {
@@ -97,10 +113,20 @@ export const usePreviewDebuggerServerWatcher = (
           if (parsedMessage.command === 'hotReloader.logs') {
             if (parsedMessage.payload.isInGameEdition) {
               setEditorHotReloadLogs(parsedMessage.payload.logs);
+              // The code may have changed: errors still there are sent again.
+              setInGameEditorExtensionErrors([]);
             } else {
               setGameHotReloadLogs(parsedMessage.payload.logs);
             }
           } else if (parsedMessage.command === 'status') {
+            if (
+              parsedMessage.payload.isInGameEdition &&
+              typeof parsedMessage.payload.is3DRenderingAvailable === 'boolean'
+            ) {
+              setInGameEditorRendererCreationFailed(
+                !parsedMessage.payload.is3DRenderingAvailable
+              );
+            }
             setDebuggerStatus(debuggerStatus => ({
               ...debuggerStatus,
               [id]: {
@@ -109,6 +135,36 @@ export const usePreviewDebuggerServerWatcher = (
                 sceneName: parsedMessage.payload.sceneName,
               },
             }));
+          } else if (parsedMessage.command === 'inGameEditor.extensionError') {
+            const { payload } = parsedMessage;
+            setInGameEditorExtensionErrors(errors => {
+              const existingError = errors.find(
+                error => error.key === payload.key
+              );
+              if (existingError) {
+                return errors.map(error =>
+                  error === existingError
+                    ? { ...error, count: payload.count }
+                    : error
+                );
+              }
+              if (errors.length >= MAX_IN_GAME_EDITOR_EXTENSION_ERRORS) {
+                return errors;
+              }
+              return [
+                ...errors,
+                {
+                  id: nextInGameEditorExtensionErrorId++,
+                  key: payload.key,
+                  extensionName: payload.extensionName || null,
+                  phase: payload.phase,
+                  type: payload.type || null,
+                  message: payload.message,
+                  stack: payload.stack,
+                  count: payload.count,
+                },
+              ];
+            });
           } else if (parsedMessage.command === 'game.crashed') {
             // Only keep the first exception.
             if (parsedMessage.payload.isInGameEdition) {
@@ -138,6 +194,14 @@ export const usePreviewDebuggerServerWatcher = (
     () => setEditorUncaughtError(null),
     [setEditorUncaughtError]
   );
+  React.useEffect(
+    () => setLatestInGameEditorExtensionErrors(inGameEditorExtensionErrors),
+    [inGameEditorExtensionErrors]
+  );
+  const clearInGameEditorExtensionErrors = React.useCallback(
+    () => setInGameEditorExtensionErrors([]),
+    [setInGameEditorExtensionErrors]
+  );
 
   const hardReloadAllPreviews = React.useCallback(
     () => {
@@ -145,6 +209,9 @@ export const usePreviewDebuggerServerWatcher = (
 
       console.info('Hard reloading all previews...');
       previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+        // The gameplay test frame is only driven by the gameplay test runner.
+        if (debuggerId === 'gameplay-test-frame') return;
+
         previewDebuggerServer.sendMessage(debuggerId, {
           command: 'hardReload',
         });
@@ -153,11 +220,13 @@ export const usePreviewDebuggerServerWatcher = (
     [previewDebuggerServer]
   );
 
+  // The gameplay test frame is not counted as a running preview: it's
+  // entirely driven by the gameplay test runner (no hot-reload/update).
   const hasNonEditionPreviewsRunning = Object.keys(debuggerStatus).some(
-    key => !debuggerStatus[key].isInGameEdition
+    key => key !== 'gameplay-test-frame' && !debuggerStatus[key].isInGameEdition
   );
   const nonEditionPreviewsCount = Object.keys(debuggerStatus).filter(
-    key => !debuggerStatus[key].isInGameEdition
+    key => key !== 'gameplay-test-frame' && !debuggerStatus[key].isInGameEdition
   ).length;
 
   return {
@@ -169,6 +238,8 @@ export const usePreviewDebuggerServerWatcher = (
     clearEditorHotReloadLogs,
     editorUncaughtError,
     clearEditorUncaughtError,
+    inGameEditorExtensionErrors,
+    clearInGameEditorExtensionErrors,
     hardReloadAllPreviews,
   };
 };

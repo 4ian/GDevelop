@@ -26,6 +26,14 @@ describe('PublicApi', () => {
     expect(functionNames).toContain('run_script');
   });
 
+  it('includes the search of the GDevelop AI and its recipes among the lookup functions', () => {
+    const lookupFunctionNames = publicApi.lookupFunctions.map(
+      lookupFunction => lookupFunction.name
+    );
+    expect(lookupFunctionNames).toContain('search');
+    expect(lookupFunctionNames).toContain('read_recipe');
+  });
+
   it('has a script API definition declaring every function a script can call', () => {
     for (const publicApiFunction of publicApi.functions) {
       if (publicApiFunction.name === 'run_script') continue;

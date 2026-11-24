@@ -200,6 +200,8 @@ import {
 } from './Extensions/CustomFunctionFunctions';
 import { capScriptExecutionResult } from './ScriptExecution/CapScriptOutput';
 import { isNoOpConsideredSuccess } from './IsNoOpConsideredSuccess';
+import { createImageFromCode } from './CreateImageFromCode';
+import { copyFromExample } from './CopyFromExample';
 import {
   inspectExtension,
   type InspectedCustomBehavior,
@@ -12382,6 +12384,9 @@ export const editorFunctions: { [string]: EditorFunction } = {
   generate_events: addSceneEvents,
 
   report_fulfilment_problem: reportFulfilmentProblem,
+
+  create_image_from_code: createImageFromCode,
+  copy_from_example: copyFromExample,
 };
 
 export const editorFunctionsWithoutProject: {

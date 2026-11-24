@@ -206,6 +206,45 @@ declare function create_or_replace_object(args: {
   two_dimensional_view_kind?: 'top-down' | 'side-view';
 }): Promise<FunctionResult>;
 
+/**
+ * Create a PNG image resource from SVG code, and optionally a 2D object using it: for a 2D visual the asset store does not have. The result gives the resource name, the image size, the object created and the SVG features that were removed (scripts, external references).
+ */
+declare function create_image_from_code(args: {
+  /** Where the object is created. Set `type` and the name field(s) of that type. */
+  scope: {
+    /** `scene`: a scene (`scene_name`). `custom_object_variant`: the child objects, instances and layers of a variant of a custom object (`extension_name` + `custom_object_name` + `variant_name`, `""` being the default variant that named variants inherit from). */
+    type: 'scene' | 'custom_object_variant';
+    /** The name of the scene (type `scene`). */
+    scene_name?: string;
+    /** The name of the extension (extension, custom_behavior, custom_object and custom_object_variant types). */
+    extension_name?: string;
+    /** The name of the custom object in the extension (custom_object and custom_object_variant types). */
+    custom_object_name?: string;
+    /** The name of the variant of the custom object (type `custom_object_variant`); "" is the default variant. */
+    variant_name?: string;
+  };
+  /** A standalone SVG. Its width and height, in pixels, are the size of the image (4096 at most). */
+  svg: string;
+  /** When given, an object using the image is created with this name. */
+  object_name?: string;
+  /** The type of the object created (default `Sprite`). A tiled sprite or a panel sprite is sized to the image. */
+  object_type?: 'Sprite' | 'TiledSpriteObject::TiledSprite' | 'PanelSpriteObject::PanelSprite';
+  /** Replace an existing object of the same name. Otherwise the existing object is kept unchanged and the call fails. */
+  replace_existing_object?: boolean;
+}): Promise<FunctionResult>;
+
+/**
+ * Copy a scene of an example project into the project as a new scene, with everything it needs: its objects and the global objects it uses, their resources, the extensions they and the events use, layers and effects, variables, instances, events and the external events and layouts linked from the scene. Never changes or removes what the project has: on a name conflict (a global variable, an extension), the project keeps its own and the result says so. The result gives the new scene name and what was copied.
+ */
+declare function copy_from_example(args: {
+  /** The slug of the example, exactly as given by `search`. */
+  example: string;
+  /** The name of the scene of the example to copy. */
+  scene: string;
+  /** The name of the new scene (default: the name of the scene of the example, made unique). */
+  new_scene_name?: string;
+}): Promise<FunctionResult>;
+
 type InspectObjectPropertiesEffectsResult = FunctionResult & {
   properties: Array<NamedProperty>;
   behaviors: Array<{

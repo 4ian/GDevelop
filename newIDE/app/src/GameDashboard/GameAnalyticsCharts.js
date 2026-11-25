@@ -8,6 +8,8 @@ import {
   LineChart,
   Line as RechartsLine,
   BarChart,
+  ComposedChart,
+  Customized,
   Bar,
   LabelList,
   XAxis,
@@ -27,6 +29,7 @@ import {
   type GameAnalyticsPlayedDurationStep,
   type GameAnalyticsPlayerPlatforms,
   type GameAnalyticsRetentionDay,
+  gameAnalyticsBenchmarks,
 } from './GameAnalyticsEvaluator';
 
 const chartMargins = {
@@ -49,6 +52,21 @@ const getChartsStyleFromTheme = (gdevelopTheme: GDevelopTheme) => ({
   },
   tickLabel: {
     fontFamily: gdevelopTheme.chart.fontFamily,
+  },
+  typicalLegendDash: {
+    display: 'inline-block',
+    width: 16,
+    marginRight: 6,
+    verticalAlign: 'middle',
+    borderTop: `2px dashed ${gdevelopTheme.chart.typicalGameColor}`,
+  },
+  topLegendDash: {
+    display: 'inline-block',
+    width: 16,
+    marginLeft: 16,
+    marginRight: 6,
+    verticalAlign: 'middle',
+    borderTop: `2px dashed ${gdevelopTheme.chart.topGamesColor}`,
   },
   chartLineDot: {
     fill: gdevelopTheme.chart.dataColor1,
@@ -276,6 +294,8 @@ type RateOverTimeChartProps = {|
   dataKey: 'bounceRatePercent' | 'playedDurationPerPlayerInMinutes',
   unit: string,
   formatValue: (value: number) => string,
+  typicalValue: number,
+  topValue: number,
 |};
 
 const RateOverTimeChart = ({
@@ -285,6 +305,9 @@ const RateOverTimeChart = ({
   dataKey,
   unit,
   formatValue,
+  typicalValue,
+  topValue,
+  i18n,
 }: RateOverTimeChartProps): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const styles = getChartsStyleFromTheme(gdevelopTheme);
@@ -321,6 +344,34 @@ const RateOverTimeChart = ({
             />
           )}
         />
+        <ReferenceLine
+          y={typicalValue}
+          stroke={gdevelopTheme.chart.typicalGameColor}
+          strokeWidth={2}
+          strokeDasharray="6 4"
+          ifOverflow="extendDomain"
+          label={{
+            value: i18n._(t`Typical game`),
+            position: 'insideBottomRight',
+            fill: gdevelopTheme.chart.typicalGameColor,
+            fontSize: 12,
+            fontFamily: gdevelopTheme.chart.fontFamily,
+          }}
+        />
+        <ReferenceLine
+          y={topValue}
+          stroke={gdevelopTheme.chart.topGamesColor}
+          strokeWidth={2}
+          strokeDasharray="6 4"
+          ifOverflow="extendDomain"
+          label={{
+            value: i18n._(t`Top games`),
+            position: 'insideBottomRight',
+            fill: gdevelopTheme.chart.topGamesColor,
+            fontSize: 12,
+            fontFamily: gdevelopTheme.chart.fontFamily,
+          }}
+        />
         <RechartsLine
           name={name}
           type="monotone"
@@ -340,6 +391,8 @@ export const BounceRateChart = (props: OverTimeChartProps): React.Node => (
     {...props}
     name={props.i18n._(t`Left in the first minute`)}
     dataKey="bounceRatePercent"
+    typicalValue={gameAnalyticsBenchmarks.bounceRatePercent.typical}
+    topValue={gameAnalyticsBenchmarks.bounceRatePercent.top}
     unit="%"
     formatValue={value => `${Math.round(value)}`}
   />
@@ -350,77 +403,159 @@ export const PlayedDurationChart = (props: OverTimeChartProps): React.Node => (
     {...props}
     name={props.i18n._(t`Average play time`)}
     dataKey="playedDurationPerPlayerInMinutes"
+    typicalValue={
+      gameAnalyticsBenchmarks.playedDurationPerPlayerInMinutes.typical
+    }
+    topValue={gameAnalyticsBenchmarks.playedDurationPerPlayerInMinutes.top}
     unit={` ${props.i18n._(t`min`)}`}
     formatValue={formatMinutes}
   />
 );
 
 type PercentBarsChartProps = {|
-  data: Array<{| label: string, percent: number |}>,
+  data: Array<{|
+    label: string,
+    percent: number,
+    typicalPercent?: number,
+    topPercent?: number,
+  |}>,
   name: string,
+  /** The names of the markers drawn when the data has typical and top values. */
+  benchmarkNames?: {| typical: string, top: string |},
   height: number,
 |};
 
 const PercentBarsChart = ({
   data,
   name,
+  benchmarkNames,
   height,
 }: PercentBarsChartProps): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const styles = getChartsStyleFromTheme(gdevelopTheme);
 
   return (
-    <ResponsiveContainer width={chartWidth} height={height} debounce={1}>
-      <BarChart data={data} margin={chartMargins}>
-        <CartesianGrid
-          stroke={gdevelopTheme.chart.gridColor}
-          strokeDasharray="3 3"
-          vertical={false}
-        />
-        <XAxis
-          dataKey="label"
-          stroke={gdevelopTheme.chart.textColor}
-          style={styles.tickLabel}
-          tick={{ fontSize: 12 }}
-          interval={0}
-        />
-        <YAxis
-          unit="%"
-          stroke={gdevelopTheme.chart.textColor}
-          style={styles.tickLabel}
-          tick={{ fontSize: 12 }}
-        />
-        <Tooltip
-          cursor={{ fill: gdevelopTheme.chart.gridColor, fillOpacity: 0.2 }}
-          content={({ payload }) => (
-            <ChartTooltip
-              payload={payload}
-              title={
-                payload && payload.length > 0 && payload[0].payload
-                  ? payload[0].payload.label
-                  : null
-              }
-              customStyle={styles.tooltipContent}
-              formatValue={formatPercent}
-            />
-          )}
-        />
-        <Bar
-          name={name}
-          dataKey="percent"
-          fill={gdevelopTheme.chart.dataColor1}
-          radius={barRadius}
-          animationDuration={animationDuration}
-        >
-          <LabelList
-            dataKey="percent"
-            position="top"
-            formatter={formatPercent}
-            style={styles.barLabel}
+    <>
+      {benchmarkNames && (
+        <Text noMargin size="body-small" color="secondary">
+          <span style={styles.typicalLegendDash} />
+          {benchmarkNames.typical}
+          <span style={styles.topLegendDash} />
+          {benchmarkNames.top}
+        </Text>
+      )}
+      <ResponsiveContainer width={chartWidth} height={height} debounce={1}>
+        <ComposedChart data={data} margin={chartMargins}>
+          <CartesianGrid
+            stroke={gdevelopTheme.chart.gridColor}
+            strokeDasharray="3 3"
+            vertical={false}
           />
-        </Bar>
-      </BarChart>
-    </ResponsiveContainer>
+          <XAxis
+            dataKey="label"
+            stroke={gdevelopTheme.chart.textColor}
+            style={styles.tickLabel}
+            tick={{ fontSize: 12 }}
+            interval={0}
+          />
+          <YAxis
+            unit="%"
+            stroke={gdevelopTheme.chart.textColor}
+            style={styles.tickLabel}
+            tick={{ fontSize: 12 }}
+          />
+          <Tooltip
+            cursor={{ fill: gdevelopTheme.chart.gridColor, fillOpacity: 0.2 }}
+            content={({ payload }) => (
+              <ChartTooltip
+                payload={payload}
+                title={
+                  payload && payload.length > 0 && payload[0].payload
+                    ? payload[0].payload.label
+                    : null
+                }
+                customStyle={styles.tooltipContent}
+                formatValue={formatPercent}
+              />
+            )}
+          />
+          <Bar
+            name={name}
+            dataKey="percent"
+            fill={gdevelopTheme.chart.dataColor1}
+            radius={barRadius}
+            animationDuration={animationDuration}
+          >
+            <LabelList
+              dataKey="percent"
+              position="top"
+              formatter={formatPercent}
+              style={styles.barLabel}
+            />
+          </Bar>
+          {/* Not drawn: they give the tooltip its values and keep the markers inside the axis. */}
+          {benchmarkNames && (
+            <>
+              <RechartsLine
+                name={benchmarkNames.typical}
+                dataKey="typicalPercent"
+                stroke="none"
+                dot={false}
+                activeDot={false}
+                isAnimationActive={false}
+              />
+              <RechartsLine
+                name={benchmarkNames.top}
+                dataKey="topPercent"
+                stroke="none"
+                dot={false}
+                activeDot={false}
+                isAnimationActive={false}
+              />
+            </>
+          )}
+          <Customized
+            component={({ xAxisMap, yAxisMap }) => {
+              const xScale = xAxisMap[0].scale;
+              const yScale = yAxisMap[0].scale;
+              const bandWidth = xScale.bandwidth();
+              return (
+                <>
+                  {data.map(point =>
+                    point.typicalPercent !== undefined ? (
+                      <line
+                        key={point.label}
+                        x1={xScale(point.label) + bandWidth * 0.1}
+                        x2={xScale(point.label) + bandWidth * 0.9}
+                        y1={yScale(point.typicalPercent)}
+                        y2={yScale(point.typicalPercent)}
+                        stroke={gdevelopTheme.chart.typicalGameColor}
+                        strokeWidth={2}
+                        strokeDasharray="6 4"
+                      />
+                    ) : null
+                  )}
+                  {data.map(point =>
+                    point.topPercent !== undefined ? (
+                      <line
+                        key={point.label}
+                        x1={xScale(point.label) + bandWidth * 0.1}
+                        x2={xScale(point.label) + bandWidth * 0.9}
+                        y1={yScale(point.topPercent)}
+                        y2={yScale(point.topPercent)}
+                        stroke={gdevelopTheme.chart.topGamesColor}
+                        strokeWidth={2}
+                        strokeDasharray="6 4"
+                      />
+                    ) : null
+                  )}
+                </>
+              );
+            }}
+          />
+        </ComposedChart>
+      </ResponsiveContainer>
+    </>
   );
 };
 
@@ -435,10 +570,17 @@ export const RetentionChart = ({
 |}): React.Node => (
   <PercentBarsChart
     name={i18n._(t`New players who came back`)}
+    benchmarkNames={{
+      typical: i18n._(t`Typical game`),
+      top: i18n._(t`Top games`),
+    }}
     height={height}
     data={retentionDays.map(({ dayNumber, retentionPercent }) => ({
       label: i18n._(t`Day ${dayNumber}`),
       percent: retentionPercent,
+      typicalPercent:
+        gameAnalyticsBenchmarks.typicalRetentionPercents[dayNumber - 1],
+      topPercent: gameAnalyticsBenchmarks.topRetentionPercents[dayNumber - 1],
     }))}
   />
 );
@@ -454,14 +596,23 @@ export const PlayedDurationStepsChart = ({
 |}): React.Node => (
   <PercentBarsChart
     name={i18n._(t`Players still playing`)}
+    benchmarkNames={{
+      typical: i18n._(t`Typical game`),
+      top: i18n._(t`Top games`),
+    }}
     height={height}
-    data={playedDurationSteps.map(({ durationInMinutes, playersPercent }) => ({
-      label:
-        durationInMinutes === 0
-          ? i18n._(t`Start`)
-          : i18n._(t`${durationInMinutes} min`),
-      percent: playersPercent,
-    }))}
+    data={playedDurationSteps.map(
+      ({ durationInMinutes, playersPercent }, index) => ({
+        label:
+          durationInMinutes === 0
+            ? i18n._(t`Start`)
+            : i18n._(t`${durationInMinutes} min`),
+        percent: playersPercent,
+        typicalPercent:
+          gameAnalyticsBenchmarks.typicalPlayersPercents[index - 1],
+        topPercent: gameAnalyticsBenchmarks.topPlayersPercents[index - 1],
+      })
+    )}
   />
 );
 

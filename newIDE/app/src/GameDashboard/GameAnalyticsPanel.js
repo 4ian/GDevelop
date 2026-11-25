@@ -29,6 +29,7 @@ import {
   getGameAnalytics,
   daysShownForYear,
   minPlayersCountForRates,
+  gameAnalyticsBenchmarks,
   type GameAnalyticsPeriod,
 } from './GameAnalyticsEvaluator';
 import {
@@ -136,6 +137,7 @@ const SummaryTile = ({
   formatValue,
   change,
   caption,
+  benchmark,
 }: {|
   title: React.Node,
   /** Null when there are too few players to show it. */
@@ -143,6 +145,8 @@ const SummaryTile = ({
   formatValue: (value: number) => string,
   change: SummaryChange | null,
   caption?: React.Node,
+  /** How other games do, to compare the value with. */
+  benchmark?: React.Node,
 |}) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const animatedValue = useAnimatedNumber(value);
@@ -177,8 +181,29 @@ const SummaryTile = ({
             {caption || '\u00a0'}
           </Text>
         )}
+        {benchmark && (
+          <Text noMargin size="body-small" color="secondary">
+            {benchmark}
+          </Text>
+        )}
       </ColumnStackLayout>
     </Paper>
+  );
+};
+
+const TypicalGameLabel = ({ children }: {| children: React.Node |}) => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  return (
+    <span style={{ color: gdevelopTheme.chart.typicalGameColor }}>
+      {children}
+    </span>
+  );
+};
+
+const TopGamesLabel = ({ children }: {| children: React.Node |}) => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  return (
+    <span style={{ color: gdevelopTheme.chart.topGamesColor }}>{children}</span>
   );
 };
 
@@ -320,6 +345,16 @@ export const GameAnalyticsPanel = ({
       : null;
   const canShowRatesOverTime = !!playedDurationSteps;
   const d1RetentionDay = retentionDays ? retentionDays[0] : null;
+  const typicalBounceRatePercent =
+    gameAnalyticsBenchmarks.bounceRatePercent.typical;
+  const topBounceRatePercent = gameAnalyticsBenchmarks.bounceRatePercent.top;
+  const typicalPlayedDurationInMinutes =
+    gameAnalyticsBenchmarks.playedDurationPerPlayerInMinutes.typical;
+  const topPlayedDurationInMinutes =
+    gameAnalyticsBenchmarks.playedDurationPerPlayerInMinutes.top;
+  const typicalD1RetentionPercent =
+    gameAnalyticsBenchmarks.d1RetentionPercent.typical;
+  const topD1RetentionPercent = gameAnalyticsBenchmarks.d1RetentionPercent.top;
 
   const displaySuggestedMarketingPlan =
     recommendedMarketingPlan && gameFeaturings && fetchGameFeaturings;
@@ -439,6 +474,14 @@ export const GameAnalyticsPanel = ({
                           ? notEnoughPlayersCaption
                           : null
                       }
+                      benchmark={
+                        <Trans>
+                          <TypicalGameLabel>Typical game:</TypicalGameLabel>{' '}
+                          {typicalBounceRatePercent}% ·{' '}
+                          <TopGamesLabel>Top games:</TopGamesLabel> under{' '}
+                          {topBounceRatePercent}%
+                        </Trans>
+                      }
                     />
                   </Grid>
                   <Grid item xs={6} md={3}>
@@ -467,6 +510,14 @@ export const GameAnalyticsPanel = ({
                           ? notEnoughPlayersCaption
                           : null
                       }
+                      benchmark={
+                        <Trans>
+                          <TypicalGameLabel>Typical game:</TypicalGameLabel>{' '}
+                          {typicalPlayedDurationInMinutes} min ·{' '}
+                          <TopGamesLabel>Top games:</TopGamesLabel> over{' '}
+                          {topPlayedDurationInMinutes} min
+                        </Trans>
+                      }
                     />
                   </Grid>
                 </Grid>
@@ -483,7 +534,11 @@ export const GameAnalyticsPanel = ({
                     description={
                       <Trans>
                         Share of new players who played again 1 to 7 days after
-                        their first day.
+                        their first day.{' '}
+                        <TypicalGameLabel>Typical game:</TypicalGameLabel>{' '}
+                        {typicalD1RetentionPercent}% the next day ·{' '}
+                        <TopGamesLabel>Top games:</TopGamesLabel> over{' '}
+                        {topD1RetentionPercent}%.
                       </Trans>
                     }
                   >

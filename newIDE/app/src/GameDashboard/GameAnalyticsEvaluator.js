@@ -80,6 +80,19 @@ const lowD1RetentionPercent = 4;
 
 const playedDurationsInMinutes = [1, 3, 5, 10, 15];
 
+// Median and best quarter of the games with 20+ players over 4 weeks (measured on 2026-11-24).
+export const gameAnalyticsBenchmarks = {
+  bounceRatePercent: { typical: 25, top: 15 },
+  playedDurationPerPlayerInMinutes: { typical: 3, top: 7 },
+  d1RetentionPercent: { typical: 2, top: 5 },
+  // One value for each day after the first day, from the games with 100+ players.
+  typicalRetentionPercents: [2, 0.9, 0.6, 0.5, 0.3, 0.3, 0.3],
+  topRetentionPercents: [5, 2, 1.4, 1.1, 0.9, 0.9, 0.9],
+  // One value for each played duration, the start excluded.
+  typicalPlayersPercents: [74, 50, 41, 32, 29],
+  topPlayersPercents: [84, 65, 55, 46, 42],
+};
+
 const periodSettings: {
   [GameAnalyticsPeriod]: {|
     pointsCount: number,

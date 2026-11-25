@@ -282,8 +282,13 @@ export const addAssetToProject = async ({
                 const customObjectConfiguration = gd.asCustomObjectConfiguration(
                   object.getConfiguration()
                 );
+                // Several children can be of the same type and use different
+                // variants (like 2 buttons of different colors).
                 const customObjectVariantRenaming = variantRenamings.find(
-                  renaming => renaming.objectType === object.getType()
+                  renaming =>
+                    renaming.objectType === object.getType() &&
+                    renaming.oldVariantName ===
+                      customObjectConfiguration.getVariantName()
                 );
                 if (customObjectVariantRenaming) {
                   customObjectConfiguration.setVariantName(

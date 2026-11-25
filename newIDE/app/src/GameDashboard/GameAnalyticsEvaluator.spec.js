@@ -1,5 +1,8 @@
 // @flow
-import { getGameAnalytics } from './GameAnalyticsEvaluator';
+import {
+  getGameAnalytics,
+  getGameVersionAnalytics,
+} from './GameAnalyticsEvaluator';
 import { type GameMetrics } from '../Utils/GDevelopServices/Analytics';
 
 const todayDate = new Date('2026-11-20T10:00:00Z');
@@ -273,5 +276,55 @@ describe('GameAnalyticsEvaluator', () => {
     expect(gameAnalytics.overTime.length).toBe(12);
     expect(gameAnalytics.overTime[11].playersCount).toBe(30);
     expect(gameAnalytics.overTime[10].playersCount).toBe(17);
+  });
+
+  it('compares the versions played during the period, the latest first', () => {
+    const createFakeGameVersionMetrics = (
+      date: string,
+      version: string,
+      playersCount: number,
+      bouncedPlayersCount: number
+    ) => ({
+      gameId: 'fake-game-id',
+      date,
+      version,
+      d0Players: playersCount,
+      d0SessionsDurationTotal: playersCount * 120,
+      d0PlayersBelow60s: bouncedPlayersCount,
+    });
+
+    expect(
+      getGameVersionAnalytics(
+        [
+          // Before the period: it only tells this version is the oldest.
+          createFakeGameVersionMetrics('2026-10-01', '1.0.0', 50, 25),
+          createFakeGameVersionMetrics('2026-11-18', '1.0.0', 30, 15),
+          createFakeGameVersionMetrics('2026-11-19', '1.0.0', 10, 5),
+          createFakeGameVersionMetrics('2026-11-19', '1.1.0', 100, 20),
+          createFakeGameVersionMetrics('2026-11-20', '1.2.0', 5, 5),
+        ],
+        'week',
+        todayDate
+      )
+    ).toEqual([
+      {
+        version: '1.2.0',
+        playersCount: 5,
+        bounceRatePercent: null,
+        playedDurationPerPlayerInSeconds: null,
+      },
+      {
+        version: '1.1.0',
+        playersCount: 100,
+        bounceRatePercent: 20,
+        playedDurationPerPlayerInSeconds: 120,
+      },
+      {
+        version: '1.0.0',
+        playersCount: 40,
+        bounceRatePercent: 50,
+        playedDurationPerPlayerInSeconds: 120,
+      },
+    ]);
   });
 });

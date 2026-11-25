@@ -1,5 +1,8 @@
 // @flow
-import { type GameMetrics } from '../Utils/GDevelopServices/Analytics';
+import {
+  type GameMetrics,
+  type GameVersionMetrics,
+} from '../Utils/GDevelopServices/Analytics';
 import { type GameFeaturing } from '../Utils/GDevelopServices/Game';
 import { type Build } from '../Utils/GDevelopServices/Build';
 
@@ -367,6 +370,89 @@ const isIsoDayInMarketingBoost = (
       getIsoDay(gameFeaturing.createdAt * 1000) <= isoDay &&
       isoDay <= getIsoDay(gameFeaturing.expiresAt * 1000)
   );
+
+export type GameVersionAnalytics = {|
+  /** Empty when the game has no version. */
+  version: string,
+  playersCount: number,
+  /** Null when the version has too few players. */
+  bounceRatePercent: number | null,
+  /** Null when the version has too few players. */
+  playedDurationPerPlayerInSeconds: number | null,
+|};
+
+/**
+ * @returns the versions played during the period, the most recently released first.
+ */
+export const getGameVersionAnalytics = (
+  gameVersionMetricsArray: Array<GameVersionMetrics>,
+  period: GameAnalyticsPeriod,
+  todayDate?: Date
+): Array<GameVersionAnalytics> => {
+  const { pointsCount, daysCountPerPoint } = periodSettings[period];
+  const isoDays = new Set(
+    getIsoDays(
+      (todayDate || new Date()).getTime(),
+      pointsCount * daysCountPerPoint,
+      0
+    )
+  );
+
+  const firstIsoDayByVersion: { [string]: string } = {};
+  const metricsByVersion: {
+    [string]: {|
+      playersCount: number,
+      bouncedPlayersCount: number,
+      playedDurationInSeconds: number,
+    |},
+  } = {};
+  gameVersionMetricsArray.forEach(gameVersionMetrics => {
+    const { version } = gameVersionMetrics;
+    const isoDay = gameVersionMetrics.date.substring(0, 10);
+    if (
+      !firstIsoDayByVersion[version] ||
+      isoDay < firstIsoDayByVersion[version]
+    )
+      firstIsoDayByVersion[version] = isoDay;
+    if (!isoDays.has(isoDay)) return;
+
+    const metrics = metricsByVersion[version] || {
+      playersCount: 0,
+      bouncedPlayersCount: 0,
+      playedDurationInSeconds: 0,
+    };
+    metrics.playersCount += gameVersionMetrics.d0Players;
+    metrics.bouncedPlayersCount += gameVersionMetrics.d0PlayersBelow60s;
+    metrics.playedDurationInSeconds +=
+      gameVersionMetrics.d0SessionsDurationTotal;
+    metricsByVersion[version] = metrics;
+  });
+
+  return Object.keys(metricsByVersion)
+    .sort((version1, version2) =>
+      firstIsoDayByVersion[version2].localeCompare(
+        firstIsoDayByVersion[version1]
+      )
+    )
+    .map(version => {
+      const {
+        playersCount,
+        bouncedPlayersCount,
+        playedDurationInSeconds,
+      } = metricsByVersion[version];
+      const hasEnoughPlayers = playersCount >= minPlayersCountForRates;
+      return {
+        version,
+        playersCount,
+        bounceRatePercent: hasEnoughPlayers
+          ? (100 * bouncedPlayersCount) / playersCount
+          : null,
+        playedDurationPerPlayerInSeconds: hasEnoughPlayers
+          ? playedDurationInSeconds / playersCount
+          : null,
+      };
+    });
+};
 
 export const getGameAnalytics = (
   gameMetricsArray: ?Array<GameMetrics>,

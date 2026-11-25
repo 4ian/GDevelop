@@ -4,6 +4,7 @@ import { GDevelopAnalyticsApi } from './ApiConfigs';
 import {
   ensureIsNullOrObjectHasProperty,
   ensureIsArrayOrNull,
+  ensureIsArray,
 } from '../DataValidator';
 
 export type GameMetrics = {
@@ -111,6 +112,44 @@ export const getGameMetricsFrom = async (
   return ensureIsArrayOrNull({
     data: response.data,
     endpointName: '/game-metrics of Analytics API',
+  });
+};
+
+/** The metrics of the players of a version of a game for a day. */
+export type GameVersionMetrics = {|
+  gameId: string,
+  date: string,
+  /** The version set in the game properties. Empty when the game has none. */
+  version: string,
+  /** Number of players for this day whose first session of the day was on this version. */
+  d0Players: number,
+  d0SessionsDurationTotal: number,
+  /** Number of these players who played the game less than 1 minute for this day. */
+  d0PlayersBelow60s: number,
+|};
+
+export const listGameVersionMetricsFrom = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  gameId: string,
+  firstDayIsoDate: string
+): Promise<Array<GameVersionMetrics>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+
+  const response = await client.get(`/game-version-metrics`, {
+    params: {
+      userId,
+      gameId,
+      firstDayIsoDate,
+    },
+    headers: {
+      Authorization: authorizationHeader,
+    },
+  });
+
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/game-version-metrics of Analytics API',
   });
 };
 

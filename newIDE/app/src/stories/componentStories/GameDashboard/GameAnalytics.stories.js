@@ -24,7 +24,10 @@ import {
 import { GDevelopAnalyticsApi } from '../../../Utils/GDevelopServices/ApiConfigs';
 import { client as analyticsApiClient } from '../../../Utils/GDevelopServices/Analytics';
 import MockAdapter from 'axios-mock-adapter';
-import { type GameMetrics } from '../../../Utils/GDevelopServices/Analytics';
+import {
+  type GameMetrics,
+  type GameVersionMetrics,
+} from '../../../Utils/GDevelopServices/Analytics';
 import { type GameFeaturing } from '../../../Utils/GDevelopServices/Game';
 import { type Build } from '../../../Utils/GDevelopServices/Build';
 
@@ -183,11 +186,16 @@ export const WithAnalyticsAndMarketingPlan = (): React.Node => {
   );
 };
 
-const mockGameMetrics = (gameMetrics: Array<GameMetrics>) => {
+const mockGameMetrics = (
+  gameMetrics: Array<GameMetrics>,
+  gameVersionMetrics: Array<GameVersionMetrics> = []
+) => {
   const mock = new MockAdapter(analyticsApiClient);
   mock
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
     .reply(200, gameMetrics)
+    .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-version-metrics`)
+    .reply(200, gameVersionMetrics)
     .onAny()
     .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
@@ -231,6 +239,53 @@ export const WithMarketingBoostAndBuilds = (): React.Node => {
         gameFeaturings={gameFeaturings}
         builds={builds}
       />
+    </AuthenticatedUserContext.Provider>
+  );
+};
+
+export const WithVersions = (): React.Node => {
+  const getIsoDay = (daysCountBeforeToday: number) =>
+    new Date(Date.now() - daysCountBeforeToday * oneDayInMs)
+      .toISOString()
+      .substring(0, 10);
+  mockGameMetrics(gameRollingMetricsFor364Days, [
+    {
+      gameId: game1.id,
+      date: getIsoDay(20),
+      version: '1.0.0',
+      d0Players: 900,
+      d0SessionsDurationTotal: 900 * 150,
+      d0PlayersBelow60s: 380,
+    },
+    {
+      gameId: game1.id,
+      date: getIsoDay(3),
+      version: '1.0.0',
+      d0Players: 120,
+      d0SessionsDurationTotal: 120 * 140,
+      d0PlayersBelow60s: 52,
+    },
+    {
+      gameId: game1.id,
+      date: getIsoDay(3),
+      version: '1.1.0',
+      d0Players: 640,
+      d0SessionsDurationTotal: 640 * 260,
+      d0PlayersBelow60s: 150,
+    },
+    {
+      gameId: game1.id,
+      date: getIsoDay(1),
+      version: '1.2.0',
+      d0Players: 12,
+      d0SessionsDurationTotal: 12 * 300,
+      d0PlayersBelow60s: 2,
+    },
+  ]);
+
+  return (
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+      <GameAnalyticsPanel game={game1} />
     </AuthenticatedUserContext.Provider>
   );
 };

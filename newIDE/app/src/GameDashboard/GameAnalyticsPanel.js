@@ -16,8 +16,18 @@ import Text from '../UI/Text';
 import Paper from '../UI/Paper';
 import {
   type GameMetrics,
+  type GameVersionMetrics,
   getGameMetricsFrom,
+  listGameVersionMetricsFrom,
 } from '../Utils/GDevelopServices/Analytics';
+import {
+  Table,
+  TableBody,
+  TableHeader,
+  TableHeaderColumn,
+  TableRow,
+  TableRowColumn,
+} from '../UI/Table';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import PlaceholderError from '../UI/PlaceholderError';
@@ -30,6 +40,7 @@ import {
   daysShownForYear,
   minPlayersCountForRates,
   gameAnalyticsBenchmarks,
+  getGameVersionAnalytics,
   type GameAnalyticsPeriod,
 } from './GameAnalyticsEvaluator';
 import {
@@ -258,6 +269,14 @@ export const GameAnalyticsPanel = ({
     [gameRollingMetrics, period, gameFeaturings, builds]
   );
 
+  const [gameVersionMetrics, setGameVersionMetrics] = React.useState<
+    Array<GameVersionMetrics>
+  >([]);
+  const gameVersionAnalytics = React.useMemo(
+    () => getGameVersionAnalytics(gameVersionMetrics, period),
+    [gameVersionMetrics, period]
+  );
+
   const [gameRollingMetricsError, setGameMetricsError] = React.useState<?Error>(
     null
   );
@@ -285,6 +304,19 @@ export const GameAnalyticsPanel = ({
       } catch (err) {
         console.error(`Unable to load game rolling metrics:`, err);
         setGameMetricsError(err);
+      }
+      // The rest of the analytics is shown even without the versions.
+      try {
+        setGameVersionMetrics(
+          await listGameVersionMetricsFrom(
+            getAuthorizationHeader,
+            id,
+            game.id,
+            lastYearIsoDate
+          )
+        );
+      } catch (err) {
+        console.error(`Unable to load game version metrics:`, err);
       }
       setIsGameMetricsLoading(false);
     },
@@ -620,6 +652,71 @@ export const GameAnalyticsPanel = ({
                       playerPlatforms={playerPlatforms}
                       height={chartHeight}
                     />
+                  </ChartBlock>
+                </Grid>
+              )}
+              {gameVersionAnalytics.length > 1 && (
+                <Grid item xs={12} sm={6}>
+                  <ChartBlock
+                    title={<Trans>Versions</Trans>}
+                    description={
+                      <Trans>
+                        Players of each version of the game, the latest version
+                        first. A player is counted with the first version they
+                        played in a day.
+                      </Trans>
+                    }
+                  >
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHeaderColumn>
+                            <Trans>Version</Trans>
+                          </TableHeaderColumn>
+                          <TableHeaderColumn>
+                            <Trans>Players</Trans>
+                          </TableHeaderColumn>
+                          <TableHeaderColumn>
+                            <Trans>Left in the first minute</Trans>
+                          </TableHeaderColumn>
+                          <TableHeaderColumn>
+                            <Trans>Average play time</Trans>
+                          </TableHeaderColumn>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {gameVersionAnalytics.map(
+                          ({
+                            version,
+                            playersCount,
+                            bounceRatePercent,
+                            playedDurationPerPlayerInSeconds,
+                          }) => (
+                            <TableRow key={version}>
+                              <TableRowColumn>
+                                {version || <Trans>No version</Trans>}
+                              </TableRowColumn>
+                              <TableRowColumn>
+                                {formatCount(playersCount)}
+                              </TableRowColumn>
+                              <TableRowColumn>
+                                {bounceRatePercent !== null
+                                  ? `${Math.round(bounceRatePercent)}%`
+                                  : '–'}
+                              </TableRowColumn>
+                              <TableRowColumn>
+                                {playedDurationPerPlayerInSeconds !== null
+                                  ? formatDuration(
+                                      i18n,
+                                      playedDurationPerPlayerInSeconds
+                                    )
+                                  : '–'}
+                              </TableRowColumn>
+                            </TableRow>
+                          )
+                        )}
+                      </TableBody>
+                    </Table>
                   </ChartBlock>
                 </Grid>
               )}

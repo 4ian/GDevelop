@@ -456,6 +456,75 @@ describe('InstallAsset', () => {
           .isSmooth()
       ).toBe(false);
     });
+
+    it('gives each child of a custom object its own renamed variant', async () => {
+      const { project } = makeTestProject(gd);
+      const layout = project.insertNewLayout('MyTestLayout', 0);
+      const extension = project.insertNewEventsFunctionsExtension('UI', 0);
+      const button = extension.getEventsBasedObjects().insertNew('Button', 0);
+      extension.getEventsBasedObjects().insertNew('Dialog', 1);
+      // The asset variants will be renamed because these names are taken.
+      button.getVariants().insertNewVariant('Green', 0);
+      button.getVariants().insertNewVariant('Pink', 1);
+
+      await addAssetToProject({
+        project,
+        objectsContainer: layout.getObjects(),
+        asset: {
+          ...fakeAsset1,
+          objectAssets: [
+            {
+              object: { name: 'Dialog', type: 'UI::Dialog', variant: 'Themed' },
+              resources: [],
+              variants: [
+                {
+                  objectType: 'UI::Button',
+                  variant: { name: 'Green', objects: [] },
+                },
+                {
+                  objectType: 'UI::Button',
+                  variant: { name: 'Pink', objects: [] },
+                },
+                {
+                  objectType: 'UI::Dialog',
+                  variant: {
+                    name: 'Themed',
+                    objects: [
+                      {
+                        name: 'YesButton',
+                        type: 'UI::Button',
+                        variant: 'Green',
+                      },
+                      { name: 'NoButton', type: 'UI::Button', variant: 'Pink' },
+                    ],
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      });
+
+      const themedDialogChildren = project
+        .getEventsBasedObject('UI::Dialog')
+        .getVariants()
+        .getVariant('Themed')
+        .getObjects();
+      expect(
+        gd
+          .asCustomObjectConfiguration(
+            themedDialogChildren.getObject('YesButton').getConfiguration()
+          )
+          .getVariantName()
+      ).toBe('Green2');
+      expect(
+        gd
+          .asCustomObjectConfiguration(
+            themedDialogChildren.getObject('NoButton').getConfiguration()
+          )
+          .getVariantName()
+      ).toBe('Pink2');
+    });
   });
 
   describe('getRequiredExtensionsFromAsset', () => {

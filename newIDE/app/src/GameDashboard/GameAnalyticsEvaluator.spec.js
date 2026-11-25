@@ -2,6 +2,7 @@
 import {
   getGameAnalytics,
   getGameVersionAnalytics,
+  getGameSourceAnalytics,
 } from './GameAnalyticsEvaluator';
 import { type GameMetrics } from '../Utils/GDevelopServices/Analytics';
 
@@ -308,22 +309,71 @@ describe('GameAnalyticsEvaluator', () => {
       )
     ).toEqual([
       {
-        version: '1.2.0',
+        name: '1.2.0',
         playersCount: 5,
         bounceRatePercent: null,
         playedDurationPerPlayerInSeconds: null,
       },
       {
-        version: '1.1.0',
+        name: '1.1.0',
         playersCount: 100,
         bounceRatePercent: 20,
         playedDurationPerPlayerInSeconds: 120,
       },
       {
-        version: '1.0.0',
+        name: '1.0.0',
         playersCount: 40,
         bounceRatePercent: 50,
         playedDurationPerPlayerInSeconds: 120,
+      },
+    ]);
+  });
+
+  it('lists where the game was played during the period, the most played first', () => {
+    const createFakeGameSourceMetrics = (
+      date: string,
+      source: string,
+      playersCount: number,
+      bouncedPlayersCount: number
+    ) => ({
+      gameId: 'fake-game-id',
+      date,
+      source,
+      d0Players: playersCount,
+      d0SessionsDurationTotal: playersCount * 120,
+      d0PlayersBelow60s: bouncedPlayersCount,
+    });
+
+    expect(
+      getGameSourceAnalytics(
+        [
+          createFakeGameSourceMetrics('2026-10-01', 'itch.io', 500, 100),
+          createFakeGameSourceMetrics('2026-11-18', 'itch.io', 5, 1),
+          createFakeGameSourceMetrics('2026-11-18', 'gd.games', 30, 15),
+          createFakeGameSourceMetrics('2026-11-19', 'gd.games', 10, 5),
+          createFakeGameSourceMetrics('2026-11-19', 'android-app', 100, 20),
+        ],
+        'week',
+        todayDate
+      )
+    ).toEqual([
+      {
+        name: 'android-app',
+        playersCount: 100,
+        bounceRatePercent: 20,
+        playedDurationPerPlayerInSeconds: 120,
+      },
+      {
+        name: 'gd.games',
+        playersCount: 40,
+        bounceRatePercent: 50,
+        playedDurationPerPlayerInSeconds: 120,
+      },
+      {
+        name: 'itch.io',
+        playersCount: 5,
+        bounceRatePercent: null,
+        playedDurationPerPlayerInSeconds: null,
       },
     ]);
   });

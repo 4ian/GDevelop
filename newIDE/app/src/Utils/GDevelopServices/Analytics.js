@@ -153,6 +153,44 @@ export const listGameVersionMetricsFrom = async (
   });
 };
 
+/** The metrics of the players of a game coming from a source for a day. */
+export type GameSourceMetrics = {|
+  gameId: string,
+  date: string,
+  /** Where the game is played: `android-app`, `ios-app`, `desktop-app`, `unknown`, a game portal (like `itch.io`) or the hostname of a website. */
+  source: string,
+  /** Number of players for this day whose first session of the day was on this source. */
+  d0Players: number,
+  d0SessionsDurationTotal: number,
+  /** Number of these players who played the game less than 1 minute for this day. */
+  d0PlayersBelow60s: number,
+|};
+
+export const listGameSourceMetricsFrom = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  gameId: string,
+  firstDayIsoDate: string
+): Promise<Array<GameSourceMetrics>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+
+  const response = await client.get(`/game-source-metrics`, {
+    params: {
+      userId,
+      gameId,
+      firstDayIsoDate,
+    },
+    headers: {
+      Authorization: authorizationHeader,
+    },
+  });
+
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/game-source-metrics of Analytics API',
+  });
+};
+
 /** A crash report, in the format sent by the game engine. */
 export type GameCrashReport = {|
   type: 'javascript-uncaught-exception',

@@ -2,6 +2,7 @@
 import {
   type GameMetrics,
   type GameVersionMetrics,
+  type GameSourceMetrics,
 } from '../Utils/GDevelopServices/Analytics';
 import { type GameFeaturing } from '../Utils/GDevelopServices/Game';
 import { type Build } from '../Utils/GDevelopServices/Build';
@@ -371,24 +372,30 @@ const isIsoDayInMarketingBoost = (
       isoDay <= getIsoDay(gameFeaturing.expiresAt * 1000)
   );
 
-export type GameVersionAnalytics = {|
-  /** Empty when the game has no version. */
-  version: string,
+export type GameBreakdownAnalytics = {|
+  /** A version (empty when the game has none) or a source of players. */
+  name: string,
   playersCount: number,
-  /** Null when the version has too few players. */
+  /** Null when there are too few players. */
   bounceRatePercent: number | null,
-  /** Null when the version has too few players. */
+  /** Null when there are too few players. */
   playedDurationPerPlayerInSeconds: number | null,
 |};
 
-/**
- * @returns the versions played during the period, the most recently released first.
- */
-export const getGameVersionAnalytics = (
-  gameVersionMetricsArray: Array<GameVersionMetrics>,
+type BreakdownMetrics = {
+  +date: string,
+  +d0Players: number,
+  +d0SessionsDurationTotal: number,
+  +d0PlayersBelow60s: number,
+  ...
+};
+
+const getGameBreakdownAnalytics = <Metrics: BreakdownMetrics>(
+  metricsArray: Array<Metrics>,
+  getName: Metrics => string,
   period: GameAnalyticsPeriod,
-  todayDate?: Date
-): Array<GameVersionAnalytics> => {
+  todayDate: ?Date
+): Array<{| ...GameBreakdownAnalytics, firstIsoDay: string |}> => {
   const { pointsCount, daysCountPerPoint } = periodSettings[period];
   const isoDays = new Set(
     getIsoDays(
@@ -398,61 +405,91 @@ export const getGameVersionAnalytics = (
     )
   );
 
-  const firstIsoDayByVersion: { [string]: string } = {};
-  const metricsByVersion: {
+  const firstIsoDayByName: { [string]: string } = {};
+  const periodMetricsByName: {
     [string]: {|
       playersCount: number,
       bouncedPlayersCount: number,
       playedDurationInSeconds: number,
     |},
   } = {};
-  gameVersionMetricsArray.forEach(gameVersionMetrics => {
-    const { version } = gameVersionMetrics;
-    const isoDay = gameVersionMetrics.date.substring(0, 10);
-    if (
-      !firstIsoDayByVersion[version] ||
-      isoDay < firstIsoDayByVersion[version]
-    )
-      firstIsoDayByVersion[version] = isoDay;
+  metricsArray.forEach(metrics => {
+    const name = getName(metrics);
+    const isoDay = metrics.date.substring(0, 10);
+    if (!firstIsoDayByName[name] || isoDay < firstIsoDayByName[name])
+      firstIsoDayByName[name] = isoDay;
     if (!isoDays.has(isoDay)) return;
 
-    const metrics = metricsByVersion[version] || {
+    const periodMetrics = periodMetricsByName[name] || {
       playersCount: 0,
       bouncedPlayersCount: 0,
       playedDurationInSeconds: 0,
     };
-    metrics.playersCount += gameVersionMetrics.d0Players;
-    metrics.bouncedPlayersCount += gameVersionMetrics.d0PlayersBelow60s;
-    metrics.playedDurationInSeconds +=
-      gameVersionMetrics.d0SessionsDurationTotal;
-    metricsByVersion[version] = metrics;
+    periodMetrics.playersCount += metrics.d0Players;
+    periodMetrics.bouncedPlayersCount += metrics.d0PlayersBelow60s;
+    periodMetrics.playedDurationInSeconds += metrics.d0SessionsDurationTotal;
+    periodMetricsByName[name] = periodMetrics;
   });
 
-  return Object.keys(metricsByVersion)
-    .sort((version1, version2) =>
-      firstIsoDayByVersion[version2].localeCompare(
-        firstIsoDayByVersion[version1]
-      )
-    )
-    .map(version => {
-      const {
-        playersCount,
-        bouncedPlayersCount,
-        playedDurationInSeconds,
-      } = metricsByVersion[version];
-      const hasEnoughPlayers = playersCount >= minPlayersCountForRates;
-      return {
-        version,
-        playersCount,
-        bounceRatePercent: hasEnoughPlayers
-          ? (100 * bouncedPlayersCount) / playersCount
-          : null,
-        playedDurationPerPlayerInSeconds: hasEnoughPlayers
-          ? playedDurationInSeconds / playersCount
-          : null,
-      };
-    });
+  return Object.keys(periodMetricsByName).map(name => {
+    const {
+      playersCount,
+      bouncedPlayersCount,
+      playedDurationInSeconds,
+    } = periodMetricsByName[name];
+    const hasEnoughPlayers = playersCount >= minPlayersCountForRates;
+    return {
+      name,
+      firstIsoDay: firstIsoDayByName[name],
+      playersCount,
+      bounceRatePercent: hasEnoughPlayers
+        ? (100 * bouncedPlayersCount) / playersCount
+        : null,
+      playedDurationPerPlayerInSeconds: hasEnoughPlayers
+        ? playedDurationInSeconds / playersCount
+        : null,
+    };
+  });
 };
+
+/**
+ * @returns the versions played during the period, the most recently released first.
+ */
+export const getGameVersionAnalytics = (
+  gameVersionMetricsArray: Array<GameVersionMetrics>,
+  period: GameAnalyticsPeriod,
+  todayDate?: Date
+): Array<GameBreakdownAnalytics> =>
+  getGameBreakdownAnalytics(
+    gameVersionMetricsArray,
+    gameVersionMetrics => gameVersionMetrics.version,
+    period,
+    todayDate
+  )
+    .sort((version1, version2) =>
+      version2.firstIsoDay.localeCompare(version1.firstIsoDay)
+    )
+    .map(({ firstIsoDay, ...gameVersionAnalytics }) => gameVersionAnalytics);
+
+const maxGameSourcesCount = 10;
+
+/**
+ * @returns where the game was played during the period, the sources with the most players first.
+ */
+export const getGameSourceAnalytics = (
+  gameSourceMetricsArray: Array<GameSourceMetrics>,
+  period: GameAnalyticsPeriod,
+  todayDate?: Date
+): Array<GameBreakdownAnalytics> =>
+  getGameBreakdownAnalytics(
+    gameSourceMetricsArray,
+    gameSourceMetrics => gameSourceMetrics.source,
+    period,
+    todayDate
+  )
+    .sort((source1, source2) => source2.playersCount - source1.playersCount)
+    .slice(0, maxGameSourcesCount)
+    .map(({ firstIsoDay, ...gameSourceAnalytics }) => gameSourceAnalytics);
 
 export const getGameAnalytics = (
   gameMetricsArray: ?Array<GameMetrics>,

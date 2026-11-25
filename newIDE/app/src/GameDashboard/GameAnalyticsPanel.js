@@ -17,8 +17,10 @@ import Paper from '../UI/Paper';
 import {
   type GameMetrics,
   type GameVersionMetrics,
+  type GameSourceMetrics,
   getGameMetricsFrom,
   listGameVersionMetricsFrom,
+  listGameSourceMetricsFrom,
 } from '../Utils/GDevelopServices/Analytics';
 import {
   Table,
@@ -41,6 +43,8 @@ import {
   minPlayersCountForRates,
   gameAnalyticsBenchmarks,
   getGameVersionAnalytics,
+  getGameSourceAnalytics,
+  type GameBreakdownAnalytics,
   type GameAnalyticsPeriod,
 } from './GameAnalyticsEvaluator';
 import {
@@ -240,6 +244,71 @@ const ChartBlock = ({
   </Paper>
 );
 
+const formatSource = (i18n: I18nType, source: string): string =>
+  source === 'android-app'
+    ? i18n._(t`Android app`)
+    : source === 'ios-app'
+    ? i18n._(t`iOS app`)
+    : source === 'desktop-app'
+    ? i18n._(t`Desktop app`)
+    : source === 'unknown'
+    ? i18n._(t`Unknown`)
+    : source;
+
+const BreakdownTable = ({
+  i18n,
+  nameTitle,
+  breakdownAnalytics,
+  formatName,
+}: {|
+  i18n: I18nType,
+  nameTitle: React.Node,
+  breakdownAnalytics: Array<GameBreakdownAnalytics>,
+  formatName: string => string,
+|}) => (
+  <Table>
+    <TableHeader>
+      <TableRow>
+        <TableHeaderColumn>{nameTitle}</TableHeaderColumn>
+        <TableHeaderColumn>
+          <Trans>Players</Trans>
+        </TableHeaderColumn>
+        <TableHeaderColumn>
+          <Trans>Left in the first minute</Trans>
+        </TableHeaderColumn>
+        <TableHeaderColumn>
+          <Trans>Average play time</Trans>
+        </TableHeaderColumn>
+      </TableRow>
+    </TableHeader>
+    <TableBody>
+      {breakdownAnalytics.map(
+        ({
+          name,
+          playersCount,
+          bounceRatePercent,
+          playedDurationPerPlayerInSeconds,
+        }) => (
+          <TableRow key={name}>
+            <TableRowColumn>{formatName(name)}</TableRowColumn>
+            <TableRowColumn>{formatCount(playersCount)}</TableRowColumn>
+            <TableRowColumn>
+              {bounceRatePercent !== null
+                ? `${Math.round(bounceRatePercent)}%`
+                : '–'}
+            </TableRowColumn>
+            <TableRowColumn>
+              {playedDurationPerPlayerInSeconds !== null
+                ? formatDuration(i18n, playedDurationPerPlayerInSeconds)
+                : '–'}
+            </TableRowColumn>
+          </TableRow>
+        )
+      )}
+    </TableBody>
+  </Table>
+);
+
 type Props = {|
   game: Game,
   recommendedMarketingPlan?: ?MarketingPlan,
@@ -276,6 +345,13 @@ export const GameAnalyticsPanel = ({
     () => getGameVersionAnalytics(gameVersionMetrics, period),
     [gameVersionMetrics, period]
   );
+  const [gameSourceMetrics, setGameSourceMetrics] = React.useState<
+    Array<GameSourceMetrics>
+  >([]);
+  const gameSourceAnalytics = React.useMemo(
+    () => getGameSourceAnalytics(gameSourceMetrics, period),
+    [gameSourceMetrics, period]
+  );
 
   const [gameRollingMetricsError, setGameMetricsError] = React.useState<?Error>(
     null
@@ -305,8 +381,16 @@ export const GameAnalyticsPanel = ({
         console.error(`Unable to load game rolling metrics:`, err);
         setGameMetricsError(err);
       }
-      // The rest of the analytics is shown even without the versions.
+      // The rest of the analytics is shown even without the versions and the sources.
       try {
+        setGameSourceMetrics(
+          await listGameSourceMetricsFrom(
+            getAuthorizationHeader,
+            id,
+            game.id,
+            lastYearIsoDate
+          )
+        );
         setGameVersionMetrics(
           await listGameVersionMetricsFrom(
             getAuthorizationHeader,
@@ -316,7 +400,7 @@ export const GameAnalyticsPanel = ({
           )
         );
       } catch (err) {
-        console.error(`Unable to load game version metrics:`, err);
+        console.error(`Unable to load game version or source metrics:`, err);
       }
       setIsGameMetricsLoading(false);
     },
@@ -655,6 +739,26 @@ export const GameAnalyticsPanel = ({
                   </ChartBlock>
                 </Grid>
               )}
+              {gameSourceAnalytics.length > 0 && (
+                <Grid item xs={12} sm={6}>
+                  <ChartBlock
+                    title={<Trans>Where players play</Trans>}
+                    description={
+                      <Trans>
+                        The apps and websites with the most players. A player is
+                        counted where they first played in a day.
+                      </Trans>
+                    }
+                  >
+                    <BreakdownTable
+                      i18n={i18n}
+                      nameTitle={<Trans>Where</Trans>}
+                      breakdownAnalytics={gameSourceAnalytics}
+                      formatName={source => formatSource(i18n, source)}
+                    />
+                  </ChartBlock>
+                </Grid>
+              )}
               {gameVersionAnalytics.length > 1 && (
                 <Grid item xs={12} sm={6}>
                   <ChartBlock
@@ -667,56 +771,12 @@ export const GameAnalyticsPanel = ({
                       </Trans>
                     }
                   >
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHeaderColumn>
-                            <Trans>Version</Trans>
-                          </TableHeaderColumn>
-                          <TableHeaderColumn>
-                            <Trans>Players</Trans>
-                          </TableHeaderColumn>
-                          <TableHeaderColumn>
-                            <Trans>Left in the first minute</Trans>
-                          </TableHeaderColumn>
-                          <TableHeaderColumn>
-                            <Trans>Average play time</Trans>
-                          </TableHeaderColumn>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {gameVersionAnalytics.map(
-                          ({
-                            version,
-                            playersCount,
-                            bounceRatePercent,
-                            playedDurationPerPlayerInSeconds,
-                          }) => (
-                            <TableRow key={version}>
-                              <TableRowColumn>
-                                {version || <Trans>No version</Trans>}
-                              </TableRowColumn>
-                              <TableRowColumn>
-                                {formatCount(playersCount)}
-                              </TableRowColumn>
-                              <TableRowColumn>
-                                {bounceRatePercent !== null
-                                  ? `${Math.round(bounceRatePercent)}%`
-                                  : '–'}
-                              </TableRowColumn>
-                              <TableRowColumn>
-                                {playedDurationPerPlayerInSeconds !== null
-                                  ? formatDuration(
-                                      i18n,
-                                      playedDurationPerPlayerInSeconds
-                                    )
-                                  : '–'}
-                              </TableRowColumn>
-                            </TableRow>
-                          )
-                        )}
-                      </TableBody>
-                    </Table>
+                    <BreakdownTable
+                      i18n={i18n}
+                      nameTitle={<Trans>Version</Trans>}
+                      breakdownAnalytics={gameVersionAnalytics}
+                      formatName={version => version || i18n._(t`No version`)}
+                    />
                   </ChartBlock>
                 </Grid>
               )}

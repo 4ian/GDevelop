@@ -27,6 +27,7 @@ import MockAdapter from 'axios-mock-adapter';
 import {
   type GameMetrics,
   type GameVersionMetrics,
+  type GameSourceMetrics,
 } from '../../../Utils/GDevelopServices/Analytics';
 import { type GameFeaturing } from '../../../Utils/GDevelopServices/Game';
 import { type Build } from '../../../Utils/GDevelopServices/Build';
@@ -188,7 +189,8 @@ export const WithAnalyticsAndMarketingPlan = (): React.Node => {
 
 const mockGameMetrics = (
   gameMetrics: Array<GameMetrics>,
-  gameVersionMetrics: Array<GameVersionMetrics> = []
+  gameVersionMetrics: Array<GameVersionMetrics> = [],
+  gameSourceMetrics: Array<GameSourceMetrics> = []
 ) => {
   const mock = new MockAdapter(analyticsApiClient);
   mock
@@ -196,6 +198,8 @@ const mockGameMetrics = (
     .reply(200, gameMetrics)
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-version-metrics`)
     .reply(200, gameVersionMetrics)
+    .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-source-metrics`)
+    .reply(200, gameSourceMetrics)
     .onAny()
     .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
@@ -243,45 +247,67 @@ export const WithMarketingBoostAndBuilds = (): React.Node => {
   );
 };
 
-export const WithVersions = (): React.Node => {
+export const WithVersionsAndSources = (): React.Node => {
   const getIsoDay = (daysCountBeforeToday: number) =>
     new Date(Date.now() - daysCountBeforeToday * oneDayInMs)
       .toISOString()
       .substring(0, 10);
-  mockGameMetrics(gameRollingMetricsFor364Days, [
-    {
-      gameId: game1.id,
-      date: getIsoDay(20),
-      version: '1.0.0',
-      d0Players: 900,
-      d0SessionsDurationTotal: 900 * 150,
-      d0PlayersBelow60s: 380,
-    },
-    {
-      gameId: game1.id,
-      date: getIsoDay(3),
-      version: '1.0.0',
-      d0Players: 120,
-      d0SessionsDurationTotal: 120 * 140,
-      d0PlayersBelow60s: 52,
-    },
-    {
-      gameId: game1.id,
-      date: getIsoDay(3),
-      version: '1.1.0',
-      d0Players: 640,
-      d0SessionsDurationTotal: 640 * 260,
-      d0PlayersBelow60s: 150,
-    },
-    {
-      gameId: game1.id,
-      date: getIsoDay(1),
-      version: '1.2.0',
-      d0Players: 12,
-      d0SessionsDurationTotal: 12 * 300,
-      d0PlayersBelow60s: 2,
-    },
-  ]);
+  mockGameMetrics(
+    gameRollingMetricsFor364Days,
+    [
+      {
+        gameId: game1.id,
+        date: getIsoDay(20),
+        version: '1.0.0',
+        d0Players: 900,
+        d0SessionsDurationTotal: 900 * 150,
+        d0PlayersBelow60s: 380,
+      },
+      {
+        gameId: game1.id,
+        date: getIsoDay(3),
+        version: '1.0.0',
+        d0Players: 120,
+        d0SessionsDurationTotal: 120 * 140,
+        d0PlayersBelow60s: 52,
+      },
+      {
+        gameId: game1.id,
+        date: getIsoDay(3),
+        version: '1.1.0',
+        d0Players: 640,
+        d0SessionsDurationTotal: 640 * 260,
+        d0PlayersBelow60s: 150,
+      },
+      {
+        gameId: game1.id,
+        date: getIsoDay(1),
+        version: '1.2.0',
+        d0Players: 12,
+        d0SessionsDurationTotal: 12 * 300,
+        d0PlayersBelow60s: 2,
+      },
+    ],
+    [
+      ...[
+        ['android-app', 2400, 700],
+        ['gd.games', 1300, 480],
+        ['itch.io', 900, 190],
+        ['poki.com', 640, 90],
+        ['ios-app', 310, 80],
+        ['desktop-app', 85, 9],
+        ['my-own-website.com', 14, 6],
+      ].map(([source, playersCount, bouncedPlayersCount]) => ({
+        gameId: game1.id,
+        date: getIsoDay(2),
+        source,
+        d0Players: playersCount,
+        d0SessionsDurationTotal:
+          playersCount * (source === 'poki.com' ? 420 : 200),
+        d0PlayersBelow60s: bouncedPlayersCount,
+      })),
+    ]
+  );
 
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>

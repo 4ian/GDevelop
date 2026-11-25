@@ -49,7 +49,10 @@ import TextButton from '../UI/TextButton';
 import ChevronArrowLeft from '../UI/CustomSvgIcons/ChevronArrowLeft';
 import ExampleInformationPage from '../AssetStore/ExampleStore/ExampleInformationPage';
 import PrivateGameTemplateInformationPage from '../AssetStore/PrivateGameTemplates/PrivateGameTemplateInformationPage';
-import ExampleStore from '../AssetStore/ExampleStore';
+import ExampleStore, {
+  useExampleAndGameTemplateSearch,
+} from '../AssetStore/ExampleStore';
+import SearchBar from '../UI/SearchBar';
 import Text from '../UI/Text';
 import { type WindowSizeType } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import { PrivateGameTemplateStoreContext } from '../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
@@ -201,7 +204,11 @@ const NewProjectSetupDialog = ({
   const [startersSelected, setStartersSelected] = React.useState<boolean>(
     false
   );
-  const { exampleShortHeaders } = React.useContext(ExampleStoreContext);
+  const {
+    exampleShortHeaders,
+    searchText: exampleStoreSearchText,
+  } = React.useContext(ExampleStoreContext);
+  const { searchText, setSearchText } = useExampleAndGameTemplateSearch();
   const isOnHomePage =
     !selectedExampleShortHeader &&
     !selectedPrivateGameTemplateListingData &&
@@ -723,12 +730,29 @@ const NewProjectSetupDialog = ({
                       <Trans>Continue with Human Intelligence</Trans>
                     )
                   }
+                  searchBar={
+                    <Line>
+                      <Column expand noMargin>
+                        <SearchBar
+                          value={searchText}
+                          onChange={setSearchText}
+                          onRequestSearch={() => {}}
+                          placeholder={t`Search starters and game templates`}
+                          disabled={isLoading}
+                        />
+                      </Column>
+                    </Line>
+                  }
                 />
                 {isOnline ? (
                   <>
-                    <Text size="block-title" noMargin>
-                      <Trans>Remix an existing game</Trans>
-                    </Text>
+                    {!exampleStoreSearchText && (
+                      <Line alignItems="center">
+                        <Text size="block-title">
+                          <Trans>Game templates</Trans>
+                        </Text>
+                      </Line>
+                    )}
                     <ExampleStore
                       onSelectExampleShortHeader={exampleShortHeader => {
                         onSelectExampleShortHeader(exampleShortHeader);
@@ -740,6 +764,7 @@ const NewProjectSetupDialog = ({
                       }}
                       i18n={i18n}
                       getColumnsFromWindowSize={getItemsColumns}
+                      hideSearch
                       hideStartingPoints
                       limitRowsTo={6}
                       showLoadMore
@@ -775,9 +800,6 @@ const NewProjectSetupDialog = ({
               <EmptyAndStartingPointProjects
                 onSelectExampleShortHeader={exampleShortHeader => {
                   onSelectExampleShortHeader(exampleShortHeader);
-                }}
-                onSelectEmptyProject={() => {
-                  setEmptyProjectSelected(true);
                 }}
                 disabled={isLoading}
                 title={<Trans>Start from a template</Trans>}

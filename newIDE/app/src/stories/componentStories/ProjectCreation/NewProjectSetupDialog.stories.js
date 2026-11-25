@@ -16,11 +16,22 @@ import {
 } from '../../../fixtures/GDevelopServicesTestData';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import fakeResourceManagementProps from '../../FakeResourceManagement';
+import { ExampleStoreStateProvider } from '../../../AssetStore/ExampleStore/ExampleStoreContext';
+import { PrivateGameTemplateStoreStateProvider } from '../../../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
 
 export default {
   title: 'Project Creation/NewProjectSetupDialog',
   component: NewProjectSetupDialog,
-  decorators: [paperDecorator],
+  decorators: [
+    (Story: any): React.Node => (
+      <ExampleStoreStateProvider>
+        <PrivateGameTemplateStoreStateProvider>
+          <Story />
+        </PrivateGameTemplateStoreStateProvider>
+      </ExampleStoreStateProvider>
+    ),
+    paperDecorator,
+  ],
 };
 
 export const OpenAndNotAuthenticated = (): React.Node => {

@@ -298,6 +298,7 @@ export const PrivateGameTemplateStoreStateProvider = ({
     // $FlowFixMe[incompatible-type]
     defaultFirstSearchItemIds: firstGameTemplateIds,
     shuffleResults: false,
+    nameWeight: 8,
   });
 
   const privateGameTemplateListingDatasSearchResultsForShop: ?Array<PrivateGameTemplateListingData> = useSearchItem(

@@ -114,11 +114,14 @@ export const isLinkedToStartingPointExampleShortHeader = (
 };
 
 type Props = {|
-  onSelectEmptyProject: () => void,
+  // The empty project tile is hidden if not set, or when searching.
+  onSelectEmptyProject?: () => void,
   onSelectExampleShortHeader: (exampleShortHeader: ExampleShortHeader) => void,
   disabled?: boolean,
   onSeeAll?: () => void,
   title: React.Node,
+  // Shown below the title. When set, starters are hidden when searching.
+  searchBar?: React.Node,
 |};
 
 const EmptyAndStartingPointProjects = ({
@@ -127,28 +130,34 @@ const EmptyAndStartingPointProjects = ({
   disabled,
   onSeeAll,
   title,
+  searchBar,
 }: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const styles = getStyles(gdevelopTheme);
-  const { exampleShortHeaders } = React.useContext(ExampleStoreContext);
+  const { exampleShortHeaders, searchText } = React.useContext(
+    ExampleStoreContext
+  );
   const { windowSize, isLandscape } = useResponsiveWindowSize();
   const columnsCount = getItemsColumns(windowSize, isLandscape);
+  const isSearching = !!searchBar && !!searchText;
+  const shouldShowEmptyProject = !!onSelectEmptyProject && !isSearching;
 
   const startingPointExampleShortHeaders = React.useMemo(
     () => {
-      const allStarterShortHeaders = exampleShortHeaders
-        ? exampleShortHeaders.filter(isStartingPointExampleShortHeader)
-        : [];
+      const allStarterShortHeaders = (exampleShortHeaders || []).filter(
+        isStartingPointExampleShortHeader
+      );
 
       if (onSeeAll) {
-        // only return 2 rows of items.
-        const maxItemsToShow = columnsCount * 2 - 1; // -1 for the empty project tile
+        // Only return 2 rows of items, counting the empty project tile.
+        const maxItemsToShow =
+          columnsCount * 2 - (shouldShowEmptyProject ? 1 : 0);
         return allStarterShortHeaders.slice(0, maxItemsToShow);
       }
 
       return allStarterShortHeaders;
     },
-    [exampleShortHeaders, onSeeAll, columnsCount]
+    [exampleShortHeaders, shouldShowEmptyProject, onSeeAll, columnsCount]
   );
 
   return (
@@ -159,7 +168,7 @@ const EmptyAndStartingPointProjects = ({
             <Line justifyContent="space-between" alignItems="center">
               <Text size="block-title">{title}</Text>
               <FlatButton
-                label={<Trans>See all</Trans>}
+                label={<Trans>See all starters</Trans>}
                 rightIcon={<ArrowRight fontSize="small" />}
                 onClick={onSeeAll}
                 primary
@@ -167,26 +176,35 @@ const EmptyAndStartingPointProjects = ({
               />
             </Line>
           ) : null}
-          <GridList
-            cols={columnsCount}
-            style={styles.grid}
-            cellHeight="auto"
-            spacing={ITEMS_SPACING * 2}
-          >
-            <EmptyProjectTile
-              onSelectEmptyProject={onSelectEmptyProject}
-              disabled={disabled}
-            />
-            {startingPointExampleShortHeaders.map(exampleShortHeader => (
-              <ExampleTile
-                exampleShortHeader={exampleShortHeader}
-                onSelect={() => onSelectExampleShortHeader(exampleShortHeader)}
-                key={exampleShortHeader.id}
-                disabled={disabled}
-                centerTitle
-              />
-            ))}
-          </GridList>
+          {searchBar}
+          {!isSearching &&
+            (shouldShowEmptyProject ||
+              startingPointExampleShortHeaders.length > 0) && (
+              <GridList
+                cols={columnsCount}
+                style={styles.grid}
+                cellHeight="auto"
+                spacing={ITEMS_SPACING * 2}
+              >
+                {shouldShowEmptyProject && onSelectEmptyProject && (
+                  <EmptyProjectTile
+                    onSelectEmptyProject={onSelectEmptyProject}
+                    disabled={disabled}
+                  />
+                )}
+                {startingPointExampleShortHeaders.map(exampleShortHeader => (
+                  <ExampleTile
+                    exampleShortHeader={exampleShortHeader}
+                    onSelect={() =>
+                      onSelectExampleShortHeader(exampleShortHeader)
+                    }
+                    key={exampleShortHeader.id}
+                    disabled={disabled}
+                    centerTitle
+                  />
+                ))}
+              </GridList>
+            )}
         </Column>
       )}
     </I18n>

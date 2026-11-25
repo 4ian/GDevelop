@@ -883,6 +883,7 @@ export const AiRequestChat: React.ComponentType<{
                         : newChatPlaceholder
                     }
                     rows={getRowsAndHeight({ standAloneForm }).rows}
+                    maxRows={standAloneForm ? 10 : undefined}
                     controls={
                       <Column>
                         <LineStackLayout

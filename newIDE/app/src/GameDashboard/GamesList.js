@@ -27,6 +27,7 @@ import { Column, Line } from '../UI/Grid';
 import Text from '../UI/Text';
 import Paper from '../UI/Paper';
 import BackgroundText from '../UI/BackgroundText';
+import EmptyMessage from '../UI/EmptyMessage';
 import GamesListFilterSelector, {
   type GamesListFilter,
 } from './GamesListFilterSelector';
@@ -553,29 +554,31 @@ const GamesList = ({
     // Only show on desktop as otherwise, cloud projects are the only ones that can be opened.
     isDesktop;
 
+  const hasDashboardItems =
+    (!!activeDashboardItems && activeDashboardItems.length > 0) ||
+    deletedDashboardItems.length > 0;
+
   return (
     <I18n>
       {({ i18n }) => (
-        <ColumnStackLayout noMargin>
+        <ColumnStackLayout noMargin expand>
           <Line noMargin justifyContent="space-between">
             <LineStackLayout noMargin alignItems="center">
               <Text size="section-title" noMargin>
                 <Trans>Games</Trans>
               </Text>
-              <IconButton
-                size="small"
-                onClick={refreshGamesList}
-                disabled={
-                  isRefreshing ||
-                  !allDashboardItems ||
-                  !allDashboardItems.length
-                }
-                tooltip={t`Refresh games`}
-              >
-                <div style={styles.refreshIconContainer}>
-                  <Refresh fontSize="inherit" />
-                </div>
-              </IconButton>
+              {hasDashboardItems && (
+                <IconButton
+                  size="small"
+                  onClick={refreshGamesList}
+                  disabled={isRefreshing}
+                  tooltip={t`Refresh games`}
+                >
+                  <div style={styles.refreshIconContainer}>
+                    <Refresh fontSize="inherit" />
+                  </div>
+                </IconButton>
+              )}
             </LineStackLayout>
             <LineStackLayout noMargin alignItems="center">
               <RaisedButton
@@ -607,8 +610,7 @@ const GamesList = ({
               )}
             </LineStackLayout>
           </Line>
-          {((activeDashboardItems && activeDashboardItems.length > 0) ||
-            deletedDashboardItems.length > 0) && (
+          {hasDashboardItems && (
             <ResponsiveLineStackLayout
               expand
               noMargin
@@ -792,6 +794,10 @@ const GamesList = ({
                 </BackgroundText>
               </Paper>
             </Column>
+          ) : displayedDashboardItems ? (
+            <EmptyMessage>
+              <Trans>Saved projects will be displayed here.</Trans>
+            </EmptyMessage>
           ) : null}
         </ColumnStackLayout>
       )}

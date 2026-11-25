@@ -49,6 +49,8 @@ type SearchOptions = {|
   excludedTiers: Set<string>,
   defaultFirstSearchItemIds: Array<string>,
   shuffleResults?: boolean,
+  // Set when the name is what the user sees, so that it ranks above tags.
+  nameWeight?: number,
 |};
 
 /**
@@ -487,6 +489,7 @@ export const useSearchStructuredItem = <SearchItem: SearchableItem>(
     excludedTiers,
     defaultFirstSearchItemIds,
     shuffleResults = true,
+    nameWeight = 2,
   }: SearchOptions
 ): ?Array<SearchResult<SearchItem>> => {
   const searchApiRef = React.useRef<?any>(null);
@@ -534,7 +537,7 @@ export const useSearchStructuredItem = <SearchItem: SearchableItem>(
       try {
         const newSearchApi = new Fuse(Object.values(searchItemsById), {
           keys: [
-            { name: 'name', weight: 2 },
+            { name: 'name', weight: nameWeight },
             { name: 'fullName', weight: 5 },
             { name: 'shortDescription', weight: 1 },
             { name: 'tags', weight: 4 },
@@ -560,7 +563,7 @@ export const useSearchStructuredItem = <SearchItem: SearchableItem>(
         console.error('Error while indexing items: ', error);
       }
     },
-    [searchItemsById]
+    [searchItemsById, nameWeight]
   );
 
   // Update the search results according to the items, search term

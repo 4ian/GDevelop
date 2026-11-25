@@ -622,14 +622,6 @@ export const HomePage: React.ComponentType<Props> = React.memo<Props>(
                       currentFileMetadata={fileMetadata}
                       onOpenProject={onOpenRecentFile}
                       storageProviders={storageProviders}
-                      storageProvider={storageProvider}
-                      resourceManagementProps={resourceManagementProps}
-                      onCreateEmptyProject={onCreateEmptyProject}
-                      onOpenLayout={onOpenLayout}
-                      onWillInstallExtension={onWillInstallExtension}
-                      onExtensionInstalled={onExtensionInstalled}
-                      onCloseAskAi={onCloseAskAi}
-                      onOpenAskAi={onOpenAskAi}
                       closeProject={closeProject}
                       games={games}
                       onRefreshGames={fetchGames}
@@ -642,11 +634,6 @@ export const HomePage: React.ComponentType<Props> = React.memo<Props>(
                       canOpen={canOpen}
                       onOpenProfile={onOpenProfile}
                       askToCloseProject={askToCloseProject}
-                      onCreateProjectFromExample={onCreateProjectFromExample}
-                      onSelectExampleShortHeader={onSelectExampleShortHeader}
-                      onSelectPrivateGameTemplateListingData={
-                        onSelectPrivateGameTemplateListingData
-                      }
                       i18n={i18n}
                       onOpenNewProjectSetupDialog={onOpenNewProjectSetupDialog}
                       onChooseProject={onChooseProject}

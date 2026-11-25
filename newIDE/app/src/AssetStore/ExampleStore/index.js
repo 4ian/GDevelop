@@ -51,21 +51,58 @@ const gameFilter = (
   return true;
 };
 
+// Starting points are kept when searching, so that they are mixed with the other results.
 const noStartingPointFilter = (
   allExampleShortHeaders: ExampleShortHeader[],
-  exampleShortHeader: ExampleShortHeader
+  exampleShortHeader: ExampleShortHeader,
+  isSearchActive: boolean
 ) =>
-  !isStartingPointExampleShortHeader(exampleShortHeader) &&
+  (isSearchActive || !isStartingPointExampleShortHeader(exampleShortHeader)) &&
   !isLinkedToStartingPointExampleShortHeader(
     allExampleShortHeaders,
     exampleShortHeader
   );
+
+// Search in both examples and game templates stores.
+export const useExampleAndGameTemplateSearch = (): {|
+  searchText: string,
+  setSearchText: (searchText: string) => void,
+|} => {
+  const {
+    searchText: exampleStoreSearchText,
+    setSearchText: setExampleStoreSearchText,
+  } = React.useContext(ExampleStoreContext);
+  const {
+    exampleStore: { setSearchText: setGameTemplateStoreSearchText },
+  } = React.useContext(PrivateGameTemplateStoreContext);
+  const [localSearchText, setLocalSearchText] = React.useState(
+    exampleStoreSearchText
+  );
+
+  const setSearchText = React.useCallback(
+    (searchText: string) => {
+      if (searchText.length < 2) {
+        // Prevent searching with less than 2 characters, as it does not return any results.
+        setExampleStoreSearchText('');
+        setGameTemplateStoreSearchText('');
+      } else {
+        setExampleStoreSearchText(searchText);
+        setGameTemplateStoreSearchText(searchText);
+      }
+      setLocalSearchText(searchText);
+    },
+    [setExampleStoreSearchText, setGameTemplateStoreSearchText]
+  );
+
+  return { searchText: localSearchText, setSearchText };
+};
 
 type Props = {|
   onSelectExampleShortHeader: ExampleShortHeader => void,
   onSelectPrivateGameTemplateListingData: PrivateGameTemplateListingData => void,
   i18n: I18nType,
   onlyShowGames?: boolean,
+  // Starting points are still shown in search results.
   hideStartingPoints?: boolean,
   getColumnsFromWindowSize: (
     windowSize: WindowSizeType,
@@ -101,36 +138,17 @@ const ExampleStore = ({
     exampleShortHeadersSearchResults,
     fetchExamplesAndFilters,
     searchText: exampleStoreSearchText,
-    setSearchText: setExampleStoreSearchText,
   } = React.useContext(ExampleStoreContext);
   const {
     fetchGameTemplates,
-    exampleStore: {
-      privateGameTemplateListingDatasSearchResults,
-      setSearchText: setGameTemplateStoreSearchText,
-    },
+    exampleStore: { privateGameTemplateListingDatasSearchResults },
   } = React.useContext(PrivateGameTemplateStoreContext);
-  const [localSearchText, setLocalSearchText] = React.useState(
-    exampleStoreSearchText
-  );
+  const {
+    searchText: localSearchText,
+    setSearchText,
+  } = useExampleAndGameTemplateSearch();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const columnsCount = getColumnsFromWindowSize(windowSize, isLandscape);
-
-  // We search in both examples and game templates stores.
-  const setSearchText = React.useCallback(
-    (searchText: string) => {
-      if (searchText.length < 2) {
-        // Prevent searching with less than 2 characters, as it does not return any results.
-        setExampleStoreSearchText('');
-        setGameTemplateStoreSearchText('');
-      } else {
-        setExampleStoreSearchText(searchText);
-        setGameTemplateStoreSearchText(searchText);
-      }
-      setLocalSearchText(searchText);
-    },
-    [setExampleStoreSearchText, setGameTemplateStoreSearchText]
-  );
 
   const fetchGameTemplatesAndExamples = React.useCallback(
     () => {
@@ -165,7 +183,11 @@ const ExampleStore = ({
                 ({ item }) =>
                   !allExampleShortHeaders ||
                   !hideStartingPoints ||
-                  noStartingPointFilter(allExampleShortHeaders, item)
+                  noStartingPointFilter(
+                    allExampleShortHeaders,
+                    item,
+                    !!exampleStoreSearchText
+                  )
               )
           : [],
         onSelectPrivateGameTemplateListingData: privateGameTemplateListingData => {

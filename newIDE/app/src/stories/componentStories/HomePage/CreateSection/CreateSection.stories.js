@@ -21,8 +21,8 @@ import CloudStorageProvider from '../../../../ProjectsStorage/CloudStorageProvid
 import {
   fakeSilverAuthenticatedUser,
   fakeAuthenticatedUserLoggingIn,
+  fakeNotAuthenticatedUser,
 } from '../../../../fixtures/GDevelopServicesTestData';
-import fakeResourceManagementProps from '../../../FakeResourceManagement';
 import inAppTutorialDecorator from '../../../InAppTutorialDecorator';
 import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import { type Game } from '../../../../Utils/GDevelopServices/Game';
@@ -87,29 +87,10 @@ const WrappedCreateSection = ({
                     currentFileMetadata={null}
                     onOpenProject={() => action('onOpenProject')()}
                     storageProviders={[CloudStorageProvider]}
-                    storageProvider={CloudStorageProvider}
-                    resourceManagementProps={fakeResourceManagementProps}
-                    onCreateEmptyProject={action('onCreateEmptyProject')}
-                    onOpenLayout={() => action('onOpenLayout')()}
-                    onWillInstallExtension={action(
-                      'extension will be installed'
-                    )}
-                    onExtensionInstalled={action('onExtensionInstalled')}
-                    onCloseAskAi={() => action('onCloseAskAi')()}
-                    onOpenAskAi={() => action('onOpenAskAi')()}
                     closeProject={async () => {}}
                     canOpen={true}
                     onOpenProfile={() => action('open profile')()}
                     askToCloseProject={async () => true}
-                    onCreateProjectFromExample={action(
-                      'onCreateProjectFromExample'
-                    )}
-                    onSelectPrivateGameTemplateListingData={() =>
-                      action('onSelectPrivateGameTemplateListingData')()
-                    }
-                    onSelectExampleShortHeader={() =>
-                      action('onSelectExampleShortHeader')()
-                    }
                     i18n={i18n}
                     games={games}
                     onRefreshGames={() => Promise.resolve()}
@@ -149,6 +130,20 @@ export const CreateSectionLoading = (): React.Node => (
     recentProjectFiles={getRecentProjectFiles(5)}
     user={fakeAuthenticatedUserLoggingIn}
     games={null}
+  />
+);
+export const NewUserNotAuthenticated = (): React.Node => (
+  <WrappedCreateSection
+    project={null}
+    recentProjectFiles={[]}
+    user={fakeNotAuthenticatedUser}
+  />
+);
+export const NewUserWithoutProjects = (): React.Node => (
+  <WrappedCreateSection
+    project={null}
+    recentProjectFiles={[]}
+    user={fakeSilverAuthenticatedUser}
   />
 );
 export const NoProjectOpened = (): React.Node => (

@@ -402,6 +402,23 @@ class GD_CORE_API InstructionMetadata : public gd::AbstractFunctionMetadata {
   }
 
   /**
+   * \brief Set the capability that the object of the instruction must have
+   * for the last added parameter to be used (for instance, a Z position only
+   * used by 3D objects). The editor doesn't show the parameter for other
+   * objects.
+   *
+   * \see gd::ParameterMetadata::SetRequiredObjectCapability
+   */
+  InstructionMetadata &SetParameterRequiredObjectCapability(
+      const gd::String &capability) {
+    if (parameters.GetParametersCount() > 0) {
+      parameters.GetInternalVector().back()->SetRequiredObjectCapability(
+          capability);
+    }
+    return *this;
+  }
+
+  /**
    * \brief Consider that the instruction is easy for a user to understand.
    */
   InstructionMetadata &MarkAsSimple() {

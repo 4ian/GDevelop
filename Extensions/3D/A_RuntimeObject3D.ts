@@ -337,6 +337,49 @@ namespace gdjs {
       this.setAngle(gdjs.toDegrees(mesh.rotation.z));
     }
 
+    /**
+     * Turn the object around its own x axis (which moves with the object
+     * rotation) at its center.
+     * @param deltaAngle the rotation angle
+     */
+    turnAroundLocalX(deltaAngle: float): void {
+      this._turnAroundLocalAxis(1, 0, 0, deltaAngle);
+    }
+
+    /**
+     * Turn the object around its own y axis (which moves with the object
+     * rotation) at its center.
+     * @param deltaAngle the rotation angle
+     */
+    turnAroundLocalY(deltaAngle: float): void {
+      this._turnAroundLocalAxis(0, 1, 0, deltaAngle);
+    }
+
+    /**
+     * Turn the object around its own z axis (which moves with the object
+     * rotation) at its center.
+     * @param deltaAngle the rotation angle
+     */
+    turnAroundLocalZ(deltaAngle: float): void {
+      this._turnAroundLocalAxis(0, 0, 1, deltaAngle);
+    }
+
+    private _turnAroundLocalAxis(
+      axisX: float,
+      axisY: float,
+      axisZ: float,
+      deltaAngle: float
+    ): void {
+      const axis = gdjs.RuntimeObject3D._temporaryVector;
+      axis.set(axisX, axisY, axisZ);
+
+      const mesh = this.getRenderer().get3DRendererObject();
+      mesh.rotateOnAxis(axis, gdjs.toRad(deltaAngle));
+      this._rotationX = gdjs.toDegrees(mesh.rotation.x);
+      this._rotationY = gdjs.toDegrees(mesh.rotation.y);
+      this.setAngle(gdjs.toDegrees(mesh.rotation.z));
+    }
+
     getForwardX(): float {
       return this.getRenderer().getForwardX();
     }

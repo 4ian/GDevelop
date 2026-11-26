@@ -265,6 +265,7 @@ namespace gdjs {
      */
     _debuggerClient: gdjs.AbstractDebuggerClient | null;
     _sessionMetricsInitialized: boolean = false;
+    _loadingDurationInSeconds: float | null = null;
     _disableMetrics: boolean = false;
     _isPreview: boolean;
     _isInGameEdition: boolean;
@@ -371,6 +372,7 @@ namespace gdjs {
         : null;
       this._sessionId = null;
       this._playerId = null;
+      this._disableMetrics = this._data.properties.areMetricsEnabled === false;
 
       this._embeddedResourcesMappings = new Map();
       this._updateEmbeddedResourcesMappings();
@@ -1149,6 +1151,10 @@ namespace gdjs {
       progressCallback?: (progress: float) => void
     ): Promise<void> {
       this._hasGameStartupBegun = true;
+      // The session starts even if the game is still loading, to know the players leaving before the end.
+      setTimeout(() => {
+        this._setupSessionMetrics();
+      }, 4000);
       try {
         // Download the loading screen background image first to be able to
         // display the loading screen as soon as possible.
@@ -1422,9 +1428,10 @@ namespace gdjs {
             throw e;
           }
         });
-        setTimeout(() => {
-          this._setupSessionMetrics();
-        }, 4000);
+        // Measured from the opening of the page to the first scene starting.
+        if (typeof performance !== 'undefined')
+          this._loadingDurationInSeconds =
+            Math.round(performance.now() / 100) / 10;
         if (this._captureManager) {
           this._captureManager.setupCaptureOptions(this._isPreview);
         }
@@ -1538,6 +1545,11 @@ namespace gdjs {
        **/
       let lastSessionResumeTime = Date.now();
       const platform = this.getPlatformInfo();
+      // The loading is only measured on the web: the files of an installed game are already on the device.
+      const isOnWeb =
+        !platform.isCordova && window.location.protocol !== 'file:';
+      let isLoadingDurationSent =
+        !isOnWeb || this._loadingDurationInSeconds !== null;
       fetch(baseUrl + '/session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1559,6 +1571,8 @@ namespace gdjs {
             navigatorPlatform: platform.navigatorPlatform,
             hasTouch: platform.hasTouch,
           },
+          // Null when the game is still loading: it's then sent with a session hit.
+          loadingDuration: isOnWeb ? this._loadingDurationInSeconds : undefined,
         }),
       })
         .then((response) => {
@@ -1585,11 +1599,15 @@ namespace gdjs {
         notYetSentDuration += now - lastSessionResumeTime;
         lastSessionResumeTime = now;
 
+        const hasLoadingDurationToSend =
+          !isLoadingDurationSent && this._loadingDurationInSeconds !== null;
         // Group repeated calls to sendSessionHit - which could
         // happen because of multiple event listeners being fired.
-        if (notYetSentDuration < 5 * 1000) {
+        if (notYetSentDuration < 5 * 1000 && !hasLoadingDurationToSend) {
           return;
         }
+        isLoadingDurationSent =
+          isLoadingDurationSent || hasLoadingDurationToSend;
         // The backend use seconds for duration.
         // The milliseconds will stay in notYetSentDuration.
         const toBeSentDuration = Math.floor(notYetSentDuration / 1000) * 1000;
@@ -1603,6 +1621,9 @@ namespace gdjs {
             playerId: this._playerId,
             sessionId: this._sessionId,
             duration: Math.floor(sentDuration / 1000),
+            loadingDuration: hasLoadingDurationToSend
+              ? this._loadingDurationInSeconds
+              : undefined,
           })
         );
       };

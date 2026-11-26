@@ -253,7 +253,20 @@ export const WithVersionsAndSources = (): React.Node => {
       .toISOString()
       .substring(0, 10);
   mockGameMetrics(
-    gameRollingMetricsFor364Days,
+    gameRollingMetricsFor364Days.map(gameMetrics => {
+      const { sessions } = gameMetrics;
+      if (!sessions) return gameMetrics;
+      const loadedSessionsCount = Math.round(sessions.d0Sessions * 0.93);
+      return {
+        ...gameMetrics,
+        sessions: {
+          ...sessions,
+          d0SessionsMeasuringLoading: sessions.d0Sessions,
+          d0SessionsWithLoadingDuration: loadedSessionsCount,
+          d0LoadingDurationTotal: loadedSessionsCount * 4.2,
+        },
+      };
+    }),
     [
       {
         gameId: game1.id,

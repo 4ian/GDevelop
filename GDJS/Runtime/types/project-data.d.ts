@@ -586,6 +586,8 @@ declare interface ProjectPropertiesData {
   watermark: WatermarkData;
   currentPlatform: string;
   extensionProperties: Array<ExtensionProperty>;
+  /** False when the game must not send metrics until an event enables them. */
+  areMetricsEnabled?: boolean;
   useDeprecatedZeroAsDefaultZOrder?: boolean;
   useDeprecatedZeroAsDefaultStringVariable?: boolean;
   projectUuid?: string;

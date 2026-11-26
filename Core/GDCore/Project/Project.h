@@ -442,6 +442,17 @@ class GD_CORE_API Project {
   }
 
   /**
+   * \brief Return if the game sends anonymous metrics when it starts
+   * (events can still enable or disable them while the game is running).
+   */
+  bool AreMetricsEnabled() const { return areMetricsEnabled; }
+
+  /**
+   * \brief Set if the game sends anonymous metrics when it starts.
+   */
+  void SetMetricsEnabled(bool enable) { areMetricsEnabled = enable; }
+
+  /**
    * \brief Check if the project should use "0" as the default value for
    * unset string variables (deprecated behavior from before 5.6.267).
    */
@@ -1207,6 +1218,8 @@ class GD_CORE_API Project {
   bool isAntialisingEnabledOnMobile = false;
   gd::String projectUuid;  ///< UUID useful to identify the game in online
                            ///< services or database that would require it.
+  bool areMetricsEnabled = true;  ///< If false, the game sends no metrics
+                                  ///< until an event enables them.
   bool useDeprecatedZeroAsDefaultZOrder =
       false;  ///< If true, objects created from
               ///< events will have 0 as Z order,

@@ -19,6 +19,10 @@ export type GameAnalyticsSummary = {|
   bounceRatePercent: number | null,
   /** Null when there are too few players for the mean to mean something. */
   playedDurationPerPlayerInSeconds: number | null,
+  /** From the page opening to the first scene starting. Null when too few sessions measured it. */
+  loadingDurationPerSessionInSeconds: number | null,
+  /** Share of the sessions which finished loading. Null when too few sessions measured it. */
+  loadedSessionsPercent: number | null,
 |};
 
 export type GameAnalyticsOverTimePoint = {|
@@ -171,6 +175,9 @@ type DaysMetrics = {|
   /** Players of the days having the numbers of players per platform. */
   playersWithPlatformsCount: number,
   touchPlayersCount: number,
+  sessionsMeasuringLoadingCount: number,
+  sessionsWithLoadingDurationCount: number,
+  loadingDurationInSeconds: number,
 |};
 
 const sumDaysMetrics = (
@@ -186,12 +193,23 @@ const sumDaysMetrics = (
     playersBelowDurationCounts: playedDurationsInMinutes.map(() => 0),
     playersWithPlatformsCount: 0,
     touchPlayersCount: 0,
+    sessionsMeasuringLoadingCount: 0,
+    sessionsWithLoadingDurationCount: 0,
+    loadingDurationInSeconds: 0,
   };
   isoDays.forEach(isoDay => {
     const gameMetrics = gameMetricsByIsoDay[isoDay];
     if (!gameMetrics) return;
     const { sessions, players } = gameMetrics;
-    if (sessions) daysMetrics.sessionsCount += sessions.d0Sessions;
+    if (sessions) {
+      daysMetrics.sessionsCount += sessions.d0Sessions;
+      daysMetrics.sessionsMeasuringLoadingCount +=
+        sessions.d0SessionsMeasuringLoading || 0;
+      daysMetrics.sessionsWithLoadingDurationCount +=
+        sessions.d0SessionsWithLoadingDuration || 0;
+      daysMetrics.loadingDurationInSeconds +=
+        sessions.d0LoadingDurationTotal || 0;
+    }
     if (!players) return;
 
     daysMetrics.playersCount += players.d0Players;
@@ -261,6 +279,16 @@ const getSummary = (
     daysMetrics,
     minPlayersCountForRates
   ),
+  loadingDurationPerSessionInSeconds:
+    daysMetrics.sessionsWithLoadingDurationCount >= minPlayersCountForRates
+      ? daysMetrics.loadingDurationInSeconds /
+        daysMetrics.sessionsWithLoadingDurationCount
+      : null,
+  loadedSessionsPercent:
+    daysMetrics.sessionsMeasuringLoadingCount >= minPlayersCountForRates
+      ? (100 * daysMetrics.sessionsWithLoadingDurationCount) /
+        daysMetrics.sessionsMeasuringLoadingCount
+      : null,
 });
 
 const getPlayedDurationSteps = (

@@ -48,6 +48,8 @@ import {
   type GameAnalyticsPeriod,
 } from './GameAnalyticsEvaluator';
 import {
+  BenchmarkGlyph,
+  BenchmarksLegend,
   BounceRateChart,
   formatPercent,
   PlayedDurationChart,
@@ -64,9 +66,28 @@ import MarketingPlanSingleDisplay from '../MarketingPlans/MarketingPlanSingleDis
 const chartHeight = 260;
 
 const styles = {
-  tile: { padding: 16, height: '100%', boxSizing: 'border-box' },
+  tile: { padding: 16, flex: 1, boxSizing: 'border-box' },
+  tilesColumn: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 8,
+    height: '100%',
+  },
+  tileBenchmarks: { marginTop: 12 },
   chartPaper: { padding: 16, height: '100%', boxSizing: 'border-box' },
+  chartDescription: { marginTop: 2 },
+  chartLegend: { marginTop: 16 },
+  chartContent: { marginTop: 8 },
 };
+
+const getPeriodLabel = (i18n: I18nType, period: GameAnalyticsPeriod): string =>
+  period === 'week'
+    ? i18n._(t`the last 7 days`)
+    : period === 'month'
+    ? i18n._(t`the last 30 days`)
+    : period === 'quarter'
+    ? i18n._(t`the last 12 weeks`)
+    : i18n._(t`the last 12 months`);
 
 const formatDuration = (i18n: I18nType, durationInSeconds: number): string => {
   const roundedDuration = Math.round(durationInSeconds);
@@ -75,6 +96,15 @@ const formatDuration = (i18n: I18nType, durationInSeconds: number): string => {
   return minutes > 0
     ? i18n._(t`${minutes}m ${seconds}s`)
     : i18n._(t`${seconds}s`);
+};
+
+const formatLoadingDuration = (
+  i18n: I18nType,
+  durationInSeconds: number
+): string => {
+  if (durationInSeconds >= 10) return formatDuration(i18n, durationInSeconds);
+  const seconds = Math.round(durationInSeconds * 10) / 10;
+  return i18n._(t`${seconds}s`);
 };
 
 const formatCount = (count: number): string =>
@@ -152,7 +182,8 @@ const SummaryTile = ({
   formatValue,
   change,
   caption,
-  benchmark,
+  benchmarks,
+  note,
 }: {|
   title: React.Node,
   /** Null when there are too few players to show it. */
@@ -161,7 +192,8 @@ const SummaryTile = ({
   change: SummaryChange | null,
   caption?: React.Node,
   /** How other games do, to compare the value with. */
-  benchmark?: React.Node,
+  benchmarks?: {| typical: React.Node, top: React.Node |},
+  note?: React.Node,
 |}) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const animatedValue = useAnimatedNumber(value);
@@ -196,53 +228,62 @@ const SummaryTile = ({
             {caption || '\u00a0'}
           </Text>
         )}
-        {benchmark && (
-          <Text noMargin size="body-small" color="secondary">
-            {benchmark}
-          </Text>
-        )}
       </ColumnStackLayout>
+      {benchmarks && (
+        <div style={styles.tileBenchmarks}>
+          <div>
+            <Text noMargin size="body-small" color="secondary">
+              <BenchmarkGlyph kind="typical" />
+              <Trans>Average game:</Trans> <b>{benchmarks.typical}</b>
+            </Text>
+          </div>
+          <div>
+            <Text noMargin size="body-small" color="secondary">
+              <BenchmarkGlyph kind="top" />
+              <Trans>Best games:</Trans> <b>{benchmarks.top}</b>
+            </Text>
+          </div>
+        </div>
+      )}
+      {note && (
+        <div style={styles.tileBenchmarks}>
+          <Text noMargin size="body-small" color="secondary">
+            {note}
+          </Text>
+        </div>
+      )}
     </Paper>
-  );
-};
-
-const TypicalGameLabel = ({ children }: {| children: React.Node |}) => {
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  return (
-    <span style={{ color: gdevelopTheme.chart.typicalGameColor }}>
-      {children}
-    </span>
-  );
-};
-
-const TopGamesLabel = ({ children }: {| children: React.Node |}) => {
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  return (
-    <span style={{ color: gdevelopTheme.chart.topGamesColor }}>{children}</span>
   );
 };
 
 const ChartBlock = ({
   title,
   description,
+  legend,
   children,
 }: {|
   title: React.Node,
-  description: React.Node,
+  description?: React.Node,
+  legend?: React.Node,
   children: React.Node,
 |}) => (
   <Paper background="medium" style={styles.chartPaper}>
-    <ColumnStackLayout noMargin>
-      <Text noMargin size="block-title">
-        {title}
-      </Text>
-      <Text noMargin size="body-small" color="secondary">
-        {description}
-      </Text>
-      {children}
-    </ColumnStackLayout>
+    <Text noMargin size="block-title">
+      {title}
+    </Text>
+    {description && (
+      <div style={styles.chartDescription}>
+        <Text noMargin size="body-small" color="secondary">
+          {description}
+        </Text>
+      </div>
+    )}
+    {legend && <div style={styles.chartLegend}>{legend}</div>}
+    <div style={styles.chartContent}>{children}</div>
   </Paper>
 );
+
+const appSources = ['android-app', 'ios-app', 'desktop-app'];
 
 const formatSource = (i18n: I18nType, source: string): string =>
   source === 'android-app'
@@ -327,6 +368,7 @@ export const GameAnalyticsPanel = ({
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
   );
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const [gameRollingMetrics, setGameMetrics] = React.useState<?(GameMetrics[])>(
     null
@@ -442,6 +484,8 @@ export const GameAnalyticsPanel = ({
     sessionsCount,
     bounceRatePercent,
     playedDurationPerPlayerInSeconds,
+    loadingDurationPerSessionInSeconds,
+    loadedSessionsPercent,
   } = summary;
   const previousBounceRatePercent = previousSummary
     ? previousSummary.bounceRatePercent
@@ -474,6 +518,9 @@ export const GameAnalyticsPanel = ({
 
   const displaySuggestedMarketingPlan =
     recommendedMarketingPlan && gameFeaturings && fetchGameFeaturings;
+  const isOnlyPlayedInApps =
+    gameSourceAnalytics.length > 0 &&
+    gameSourceAnalytics.every(({ name }) => appSources.includes(name));
   const notEnoughPlayersCaption = (
     <Trans>Shown from {minPlayersCountForRates} players</Trans>
   );
@@ -510,16 +557,16 @@ export const GameAnalyticsPanel = ({
               </Trans>
             </EmptyMessage>
           ) : (
-            <Grid container spacing={2}>
+            <Grid container spacing={1}>
               <Grid
                 item
                 xs={12}
-                sm={displaySuggestedMarketingPlan ? 7 : 12}
-                md={displaySuggestedMarketingPlan ? 8 : 12}
+                md={displaySuggestedMarketingPlan ? 6 : 9}
+                lg={displaySuggestedMarketingPlan ? 6 : 10}
               >
                 <ChartBlock
                   title={<Trans>Players</Trans>}
-                  description={
+                  legend={
                     <PlayersChartLegend i18n={i18n} overTime={overTime} />
                   }
                 >
@@ -530,10 +577,33 @@ export const GameAnalyticsPanel = ({
                   />
                 </ChartBlock>
               </Grid>
+              <Grid item xs={12} md={3} lg={2}>
+                <div style={styles.tilesColumn}>
+                  <SummaryTile
+                    title={<Trans>Players</Trans>}
+                    value={playersCount}
+                    formatValue={formatCount}
+                    change={getCountChange(
+                      playersCount,
+                      previousSummary ? previousSummary.playersCount : null
+                    )}
+                    caption={<Trans>{sessionsCount} sessions</Trans>}
+                  />
+                  <SummaryTile
+                    title={<Trans>New players</Trans>}
+                    value={newPlayersCount}
+                    formatValue={formatCount}
+                    change={getCountChange(
+                      newPlayersCount,
+                      previousSummary ? previousSummary.newPlayersCount : null
+                    )}
+                  />
+                </div>
+              </Grid>
               {recommendedMarketingPlan &&
                 gameFeaturings &&
                 fetchGameFeaturings && (
-                  <Grid item xs={12} sm={5} md={4}>
+                  <Grid item xs={12} md={3} lg={4}>
                     <MarketingPlanSingleDisplay
                       fetchGameFeaturings={fetchGameFeaturings}
                       gameFeaturings={gameFeaturings}
@@ -542,186 +612,218 @@ export const GameAnalyticsPanel = ({
                     />
                   </Grid>
                 )}
-              <Grid item xs={12}>
-                <Grid container spacing={1}>
-                  <Grid item xs={6} md={3}>
-                    <SummaryTile
-                      title={<Trans>Players</Trans>}
-                      value={playersCount}
-                      formatValue={formatCount}
-                      change={getCountChange(
-                        playersCount,
-                        previousSummary ? previousSummary.playersCount : null
-                      )}
-                      caption={<Trans>{sessionsCount} sessions</Trans>}
-                    />
-                  </Grid>
-                  <Grid item xs={6} md={3}>
-                    <SummaryTile
-                      title={<Trans>New players</Trans>}
-                      value={newPlayersCount}
-                      formatValue={formatCount}
-                      change={getCountChange(
-                        newPlayersCount,
-                        previousSummary ? previousSummary.newPlayersCount : null
-                      )}
-                    />
-                  </Grid>
-                  <Grid item xs={6} md={3}>
-                    <SummaryTile
-                      title={<Trans>Left in the first minute</Trans>}
-                      value={bounceRatePercent}
-                      formatValue={value => `${Math.round(value)}%`}
-                      change={
-                        bounceRateChangeInPoints !== null
-                          ? {
-                              text: `${getChangeArrow(
-                                bounceRateChangeInPoints
-                              )} ${Math.abs(bounceRateChangeInPoints)} pts`,
-                              isGood:
-                                bounceRateChangeInPoints === 0
-                                  ? null
-                                  : bounceRateChangeInPoints < 0,
-                            }
-                          : null
-                      }
-                      caption={
-                        bounceRatePercent === null
-                          ? notEnoughPlayersCaption
-                          : null
-                      }
-                      benchmark={
-                        <Trans>
-                          <TypicalGameLabel>Typical game:</TypicalGameLabel>{' '}
-                          {typicalBounceRatePercent}% ·{' '}
-                          <TopGamesLabel>Top games:</TopGamesLabel> under{' '}
-                          {topBounceRatePercent}%
-                        </Trans>
-                      }
-                    />
-                  </Grid>
-                  <Grid item xs={6} md={3}>
-                    <SummaryTile
-                      title={<Trans>Average play time</Trans>}
-                      value={playedDurationPerPlayerInSeconds}
-                      formatValue={value => formatDuration(i18n, value)}
-                      change={
-                        playedDurationChangeInSeconds !== null
-                          ? {
-                              text: `${getChangeArrow(
-                                playedDurationChangeInSeconds
-                              )} ${formatDuration(
-                                i18n,
-                                Math.abs(playedDurationChangeInSeconds)
-                              )}`,
-                              isGood:
-                                playedDurationChangeInSeconds === 0
-                                  ? null
-                                  : playedDurationChangeInSeconds > 0,
-                            }
-                          : null
-                      }
-                      caption={
-                        playedDurationPerPlayerInSeconds === null
-                          ? notEnoughPlayersCaption
-                          : null
-                      }
-                      benchmark={
-                        <Trans>
-                          <TypicalGameLabel>Typical game:</TypicalGameLabel>{' '}
-                          {typicalPlayedDurationInMinutes} min ·{' '}
-                          <TopGamesLabel>Top games:</TopGamesLabel> over{' '}
-                          {topPlayedDurationInMinutes} min
-                        </Trans>
-                      }
-                    />
-                  </Grid>
+              <Grid item xs={12} md={3} lg={2}>
+                <div style={styles.tilesColumn}>
+                  <SummaryTile
+                    title={<Trans>Came back the next day</Trans>}
+                    value={
+                      d1RetentionDay ? d1RetentionDay.retentionPercent : null
+                    }
+                    formatValue={formatPercent}
+                    change={null}
+                    caption={d1RetentionDay ? null : notEnoughPlayersCaption}
+                    benchmarks={{
+                      typical: `${typicalD1RetentionPercent}%`,
+                      top: <Trans>over {topD1RetentionPercent}%</Trans>,
+                    }}
+                  />
+                  <SummaryTile
+                    title={<Trans>Left in the first minute</Trans>}
+                    value={bounceRatePercent}
+                    formatValue={value => `${Math.round(value)}%`}
+                    change={
+                      bounceRateChangeInPoints !== null
+                        ? {
+                            text: `${getChangeArrow(
+                              bounceRateChangeInPoints
+                            )} ${Math.abs(bounceRateChangeInPoints)} pts`,
+                            isGood:
+                              bounceRateChangeInPoints === 0
+                                ? null
+                                : bounceRateChangeInPoints < 0,
+                          }
+                        : null
+                    }
+                    caption={
+                      bounceRatePercent === null
+                        ? notEnoughPlayersCaption
+                        : null
+                    }
+                    benchmarks={{
+                      typical: `${typicalBounceRatePercent}%`,
+                      top: <Trans>under {topBounceRatePercent}%</Trans>,
+                    }}
+                  />
+                </div>
+              </Grid>
+              <Grid item xs={12} md={9} lg={10}>
+                <Grid container spacing={1} style={{ height: '100%' }}>
+                  {retentionDays && (
+                    <Grid item xs={12} sm={6}>
+                      <ChartBlock
+                        title={<Trans>Player retention</Trans>}
+                        description={
+                          <Trans>
+                            Share of new players who played again 1 to 7 days
+                            after their first day, over{' '}
+                            {getPeriodLabel(i18n, period)}.
+                          </Trans>
+                        }
+                        legend={<BenchmarksLegend />}
+                      >
+                        <RetentionChart
+                          i18n={i18n}
+                          retentionDays={retentionDays}
+                          height={chartHeight}
+                        />
+                      </ChartBlock>
+                    </Grid>
+                  )}
+                  {canShowRatesOverTime && (
+                    <Grid item xs={12} sm={6}>
+                      <ChartBlock
+                        title={<Trans>Left in the first minute</Trans>}
+                        description={
+                          <Trans>
+                            Share of players who left before 60 seconds. Lower
+                            is better.
+                          </Trans>
+                        }
+                        legend={<BenchmarksLegend />}
+                      >
+                        <BounceRateChart
+                          i18n={i18n}
+                          overTime={overTime}
+                          height={chartHeight}
+                        />
+                      </ChartBlock>
+                    </Grid>
+                  )}
                 </Grid>
               </Grid>
-              {retentionDays && d1RetentionDay && (
-                <Grid item xs={12} sm={6}>
-                  <ChartBlock
-                    title={
-                      <Trans>
-                        {formatPercent(d1RetentionDay.retentionPercent)} of new
-                        players came back the next day
-                      </Trans>
-                    }
-                    description={
-                      <Trans>
-                        Share of new players who played again 1 to 7 days after
-                        their first day.{' '}
-                        <TypicalGameLabel>Typical game:</TypicalGameLabel>{' '}
-                        {typicalD1RetentionPercent}% the next day ·{' '}
-                        <TopGamesLabel>Top games:</TopGamesLabel> over{' '}
-                        {topD1RetentionPercent}%.
-                      </Trans>
-                    }
-                  >
-                    <RetentionChart
-                      i18n={i18n}
-                      retentionDays={retentionDays}
-                      height={chartHeight}
-                    />
-                  </ChartBlock>
+              <Grid item xs={12} md={9} lg={10}>
+                <Grid container spacing={1} style={{ height: '100%' }}>
+                  {playedDurationSteps && (
+                    <Grid item xs={12} sm={6}>
+                      <ChartBlock
+                        title={<Trans>How long players stay</Trans>}
+                        description={
+                          <Trans>
+                            Share of players still playing after each duration,
+                            loading screens included.
+                          </Trans>
+                        }
+                        legend={<BenchmarksLegend />}
+                      >
+                        <PlayedDurationStepsChart
+                          i18n={i18n}
+                          playedDurationSteps={playedDurationSteps}
+                          height={chartHeight}
+                        />
+                      </ChartBlock>
+                    </Grid>
+                  )}
+                  {canShowRatesOverTime && (
+                    <Grid item xs={12} sm={6}>
+                      <ChartBlock
+                        title={<Trans>Average play time</Trans>}
+                        description={
+                          <Trans>
+                            Time a player spends in the game in a day.
+                          </Trans>
+                        }
+                        legend={<BenchmarksLegend />}
+                      >
+                        <PlayedDurationChart
+                          i18n={i18n}
+                          overTime={overTime}
+                          height={chartHeight}
+                        />
+                      </ChartBlock>
+                    </Grid>
+                  )}
                 </Grid>
-              )}
-              {playedDurationSteps && (
-                <Grid item xs={12} sm={6}>
-                  <ChartBlock
-                    title={<Trans>How long players stay</Trans>}
-                    description={
-                      <Trans>
-                        Share of players still playing after each duration,
-                        loading screens included.
-                      </Trans>
-                    }
-                  >
-                    <PlayedDurationStepsChart
-                      i18n={i18n}
-                      playedDurationSteps={playedDurationSteps}
-                      height={chartHeight}
-                    />
-                  </ChartBlock>
-                </Grid>
-              )}
-              {canShowRatesOverTime && (
-                <Grid item xs={12} sm={6}>
-                  <ChartBlock
-                    title={<Trans>Left in the first minute</Trans>}
-                    description={
-                      <Trans>
-                        Share of players who left before 60 seconds. Lower is
-                        better.
-                      </Trans>
-                    }
-                  >
-                    <BounceRateChart
-                      i18n={i18n}
-                      overTime={overTime}
-                      height={chartHeight}
-                    />
-                  </ChartBlock>
-                </Grid>
-              )}
-              {canShowRatesOverTime && (
-                <Grid item xs={12} sm={6}>
-                  <ChartBlock
+              </Grid>
+              <Grid item xs={12} md={3} lg={2}>
+                <div style={styles.tilesColumn}>
+                  <SummaryTile
                     title={<Trans>Average play time</Trans>}
-                    description={
-                      <Trans>Time a player spends in the game in a day.</Trans>
+                    value={playedDurationPerPlayerInSeconds}
+                    formatValue={value => formatDuration(i18n, value)}
+                    change={
+                      playedDurationChangeInSeconds !== null
+                        ? {
+                            text: `${getChangeArrow(
+                              playedDurationChangeInSeconds
+                            )} ${formatDuration(
+                              i18n,
+                              Math.abs(playedDurationChangeInSeconds)
+                            )}`,
+                            isGood:
+                              playedDurationChangeInSeconds === 0
+                                ? null
+                                : playedDurationChangeInSeconds > 0,
+                          }
+                        : null
                     }
-                  >
-                    <PlayedDurationChart
-                      i18n={i18n}
-                      overTime={overTime}
-                      height={chartHeight}
-                    />
-                  </ChartBlock>
-                </Grid>
-              )}
+                    caption={
+                      playedDurationPerPlayerInSeconds === null
+                        ? notEnoughPlayersCaption
+                        : null
+                    }
+                    benchmarks={{
+                      typical: (
+                        <Trans>{typicalPlayedDurationInMinutes} min</Trans>
+                      ),
+                      top: <Trans>over {topPlayedDurationInMinutes} min</Trans>,
+                    }}
+                  />
+                  <SummaryTile
+                    title={<Trans>Average web loading time</Trans>}
+                    value={loadingDurationPerSessionInSeconds}
+                    formatValue={value => formatLoadingDuration(i18n, value)}
+                    change={null}
+                    caption={
+                      loadedSessionsPercent === null ? (
+                        isOnlyPlayedInApps ? (
+                          <Trans>
+                            Not measured: the game is only played installed on a
+                            device, where its files already are
+                          </Trans>
+                        ) : (
+                          <Trans>Export the game again to measure it</Trans>
+                        )
+                      ) : (
+                        <Trans>
+                          {Math.round(100 - loadedSessionsPercent)}% left before
+                          the loading finished
+                        </Trans>
+                      )
+                    }
+                    note={
+                      <Trans>
+                        Aim for{' '}
+                        <b
+                          style={{
+                            color: gdevelopTheme.statusIndicator.success,
+                          }}
+                        >
+                          about 3 seconds
+                        </b>{' '}
+                        on the web.{' '}
+                        <b
+                          style={{ color: gdevelopTheme.statusIndicator.error }}
+                        >
+                          Past 10 seconds
+                        </b>
+                        , most players leave.
+                      </Trans>
+                    }
+                  />
+                </div>
+              </Grid>
               {playerPlatforms && (
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12}>
                   <ChartBlock
                     title={<Trans>Devices</Trans>}
                     description={

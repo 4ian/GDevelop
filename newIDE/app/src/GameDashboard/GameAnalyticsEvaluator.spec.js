@@ -88,6 +88,8 @@ describe('GameAnalyticsEvaluator', () => {
       sessionsCount: 170,
       bounceRatePercent: 20,
       playedDurationPerPlayerInSeconds: 120,
+      loadingDurationPerSessionInSeconds: null,
+      loadedSessionsPercent: null,
     });
     expect(gameAnalytics.previousSummary).toEqual({
       playersCount: 40,
@@ -96,6 +98,8 @@ describe('GameAnalyticsEvaluator', () => {
       sessionsCount: 80,
       bounceRatePercent: 50,
       playedDurationPerPlayerInSeconds: 120,
+      loadingDurationPerSessionInSeconds: null,
+      loadedSessionsPercent: null,
     });
 
     expect(gameAnalytics.overTime.map(point => point.playersCount)).toEqual([
@@ -246,6 +250,34 @@ describe('GameAnalyticsEvaluator', () => {
     expect(gameAnalytics.playerPlatforms).toBe(null);
     expect(gameAnalytics.insight).toBe('fewPlayers');
     expect(gameAnalytics.overTime.length).toBe(30);
+  });
+
+  it('averages the loading time and gives the share of sessions which finished loading', () => {
+    const gameMetrics = createFakeGameMetrics('2026-11-19', {
+      playersCount: 30,
+      newPlayersCount: 30,
+      bouncedPlayersCount: 3,
+      d1RetainedPlayersCount: 0,
+    });
+    const gameAnalytics = getGameAnalytics(
+      [
+        {
+          ...gameMetrics,
+          sessions: {
+            d0Sessions: 60,
+            d0SessionsDurationTotal: 3600,
+            d0SessionsMeasuringLoading: 50,
+            d0SessionsWithLoadingDuration: 40,
+            d0LoadingDurationTotal: 180,
+          },
+        },
+      ],
+      'month',
+      { todayDate }
+    );
+
+    expect(gameAnalytics.summary.loadingDurationPerSessionInSeconds).toBe(4.5);
+    expect(gameAnalytics.summary.loadedSessionsPercent).toBe(80);
   });
 
   it('groups the days by week on long periods', () => {

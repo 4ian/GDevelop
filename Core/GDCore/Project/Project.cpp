@@ -802,6 +802,8 @@ void Project::UnserializeFrom(const SerializerElement& element) {
     }
   }
 
+  areMetricsEnabled = propElement.GetBoolAttribute("areMetricsEnabled", true);
+
   // Compatibility with GD <= 5.0.0-beta101
   if (VersionWrapper::IsOlderOrEqual(
           gdMajorVersion, gdMinorVersion, gdBuildVersion, 0, 4, 0, 98, 0) &&
@@ -1197,6 +1199,10 @@ void Project::SerializeTo(SerializerElement& element) const {
     playableDevicesElement.AddChild("").SetStringValue("mobile");
   }
 
+  if (!areMetricsEnabled) {
+    propElement.SetAttribute("areMetricsEnabled", false);
+  }
+
   // Compatibility with GD <= 5.0.0-beta101
   if (useDeprecatedZeroAsDefaultZOrder) {
     propElement.SetAttribute("useDeprecatedZeroAsDefaultZOrder", true);
@@ -1356,6 +1362,7 @@ void Project::Init(const gd::Project& game) {
   antialiasingMode = game.antialiasingMode;
   isAntialisingEnabledOnMobile = game.isAntialisingEnabledOnMobile;
   projectUuid = game.projectUuid;
+  areMetricsEnabled = game.areMetricsEnabled;
   useDeprecatedZeroAsDefaultZOrder = game.useDeprecatedZeroAsDefaultZOrder;
   useDeprecatedZeroAsDefaultStringVariable =
       game.useDeprecatedZeroAsDefaultStringVariable;

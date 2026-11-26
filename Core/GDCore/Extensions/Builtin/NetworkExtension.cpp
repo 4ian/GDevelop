@@ -141,9 +141,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(
           _("Enable (or disable) metrics collection"),
           _("Enable, or disable, the sending of anonymous data used to compute "
             "the number of sessions and other metrics from your game "
-            "players.\nBe sure to only send metrics if in accordance with the "
-            "terms of service of your game and if they player gave their "
-            "consent, depending on how your game/company handles this."),
+            "players.\nMetrics start being sent a few seconds after the game "
+            "is opened, before any event runs: to send them only once a "
+            "player gave their consent, disable them in the game properties "
+            "and enable them with this action.\nBe sure to only send metrics "
+            "if in accordance with the terms of service of your game and if "
+            "the player gave their consent, depending on how your "
+            "game/company handles this."),
           _("Enable analytics metrics: _PARAM1_"),
           "",
           "res/actions/net24.png",

@@ -616,6 +616,8 @@ interface Project {
     void SetMinimumFPS(long fps);
     void SetFolderProject(boolean enable);
     boolean IsFolderProject();
+    void SetMetricsEnabled(boolean enable);
+    boolean AreMetricsEnabled();
     void SetUseDeprecatedZeroAsDefaultZOrder(boolean enable);
     boolean GetUseDeprecatedZeroAsDefaultZOrder();
     void SetUseDeprecatedZeroAsDefaultStringVariable(boolean enable);

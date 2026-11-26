@@ -15,6 +15,12 @@ export type GameMetrics = {
     d0Sessions: number,
     /** Total, cumulative, duration of sessions for this day. */
     d0SessionsDurationTotal: ?number,
+    /** Number of sessions of a game measuring its loading: only on the web, and not the games exported before 2026-12. */
+    d0SessionsMeasuringLoading?: number,
+    /** Number of these sessions which finished loading. */
+    d0SessionsWithLoadingDuration?: number,
+    /** Total loading duration, in seconds, of these sessions. */
+    d0LoadingDurationTotal?: number,
   },
   players: ?{
     /** Number of players for this day. */

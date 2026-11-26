@@ -9317,6 +9317,18 @@ namespace gdjs {
   }
 
   /**
+   * The data of an object of an unknown type can be anything: for instance,
+   * the data of a custom object has no `content`. The placeholder only needs
+   * the dimensions of `content`, which are optional.
+   */
+  const toUnknownObjectData = (
+    objectData: gdjs.Object3DData
+  ): gdjs.Object3DData =>
+    objectData.content
+      ? objectData
+      : { ...objectData, content: {} as gdjs.Object3DData['content'] };
+
+  /**
    * A 3D object placeholder that is used as a fall back when the object type
    * is not known.
    */
@@ -9328,10 +9340,20 @@ namespace gdjs {
       objectData: gdjs.Object3DData,
       instanceData?: InstanceData
     ) {
-      super(instanceContainer, objectData, instanceData);
+      super(instanceContainer, toUnknownObjectData(objectData), instanceData);
       this._renderer = new UnknownRuntimeObjectRenderer(
         this,
         instanceContainer
+      );
+    }
+
+    override updateFromObjectData(
+      oldObjectData: gdjs.Object3DData,
+      newObjectData: gdjs.Object3DData
+    ): boolean {
+      return super.updateFromObjectData(
+        toUnknownObjectData(oldObjectData),
+        toUnknownObjectData(newObjectData)
       );
     }
 

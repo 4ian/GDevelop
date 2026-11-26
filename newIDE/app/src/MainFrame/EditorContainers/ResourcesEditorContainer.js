@@ -55,7 +55,7 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
     eventsBasedObject: gdEventsBasedObject,
     options?: {| editedObject?: ?gdObject, hasResourceChanged?: boolean |}
   ) {
-    // No thing to be done.
+    if (this.editor) this.editor.refreshResourcesList();
   }
 
   onSceneObjectEdited(
@@ -63,11 +63,11 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
     objectWithContext: ObjectWithContext,
     hasResourceChanged?: boolean
   ) {
-    // No thing to be done.
+    if (this.editor) this.editor.refreshResourcesList();
   }
 
   onSceneObjectsDeleted(scene: gdLayout) {
-    // No thing to be done.
+    if (this.editor) this.editor.refreshResourcesList();
   }
 
   onSceneEventsModifiedOutsideEditor(changes: SceneEventsOutsideEditorChanges) {
@@ -89,7 +89,7 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
   }
 
   onObjectsModifiedOutsideEditor(changes: ObjectsOutsideEditorChanges) {
-    // No thing to be done.
+    if (this.editor) this.editor.refreshResourcesList();
   }
 
   onWillDeleteObject(changes: WillDeleteObjectChanges) {
@@ -97,7 +97,7 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
   }
 
   onExtensionsModifiedOutsideEditor(changes: ExtensionsOutsideEditorChanges) {
-    // No thing to be done.
+    if (this.editor) this.editor.refreshResourcesList();
   }
 
   onObjectGroupsModifiedOutsideEditor(
@@ -129,6 +129,8 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
         fileMetadata={this.props.fileMetadata}
         project={project}
         storageProvider={this.props.storageProvider}
+        onOpenLayout={this.props.onOpenLayout}
+        onOpenCustomObjectEditor={this.props.onOpenCustomObjectEditor}
       />
     );
   }

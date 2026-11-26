@@ -59,6 +59,23 @@ type Props = {|
   resourceManagementProps: ResourceManagementProps,
   fileMetadata: ?FileMetadata,
   storageProvider: StorageProvider,
+  onOpenLayout?: (
+    sceneName: string,
+    options?: {|
+      openEventsEditor: boolean,
+      openSceneEditor: boolean,
+      focusWhenOpened:
+        | 'scene-or-events-otherwise'
+        | 'scene'
+        | 'events'
+        | 'none',
+    |}
+  ) => void,
+  onOpenCustomObjectEditor?: (
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    eventsBasedObject: gdEventsBasedObject,
+    variantName: string
+  ) => void,
 |};
 
 const initialMosaicEditorNodes = {
@@ -98,6 +115,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
 
   refreshResourcesList() {
     if (this._resourcesList) this._resourcesList.forceUpdateList();
+    if (this._propertiesEditor) this._propertiesEditor.forceUpdate();
   }
 
   updateToolbar = () => {
@@ -352,6 +370,8 @@ export default class ResourcesEditor extends React.Component<Props, State> {
                 }}
                 resourceManagementProps={resourceManagementProps}
                 i18n={i18n}
+                onOpenLayout={this.props.onOpenLayout}
+                onOpenCustomObjectEditor={this.props.onOpenCustomObjectEditor}
               />
             )}
           </I18n>

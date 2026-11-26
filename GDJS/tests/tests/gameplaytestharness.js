@@ -411,6 +411,27 @@ describe('gdjs.gameplayTests', () => {
     expect(result.errors.length).to.be(1);
   });
 
+  it('explains a property read on a lookup that found nothing, quoting the failing line', async () => {
+    const runtimeGame = makeRuntimeGame();
+    const result = await runTestScript(
+      runtimeGame,
+      `
+      await harness.goToScene('Scene 1');
+      const missing = harness.getObjects('NoSuchObject')[0];
+      console.log(missing.x);
+      `
+    );
+
+    expect(result.status).to.be('error');
+    expect(result.errors.length).to.be(2);
+    expect(result.errors[1]).to.contain(
+      'The test failed at: `console.log(missing.x);`.'
+    );
+    expect(result.errors[1]).to.contain(
+      '`harness.getObjects(name)` returns an empty array'
+    );
+  });
+
   it('reports a syntax error as an error', async () => {
     const runtimeGame = makeRuntimeGame();
     const result = await runTestScript(runtimeGame, `this is not valid JS {`);

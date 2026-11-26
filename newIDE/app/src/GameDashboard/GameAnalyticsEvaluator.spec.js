@@ -103,8 +103,9 @@ describe('GameAnalyticsEvaluator', () => {
       30,
       5,
     ]);
-    // Days without players have no rate, instead of a rate of 0.
-    expect(gameAnalytics.overTime[0].bounceRatePercent).toBe(null);
+    // Days without players have a rate of 0.
+    expect(gameAnalytics.overTime[0].bounceRatePercent).toBe(0);
+    expect(gameAnalytics.overTime[0].playedDurationPerPlayerInMinutes).toBe(0);
     expect(gameAnalytics.overTime[5].bounceRatePercent).toBe(20);
     // A day with a few players shows its real rate.
     expect(gameAnalytics.overTime[6].bounceRatePercent).toBe(20);

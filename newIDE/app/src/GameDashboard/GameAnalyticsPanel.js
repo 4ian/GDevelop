@@ -318,10 +318,7 @@ export const GameAnalyticsPanel = ({
       ? Math.round(playedDurationPerPlayerInSeconds) -
         Math.round(previousPlayedDurationPerPlayerInSeconds)
       : null;
-  // A line needs at least 2 points.
-  const canShowRatesOverTime =
-    !!playedDurationSteps &&
-    overTime.filter(point => point.bounceRatePercent !== null).length >= 2;
+  const canShowRatesOverTime = !!playedDurationSteps;
   const d1RetentionDay = retentionDays ? retentionDays[0] : null;
 
   const displaySuggestedMarketingPlan =

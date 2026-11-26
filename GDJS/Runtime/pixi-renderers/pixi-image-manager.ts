@@ -29,10 +29,19 @@ namespace gdjs {
     resourceData: ResourceData | null
   ) => {
     if (resourceData && !resourceData.smoothed) {
+      // Pixel-art textures must stay sharp: no mipmaps and nearest filtering
+      // (this also disables the anisotropic filtering, see
+      // `_applyThreeTextureAnisotropy`).
       threeTexture.magFilter = THREE.NearestFilter;
       threeTexture.minFilter = THREE.NearestFilter;
+      threeTexture.generateMipmaps = false;
     }
   };
+
+  /** The maximum anisotropic filtering asked for the 3D textures. */
+  const defaultMaxThreeTextureAnisotropy = 16;
+  /** The anisotropic filtering used when no WebGL renderer is available yet. */
+  const fallbackMaxThreeTextureAnisotropy = 8;
 
   const resourceKinds: Array<ResourceKind> = ['image', 'video'];
 
@@ -56,12 +65,31 @@ namespace gdjs {
      * Map associating a resource name to the loaded Three.js texture.
      */
     private _loadedThreeTextures: Hashtable<THREE.Texture<HTMLImageElement>>;
+    /**
+     * Map associating a resource name to the loaded Three.js texture for
+     * non-color data (normal maps, roughness...), that must be kept in the
+     * linear color space.
+     */
+    private _loadedThreeLinearTextures: Hashtable<
+      THREE.Texture<HTMLImageElement>
+    >;
     private _loadedThreeMaterials = new ThreeMaterialCache();
     private _loadedThreeCubeTextures = new Map<string, THREE.CubeTexture>();
     private _loadedThreeCubeTextureKeysByResourceName = new ArrayMap<
       string,
       string
     >();
+
+    /**
+     * The maximum anisotropic filtering asked for the 3D textures (16 by
+     * default, can be lowered for weak devices).
+     */
+    private _maxThreeTextureAnisotropy = defaultMaxThreeTextureAnisotropy;
+    /**
+     * The anisotropic filtering resolved from the renderer capabilities (and
+     * `_maxThreeTextureAnisotropy`). It is cached until the setting changes.
+     */
+    private _resolvedThreeTextureAnisotropy: number | null = null;
 
     private _diskTextures = new Map<float, PIXI.Texture>();
     private _rectangleTextures = new Map<string, PIXI.Texture>();
@@ -79,6 +107,7 @@ namespace gdjs {
         { width: 192, height: 192 }
       );
       this._loadedThreeTextures = new Hashtable();
+      this._loadedThreeLinearTextures = new Hashtable();
     }
 
     getResourceKinds(): ResourceKind[] {
@@ -201,10 +230,20 @@ namespace gdjs {
      * Return the three.js texture associated to the specified resource name.
      * Returns a placeholder texture if not found.
      * @param resourceName The name of the resource
+     * @param options Set `isColorData` to false for textures holding non-color
+     * data (normal maps, roughness...), that must be kept in the linear color
+     * space. It defaults to true.
      * @returns The requested texture, or a placeholder if not found.
      */
-    getThreeTexture(resourceName: string): THREE.Texture<HTMLImageElement> {
-      const loadedThreeTexture = this._loadedThreeTextures.get(resourceName);
+    getThreeTexture(
+      resourceName: string,
+      options?: { isColorData?: boolean }
+    ): THREE.Texture<HTMLImageElement> {
+      const isColorData = !options || options.isColorData !== false;
+      const loadedTextures = isColorData
+        ? this._loadedThreeTextures
+        : this._loadedThreeLinearTextures;
+      const loadedThreeTexture = loadedTextures.get(resourceName);
       if (loadedThreeTexture) {
         return loadedThreeTexture;
       }
@@ -212,18 +251,97 @@ namespace gdjs {
 
       const threeTexture = new THREE.Texture(image);
       threeTexture.magFilter = THREE.LinearFilter;
-      threeTexture.minFilter = THREE.LinearFilter;
+      // Mipmaps keep smoothed textures sharp and free of aliasing when seen
+      // small, far or at grazing angles. They are also required by the
+      // anisotropic filtering (see `_applyThreeTextureAnisotropy`).
+      threeTexture.minFilter = THREE.LinearMipmapLinearFilter;
+      threeTexture.generateMipmaps = true;
       threeTexture.wrapS = THREE.RepeatWrapping;
       threeTexture.wrapT = THREE.RepeatWrapping;
-      threeTexture.colorSpace = THREE.SRGBColorSpace;
+      threeTexture.colorSpace = isColorData
+        ? THREE.SRGBColorSpace
+        : THREE.NoColorSpace;
       threeTexture.needsUpdate = true;
 
       const resource = this._getImageResource(resourceName);
 
       applyThreeTextureSettings(threeTexture, resource);
-      this._loadedThreeTextures.put(resourceName, threeTexture);
+      this._applyThreeTextureAnisotropy(threeTexture);
+      loadedTextures.put(resourceName, threeTexture);
 
       return threeTexture;
+    }
+
+    /**
+     * Set the maximum anisotropic filtering applied to the 3D textures (16 by
+     * default). Lower it on weak devices.
+     */
+    setMaxAnisotropy(value: number): void {
+      const clamped = Math.max(1, Math.floor(value) || 1);
+      if (clamped === this._maxThreeTextureAnisotropy) return;
+      this._maxThreeTextureAnisotropy = clamped;
+      this._resolvedThreeTextureAnisotropy = null;
+      // Re-apply the value to the textures already created (they may already
+      // be uploaded, `_applyThreeTextureAnisotropy` then asks for a new
+      // upload).
+      const textures: Array<THREE.Texture<HTMLImageElement>> = [];
+      this._loadedThreeTextures.values(textures);
+      this._loadedThreeLinearTextures.values(textures);
+      for (const texture of textures) {
+        this._applyThreeTextureAnisotropy(texture);
+      }
+    }
+
+    /**
+     * @returns the maximum anisotropic filtering asked for the 3D textures.
+     */
+    getMaxAnisotropy(): number {
+      return this._maxThreeTextureAnisotropy;
+    }
+
+    /**
+     * Resolve the anisotropic filtering from the WebGL renderer capabilities
+     * and the manager setting. It is cached once the renderer is available.
+     */
+    private _getResolvedThreeTextureAnisotropy(): number {
+      if (this._resolvedThreeTextureAnisotropy !== null) {
+        return this._resolvedThreeTextureAnisotropy;
+      }
+      const gameRenderer = this._resourceLoader._runtimeGame.getRenderer();
+      const renderer = gameRenderer ? gameRenderer.getThreeRenderer() : null;
+      if (!renderer) {
+        // The 3D renderer is not created yet: use a safe fallback and retry
+        // later instead of caching the fallback forever.
+        return Math.min(
+          this._maxThreeTextureAnisotropy,
+          fallbackMaxThreeTextureAnisotropy
+        );
+      }
+      this._resolvedThreeTextureAnisotropy = Math.min(
+        this._maxThreeTextureAnisotropy,
+        renderer.capabilities.getMaxAnisotropy()
+      );
+      return this._resolvedThreeTextureAnisotropy;
+    }
+
+    /**
+     * Apply the anisotropic filtering to a texture, only when it is smoothed
+     * (mipmaps with a linear filter). Pixel-art (nearest filtered) textures are
+     * left untouched.
+     */
+    private _applyThreeTextureAnisotropy(texture: THREE.Texture): void {
+      if (
+        !texture.generateMipmaps ||
+        texture.minFilter !== THREE.LinearMipmapLinearFilter
+      ) {
+        return;
+      }
+      const anisotropy = this._getResolvedThreeTextureAnisotropy();
+      if (texture.anisotropy === anisotropy) return;
+      texture.anisotropy = anisotropy;
+      // The texture may already be uploaded: ask for a new upload so that the
+      // new anisotropic filtering is taken into account.
+      texture.needsUpdate = true;
     }
 
     private _getImageSource(resourceName: string): HTMLImageElement {
@@ -587,7 +705,10 @@ namespace gdjs {
       const threeTextures: Array<THREE.Texture<HTMLImageElement>> = [];
       this._loadedThreeTextures.values(threeTextures);
       this._loadedThreeTextures.clear();
-      for (const threeTexture of threeTextures) {
+      const threeLinearTextures: Array<THREE.Texture<HTMLImageElement>> = [];
+      this._loadedThreeLinearTextures.values(threeLinearTextures);
+      this._loadedThreeLinearTextures.clear();
+      for (const threeTexture of [...threeTextures, ...threeLinearTextures]) {
         threeTexture.dispose();
       }
       for (const cubeTexture of this._loadedThreeCubeTextures.values()) {
@@ -595,6 +716,9 @@ namespace gdjs {
       }
       this._loadedThreeCubeTextures.clear();
       this._loadedThreeCubeTextureKeysByResourceName.clear();
+      // The renderer may have changed: resolve the anisotropic filtering
+      // again on the next texture.
+      this._resolvedThreeTextureAnisotropy = null;
 
       this._loadedThreeMaterials.disposeAll();
 
@@ -639,8 +763,22 @@ namespace gdjs {
         threeTexture.dispose();
         this._loadedThreeTextures.remove(resourceName);
       }
+      const threeLinearTexture =
+        this._loadedThreeLinearTextures.get(resourceName);
+      if (threeLinearTexture) {
+        threeLinearTexture.dispose();
+        this._loadedThreeLinearTextures.remove(resourceName);
+      }
 
       this._loadedThreeMaterials.dispose(resourceName);
+
+      // Let the PBR material manager remove the textures of this resource
+      // from the materials using it (to avoid keeping disposed textures).
+      const pbrMaterialManager =
+        this._resourceLoader._runtimeGame.getPBRMaterialManager();
+      if (pbrMaterialManager) {
+        pbrMaterialManager.onImageResourceUnloaded(resourceName);
+      }
 
       const cubeTextureKeys =
         this._loadedThreeCubeTextureKeysByResourceName.getValuesFor(

@@ -26,6 +26,7 @@ import {
 } from '../../ResourcesList/ResourceUtils';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { EmbeddedResourcesMappingTable } from './EmbeddedResourcesMappingTable';
+import { ResourceUsagesList } from './ResourceUsagesList';
 import { Spacer } from '../../UI/Grid';
 import ScrollView from '../../UI/ScrollView';
 import { ColumnStackLayout } from '../../UI/Layout';
@@ -40,6 +41,23 @@ type Props = {|
   onResourcePathUpdated: () => void,
   resourceManagementProps: ResourceManagementProps,
   i18n: I18nType,
+  onOpenLayout?: (
+    sceneName: string,
+    options?: {|
+      openEventsEditor: boolean,
+      openSceneEditor: boolean,
+      focusWhenOpened:
+        | 'scene-or-events-otherwise'
+        | 'scene'
+        | 'events'
+        | 'none',
+    |}
+  ) => void,
+  onOpenCustomObjectEditor?: (
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    eventsBasedObject: gdEventsBasedObject,
+    variantName: string
+  ) => void,
 |};
 
 export type ResourcePropertiesEditorInterface = {| forceUpdate: () => void |};
@@ -191,6 +209,8 @@ const ResourcePropertiesEditor: React.ComponentType<{
       onResourcePathUpdated,
       resourceManagementProps,
       i18n,
+      onOpenLayout,
+      onOpenCustomObjectEditor,
     },
     ref
   ) => {
@@ -416,6 +436,12 @@ const ResourcePropertiesEditor: React.ComponentType<{
                 </AlertMessage>
               )}
             <EmbeddedResourcesMappingTable resources={resources} />
+            <ResourceUsagesList
+              project={project}
+              resources={resources}
+              onOpenLayout={onOpenLayout}
+              onOpenCustomObjectEditor={onOpenCustomObjectEditor}
+            />
           </ColumnStackLayout>
         </ScrollView>
       </Background>

@@ -4,6 +4,7 @@ import { GDevelopAssetApi } from './ApiConfigs';
 import { type UserPublicProfile } from './User';
 import { retryIfFailed } from '../RetryIfFailed';
 import { ensureIsArray } from '../DataValidator';
+import { getObjectTypeIcon } from '../../ObjectsRendering/ObjectTypeIcons';
 
 // This file is mocked by tests.
 // Don't put any function that is not calling services.
@@ -325,6 +326,7 @@ const adaptObjectHeader = (header: ObjectShortHeader): ObjectShortHeader => {
     header.extensionNamespace || header.extensionName,
     header.name
   );
+  header.previewIconUrl = getObjectTypeIcon(header.type, header.previewIconUrl);
   // $FlowFixMe[incompatible-type]
   header = transformTagsAsStringToTagsAsArray(header);
   if ((header.tier: string) === 'community') {

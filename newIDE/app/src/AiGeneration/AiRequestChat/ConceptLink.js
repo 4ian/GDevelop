@@ -18,6 +18,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import PortalContainerContext from '../../UI/PortalContainerContext';
 import { MarkdownText } from '../../UI/MarkdownText';
 import Text from '../../UI/Text';
+import { getObjectTypeIcon } from '../../ObjectsRendering/ObjectTypeIcons';
 
 const gd: libGDevelop = global.gd;
 
@@ -411,7 +412,7 @@ export const useGetConceptMetadata = (): {
             kind: 'Object',
             name: objectMetadata.getFullName(),
             description: objectMetadata.getDescription(),
-            iconSrc: objectMetadata.getIconFilename(),
+            iconSrc: getObjectTypeIcon(type, objectMetadata.getIconFilename()),
             helpPath: getHelpLink(objectMetadata.getHelpPath()),
             parentExtension: getExtensionMetadata(extension.getName()),
           };

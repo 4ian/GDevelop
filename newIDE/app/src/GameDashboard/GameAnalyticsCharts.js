@@ -29,8 +29,8 @@ import {
   type GameAnalyticsPlayedDurationStep,
   type GameAnalyticsPlayerPlatforms,
   type GameAnalyticsRetentionDay,
-  gameAnalyticsBenchmarks,
 } from './GameAnalyticsEvaluator';
+import { type GameMetricsBenchmarks } from '../Utils/GDevelopServices/Analytics';
 
 const chartMargins = {
   top: 20,
@@ -423,23 +423,34 @@ const RateOverTimeChart = ({
   );
 };
 
-export const BounceRateChart = (props: OverTimeChartProps): React.Node => (
+type BenchmarkedOverTimeChartProps = {|
+  ...OverTimeChartProps,
+  benchmarks: GameMetricsBenchmarks,
+|};
+
+export const BounceRateChart = ({
+  benchmarks,
+  ...props
+}: BenchmarkedOverTimeChartProps): React.Node => (
   <RateOverTimeChart
     {...props}
     name={props.i18n._(t`Left in the first minute`)}
     dataKey="bounceRatePercent"
-    benchmarks={gameAnalyticsBenchmarks.bounceRatePercent}
+    benchmarks={benchmarks.bounceRatePercent}
     unit="%"
     formatValue={value => `${Math.round(value)}`}
   />
 );
 
-export const PlayedDurationChart = (props: OverTimeChartProps): React.Node => (
+export const PlayedDurationChart = ({
+  benchmarks,
+  ...props
+}: BenchmarkedOverTimeChartProps): React.Node => (
   <RateOverTimeChart
     {...props}
     name={props.i18n._(t`Average play time`)}
     dataKey="playedDurationPerPlayerInMinutes"
-    benchmarks={gameAnalyticsBenchmarks.playedDurationPerPlayerInMinutes}
+    benchmarks={benchmarks.playedDurationPerPlayerInMinutes}
     unit={` ${props.i18n._(t`min`)}`}
     formatValue={formatMinutes}
   />
@@ -582,10 +593,12 @@ const PercentBarsChart = ({
 export const RetentionChart = ({
   i18n,
   retentionDays,
+  benchmarks,
   height,
 }: {|
   i18n: I18nType,
   retentionDays: Array<GameAnalyticsRetentionDay>,
+  benchmarks: GameMetricsBenchmarks,
   height: number,
 |}): React.Node => (
   <PercentBarsChart
@@ -594,9 +607,8 @@ export const RetentionChart = ({
     data={retentionDays.map(({ dayNumber, retentionPercent }) => ({
       label: i18n._(t`Day ${dayNumber}`),
       percent: retentionPercent,
-      typicalPercent:
-        gameAnalyticsBenchmarks.typicalRetentionPercents[dayNumber - 1],
-      topPercent: gameAnalyticsBenchmarks.topRetentionPercents[dayNumber - 1],
+      typicalPercent: benchmarks.retentionPercents.typical[dayNumber - 1],
+      topPercent: benchmarks.retentionPercents.top[dayNumber - 1],
     }))}
   />
 );
@@ -604,10 +616,12 @@ export const RetentionChart = ({
 export const PlayedDurationStepsChart = ({
   i18n,
   playedDurationSteps,
+  benchmarks,
   height,
 }: {|
   i18n: I18nType,
   playedDurationSteps: Array<GameAnalyticsPlayedDurationStep>,
+  benchmarks: GameMetricsBenchmarks,
   height: number,
 |}): React.Node => (
   <PercentBarsChart
@@ -621,8 +635,8 @@ export const PlayedDurationStepsChart = ({
             : i18n._(t`${durationInMinutes} min`),
         percent: playersPercent,
         typicalPercent:
-          gameAnalyticsBenchmarks.typicalPlayersPercents[index - 1],
-        topPercent: gameAnalyticsBenchmarks.topPlayersPercents[index - 1],
+          benchmarks.playersStillPlayingPercents.typical[index - 1],
+        topPercent: benchmarks.playersStillPlayingPercents.top[index - 1],
       })
     )}
   />

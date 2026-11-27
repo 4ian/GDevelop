@@ -31,6 +31,7 @@ import {
 } from '../../../Utils/GDevelopServices/Analytics';
 import { type GameFeaturing } from '../../../Utils/GDevelopServices/Game';
 import { type Build } from '../../../Utils/GDevelopServices/Build';
+import { defaultGameMetricsBenchmarks } from '../../../GameDashboard/GameAnalyticsEvaluator';
 
 export default {
   title: 'GameDashboard/GameAnalytics',
@@ -200,6 +201,8 @@ const mockGameMetrics = (
     .reply(200, gameVersionMetrics)
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-source-metrics`)
     .reply(200, gameSourceMetrics)
+    .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics-benchmarks`)
+    .reply(200, defaultGameMetricsBenchmarks)
     .onAny()
     .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);

@@ -5,6 +5,7 @@ import {
   ensureIsNullOrObjectHasProperty,
   ensureIsArrayOrNull,
   ensureIsArray,
+  ensureIsObject,
 } from '../DataValidator';
 
 export type GameMetrics = {
@@ -194,6 +195,35 @@ export const listGameSourceMetricsFrom = async (
   return ensureIsArray({
     data: response.data,
     endpointName: '/game-source-metrics of Analytics API',
+  });
+};
+
+type GameMetricsBenchmark = {| typical: number, top: number |};
+
+/** What other games reach, to compare the metrics of a game with. */
+export type GameMetricsBenchmarks = {|
+  /** Share of players leaving in the first minute. */
+  bounceRatePercent: GameMetricsBenchmark,
+  playedDurationPerPlayerInMinutes: GameMetricsBenchmark,
+  /** Share of new players coming back, one value for each day after their first day. */
+  retentionPercents: {| typical: Array<number>, top: Array<number> |},
+  /** Share of players still playing after 1, 3, 5, 10 and 15 minutes. */
+  playersStillPlayingPercents: {| typical: Array<number>, top: Array<number> |},
+  /** When to advise working on the first minute (bounce rate at or above) or on the retention (next day retention below). */
+  adviceThresholds: {|
+    highBounceRatePercent: number,
+    lowD1RetentionPercent: number,
+  |},
+  /** The loading duration to aim for on the web, and the one after which most players leave. */
+  webLoadingDurationInSeconds: {| good: number, tooLong: number |},
+|};
+
+export const getGameMetricsBenchmarks = async (): Promise<GameMetricsBenchmarks> => {
+  const response = await client.get(`/game-metrics-benchmarks`);
+
+  return ensureIsObject({
+    data: response.data,
+    endpointName: '/game-metrics-benchmarks of Analytics API',
   });
 };
 

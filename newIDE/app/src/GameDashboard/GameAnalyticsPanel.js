@@ -18,7 +18,9 @@ import {
   type GameMetrics,
   type GameVersionMetrics,
   type GameSourceMetrics,
+  type GameMetricsBenchmarks,
   getGameMetricsFrom,
+  getGameMetricsBenchmarks,
   listGameVersionMetricsFrom,
   listGameSourceMetricsFrom,
 } from '../Utils/GDevelopServices/Analytics';
@@ -41,7 +43,7 @@ import {
   getGameAnalytics,
   daysShownForYear,
   minPlayersCountForRates,
-  gameAnalyticsBenchmarks,
+  defaultGameMetricsBenchmarks,
   getGameVersionAnalytics,
   getGameSourceAnalytics,
   type GameBreakdownAnalytics,
@@ -374,10 +376,24 @@ export const GameAnalyticsPanel = ({
     null
   );
   const [period, setPeriod] = React.useState<GameAnalyticsPeriod>('month');
+  const [
+    gameMetricsBenchmarks,
+    setGameMetricsBenchmarks,
+  ] = React.useState<GameMetricsBenchmarks>(defaultGameMetricsBenchmarks);
+  React.useEffect(() => {
+    getGameMetricsBenchmarks().then(setGameMetricsBenchmarks, error => {
+      console.error('Unable to load the game metrics benchmarks:', error);
+    });
+  }, []);
+
   const gameAnalytics = React.useMemo(
     () =>
-      getGameAnalytics(gameRollingMetrics, period, { gameFeaturings, builds }),
-    [gameRollingMetrics, period, gameFeaturings, builds]
+      getGameAnalytics(gameRollingMetrics, period, {
+        gameFeaturings,
+        builds,
+        gameMetricsBenchmarks,
+      }),
+    [gameRollingMetrics, period, gameFeaturings, builds, gameMetricsBenchmarks]
   );
 
   const [gameVersionMetrics, setGameVersionMetrics] = React.useState<
@@ -506,15 +522,19 @@ export const GameAnalyticsPanel = ({
   const canShowRatesOverTime = !!playedDurationSteps;
   const d1RetentionDay = retentionDays ? retentionDays[0] : null;
   const typicalBounceRatePercent =
-    gameAnalyticsBenchmarks.bounceRatePercent.typical;
-  const topBounceRatePercent = gameAnalyticsBenchmarks.bounceRatePercent.top;
+    gameMetricsBenchmarks.bounceRatePercent.typical;
+  const topBounceRatePercent = gameMetricsBenchmarks.bounceRatePercent.top;
   const typicalPlayedDurationInMinutes =
-    gameAnalyticsBenchmarks.playedDurationPerPlayerInMinutes.typical;
+    gameMetricsBenchmarks.playedDurationPerPlayerInMinutes.typical;
   const topPlayedDurationInMinutes =
-    gameAnalyticsBenchmarks.playedDurationPerPlayerInMinutes.top;
+    gameMetricsBenchmarks.playedDurationPerPlayerInMinutes.top;
   const typicalD1RetentionPercent =
-    gameAnalyticsBenchmarks.d1RetentionPercent.typical;
-  const topD1RetentionPercent = gameAnalyticsBenchmarks.d1RetentionPercent.top;
+    gameMetricsBenchmarks.retentionPercents.typical[0];
+  const topD1RetentionPercent = gameMetricsBenchmarks.retentionPercents.top[0];
+  const goodLoadingDurationInSeconds =
+    gameMetricsBenchmarks.webLoadingDurationInSeconds.good;
+  const tooLongLoadingDurationInSeconds =
+    gameMetricsBenchmarks.webLoadingDurationInSeconds.tooLong;
 
   const displaySuggestedMarketingPlan =
     recommendedMarketingPlan && gameFeaturings && fetchGameFeaturings;
@@ -673,6 +693,7 @@ export const GameAnalyticsPanel = ({
                       >
                         <RetentionChart
                           i18n={i18n}
+                          benchmarks={gameMetricsBenchmarks}
                           retentionDays={retentionDays}
                           height={chartHeight}
                         />
@@ -693,6 +714,7 @@ export const GameAnalyticsPanel = ({
                       >
                         <BounceRateChart
                           i18n={i18n}
+                          benchmarks={gameMetricsBenchmarks}
                           overTime={overTime}
                           height={chartHeight}
                         />
@@ -717,6 +739,7 @@ export const GameAnalyticsPanel = ({
                       >
                         <PlayedDurationStepsChart
                           i18n={i18n}
+                          benchmarks={gameMetricsBenchmarks}
                           playedDurationSteps={playedDurationSteps}
                           height={chartHeight}
                         />
@@ -736,6 +759,7 @@ export const GameAnalyticsPanel = ({
                       >
                         <PlayedDurationChart
                           i18n={i18n}
+                          benchmarks={gameMetricsBenchmarks}
                           overTime={overTime}
                           height={chartHeight}
                         />
@@ -808,13 +832,13 @@ export const GameAnalyticsPanel = ({
                             color: gdevelopTheme.statusIndicator.success,
                           }}
                         >
-                          about 3 seconds
+                          about {goodLoadingDurationInSeconds} seconds
                         </b>{' '}
                         on the web.{' '}
                         <b
                           style={{ color: gdevelopTheme.statusIndicator.error }}
                         >
-                          Past 10 seconds
+                          Past {tooLongLoadingDurationInSeconds} seconds
                         </b>
                         , most players leave.
                       </Trans>

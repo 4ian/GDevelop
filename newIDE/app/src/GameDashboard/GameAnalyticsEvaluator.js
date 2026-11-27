@@ -3,6 +3,7 @@ import {
   type GameMetrics,
   type GameVersionMetrics,
   type GameSourceMetrics,
+  type GameMetricsBenchmarks,
 } from '../Utils/GDevelopServices/Analytics';
 import { type GameFeaturing } from '../Utils/GDevelopServices/Game';
 import { type Build } from '../Utils/GDevelopServices/Build';
@@ -80,25 +81,23 @@ export const daysShownForYear = 364;
 /** Below this number of players, a single player changes the rates too much. */
 export const minPlayersCountForRates = 20;
 
-// Same thresholds as the weekly email about the game metrics, so that both give the same advice:
-// a quarter of the games with enough players lose more than 35% of players in the first minute,
-// and a quarter of them get more than 4% of new players back the next day.
-const highBounceRatePercent = 35;
-const lowD1RetentionPercent = 4;
-
 const playedDurationsInMinutes = [1, 3, 5, 10, 15];
 
-// Median and best quarter of the games with 20+ players over 4 weeks (measured on 2026-11-24).
-export const gameAnalyticsBenchmarks = {
+// Used until the ones of the backend are loaded, and if they can't be.
+export const defaultGameMetricsBenchmarks: GameMetricsBenchmarks = {
   bounceRatePercent: { typical: 25, top: 15 },
   playedDurationPerPlayerInMinutes: { typical: 3, top: 7 },
-  d1RetentionPercent: { typical: 2, top: 5 },
-  // One value for each day after the first day, from the games with 100+ players.
-  typicalRetentionPercents: [2, 0.9, 0.6, 0.5, 0.3, 0.3, 0.3],
-  topRetentionPercents: [5, 2, 1.4, 1.1, 0.9, 0.9, 0.9],
-  // One value for each played duration, the start excluded.
-  typicalPlayersPercents: [74, 50, 41, 32, 29],
-  topPlayersPercents: [84, 65, 55, 46, 42],
+  retentionPercents: {
+    typical: [2, 0.9, 0.6, 0.5, 0.3, 0.3, 0.3],
+    top: [5, 2, 1.4, 1.1, 0.9, 0.9, 0.9],
+  },
+  playersStillPlayingPercents: {
+    typical: [74, 50, 41, 32, 29],
+    top: [84, 65, 55, 46, 42],
+  },
+  // Same thresholds as the weekly email about the game metrics, so that both give the same advice.
+  adviceThresholds: { highBounceRatePercent: 35, lowD1RetentionPercent: 4 },
+  webLoadingDurationInSeconds: { good: 3, tooLong: 10 },
 };
 
 const periodSettings: {
@@ -374,7 +373,14 @@ const getPlayerPlatforms = (
 
 const getInsight = (
   summary: GameAnalyticsSummary,
-  retentionDays: Array<GameAnalyticsRetentionDay> | null
+  retentionDays: Array<GameAnalyticsRetentionDay> | null,
+  {
+    highBounceRatePercent,
+    lowD1RetentionPercent,
+  }: {|
+    highBounceRatePercent: number,
+    lowD1RetentionPercent: number,
+  |}
 ): GameAnalyticsInsight => {
   if (summary.playersCount < minPlayersCountForRates) return 'fewPlayers';
   if (
@@ -525,10 +531,12 @@ export const getGameAnalytics = (
   {
     gameFeaturings,
     builds,
+    gameMetricsBenchmarks,
     todayDate,
   }: {|
     gameFeaturings?: ?Array<GameFeaturing>,
     builds?: ?Array<Build>,
+    gameMetricsBenchmarks?: GameMetricsBenchmarks,
     todayDate?: Date,
   |} = {}
 ): GameAnalytics => {
@@ -599,6 +607,10 @@ export const getGameAnalytics = (
     playedDurationSteps: getPlayedDurationSteps(daysMetrics),
     retentionDays,
     playerPlatforms: getPlayerPlatforms(daysMetrics),
-    insight: getInsight(summary, retentionDays),
+    insight: getInsight(
+      summary,
+      retentionDays,
+      (gameMetricsBenchmarks || defaultGameMetricsBenchmarks).adviceThresholds
+    ),
   };
 };

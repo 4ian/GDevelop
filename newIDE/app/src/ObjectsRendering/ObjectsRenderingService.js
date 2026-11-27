@@ -22,6 +22,7 @@ import {
   rgbOrHexToHexNumber,
   hexNumberToRGBArray,
 } from '../Utils/ColorTransformer';
+import { getObjectTypeIcon, isAppBundledIcon } from './ObjectTypeIcons';
 
 const path = optionalRequire('path');
 const electron = optionalRequire('electron');
@@ -56,6 +57,18 @@ const ObjectsRenderingService = {
   renderers3D: {},
   // $FlowFixMe[missing-this-annot]
   getThumbnail: function(
+    project: gdProject,
+    objectConfiguration: gdObjectConfiguration
+  ): any {
+    const thumbnail = this._getRendererThumbnail(project, objectConfiguration);
+    // Objects showing an image from the project keep it. Only generic object
+    // type icons are replaced.
+    return isAppBundledIcon(thumbnail)
+      ? getObjectTypeIcon(objectConfiguration.getType(), thumbnail)
+      : thumbnail;
+  },
+  // $FlowFixMe[missing-this-annot]
+  _getRendererThumbnail: function(
     project: gdProject,
     objectConfiguration: gdObjectConfiguration
   ): any {

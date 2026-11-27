@@ -418,7 +418,10 @@ export const EmbeddedGameFrame = ({
         }
         hasGameFrameSomethingToLoad.current = true;
         const iframe = iframeRef.current;
-        if (iframe) {
+        // Don't take the focus from what the user is using (a field being
+        // edited, the project manager, a dialog...).
+        const { activeElement } = document;
+        if (iframe && (!activeElement || activeElement === document.body)) {
           iframe.contentWindow.focus();
         }
       };

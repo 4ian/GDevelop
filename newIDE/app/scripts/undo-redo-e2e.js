@@ -4,7 +4,8 @@
  *
  * Usage:
  *   node scripts/undo-redo-e2e.js [--url=http://localhost:3000]
- *     [--only=name1,name2] [--headed] [--list] [--3d [--all]]
+ *     [--only=name1,name2] [--headed] [--list]
+ *     [--3d [--all]] [--realtime-2d [--all]] [--from=name]
  *   E2E_DEBUG=1 also prints the console errors and page errors.
  *
  * Chrome is found with the CHROME_PATH environment variable (or at its
@@ -25,7 +26,8 @@ const headed = args.includes('--headed');
 // The scenarios of the 3D editor need the game engine to be served by the
 // development server: `ln -s ../resources/GDJS public/GDJS`, and an url
 // which is not "localhost" (like http://127.0.0.1:3000).
-const with3D = args.includes('--3d');
+const withRealTime2D = args.includes('--realtime-2d');
+const with3D = args.includes('--3d') || withRealTime2D;
 
 const chromePath =
   process.env.CHROME_PATH ||
@@ -216,6 +218,8 @@ const HISTORY_SAVE_DELAY = 1800;
 class Editor {
   constructor(page) {
     this.page = page;
+    // The real-time 2D editor is the embedded game, like the 3D editor.
+    this.is3D = withRealTime2D;
   }
 
   async open(projectUrl) {
@@ -252,7 +256,7 @@ class Editor {
       page.on('pageerror', error =>
         console.log('PAGEERROR', String(error.stack || error).slice(0, 800))
       );
-    await page.evaluateOnNewDocument(() => {
+    await page.evaluateOnNewDocument(useRealTime2DEditor => {
       // Give access to the game running in the frame of the 3D editor.
       const captureGame = setInterval(() => {
         if (!window.gdjs || !window.gdjs.RuntimeGame) return;
@@ -265,7 +269,7 @@ class Editor {
       }, 5);
       localStorage.setItem(
         'gd-preferences',
-        JSON.stringify({ language: 'en' })
+        JSON.stringify({ language: 'en', useRealTime2DEditor })
       );
       // The development server shows an overlay catching all the clicks
       // for any uncaught error (like a failed request to an API).
@@ -275,7 +279,7 @@ class Editor {
         );
         if (overlay) overlay.remove();
       }, 50);
-    });
+    }, withRealTime2D);
     await page.goto(`${appUrl}/?project=${encodeURIComponent(projectUrl)}`, {
       // Not "networkidle": the requests to the online services keep the
       // network busy for a while, and the editor is what's waited for below.
@@ -725,12 +729,16 @@ class Editor {
 
   async switchTo3D() {
     this.is3D = true;
-    const handle = await this.page.evaluateHandle(() =>
-      Array.from(document.querySelectorAll('#game-editor-toggle button')).find(
-        button => button.textContent === '3D'
-      )
-    );
-    await handle.asElement().click();
+    // With the real-time 2D editor, the scenarios of the 3D editor run in
+    // the 2D mode of the embedded game.
+    if (!withRealTime2D) {
+      const handle = await this.page.evaluateHandle(() =>
+        Array.from(
+          document.querySelectorAll('#game-editor-toggle button')
+        ).find(button => button.textContent === '3D')
+      );
+      await handle.asElement().click();
+    }
     await this.waitUntil(
       '3D editor frame',
       () =>
@@ -821,6 +829,22 @@ class Editor {
   getGizmoStateIn3DEditor() {
     return this.evaluateIn3DEditor(editor => {
       const controls = editor._selectionControls;
+      if (controls && controls.selectionHandle) {
+        // The handles of the 2D mode.
+        const { selectionHandle } = controls;
+        if (!controls.isShown() || !selectionHandle.parent)
+          return 'no selection handles';
+        const buttons = Object.values(selectionHandle.buttons);
+        const xs = buttons.map(button => button.position.x);
+        const ys = buttons.map(button => button.position.y);
+        if (![...xs, ...ys].every(value => Number.isFinite(value)))
+          return 'non finite handles';
+        const width = Math.max(...xs) - Math.min(...xs);
+        const height = Math.max(...ys) - Math.min(...ys);
+        return width > 0 && height > 0
+          ? 'ok'
+          : `flat handles (${width}x${height})`;
+      }
       if (!controls || !controls.isShown() || !controls.threeTransformControls)
         return 'no selection controls';
       const helper = controls.threeTransformControls.getHelper();
@@ -903,6 +927,17 @@ const expectEqual = (actual, expected, description) => {
 };
 
 const X_FIELD = '#instance-properties-editor [id="X"]';
+
+// These scenarios use the canvas of the classic 2D editor, which is not
+// shown with the real-time 2D editor.
+const classicEditorOnlyScenarios = new Set([
+  'undo of a canvas drag does not open the properties panel',
+  'scene properties dialog makes one step per scene behavior',
+  'undoing a layer change keeps the external layout tab on the live layers',
+  'undoing the extraction of instances to an external layout removes it',
+  'a pasted instance keeps its position after undo and redo',
+  'a redo right after undoing an extraction to an external layout loses nothing (keyboard)',
+]);
 
 const scenarios = {
   'instance edit is revealed after deselecting': async editor => {
@@ -1423,6 +1458,123 @@ if (with3D) {
   };
 }
 
+if (withRealTime2D) {
+  scenarios[
+    'a drag and a resize with the handles of the real-time 2D editor can be undone and redone (3D editor)'
+  ] = async editor => {
+    await editor.switchTo3D();
+    await editor.selectInstancesOf('MyCube');
+    await editor.waitUntil(
+      'selection handles shown',
+      async () => (await editor.getGizmoStateIn3DEditor()) === 'ok',
+      20000
+    );
+    const getCube = () =>
+      editor.evaluateIn3DEditor(editor => {
+        const cube = editor._currentScene.getObjects('MyCube')[0];
+        return { x: cube.getX(), width: cube.getWidth() };
+      });
+    // The position on the page of the center of the selection, and of the
+    // handle on its right.
+    const getHandlePoints = async () => {
+      const points = await editor.evaluateIn3DEditor(editor => {
+        const { selectionHandle } = editor._selectionControls;
+        const camera = editor
+          .getTopVisibleLayer()
+          .getRenderer()
+          .getThreeCamera();
+        const canvas = editor
+          .getRuntimeGame()
+          .getRenderer()
+          .getCanvas();
+        const rect = canvas.getBoundingClientRect();
+        const toCanvas = button => {
+          const position = button.position.clone();
+          selectionHandle.localToWorld(position);
+          position.project(camera);
+          return {
+            x: rect.left + ((position.x + 1) / 2) * rect.width,
+            y: rect.top + ((1 - position.y) / 2) * rect.height,
+          };
+        };
+        const right = toCanvas(selectionHandle.buttons[1]);
+        const left = toCanvas(selectionHandle.buttons[8]);
+        return { right, center: { x: (left.x + right.x) / 2, y: right.y } };
+      });
+      const frameElement = await editor.page.$(
+        'iframe[src*="in-game-editor-preview"]'
+      );
+      const box = await frameElement.boundingBox();
+      const toPage = point => ({ x: box.x + point.x, y: box.y + point.y });
+      return { right: toPage(points.right), center: toPage(points.center) };
+    };
+    const drag = async (from, deltaX) => {
+      const { mouse } = editor.page;
+      await mouse.move(from.x, from.y);
+      await sleep(300);
+      await mouse.down();
+      for (let step = 1; step <= 10; step++) {
+        await mouse.move(from.x + (deltaX * step) / 10, from.y);
+        await sleep(50);
+      }
+      await mouse.up();
+      await sleep(1500);
+    };
+    const expectCube = async (expected, description) => {
+      let cube = null;
+      try {
+        await editor.waitUntil(
+          description,
+          async () => {
+            cube = await getCube();
+            return cube.x === expected.x && cube.width === expected.width;
+          },
+          10000
+        );
+      } catch (error) {
+        expectEqual(cube, expected, description);
+      }
+    };
+
+    const initial = await getCube();
+    await drag((await getHandlePoints()).center, 60);
+    const moved = await getCube();
+    expectEqual(moved.x > initial.x, true, `moved (${moved.x})`);
+    expectEqual(moved.width, initial.width, 'width after the move');
+
+    await drag((await getHandlePoints()).right, 40);
+    const resized = await getCube();
+    expectEqual(
+      resized.width > moved.width,
+      true,
+      `resized (${resized.width})`
+    );
+
+    await editor.undo();
+    await expectCube(moved, 'resize undone');
+    expectEqual(
+      await editor.getGizmoStateIn3DEditor(),
+      'ok',
+      'handles after the first undo'
+    );
+    await editor.undo();
+    await expectCube(initial, 'move undone');
+    await editor.redo();
+    await expectCube(moved, 'move redone');
+    await editor.redo();
+    await expectCube(resized, 'resize redone');
+    // The handles follow the instance after the undo/redo.
+    const { right } = await getHandlePoints();
+    await drag(right, -20);
+    const resizedAgain = await getCube();
+    expectEqual(
+      resizedAgain.width < resized.width,
+      true,
+      `resized again from the handle (${resizedAgain.width})`
+    );
+  };
+}
+
 scenarios[
   'undo twice while holding Control (2D editor)'
 ] = makeUndoTwiceHoldingControlScenario(false);
@@ -1520,7 +1672,11 @@ const makeZeroSizeScenario = keepRatio => async editor => {
   );
   await editor.waitUntil(
     'scale gizmo shown',
-    async () => (await editor.getGizmoStateIn3DEditor()) === 'ok',
+    async () => {
+      const state = await editor.getGizmoStateIn3DEditor();
+      if (process.env.E2E_DEBUG) console.log('gizmo state:', state);
+      return state === 'ok';
+    },
     15000
   );
 
@@ -4685,6 +4841,8 @@ const makeBoxGlb = () => {
     });
   };
   scenarios[name] = async editor => {
+    // The embedded game only knows the selection made once it is started.
+    if (withRealTime2D) await editor.switchTo3D();
     // Selected while the model is still loading: the panel shows the
     // placeholder size (1), and must show the real one once known, without
     // any other action.
@@ -8345,11 +8503,20 @@ const main = async () => {
 
   // In 3D mode, only the scenarios needing the 3D editor run (the others
   // already ran in 2D mode) - unless `--all` or `--only` is given.
-  const names = Object.keys(scenarios).filter(
-    name =>
-      (!only || only.some(filter => name.includes(filter))) &&
-      (!with3D || only || args.includes('--all') || /3D editor/.test(name))
-  );
+  const allNames = Object.keys(scenarios);
+  // `--from=name` resumes a run from a scenario.
+  const from = getArg('from');
+  const fromIndex = from
+    ? Math.max(0, allNames.findIndex(name => name.includes(from)))
+    : 0;
+  const names = allNames
+    .slice(fromIndex)
+    .filter(
+      name =>
+        (!only || only.some(filter => name.includes(filter))) &&
+        (!with3D || only || args.includes('--all') || /3D editor/.test(name)) &&
+        (!withRealTime2D || only || !classicEditorOnlyScenarios.has(name))
+    );
   const failures = [];
   for (const name of names) {
     const context = await browser.createIncognitoBrowserContext();

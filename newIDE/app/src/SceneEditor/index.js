@@ -2186,7 +2186,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       state.layoutVariablesDialogOpen ||
       state.extractAsExternalLayoutDialogOpen ||
       state.extractAsCustomObjectDialogOpen ||
-      state.isAssetExporterDialogOpen ||
+      !!state.exportedObjects ||
       state.isAssetImporterDialogOpen
     );
   };
@@ -5593,10 +5593,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     // in-game editor has its own shortcuts (like "F" to focus the
     // selection) and forwards undo/redo & others back to the editor. Give
     // it the focus instead of the editor container.
-    if (
-      this.props.gameEditorMode === 'embedded-game' &&
-      focusEmbeddedGameFrame()
-    ) {
+    if (this._isGameEditorEmbedded() && focusEmbeddedGameFrame()) {
       return;
     }
 

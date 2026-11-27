@@ -17,10 +17,6 @@ import GridList from '@material-ui/core/GridList';
 import { getExampleAndTemplateTiles } from '../../MainFrame/EditorContainers/HomePage/CreateSection/utils';
 import BackgroundText from '../../UI/BackgroundText';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
-import {
-  isLinkedToStartingPointExampleShortHeader,
-  isStartingPointExampleShortHeader,
-} from '../../ProjectCreation/EmptyAndStartingPointProjects';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import {
   useResponsiveWindowSize,
@@ -50,18 +46,6 @@ const gameFilter = (
   // It's a game template, trust it's been filtered correctly.
   return true;
 };
-
-// Starting points are kept when searching, so that they are mixed with the other results.
-const noStartingPointFilter = (
-  allExampleShortHeaders: ExampleShortHeader[],
-  exampleShortHeader: ExampleShortHeader,
-  isSearchActive: boolean
-) =>
-  (isSearchActive || !isStartingPointExampleShortHeader(exampleShortHeader)) &&
-  !isLinkedToStartingPointExampleShortHeader(
-    allExampleShortHeaders,
-    exampleShortHeader
-  );
 
 // Search in both examples and game templates stores.
 export const useExampleAndGameTemplateSearch = (): {|
@@ -102,8 +86,6 @@ type Props = {|
   onSelectPrivateGameTemplateListingData: PrivateGameTemplateListingData => void,
   i18n: I18nType,
   onlyShowGames?: boolean,
-  // Starting points are still shown in search results.
-  hideStartingPoints?: boolean,
   getColumnsFromWindowSize: (
     windowSize: WindowSizeType,
     isLandscape: boolean
@@ -120,7 +102,6 @@ const ExampleStore = ({
   onSelectPrivateGameTemplateListingData,
   i18n,
   onlyShowGames,
-  hideStartingPoints,
   getColumnsFromWindowSize,
   hideSearch,
   limitRowsTo,
@@ -134,7 +115,6 @@ const ExampleStore = ({
 
   const { receivedGameTemplates } = React.useContext(AuthenticatedUserContext);
   const {
-    exampleShortHeaders: allExampleShortHeaders,
     exampleShortHeadersSearchResults,
     fetchExamplesAndFilters,
     searchText: exampleStoreSearchText,
@@ -177,18 +157,9 @@ const ExampleStore = ({
               )
             : [],
         exampleShortHeaders: exampleShortHeadersSearchResults
-          ? exampleShortHeadersSearchResults
-              .filter(({ item }) => !onlyShowGames || gameFilter(item))
-              .filter(
-                ({ item }) =>
-                  !allExampleShortHeaders ||
-                  !hideStartingPoints ||
-                  noStartingPointFilter(
-                    allExampleShortHeaders,
-                    item,
-                    !!exampleStoreSearchText
-                  )
-              )
+          ? exampleShortHeadersSearchResults.filter(
+              ({ item }) => !onlyShowGames || gameFilter(item)
+            )
           : [],
         onSelectPrivateGameTemplateListingData: privateGameTemplateListingData => {
           const priceForUsageType = privateGameTemplateListingData.prices.find(
@@ -226,8 +197,6 @@ const ExampleStore = ({
       i18n,
       gdevelopTheme,
       onlyShowGames,
-      hideStartingPoints,
-      allExampleShortHeaders,
       hidePremiumTemplates,
       exampleStoreSearchText,
       disabled,

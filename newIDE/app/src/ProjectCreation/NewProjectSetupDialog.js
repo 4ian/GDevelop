@@ -13,7 +13,7 @@ import TextField from '../UI/TextField';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import generateName from '../Utils/ProjectNameGenerator';
 import IconButton from '../UI/IconButton';
-import { ColumnStackLayout } from '../UI/Layout';
+import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
 import { emptyStorageProvider } from '../ProjectsStorage/ProjectStorageProviders';
 import { findEmptyPathInWorkspaceFolder } from '../ProjectsStorage/LocalFileStorageProvider/LocalPathFinder';
 import SelectField from '../UI/SelectField';
@@ -41,17 +41,19 @@ import { type I18n as I18nType } from '@lingui/core';
 import { I18n } from '@lingui/react';
 import { type PrivateGameTemplateListingData } from '../Utils/GDevelopServices/Shop';
 import { CLOUD_PROJECT_NAME_MAX_LENGTH } from '../Utils/GDevelopServices/Project';
-import EmptyAndStartingPointProjects, {
+import {
   isLinkedToStartingPointExampleShortHeader,
   isStartingPointExampleShortHeader,
-} from './EmptyAndStartingPointProjects';
+  type TemplateComplexity,
+  type TemplateType,
+} from './ProjectTemplatesOrdering';
+import ProjectTemplatesList from './ProjectTemplatesList';
+import ProjectTemplatesFilterButton from './ProjectTemplatesFilterButton';
 import TextButton from '../UI/TextButton';
 import ChevronArrowLeft from '../UI/CustomSvgIcons/ChevronArrowLeft';
 import ExampleInformationPage from '../AssetStore/ExampleStore/ExampleInformationPage';
 import PrivateGameTemplateInformationPage from '../AssetStore/PrivateGameTemplates/PrivateGameTemplateInformationPage';
-import ExampleStore, {
-  useExampleAndGameTemplateSearch,
-} from '../AssetStore/ExampleStore';
+import { useExampleAndGameTemplateSearch } from '../AssetStore/ExampleStore';
 import SearchBar from '../UI/SearchBar';
 import Text from '../UI/Text';
 import { type WindowSizeType } from '../UI/Responsive/ResponsiveWindowMeasurer';
@@ -201,24 +203,18 @@ const NewProjectSetupDialog = ({
     emptyProjectSelected,
     setEmptyProjectSelected,
   ] = React.useState<boolean>(false);
-  const [startersSelected, setStartersSelected] = React.useState<boolean>(
-    false
+  const [templateTypes, setTemplateTypes] = React.useState<Set<TemplateType>>(
+    new Set()
   );
-  const {
-    exampleShortHeaders,
-    searchText: exampleStoreSearchText,
-  } = React.useContext(ExampleStoreContext);
+  const [complexities, setComplexities] = React.useState<
+    Set<TemplateComplexity>
+  >(new Set());
+  const { exampleShortHeaders } = React.useContext(ExampleStoreContext);
   const { searchText, setSearchText } = useExampleAndGameTemplateSearch();
   const isOnHomePage =
     !selectedExampleShortHeader &&
     !selectedPrivateGameTemplateListingData &&
-    !emptyProjectSelected &&
-    !startersSelected;
-  const isOnStartersPage =
-    !selectedExampleShortHeader &&
-    !selectedPrivateGameTemplateListingData &&
-    !emptyProjectSelected &&
-    startersSelected;
+    !emptyProjectSelected;
 
   const { privateGameTemplateListingDatas } = React.useContext(
     PrivateGameTemplateStoreContext
@@ -557,8 +553,7 @@ const NewProjectSetupDialog = ({
       if (
         !emptyProjectSelected &&
         !selectedExampleShortHeader &&
-        !selectedPrivateGameTemplateListingData &&
-        !startersSelected
+        !selectedPrivateGameTemplateListingData
       ) {
         // Reset project name when everything is unselected.
         setProjectName(generateProjectName());
@@ -591,7 +586,6 @@ const NewProjectSetupDialog = ({
       selectedExampleShortHeader,
       selectedPrivateGameTemplateListingData,
       emptyProjectSelected,
-      startersSelected,
       exampleShortHeaders,
     ]
   );
@@ -611,10 +605,6 @@ const NewProjectSetupDialog = ({
           onSelectPrivateGameTemplateListingData(null);
           return;
         }
-        if (startersSelected) {
-          setStartersSelected(false);
-          return;
-        }
       }
     },
     [
@@ -625,7 +615,6 @@ const NewProjectSetupDialog = ({
       onSelectExampleShortHeader,
       selectedPrivateGameTemplateListingData,
       onSelectPrivateGameTemplateListingData,
-      startersSelected,
       preventBackHome,
     ]
   );
@@ -665,11 +654,8 @@ const NewProjectSetupDialog = ({
           cannotBeDismissed={isLoading}
           onRequestClose={onClose}
           fullHeight={
-            // Make full height if on home page or starters page,
+            // Make full height if on home page,
             isOnHomePage ||
-            (startersSelected &&
-              !selectedExampleShortHeader &&
-              !emptyProjectSelected) ||
             // Or if a template is selected but not owned (to show the full information page).
             (!!selectedPrivateGameTemplateListingData &&
               !selectedGameTemplatePurchaseUsageType)
@@ -712,66 +698,51 @@ const NewProjectSetupDialog = ({
                     ASK_AI_STANDALONE_FORM_DISMISSABLE_IDENTIFIER
                   }
                 />
-                <EmptyAndStartingPointProjects
-                  onSelectExampleShortHeader={exampleShortHeader => {
-                    onSelectExampleShortHeader(exampleShortHeader);
-                  }}
-                  onSelectEmptyProject={() => {
-                    setEmptyProjectSelected(true);
-                  }}
-                  disabled={isLoading}
-                  onSeeAll={() => {
-                    setStartersSelected(true);
-                  }}
-                  title={
-                    isAskAiStandAloneFormHidden ? (
+                <Line alignItems="center">
+                  <Text size="block-title">
+                    {isAskAiStandAloneFormHidden ? (
                       <Trans>Start from a template</Trans>
                     ) : (
                       <Trans>Continue with Human Intelligence</Trans>
-                    )
-                  }
-                  searchBar={
-                    <Line>
-                      <Column expand noMargin>
-                        <SearchBar
-                          value={searchText}
-                          onChange={setSearchText}
-                          onRequestSearch={() => {}}
-                          placeholder={t`Search starters and game templates`}
-                          disabled={isLoading}
-                        />
-                      </Column>
-                    </Line>
-                  }
-                />
-                {isOnline ? (
-                  <>
-                    {!exampleStoreSearchText && (
-                      <Line alignItems="center">
-                        <Text size="block-title">
-                          <Trans>Game templates</Trans>
-                        </Text>
-                      </Line>
                     )}
-                    <ExampleStore
-                      onSelectExampleShortHeader={exampleShortHeader => {
-                        onSelectExampleShortHeader(exampleShortHeader);
-                      }}
-                      onSelectPrivateGameTemplateListingData={privateGameTemplateListingData => {
-                        onSelectPrivateGameTemplateListingData(
-                          privateGameTemplateListingData
-                        );
-                      }}
-                      i18n={i18n}
-                      getColumnsFromWindowSize={getItemsColumns}
-                      hideSearch
-                      hideStartingPoints
-                      limitRowsTo={6}
-                      showLoadMore
+                  </Text>
+                </Line>
+                <LineStackLayout noMargin alignItems="center">
+                  <Column expand noMargin>
+                    <SearchBar
+                      value={searchText}
+                      onChange={setSearchText}
+                      onRequestSearch={() => {}}
+                      placeholder={t`Search something...`}
                       disabled={isLoading}
                     />
-                  </>
-                ) : (
+                  </Column>
+                  <ProjectTemplatesFilterButton
+                    templateTypes={templateTypes}
+                    onChangeTemplateTypes={setTemplateTypes}
+                    complexities={complexities}
+                    onChangeComplexities={setComplexities}
+                    disabled={isLoading}
+                  />
+                </LineStackLayout>
+                <ProjectTemplatesList
+                  onSelectEmptyProject={() => {
+                    setEmptyProjectSelected(true);
+                  }}
+                  onSelectExampleShortHeader={exampleShortHeader => {
+                    onSelectExampleShortHeader(exampleShortHeader);
+                  }}
+                  onSelectPrivateGameTemplateListingData={privateGameTemplateListingData => {
+                    onSelectPrivateGameTemplateListingData(
+                      privateGameTemplateListingData
+                    );
+                  }}
+                  i18n={i18n}
+                  templateTypes={templateTypes}
+                  complexities={complexities}
+                  disabled={isLoading}
+                />
+                {!isOnline && (
                   <EmptyMessage>
                     <Text>
                       <Trans>
@@ -796,15 +767,6 @@ const NewProjectSetupDialog = ({
                   onGameTemplateOpen={onSelectPrivateGameTemplateListingData}
                 />
               )}
-            {isOnStartersPage && (
-              <EmptyAndStartingPointProjects
-                onSelectExampleShortHeader={exampleShortHeader => {
-                  onSelectExampleShortHeader(exampleShortHeader);
-                }}
-                disabled={isLoading}
-                title={<Trans>Start from a template</Trans>}
-              />
-            )}
             {shouldShowCreateActions && (
               <ColumnStackLayout noMargin>
                 {selectedExampleShortHeader ? (

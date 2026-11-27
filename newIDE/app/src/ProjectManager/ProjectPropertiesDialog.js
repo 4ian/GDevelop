@@ -77,6 +77,7 @@ type ProjectProperties = {|
   minFPS: number,
   maxFPS: number,
   isFolderProject: boolean,
+  areMetricsEnabled: boolean,
   useDeprecatedZeroAsDefaultZOrder: boolean,
   useDeprecatedZeroAsDefaultStringVariable: boolean,
   desktopIconResourceNames: Array<string>,
@@ -109,6 +110,7 @@ const loadPropertiesFromProject = (project: gdProject): ProjectProperties => {
     minFPS: project.getMinimumFPS(),
     maxFPS: project.getMaximumFPS(),
     isFolderProject: project.isFolderProject(),
+    areMetricsEnabled: project.areMetricsEnabled(),
     useDeprecatedZeroAsDefaultZOrder: project.getUseDeprecatedZeroAsDefaultZOrder(),
     useDeprecatedZeroAsDefaultStringVariable: project.getUseDeprecatedZeroAsDefaultStringVariable(),
     desktopIconResourceNames: desktopIconSizes.map(size =>
@@ -154,6 +156,7 @@ function applyPropertiesToProject(
     minFPS,
     maxFPS,
     isFolderProject,
+    areMetricsEnabled,
     useDeprecatedZeroAsDefaultZOrder,
     useDeprecatedZeroAsDefaultStringVariable,
     desktopIconResourceNames,
@@ -187,6 +190,7 @@ function applyPropertiesToProject(
   project.setMinimumFPS(minFPS);
   project.setMaximumFPS(maxFPS);
   project.setFolderProject(isFolderProject);
+  project.setMetricsEnabled(areMetricsEnabled);
   project.setUseDeprecatedZeroAsDefaultZOrder(useDeprecatedZeroAsDefaultZOrder);
   project.setUseDeprecatedZeroAsDefaultStringVariable(
     useDeprecatedZeroAsDefaultStringVariable
@@ -271,6 +275,9 @@ const ProjectPropertiesDialog = (props: Props) => {
   let [maxFPS, setMaxFPS] = React.useState(initialProperties.maxFPS);
   let [isFolderProject, setIsFolderProject] = React.useState(
     initialProperties.isFolderProject
+  );
+  let [areMetricsEnabled, setAreMetricsEnabled] = React.useState(
+    initialProperties.areMetricsEnabled
   );
   let [
     useDeprecatedZeroAsDefaultZOrder,
@@ -373,6 +380,7 @@ const ProjectPropertiesDialog = (props: Props) => {
         minFPS,
         maxFPS,
         isFolderProject,
+        areMetricsEnabled,
         useDeprecatedZeroAsDefaultZOrder,
         useDeprecatedZeroAsDefaultStringVariable,
         desktopIconResourceNames,
@@ -872,6 +880,32 @@ const ProjectPropertiesDialog = (props: Props) => {
                   <SelectOption value="never" label={t`Never`} />
                 </SelectField>
 
+                <Text size="block-title">
+                  <Trans>Player metrics</Trans>
+                </Text>
+                <Checkbox
+                  label={
+                    <Trans>
+                      Send anonymous metrics when the game starts (players, play
+                      time, loading time)
+                    </Trans>
+                  }
+                  checked={areMetricsEnabled}
+                  onCheck={(e, checked) => {
+                    setAreMetricsEnabled(checked);
+                    notifyOfChange();
+                  }}
+                />
+                {!areMetricsEnabled && (
+                  <AlertMessage kind="info">
+                    <Trans>
+                      No metrics are sent until the action "Enable (or disable)
+                      metrics collection" enables them, for example once a
+                      player gave their consent. The analytics of the game only
+                      count the players for whom they are enabled.
+                    </Trans>
+                  </AlertMessage>
+                )}
                 <Text size="block-title">
                   <Trans>Project files</Trans>
                 </Text>

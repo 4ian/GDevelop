@@ -4,6 +4,8 @@ import { GDevelopAnalyticsApi } from './ApiConfigs';
 import {
   ensureIsNullOrObjectHasProperty,
   ensureIsArrayOrNull,
+  ensureIsArray,
+  ensureIsObject,
 } from '../DataValidator';
 
 export type GameMetrics = {
@@ -14,12 +16,20 @@ export type GameMetrics = {
     d0Sessions: number,
     /** Total, cumulative, duration of sessions for this day. */
     d0SessionsDurationTotal: ?number,
+    /** Number of sessions of a game measuring its loading: only on the web, and not the games exported before 2026-12. */
+    d0SessionsMeasuringLoading?: number,
+    /** Number of these sessions which finished loading. */
+    d0SessionsWithLoadingDuration?: number,
+    /** Total loading duration, in seconds, of these sessions. */
+    d0LoadingDurationTotal?: number,
   },
   players: ?{
     /** Number of players for this day. */
     d0Players: number,
     /** Number of new players for this day. */
     d0NewPlayers: number,
+    /** Number of players whose played duration is known for this day. Not set before it was counted. */
+    d0PlayersWithDuration?: ?number,
     /** Number of players who played the game less than 1 minute for this day. */
     d0PlayersBelow60s: ?number,
     /** Number of players who played the game less than 3 minutes for this day. */
@@ -111,6 +121,115 @@ export const getGameMetricsFrom = async (
   return ensureIsArrayOrNull({
     data: response.data,
     endpointName: '/game-metrics of Analytics API',
+  });
+};
+
+/** The metrics of the players of a version of a game for a day. */
+export type GameVersionMetrics = {|
+  gameId: string,
+  date: string,
+  /** The version set in the game properties. Empty when the game has none. */
+  version: string,
+  /** Number of players for this day whose first session of the day was on this version. */
+  d0Players: number,
+  d0SessionsDurationTotal: number,
+  /** Number of these players whose played duration is known for this day. Not set before it was counted. */
+  d0PlayersWithDuration?: ?number,
+  /** Number of these players who played the game less than 1 minute for this day. */
+  d0PlayersBelow60s: number,
+|};
+
+export const listGameVersionMetricsFrom = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  gameId: string,
+  firstDayIsoDate: string
+): Promise<Array<GameVersionMetrics>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+
+  const response = await client.get(`/game-version-metrics`, {
+    params: {
+      userId,
+      gameId,
+      firstDayIsoDate,
+    },
+    headers: {
+      Authorization: authorizationHeader,
+    },
+  });
+
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/game-version-metrics of Analytics API',
+  });
+};
+
+/** The metrics of the players of a game coming from a source for a day. */
+export type GameSourceMetrics = {|
+  gameId: string,
+  date: string,
+  /** Where the game is played: `android-app`, `ios-app`, `desktop-app`, `unknown`, a game portal (like `itch.io`) or the hostname of a website. */
+  source: string,
+  /** Number of players for this day whose first session of the day was on this source. */
+  d0Players: number,
+  d0SessionsDurationTotal: number,
+  /** Number of these players whose played duration is known for this day. Not set before it was counted. */
+  d0PlayersWithDuration?: ?number,
+  /** Number of these players who played the game less than 1 minute for this day. */
+  d0PlayersBelow60s: number,
+|};
+
+export const listGameSourceMetricsFrom = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  gameId: string,
+  firstDayIsoDate: string
+): Promise<Array<GameSourceMetrics>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+
+  const response = await client.get(`/game-source-metrics`, {
+    params: {
+      userId,
+      gameId,
+      firstDayIsoDate,
+    },
+    headers: {
+      Authorization: authorizationHeader,
+    },
+  });
+
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/game-source-metrics of Analytics API',
+  });
+};
+
+type GameMetricsBenchmark = {| typical: number, top: number |};
+
+/** What other games reach, to compare the metrics of a game with. */
+export type GameMetricsBenchmarks = {|
+  /** Share of players leaving in the first minute. */
+  bounceRatePercent: GameMetricsBenchmark,
+  playedDurationPerPlayerInMinutes: GameMetricsBenchmark,
+  /** Share of new players coming back, one value for each day after their first day. */
+  retentionPercents: {| typical: Array<number>, top: Array<number> |},
+  /** Share of players still playing after 1, 3, 5, 10 and 15 minutes. */
+  playersStillPlayingPercents: {| typical: Array<number>, top: Array<number> |},
+  /** When to advise working on the first minute (bounce rate at or above) or on the retention (next day retention below). */
+  adviceThresholds: {|
+    highBounceRatePercent: number,
+    lowD1RetentionPercent: number,
+  |},
+  /** The loading duration to aim for on the web, and the one after which most players leave. */
+  webLoadingDurationInSeconds: {| good: number, tooLong: number |},
+|};
+
+export const getGameMetricsBenchmarks = async (): Promise<GameMetricsBenchmarks> => {
+  const response = await client.get(`/game-metrics-benchmarks`);
+
+  return ensureIsObject({
+    data: response.data,
+    endpointName: '/game-metrics-benchmarks of Analytics API',
   });
 };
 

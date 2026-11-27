@@ -1,5 +1,10 @@
 // @flow
-import { type GameMetrics } from '../Utils/GDevelopServices/Analytics';
+import {
+  type GameMetrics,
+  type GameVersionMetrics,
+  type GameSourceMetrics,
+  type GameMetricsBenchmarks,
+} from '../Utils/GDevelopServices/Analytics';
 import { type GameFeaturing } from '../Utils/GDevelopServices/Game';
 import { type Build } from '../Utils/GDevelopServices/Build';
 
@@ -15,6 +20,10 @@ export type GameAnalyticsSummary = {|
   bounceRatePercent: number | null,
   /** Null when there are too few players for the mean to mean something. */
   playedDurationPerPlayerInSeconds: number | null,
+  /** From the page opening to the first scene starting. Null when too few sessions measured it. */
+  loadingDurationPerSessionInSeconds: number | null,
+  /** Share of the sessions which finished loading. Null when too few sessions measured it. */
+  loadedSessionsPercent: number | null,
 |};
 
 export type GameAnalyticsOverTimePoint = {|
@@ -24,8 +33,8 @@ export type GameAnalyticsOverTimePoint = {|
   playersCount: number,
   newPlayersCount: number,
   returningPlayersCount: number,
-  bounceRatePercent: number,
-  playedDurationPerPlayerInMinutes: number,
+  bounceRatePercent: number | null,
+  playedDurationPerPlayerInMinutes: number | null,
   hasMarketingBoost: boolean,
   buildsCount: number,
 |};
@@ -71,14 +80,27 @@ export const daysShownForYear = 364;
 
 /** Below this number of players, a single player changes the rates too much. */
 export const minPlayersCountForRates = 20;
-
-// Same thresholds as the weekly email about the game metrics, so that both give the same advice:
-// a quarter of the games with enough players lose more than 35% of players in the first minute,
-// and a quarter of them get more than 4% of new players back the next day.
-const highBounceRatePercent = 35;
-const lowD1RetentionPercent = 4;
+// Retention rates are around 1%: they mean nothing on a few players.
+export const minNewPlayersCountForRetention = 100;
 
 const playedDurationsInMinutes = [1, 3, 5, 10, 15];
+
+// Used until the ones of the backend are loaded, and if they can't be.
+export const defaultGameMetricsBenchmarks: GameMetricsBenchmarks = {
+  bounceRatePercent: { typical: 25, top: 15 },
+  playedDurationPerPlayerInMinutes: { typical: 3, top: 7 },
+  retentionPercents: {
+    typical: [2, 0.9, 0.6, 0.5, 0.3, 0.3, 0.3],
+    top: [5, 2, 1.4, 1.1, 0.9, 0.9, 0.9],
+  },
+  playersStillPlayingPercents: {
+    typical: [74, 50, 41, 32, 29],
+    top: [84, 65, 55, 46, 42],
+  },
+  // Same thresholds as the weekly email about the game metrics, so that both give the same advice.
+  adviceThresholds: { highBounceRatePercent: 35, lowD1RetentionPercent: 4 },
+  webLoadingDurationInSeconds: { good: 3, tooLong: 10 },
+};
 
 const periodSettings: {
   [GameAnalyticsPeriod]: {|
@@ -154,6 +176,9 @@ type DaysMetrics = {|
   /** Players of the days having the numbers of players per platform. */
   playersWithPlatformsCount: number,
   touchPlayersCount: number,
+  sessionsMeasuringLoadingCount: number,
+  sessionsWithLoadingDurationCount: number,
+  loadingDurationInSeconds: number,
 |};
 
 const sumDaysMetrics = (
@@ -169,12 +194,23 @@ const sumDaysMetrics = (
     playersBelowDurationCounts: playedDurationsInMinutes.map(() => 0),
     playersWithPlatformsCount: 0,
     touchPlayersCount: 0,
+    sessionsMeasuringLoadingCount: 0,
+    sessionsWithLoadingDurationCount: 0,
+    loadingDurationInSeconds: 0,
   };
   isoDays.forEach(isoDay => {
     const gameMetrics = gameMetricsByIsoDay[isoDay];
     if (!gameMetrics) return;
     const { sessions, players } = gameMetrics;
-    if (sessions) daysMetrics.sessionsCount += sessions.d0Sessions;
+    if (sessions) {
+      daysMetrics.sessionsCount += sessions.d0Sessions;
+      daysMetrics.sessionsMeasuringLoadingCount +=
+        sessions.d0SessionsMeasuringLoading || 0;
+      daysMetrics.sessionsWithLoadingDurationCount +=
+        sessions.d0SessionsWithLoadingDuration || 0;
+      daysMetrics.loadingDurationInSeconds +=
+        sessions.d0LoadingDurationTotal || 0;
+    }
     if (!players) return;
 
     daysMetrics.playersCount += players.d0Players;
@@ -202,7 +238,11 @@ const sumDaysMetrics = (
     )
       return;
 
-    daysMetrics.playersWithDurationCount += players.d0Players;
+    // The players whose played duration never arrived are left out. Before they were counted apart, all players are used.
+    daysMetrics.playersWithDurationCount +=
+      players.d0PlayersWithDuration != null
+        ? players.d0PlayersWithDuration
+        : players.d0Players;
     daysMetrics.playedDurationInSeconds += playedDurationInSeconds;
     playersBelowDurationCounts.forEach((count, index) => {
       daysMetrics.playersBelowDurationCounts[index] += count || 0;
@@ -244,6 +284,16 @@ const getSummary = (
     daysMetrics,
     minPlayersCountForRates
   ),
+  loadingDurationPerSessionInSeconds:
+    daysMetrics.sessionsWithLoadingDurationCount >= minPlayersCountForRates
+      ? daysMetrics.loadingDurationInSeconds /
+        daysMetrics.sessionsWithLoadingDurationCount
+      : null,
+  loadedSessionsPercent:
+    daysMetrics.sessionsMeasuringLoadingCount >= minPlayersCountForRates
+      ? (100 * daysMetrics.sessionsWithLoadingDurationCount) /
+        daysMetrics.sessionsMeasuringLoadingCount
+      : null,
 });
 
 const getPlayedDurationSteps = (
@@ -302,7 +352,8 @@ const getRetentionDays = (
       }
     });
     // Later days are not shown either: they would leave holes in the chart.
-    if (!hasRetention || cohortPlayersCount < minPlayersCountForRates) break;
+    if (!hasRetention || cohortPlayersCount < minNewPlayersCountForRetention)
+      break;
 
     retentionDays.push({
       dayNumber,
@@ -329,7 +380,14 @@ const getPlayerPlatforms = (
 
 const getInsight = (
   summary: GameAnalyticsSummary,
-  retentionDays: Array<GameAnalyticsRetentionDay> | null
+  retentionDays: Array<GameAnalyticsRetentionDay> | null,
+  {
+    highBounceRatePercent,
+    lowD1RetentionPercent,
+  }: {|
+    highBounceRatePercent: number,
+    lowD1RetentionPercent: number,
+  |}
 ): GameAnalyticsInsight => {
   if (summary.playersCount < minPlayersCountForRates) return 'fewPlayers';
   if (
@@ -355,16 +413,146 @@ const isIsoDayInMarketingBoost = (
       isoDay <= getIsoDay(gameFeaturing.expiresAt * 1000)
   );
 
+export type GameBreakdownAnalytics = {|
+  /** A version (empty when the game has none) or a source of players. */
+  name: string,
+  playersCount: number,
+  /** Null when there are too few players. */
+  bounceRatePercent: number | null,
+  /** Null when there are too few players. */
+  playedDurationPerPlayerInSeconds: number | null,
+|};
+
+type BreakdownMetrics = {
+  +date: string,
+  +d0Players: number,
+  +d0SessionsDurationTotal: number,
+  +d0PlayersWithDuration?: ?number,
+  +d0PlayersBelow60s: number,
+  ...
+};
+
+const getGameBreakdownAnalytics = <Metrics: BreakdownMetrics>(
+  metricsArray: Array<Metrics>,
+  getName: Metrics => string,
+  period: GameAnalyticsPeriod,
+  todayDate: ?Date
+): Array<{| ...GameBreakdownAnalytics, firstIsoDay: string |}> => {
+  const { pointsCount, daysCountPerPoint } = periodSettings[period];
+  const isoDays = new Set(
+    getIsoDays(
+      (todayDate || new Date()).getTime(),
+      pointsCount * daysCountPerPoint,
+      0
+    )
+  );
+
+  const firstIsoDayByName: { [string]: string } = {};
+  const periodMetricsByName: {
+    [string]: {|
+      playersCount: number,
+      playersWithDurationCount: number,
+      bouncedPlayersCount: number,
+      playedDurationInSeconds: number,
+    |},
+  } = {};
+  metricsArray.forEach(metrics => {
+    const name = getName(metrics);
+    const isoDay = metrics.date.substring(0, 10);
+    if (!firstIsoDayByName[name] || isoDay < firstIsoDayByName[name])
+      firstIsoDayByName[name] = isoDay;
+    if (!isoDays.has(isoDay)) return;
+
+    const periodMetrics = periodMetricsByName[name] || {
+      playersCount: 0,
+      playersWithDurationCount: 0,
+      bouncedPlayersCount: 0,
+      playedDurationInSeconds: 0,
+    };
+    periodMetrics.playersCount += metrics.d0Players;
+    periodMetrics.playersWithDurationCount +=
+      metrics.d0PlayersWithDuration != null
+        ? metrics.d0PlayersWithDuration
+        : metrics.d0Players;
+    periodMetrics.bouncedPlayersCount += metrics.d0PlayersBelow60s;
+    periodMetrics.playedDurationInSeconds += metrics.d0SessionsDurationTotal;
+    periodMetricsByName[name] = periodMetrics;
+  });
+
+  return Object.keys(periodMetricsByName).map(name => {
+    const {
+      playersCount,
+      playersWithDurationCount,
+      bouncedPlayersCount,
+      playedDurationInSeconds,
+    } = periodMetricsByName[name];
+    const hasEnoughPlayers =
+      playersWithDurationCount >= minPlayersCountForRates;
+    return {
+      name,
+      firstIsoDay: firstIsoDayByName[name],
+      playersCount,
+      bounceRatePercent: hasEnoughPlayers
+        ? (100 * bouncedPlayersCount) / playersWithDurationCount
+        : null,
+      playedDurationPerPlayerInSeconds: hasEnoughPlayers
+        ? playedDurationInSeconds / playersWithDurationCount
+        : null,
+    };
+  });
+};
+
+/**
+ * @returns the versions played during the period, the most recently released first.
+ */
+export const getGameVersionAnalytics = (
+  gameVersionMetricsArray: Array<GameVersionMetrics>,
+  period: GameAnalyticsPeriod,
+  todayDate?: Date
+): Array<GameBreakdownAnalytics> =>
+  getGameBreakdownAnalytics(
+    gameVersionMetricsArray,
+    gameVersionMetrics => gameVersionMetrics.version,
+    period,
+    todayDate
+  )
+    .sort((version1, version2) =>
+      version2.firstIsoDay.localeCompare(version1.firstIsoDay)
+    )
+    .map(({ firstIsoDay, ...gameVersionAnalytics }) => gameVersionAnalytics);
+
+const maxGameSourcesCount = 10;
+
+/**
+ * @returns where the game was played during the period, the sources with the most players first.
+ */
+export const getGameSourceAnalytics = (
+  gameSourceMetricsArray: Array<GameSourceMetrics>,
+  period: GameAnalyticsPeriod,
+  todayDate?: Date
+): Array<GameBreakdownAnalytics> =>
+  getGameBreakdownAnalytics(
+    gameSourceMetricsArray,
+    gameSourceMetrics => gameSourceMetrics.source,
+    period,
+    todayDate
+  )
+    .sort((source1, source2) => source2.playersCount - source1.playersCount)
+    .slice(0, maxGameSourcesCount)
+    .map(({ firstIsoDay, ...gameSourceAnalytics }) => gameSourceAnalytics);
+
 export const getGameAnalytics = (
   gameMetricsArray: ?Array<GameMetrics>,
   period: GameAnalyticsPeriod,
   {
     gameFeaturings,
     builds,
+    gameMetricsBenchmarks,
     todayDate,
   }: {|
     gameFeaturings?: ?Array<GameFeaturing>,
     builds?: ?Array<Build>,
+    gameMetricsBenchmarks?: GameMetricsBenchmarks,
     todayDate?: Date,
   |} = {}
 ): GameAnalytics => {
@@ -398,7 +586,7 @@ export const getGameAnalytics = (
       (pointIndex + 1) * daysCountPerPoint
     );
     const pointDaysMetrics = sumDaysMetrics(gameMetricsByIsoDay, pointIsoDays);
-    // Each point shows its real rate, even with a few players. Without players, it shows 0.
+    // Each point shows its real rate, even with a few players. Without players, it shows nothing.
     const pointSummary = getSummary(pointDaysMetrics, 1);
     const label = formatDay(pointIsoDays[0]);
     overTime.push({
@@ -410,9 +598,11 @@ export const getGameAnalytics = (
       playersCount: pointSummary.playersCount,
       newPlayersCount: pointSummary.newPlayersCount,
       returningPlayersCount: pointSummary.returningPlayersCount,
-      bounceRatePercent: pointSummary.bounceRatePercent || 0,
+      bounceRatePercent: pointSummary.bounceRatePercent,
       playedDurationPerPlayerInMinutes:
-        (pointSummary.playedDurationPerPlayerInSeconds || 0) / 60,
+        pointSummary.playedDurationPerPlayerInSeconds !== null
+          ? pointSummary.playedDurationPerPlayerInSeconds / 60
+          : null,
       hasMarketingBoost: pointIsoDays.some(isoDay =>
         isIsoDayInMarketingBoost(isoDay, gameFeaturings || [])
       ),
@@ -423,7 +613,11 @@ export const getGameAnalytics = (
   }
 
   const summary = getSummary(daysMetrics, minPlayersCountForRates);
-  const retentionDays = getRetentionDays(gameMetricsByIsoDay, isoDays);
+  // Today is not finished: its returning players would be compared to the new players of full days.
+  const retentionDays = getRetentionDays(
+    gameMetricsByIsoDay,
+    isoDays.slice(0, -1)
+  );
 
   return {
     summary,
@@ -435,6 +629,10 @@ export const getGameAnalytics = (
     playedDurationSteps: getPlayedDurationSteps(daysMetrics),
     retentionDays,
     playerPlatforms: getPlayerPlatforms(daysMetrics),
-    insight: getInsight(summary, retentionDays),
+    insight: getInsight(
+      summary,
+      retentionDays,
+      (gameMetricsBenchmarks || defaultGameMetricsBenchmarks).adviceThresholds
+    ),
   };
 };

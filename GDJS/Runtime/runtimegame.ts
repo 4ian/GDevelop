@@ -265,6 +265,8 @@ namespace gdjs {
      */
     _debuggerClient: gdjs.AbstractDebuggerClient | null;
     _sessionMetricsInitialized: boolean = false;
+    _sendSessionHit: (() => void) | null = null;
+    _loadingDurationInSeconds: float | null = null;
     _disableMetrics: boolean = false;
     _isPreview: boolean;
     _isInGameEdition: boolean;
@@ -371,6 +373,7 @@ namespace gdjs {
         : null;
       this._sessionId = null;
       this._playerId = null;
+      this._disableMetrics = this._data.properties.areMetricsEnabled === false;
 
       this._embeddedResourcesMappings = new Map();
       this._updateEmbeddedResourcesMappings();
@@ -1149,6 +1152,10 @@ namespace gdjs {
       progressCallback?: (progress: float) => void
     ): Promise<void> {
       this._hasGameStartupBegun = true;
+      // The session starts even if the game is still loading, to know the players leaving before the end.
+      setTimeout(() => {
+        this._setupSessionMetrics();
+      }, 4000);
       try {
         // Download the loading screen background image first to be able to
         // display the loading screen as soon as possible.
@@ -1422,9 +1429,10 @@ namespace gdjs {
             throw e;
           }
         });
-        setTimeout(() => {
-          this._setupSessionMetrics();
-        }, 4000);
+        // Measured from the opening of the page to the first scene starting.
+        if (typeof performance !== 'undefined')
+          this._loadingDurationInSeconds =
+            Math.round(performance.now() / 100) / 10;
         if (this._captureManager) {
           this._captureManager.setupCaptureOptions(this._isPreview);
         }
@@ -1537,7 +1545,16 @@ namespace gdjs {
        * either in sendedDuration or notYetSentDuration.
        **/
       let lastSessionResumeTime = Date.now();
+      // The duration is only counted while the game is visible.
+      let isGameVisible =
+        typeof document === 'undefined' ||
+        document.visibilityState !== 'hidden';
       const platform = this.getPlatformInfo();
+      // The loading is only measured on the web: the files of an installed game are already on the device.
+      const isOnWeb =
+        !platform.isCordova && window.location.protocol !== 'file:';
+      let isLoadingDurationSent =
+        !isOnWeb || this._loadingDurationInSeconds !== null;
       fetch(baseUrl + '/session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1559,6 +1576,8 @@ namespace gdjs {
             navigatorPlatform: platform.navigatorPlatform,
             hasTouch: platform.hasTouch,
           },
+          // Null when the game is still loading: it's then sent with a session hit.
+          loadingDuration: isOnWeb ? this._loadingDurationInSeconds : undefined,
         }),
       })
         .then((response) => {
@@ -1582,14 +1601,18 @@ namespace gdjs {
         }
 
         const now = Date.now();
-        notYetSentDuration += now - lastSessionResumeTime;
+        if (isGameVisible) notYetSentDuration += now - lastSessionResumeTime;
         lastSessionResumeTime = now;
 
+        const hasLoadingDurationToSend =
+          !isLoadingDurationSent && this._loadingDurationInSeconds !== null;
         // Group repeated calls to sendSessionHit - which could
         // happen because of multiple event listeners being fired.
-        if (notYetSentDuration < 5 * 1000) {
+        if (notYetSentDuration < 5 * 1000 && !hasLoadingDurationToSend) {
           return;
         }
+        isLoadingDurationSent =
+          isLoadingDurationSent || hasLoadingDurationToSend;
         // The backend use seconds for duration.
         // The milliseconds will stay in notYetSentDuration.
         const toBeSentDuration = Math.floor(notYetSentDuration / 1000) * 1000;
@@ -1603,29 +1626,34 @@ namespace gdjs {
             playerId: this._playerId,
             sessionId: this._sessionId,
             duration: Math.floor(sentDuration / 1000),
+            loadingDuration: hasLoadingDurationToSend
+              ? this._loadingDurationInSeconds
+              : undefined,
           })
         );
       };
+      this._sendSessionHit = sendSessionHit;
       if (typeof navigator !== 'undefined' && typeof document !== 'undefined') {
+        const onGameHidden = () => {
+          sendSessionHit();
+          isGameVisible = false;
+        };
+        const onGameVisible = () => {
+          // Skip the duration the game was hidden.
+          lastSessionResumeTime = Date.now();
+          isGameVisible = true;
+        };
         document.addEventListener('visibilitychange', () => {
           if (document.visibilityState === 'visible') {
-            // Skip the duration the game was hidden.
-            lastSessionResumeTime = Date.now();
+            onGameVisible();
           } else {
-            sendSessionHit();
+            onGameHidden();
           }
         });
         window.addEventListener('pagehide', sendSessionHit, false);
         // Cordova events
-        window.addEventListener('pause', sendSessionHit, false);
-        window.addEventListener(
-          'resume',
-          () => {
-            // Skip the duration the game was hidden.
-            lastSessionResumeTime = Date.now();
-          },
-          false
-        );
+        window.addEventListener('pause', onGameHidden, false);
+        window.addEventListener('resume', onGameVisible, false);
 
         // Detect Safari to work around Safari-specific bugs:
         // - https://bugs.webkit.org/show_bug.cgi?id=151610
@@ -1641,6 +1669,14 @@ namespace gdjs {
       }
       this._sessionMetricsInitialized = true;
       this._sessionId = this._sessionId;
+    }
+
+    /**
+     * Send the duration played so far. Called when the game is about to close itself,
+     * as no event tells it then.
+     */
+    sendSessionHit(): void {
+      if (this._sendSessionHit) this._sendSessionHit();
     }
 
     /**

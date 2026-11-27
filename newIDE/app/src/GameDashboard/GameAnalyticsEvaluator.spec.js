@@ -1,6 +1,14 @@
 // @flow
-import { getGameAnalytics } from './GameAnalyticsEvaluator';
-import { type GameMetrics } from '../Utils/GDevelopServices/Analytics';
+import {
+  getGameAnalytics,
+  getGameVersionAnalytics,
+  getGameSourceAnalytics,
+} from './GameAnalyticsEvaluator';
+import {
+  type GameMetrics,
+  type GameVersionMetrics,
+  type GameSourceMetrics,
+} from '../Utils/GDevelopServices/Analytics';
 
 const todayDate = new Date('2026-11-20T10:00:00Z');
 
@@ -84,6 +92,8 @@ describe('GameAnalyticsEvaluator', () => {
       sessionsCount: 170,
       bounceRatePercent: 20,
       playedDurationPerPlayerInSeconds: 120,
+      loadingDurationPerSessionInSeconds: null,
+      loadedSessionsPercent: null,
     });
     expect(gameAnalytics.previousSummary).toEqual({
       playersCount: 40,
@@ -92,6 +102,8 @@ describe('GameAnalyticsEvaluator', () => {
       sessionsCount: 80,
       bounceRatePercent: 50,
       playedDurationPerPlayerInSeconds: 120,
+      loadingDurationPerSessionInSeconds: null,
+      loadedSessionsPercent: null,
     });
 
     expect(gameAnalytics.overTime.map(point => point.playersCount)).toEqual([
@@ -103,9 +115,11 @@ describe('GameAnalyticsEvaluator', () => {
       30,
       5,
     ]);
-    // Days without players have a rate of 0.
-    expect(gameAnalytics.overTime[0].bounceRatePercent).toBe(0);
-    expect(gameAnalytics.overTime[0].playedDurationPerPlayerInMinutes).toBe(0);
+    // Days without players have no rate.
+    expect(gameAnalytics.overTime[0].bounceRatePercent).toBe(null);
+    expect(gameAnalytics.overTime[0].playedDurationPerPlayerInMinutes).toBe(
+      null
+    );
     expect(gameAnalytics.overTime[5].bounceRatePercent).toBe(20);
     // A day with a few players shows its real rate.
     expect(gameAnalytics.overTime[6].bounceRatePercent).toBe(20);
@@ -119,12 +133,30 @@ describe('GameAnalyticsEvaluator', () => {
       { durationInMinutes: 15, playersPercent: 0 },
     ]);
 
-    // 4 players of the 19th were among the 40 new players of the 18th,
-    // and 2 players of the 20th among the 20 new players of the 19th.
-    expect(gameAnalytics.retentionDays).toEqual([
-      { dayNumber: 1, retentionPercent: 10 },
-      { dayNumber: 2, retentionPercent: 0 },
-    ]);
+    // Retention is not shown under 100 new players.
+    expect(gameAnalytics.retentionDays).toBe(null);
+  });
+
+  it('leaves out the players whose played duration is unknown', () => {
+    const gameMetrics = createFakeGameMetrics('2026-11-20', {
+      playersCount: 100,
+      newPlayersCount: 100,
+      bouncedPlayersCount: 20,
+      d1RetainedPlayersCount: 0,
+    });
+    const { players } = gameMetrics;
+    if (!players) throw new Error('Should have players.');
+    const { summary, playedDurationSteps } = getGameAnalytics(
+      [{ ...gameMetrics, players: { ...players, d0PlayersWithDuration: 80 } }],
+      'week',
+      { todayDate }
+    );
+
+    expect(summary.playersCount).toBe(100);
+    expect(summary.bounceRatePercent).toBe(25);
+    expect(summary.playedDurationPerPlayerInSeconds).toBe(150);
+    if (!playedDurationSteps) throw new Error('Should have steps.');
+    expect(playedDurationSteps[1].playersPercent).toBe(75);
   });
 
   it('gives the same advice as the weekly email', () => {
@@ -134,13 +166,20 @@ describe('GameAnalyticsEvaluator', () => {
     ) =>
       getGameAnalytics(
         [
+          // Today is not finished: the players who came back today are not counted.
           createFakeGameMetrics('2026-11-20', {
+            playersCount: 0,
+            newPlayersCount: 0,
+            bouncedPlayersCount: 0,
+            d1RetainedPlayersCount: 50,
+          }),
+          createFakeGameMetrics('2026-11-19', {
             playersCount: 100,
             newPlayersCount: 50,
             bouncedPlayersCount,
             d1RetainedPlayersCount,
           }),
-          createFakeGameMetrics('2026-11-19', {
+          createFakeGameMetrics('2026-11-18', {
             playersCount: 100,
             newPlayersCount: 100,
             bouncedPlayersCount,
@@ -244,6 +283,34 @@ describe('GameAnalyticsEvaluator', () => {
     expect(gameAnalytics.overTime.length).toBe(30);
   });
 
+  it('averages the loading time and gives the share of sessions which finished loading', () => {
+    const gameMetrics = createFakeGameMetrics('2026-11-19', {
+      playersCount: 30,
+      newPlayersCount: 30,
+      bouncedPlayersCount: 3,
+      d1RetainedPlayersCount: 0,
+    });
+    const gameAnalytics = getGameAnalytics(
+      [
+        {
+          ...gameMetrics,
+          sessions: {
+            d0Sessions: 60,
+            d0SessionsDurationTotal: 3600,
+            d0SessionsMeasuringLoading: 50,
+            d0SessionsWithLoadingDuration: 40,
+            d0LoadingDurationTotal: 180,
+          },
+        },
+      ],
+      'month',
+      { todayDate }
+    );
+
+    expect(gameAnalytics.summary.loadingDurationPerSessionInSeconds).toBe(4.5);
+    expect(gameAnalytics.summary.loadedSessionsPercent).toBe(80);
+  });
+
   it('groups the days by week on long periods', () => {
     const gameAnalytics = getGameAnalytics(
       [
@@ -273,5 +340,104 @@ describe('GameAnalyticsEvaluator', () => {
     expect(gameAnalytics.overTime.length).toBe(12);
     expect(gameAnalytics.overTime[11].playersCount).toBe(30);
     expect(gameAnalytics.overTime[10].playersCount).toBe(17);
+  });
+
+  it('compares the versions played during the period, the latest first', () => {
+    const createFakeGameVersionMetrics = (
+      date: string,
+      version: string,
+      playersCount: number,
+      bouncedPlayersCount: number
+    ): GameVersionMetrics => ({
+      gameId: 'fake-game-id',
+      date,
+      version,
+      d0Players: playersCount,
+      d0SessionsDurationTotal: playersCount * 120,
+      d0PlayersBelow60s: bouncedPlayersCount,
+    });
+
+    expect(
+      getGameVersionAnalytics(
+        [
+          // Before the period: it only tells this version is the oldest.
+          createFakeGameVersionMetrics('2026-10-01', '1.0.0', 50, 25),
+          createFakeGameVersionMetrics('2026-11-18', '1.0.0', 30, 15),
+          createFakeGameVersionMetrics('2026-11-19', '1.0.0', 10, 5),
+          createFakeGameVersionMetrics('2026-11-19', '1.1.0', 100, 20),
+          createFakeGameVersionMetrics('2026-11-20', '1.2.0', 5, 5),
+        ],
+        'week',
+        todayDate
+      )
+    ).toEqual([
+      {
+        name: '1.2.0',
+        playersCount: 5,
+        bounceRatePercent: null,
+        playedDurationPerPlayerInSeconds: null,
+      },
+      {
+        name: '1.1.0',
+        playersCount: 100,
+        bounceRatePercent: 20,
+        playedDurationPerPlayerInSeconds: 120,
+      },
+      {
+        name: '1.0.0',
+        playersCount: 40,
+        bounceRatePercent: 50,
+        playedDurationPerPlayerInSeconds: 120,
+      },
+    ]);
+  });
+
+  it('lists where the game was played during the period, the most played first', () => {
+    const createFakeGameSourceMetrics = (
+      date: string,
+      source: string,
+      playersCount: number,
+      bouncedPlayersCount: number
+    ): GameSourceMetrics => ({
+      gameId: 'fake-game-id',
+      date,
+      source,
+      d0Players: playersCount,
+      d0SessionsDurationTotal: playersCount * 120,
+      d0PlayersBelow60s: bouncedPlayersCount,
+    });
+
+    expect(
+      getGameSourceAnalytics(
+        [
+          createFakeGameSourceMetrics('2026-10-01', 'itch.io', 500, 100),
+          createFakeGameSourceMetrics('2026-11-18', 'itch.io', 5, 1),
+          createFakeGameSourceMetrics('2026-11-18', 'gd.games', 30, 15),
+          createFakeGameSourceMetrics('2026-11-19', 'gd.games', 10, 5),
+          createFakeGameSourceMetrics('2026-11-19', 'android-app', 100, 20),
+        ],
+        'week',
+        todayDate
+      )
+    ).toEqual([
+      {
+        name: 'android-app',
+        playersCount: 100,
+        bounceRatePercent: 20,
+        playedDurationPerPlayerInSeconds: 120,
+      },
+      {
+        name: 'gd.games',
+        playersCount: 40,
+        bounceRatePercent: 50,
+        playedDurationPerPlayerInSeconds: 120,
+      },
+      {
+        name: 'itch.io',
+        playersCount: 5,
+        bounceRatePercent: null,
+        playedDurationPerPlayerInSeconds: null,
+      },
+    ]);
   });
 });

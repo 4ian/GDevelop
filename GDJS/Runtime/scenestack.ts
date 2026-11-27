@@ -146,6 +146,7 @@ namespace gdjs {
 
           // A scene change was requested by the current scene.
           if (request === gdjs.SceneChangeRequest.STOP_GAME) {
+            this._runtimeGame.sendSessionHit();
             this._runtimeGame.getRenderer().stopGame();
             return true;
           } else if (request === gdjs.SceneChangeRequest.POP_SCENE) {

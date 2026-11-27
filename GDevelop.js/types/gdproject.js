@@ -50,6 +50,8 @@ declare class gdProject {
   setMinimumFPS(fps: number): void;
   setFolderProject(enable: boolean): void;
   isFolderProject(): boolean;
+  setMetricsEnabled(enable: boolean): void;
+  areMetricsEnabled(): boolean;
   setUseDeprecatedZeroAsDefaultZOrder(enable: boolean): void;
   getUseDeprecatedZeroAsDefaultZOrder(): boolean;
   setUseDeprecatedZeroAsDefaultStringVariable(enable: boolean): void;

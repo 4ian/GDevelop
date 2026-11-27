@@ -699,6 +699,8 @@ export function createGdevelopTheme({
             : styles['ThemePrimaryColor'],
         textColor: styles['ThemeTextDefaultColor'],
         gridColor: styles['ThemeTextDisabledColor'],
+        typicalGameColor: styles['ThemeInfoColor'],
+        topGamesColor: styles['ThemeWarningColor'],
       },
       statusIndicator: {
         success: styles['ThemeSuccessColor'],

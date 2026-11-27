@@ -93,6 +93,9 @@ const ObjectPropertiesEditor = (props: Props): React.Node => {
                 unsavedChanges={unsavedChanges}
                 schema={propertiesSchema}
                 instances={[objectConfigurationAsGd]}
+                onInstancesModified={() => {
+                  if (props.onObjectUpdated) props.onObjectUpdated();
+                }}
                 project={project}
                 resourceManagementProps={resourceManagementProps}
                 projectScopedContainersAccessor={

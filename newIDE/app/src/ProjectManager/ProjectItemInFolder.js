@@ -45,14 +45,14 @@ export class ProjectItemInFolder {
   // The node of the folder structure holding the item.
   folderOrItem: ProjectItemFolderOrItem;
   props: ProjectItemInFolderProps;
-  // Called when pasting created at least one item.
-  onItemsAdded: ?() => void;
+  // Called with the names of the items created by a paste.
+  onItemsAdded: ?(names: Array<string>) => void;
 
   constructor(
     kind: ProjectItemFoldersKind,
     folderOrItem: ProjectItemFolderOrItem,
     props: ProjectItemInFolderProps,
-    onItemsAdded?: ?() => void
+    onItemsAdded?: ?(names: Array<string>) => void
   ) {
     this.kind = kind;
     this.folderOrItem = folderOrItem;
@@ -98,6 +98,8 @@ export class ProjectItemInFolder {
     });
     if (!pastedContent) return;
 
+    if (pastedContent.createdItems.length > 0 && this.onItemsAdded)
+      this.onItemsAdded(pastedContent.createdItems.map(item => item.getName()));
     this.onFolderStructureModified();
     this.props.expandFolders([
       getParentFolderTreeViewItemId(this.kind, destinationFolder),
@@ -108,8 +110,6 @@ export class ProjectItemInFolder {
         getFolderOrItemTreeViewItemId(this.kind, firstPastedItem)
       );
     }
-    if (pastedContent.createdItems.length > 0 && this.onItemsAdded)
-      this.onItemsAdded();
   }
 
   onProjectItemModified(): void {

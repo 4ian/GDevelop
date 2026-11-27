@@ -19,6 +19,13 @@ export default class PanelSpriteEditor extends React.Component<
   EditorProps,
   void
 > {
+  // Every change to the configuration is followed by a re-render: the
+  // dialog showing this editor must know about it (to record it).
+  forceUpdate(callback?: () => void) {
+    super.forceUpdate(callback);
+    if (this.props.onObjectUpdated) this.props.onObjectUpdated();
+  }
+
   render(): any {
     const { objectConfiguration, renderObjectNameField } = this.props;
     const shapePainterConfiguration = gd.asShapePainterConfiguration(

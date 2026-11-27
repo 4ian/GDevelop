@@ -128,6 +128,12 @@ declare class gdProject {
   getLayoutsRootFolder(): gdLayoutFolderOrLayout;
   getExternalLayoutsRootFolder(): gdExternalLayoutFolderOrExternalLayout;
   getExternalEventsRootFolder(): gdExternalEventsFolderOrExternalEvents;
+  serializeLayoutsFoldersTo(element: gdSerializerElement): void;
+  unserializeLayoutsFoldersFrom(element: gdSerializerElement): void;
+  serializeExternalLayoutsFoldersTo(element: gdSerializerElement): void;
+  unserializeExternalLayoutsFoldersFrom(element: gdSerializerElement): void;
+  serializeExternalEventsFoldersTo(element: gdSerializerElement): void;
+  unserializeExternalEventsFoldersFrom(element: gdSerializerElement): void;
   delete(): void;
   ptr: number;
 };

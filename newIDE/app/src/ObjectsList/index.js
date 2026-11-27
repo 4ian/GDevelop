@@ -34,6 +34,7 @@ import {
   dropDescendantsOfRemovedFolders,
   type ObjectFolderOrObjectWithContext,
 } from './EnumerateObjectFolderOrObject';
+import { getObjectFolderOrObjectWithContextFromObjectName } from '../SceneEditor/ObjectFolderOrObjectsSelection';
 import {
   hasObjectFolderOrObjectsInClipboard,
   pasteObjectFolderOrObjectsAndNotify,
@@ -458,6 +459,7 @@ export type ObjectsListInterface = {|
   forceUpdateList: () => void,
   openNewObjectDialog: () => void,
   closeNewObjectDialog: () => void,
+  scrollToObject: (object: gdObject) => void,
 |};
 
 type Props = {|
@@ -536,6 +538,8 @@ type Props = {|
     Array<ObjectFolderOrObjectWithContext>
   ) => void,
   onObjectPasted?: gdObject => void,
+  // Called after any other change of the objects, folders or their order.
+  onObjectFolderOrObjectsModified?: () => void,
   getValidatedObjectOrGroupName: (newName: string, global: boolean) => string,
   onAddObjectInstance: (objectName: string) => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
@@ -581,6 +585,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       onObjectEdited,
       onObjectFolderOrObjectsWithContextSelected,
       onObjectPasted,
+      onObjectFolderOrObjectsModified,
       getValidatedObjectOrGroupName,
       onAddObjectInstance,
       onWillInstallExtension,
@@ -625,6 +630,25 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       },
       closeNewObjectDialog: () => {
         setNewObjectDialogOpen(null);
+      },
+      scrollToObject: (object: gdObject) => {
+        // Open the folders containing the object first, so it's shown.
+        const objectFolderOrObjectWithContext = getObjectFolderOrObjectWithContextFromObjectName(
+          globalObjectsContainer,
+          objectsContainer,
+          object.getName()
+        );
+        if (objectFolderOrObjectWithContext && treeViewRef.current) {
+          treeViewRef.current.openItems([
+            objectFolderOrObjectWithContext.global
+              ? globalObjectsRootFolderId
+              : sceneObjectsRootFolderId,
+            ...getFoldersAscendanceWithoutRootFolder(
+              objectFolderOrObjectWithContext.objectFolderOrObject
+            ).map(folder => getObjectFolderTreeViewItemId(folder)),
+          ]);
+        }
+        scrollToItem(getObjectTreeViewItemId(object));
       },
     }));
 
@@ -808,11 +832,17 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     const onObjectModified = React.useCallback(
       (shouldForceUpdateList: boolean) => {
         if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
+        if (onObjectFolderOrObjectsModified) onObjectFolderOrObjectsModified();
 
         if (shouldForceUpdateList) forceUpdateList();
         else forceUpdate();
       },
-      [forceUpdate, forceUpdateList, unsavedChanges]
+      [
+        forceUpdate,
+        forceUpdateList,
+        unsavedChanges,
+        onObjectFolderOrObjectsModified,
+      ]
     );
 
     const globalObjectsRootFolder = globalObjectsContainer
@@ -915,7 +945,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
         const answer = Window.showConfirmDialog(
           i18n._(
-            t`Global elements help manage objects across multiple scenes and are recommended for frequently used objects. This action cannot be undone.
+            t`Global elements help manage objects across multiple scenes and are recommended for frequently used objects.
 
             Do you want to set this as global object?`
           )
@@ -1024,9 +1054,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             newObjectFolderOrObjectWithContext.objectFolderOrObject
           )
         );
+        if (onObjectFolderOrObjectsModified) onObjectFolderOrObjectsModified();
         forceUpdateList();
       },
       [
+        onObjectFolderOrObjectsModified,
         forceUpdateList,
         objectsContainer,
         selectObjectFolderOrObjectWithContext,
@@ -1080,6 +1112,39 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       [editName]
     );
 
+    // Deleting an object of the scene also deletes its instances in the
+    // scene and in all its external layouts - and undo only brings back the
+    // ones of the edited scene or external layout.
+    const editedInstances = initialInstances || null;
+    const isEditingExternalLayout =
+      !!layout &&
+      !!editedInstances &&
+      layout.getInitialInstances().ptr !== editedInstances.ptr;
+    const hasInstancesLostByUndo = React.useCallback(
+      (objectName: string): boolean => {
+        if (!layout) return false;
+        if (
+          isEditingExternalLayout &&
+          layout.getInitialInstances().hasInstancesOfObject(objectName)
+        )
+          return true;
+        const layoutName = layout.getName();
+        for (let i = 0; i < project.getExternalLayoutsCount(); i++) {
+          const externalLayout = project.getExternalLayoutAt(i);
+          const externalLayoutInstances = externalLayout.getInitialInstances();
+          if (
+            externalLayout.getAssociatedLayout() === layoutName &&
+            (!editedInstances ||
+              externalLayoutInstances.ptr !== editedInstances.ptr) &&
+            externalLayoutInstances.hasInstancesOfObject(objectName)
+          )
+            return true;
+        }
+        return false;
+      },
+      [project, layout, editedInstances, isEditingExternalLayout]
+    );
+
     const {
       bulkCopy,
       bulkDelete,
@@ -1094,6 +1159,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       project,
       globalObjectsContainer,
       objectsContainer,
+      hasInstancesLostByUndo,
+      isEditingExternalLayout,
       selectedObjectFolderOrObjectsWithContext,
       canSetAsGlobalObject,
       selectObjectFolderOrObjectsWithContext,
@@ -1164,6 +1231,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         setAsGlobalObject,
         getThumbnail,
         showDeleteConfirmation,
+        hasInstancesLostByUndo,
+        isEditingExternalLayout,
         selectObjectFolderOrObjectWithContext,
         selectObjectFolderOrObjectsWithContext,
         addFolder,
@@ -1195,6 +1264,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         setAsGlobalObject,
         getThumbnail,
         showDeleteConfirmation,
+        hasInstancesLostByUndo,
+        isEditingExternalLayout,
         selectObjectFolderOrObjectWithContext,
         selectObjectFolderOrObjectsWithContext,
         addFolder,

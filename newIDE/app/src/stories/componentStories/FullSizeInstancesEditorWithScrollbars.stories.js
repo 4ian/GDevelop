@@ -59,6 +59,7 @@ export const Default = (): React.Node => (
         onInstanceDoubleClicked={() => {}}
         onInstancesMoved={() => {}}
         onInstancesResized={() => {}}
+        onInstancesDefaultSizeChanged={() => {}}
         onInstancesRotated={() => {}}
         selectedObjectNames={[]}
         onContextMenu={() => {}}

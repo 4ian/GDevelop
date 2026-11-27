@@ -19,10 +19,11 @@ import IconButton from '../UI/IconButton';
 import PlayIcon from '../UI/CustomSvgIcons/Preview';
 
 export type GameplayTestTreeViewItemCallbacks = {|
+  onGameplayTestAdded: (names: Array<string>) => void,
   // Resolves to true once removed (after the user confirmed).
   onDeleteGameplayTests: (
     Array<gdTest>,
-    options?: {| folderName?: string |}
+    options?: {| folder?: ProjectItemFolderOrItem |}
   ) => Promise<boolean>,
   onRenameGameplayTest: (string, string) => void,
   onOpenGameplayTest: string => void,
@@ -90,7 +91,8 @@ export class GameplayTestTreeViewItemContent implements TreeViewItemContent {
     this.inFolder = new ProjectItemInFolder(
       gameplayTestFoldersKind,
       folderOrItem,
-      props
+      props,
+      props.onGameplayTestAdded
     );
     this.props = props;
   }

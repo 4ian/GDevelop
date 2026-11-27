@@ -302,6 +302,7 @@ const Effect = React.forwardRef((
                   project={project}
                   schema={effectMetadata.parametersSchema}
                   instances={[effect]}
+                  onInstancesModified={onEffectsUpdated}
                   resourceManagementProps={resourceManagementProps}
                   projectScopedContainersAccessor={
                     projectScopedContainersAccessor

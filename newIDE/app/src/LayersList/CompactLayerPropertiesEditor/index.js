@@ -167,6 +167,7 @@ export const CompactLayerPropertiesEditor = ({
           </ColumnStackLayout>
           {layerPropertiesSchema && (
             <TopLevelCollapsibleSection
+              id="layer-properties-section"
               title={<Trans>Properties</Trans>}
               isFolded={isPropertiesFolded}
               toggleFolded={() => setIsPropertiesFolded(!isPropertiesFolded)}

@@ -2,6 +2,7 @@
 import { Trans, t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
+import { type HTMLDataset } from '../Utils/HTMLDataset';
 
 import React from 'react';
 import { AutoSizer } from 'react-virtualized';
@@ -76,6 +77,11 @@ const getSceneGroupsEmptyPlaceholder = (i18n: I18nType): EmptyPlaceholder => ({
 const getGroupWithContextName = (groupWithContext: GroupWithContext): string =>
   groupWithContext.group.getName();
 
+const getTreeViewItemDataSet = (item: TreeViewItem): ?HTMLDataset =>
+  item.isRoot || item.isPlaceholder
+    ? undefined
+    : { groupName: getGroupWithContextName(item) };
+
 const getTreeViewItemName = (item: TreeViewItem) =>
   item.isRoot || item.isPlaceholder ? item.label : item.group.getName();
 
@@ -113,6 +119,8 @@ type Props = {|
   beforeSetAsGlobalGroup?: (groupName: string) => boolean,
   onGroupRemoved?: () => void,
   onGroupRenamed?: () => void,
+  // Called after any other change of the groups (like their order).
+  onObjectGroupsModified?: () => void,
   canSetAsGlobalGroup?: boolean,
   unsavedChanges?: ?UnsavedChanges,
   isListLocked: boolean,
@@ -132,6 +140,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
       getValidatedObjectOrGroupName,
       onRenameGroup,
       onGroupRenamed,
+      onObjectGroupsModified,
       beforeSetAsGlobalGroup,
       unsavedChanges,
       onEditGroup,
@@ -224,9 +233,10 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
     const onObjectGroupModified = React.useCallback(
       () => {
         if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
+        if (onObjectGroupsModified) onObjectGroupsModified();
         forceUpdate();
       },
-      [unsavedChanges, forceUpdate]
+      [unsavedChanges, forceUpdate, onObjectGroupsModified]
     );
 
     const onDelete = React.useCallback(
@@ -235,7 +245,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
 
         const answer = await showDeleteConfirmation({
           title: t`Remove group`,
-          message: t`Are you sure you want to remove this group? This can't be undone.`,
+          message: t`Are you sure you want to remove this group?`,
         });
         if (!answer) return;
 
@@ -360,7 +370,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
 
         const answer = await showConfirmation({
           title: t`Set as global group`,
-          message: t`Global elements help manage objects across multiple scenes and are recommended for frequently used objects. This action cannot be undone.
+          message: t`Global elements help manage objects across multiple scenes and are recommended for frequently used objects.
 
             Do you want to set this as global group?`,
           confirmButtonLabel: t`Set as global`,
@@ -718,6 +728,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
                         getItemChildren={getTreeViewItemChildren}
                         multiSelect={false}
                         getItemId={getTreeViewItemId}
+                        getItemDataset={getTreeViewItemDataSet}
                         onClickItem={onClickItem}
                         onEditItem={editItem}
                         selectedItems={

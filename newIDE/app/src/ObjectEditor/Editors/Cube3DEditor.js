@@ -88,8 +88,18 @@ const Cube3DEditor = ({
   projectScopedContainersAccessor,
   objectName,
   renderObjectNameField,
+  onObjectUpdated,
 }: EditorProps): React.Node => {
-  const forceUpdate = useForceUpdate();
+  const forceUpdateEditor = useForceUpdate();
+  // Every change is followed by a re-render: the dialog showing this
+  // editor must know about it (to record it).
+  const forceUpdate = React.useCallback(
+    () => {
+      forceUpdateEditor();
+      if (onObjectUpdated) onObjectUpdated();
+    },
+    [forceUpdateEditor, onObjectUpdated]
+  );
   const properties = objectConfiguration.getProperties();
 
   const onChangeProperty = React.useCallback(

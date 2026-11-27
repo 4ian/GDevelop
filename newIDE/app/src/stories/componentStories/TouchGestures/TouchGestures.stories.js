@@ -320,6 +320,11 @@ export const ProjectManagerStory = (): React.Node => {
                 )}
                 onSceneAdded={action('onSceneAdded')}
                 onExternalLayoutAdded={action('onExternalLayoutAdded')}
+                onExternalEventsAdded={action('onExternalEventsAdded')}
+                onFoldersModified={action('onFoldersModified')}
+                onGameplayTestAdded={action('onGameplayTestAdded')}
+                onUndo={action('onUndo')}
+                onRedo={action('onRedo')}
                 onDeleteLayouts={async () => {
                   action('onDeleteLayouts')();
                   return false;

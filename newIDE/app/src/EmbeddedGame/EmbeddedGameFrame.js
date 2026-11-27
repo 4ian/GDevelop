@@ -127,6 +127,7 @@ let onSetCameraState:
 let onChangeViewPosition:
   | null
   | ((command: ChangeViewPositionCommand) => void) = null;
+let onFocusEmbeddedGameFrame: null | (() => boolean) = null;
 
 export const setEmbeddedGameFramePreviewLocation = ({
   previewIndexHtmlLocation,
@@ -179,6 +180,15 @@ export const preventGameFramePointerEvents = (enabled: boolean) => {
 export const changeViewPosition = (command: ChangeViewPositionCommand) => {
   if (!onChangeViewPosition) return;
   onChangeViewPosition(command);
+};
+
+/**
+ * Give the keyboard focus to the embedded game frame, so the in-game
+ * editor shortcuts work. Return false if there is no frame to focus.
+ */
+export const focusEmbeddedGameFrame = (): boolean => {
+  if (!onFocusEmbeddedGameFrame) return false;
+  return onFocusEmbeddedGameFrame();
 };
 
 const logSwitchingInfo = ({
@@ -408,7 +418,10 @@ export const EmbeddedGameFrame = ({
         }
         hasGameFrameSomethingToLoad.current = true;
         const iframe = iframeRef.current;
-        if (iframe) {
+        // Don't take the focus from what the user is using (a field being
+        // edited, the project manager, a dialog...).
+        const { activeElement } = document;
+        if (iframe && (!activeElement || activeElement === document.body)) {
           iframe.contentWindow.focus();
         }
       };
@@ -634,6 +647,12 @@ export const EmbeddedGameFrame = ({
           return answer.payload;
         },
       });
+      onFocusEmbeddedGameFrame = () => {
+        const iframe = iframeRef.current;
+        if (!iframe || !iframe.contentWindow) return false;
+        iframe.contentWindow.focus();
+        return true;
+      };
     },
     [
       previewDebuggerServer,

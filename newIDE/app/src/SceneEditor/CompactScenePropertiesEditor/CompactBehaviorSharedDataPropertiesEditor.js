@@ -6,12 +6,14 @@ import { CompactPropertiesEditorByVisibility } from '../../CompactPropertiesEdit
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 import { useForceRecompute } from '../../Utils/UseForceUpdate';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
+import { type FieldModificationContext } from '../../CompactPropertiesEditor';
 
 type CompactBehaviorPropertiesEditorProps = {|
   project: gdProject,
   behaviorMetadata: gdBehaviorMetadata,
   behaviorSharedData: gdBehaviorsSharedData,
   resourceManagementProps: ResourceManagementProps,
+  onBehaviorSharedDataModified?: (?FieldModificationContext) => void,
   isAdvancedSectionInitiallyUncollapsed?: boolean,
 |};
 
@@ -20,6 +22,7 @@ export const CompactBehaviorSharedDataPropertiesEditor = ({
   behaviorMetadata,
   behaviorSharedData,
   resourceManagementProps,
+  onBehaviorSharedDataModified,
 }: CompactBehaviorPropertiesEditorProps): React.Node => {
   const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
 
@@ -41,6 +44,8 @@ export const CompactBehaviorSharedDataPropertiesEditor = ({
             .getValue(),
         onUpdateProperty: (instance, name, value) => {
           instance.updateProperty(name, value);
+          if (onBehaviorSharedDataModified)
+            onBehaviorSharedDataModified({ fieldName: name });
         },
         object: null,
         layersContainer: null,

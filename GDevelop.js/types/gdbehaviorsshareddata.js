@@ -7,6 +7,7 @@ declare class gdBehaviorsSharedData {
   getProperties(): gdMapStringPropertyDescriptor;
   updateProperty(name: string, value: string): boolean;
   initializeContent(): void;
+  serializeTo(element: gdSerializerElement): void;
   isFolded(): boolean;
   setFolded(folded: boolean): void;
   delete(): void;

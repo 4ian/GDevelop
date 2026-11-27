@@ -435,7 +435,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       'PanelSpriteButton',
       'PanelSpriteButton',
       'A fake button made with a panel sprite and events.',
-      'res/button.svg',
+      'res/object-icons/labeled_button.svg',
       new gd.ObjectJsImplementation()
     );
     platform.addNewExtension(extension);
@@ -479,7 +479,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
         'Cube3DObject',
         '3D Box',
         'A box with images for each face',
-        'JsPlatform/Extensions/3d_box.svg',
+        'res/object-icons/3d_box.svg',
         Cube3DObject
       )
       .setCategory('General')
@@ -543,7 +543,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
         'Model3DObject',
         '3D Model',
         'A 3D model',
-        'JsPlatform/Extensions/3d_model.svg',
+        'res/object-icons/3d_model.svg',
         Model3DObject
       )
       .setCategory('General')
@@ -686,7 +686,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
         'TextInput',
         'Text input',
         'A text field the player can type text into.',
-        'JsPlatform/Extensions/text_input.svg',
+        'res/object-icons/text_input.svg',
         textInputObject
       )
       .setCategory('User interface');

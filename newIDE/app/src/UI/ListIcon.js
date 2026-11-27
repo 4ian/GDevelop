@@ -2,6 +2,8 @@
 import React from 'react';
 import { CorsAwareImage } from './CorsAwareImage';
 import GDevelopThemeContext from './Theme/GDevelopThemeContext';
+import ObjectTypeIcon from './ObjectTypeIcon';
+import { isObjectTypeIcon } from '../ObjectsRendering/ObjectTypeIcons';
 // No i18n in this file
 
 type SizeProps =
@@ -101,7 +103,15 @@ function ListIcon(props: Props) {
         paddingBottom: padding,
       }}
     >
-      {isGDevelopIcon ? (
+      {isObjectTypeIcon(src) ? (
+        <ObjectTypeIcon
+          src={src}
+          width={iconWidth}
+          height={iconHeight}
+          title={tooltip}
+          disabled={disabled || brightness != null}
+        />
+      ) : isGDevelopIcon ? (
         <img title={tooltip} alt={tooltip} src={src} style={style} />
       ) : (
         <CorsAwareImage title={tooltip} alt={tooltip} src={src} style={style} />

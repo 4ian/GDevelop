@@ -265,6 +265,7 @@ namespace gdjs {
      */
     _debuggerClient: gdjs.AbstractDebuggerClient | null;
     _sessionMetricsInitialized: boolean = false;
+    _sendSessionHit: (() => void) | null = null;
     _loadingDurationInSeconds: float | null = null;
     _disableMetrics: boolean = false;
     _isPreview: boolean;
@@ -1544,6 +1545,10 @@ namespace gdjs {
        * either in sendedDuration or notYetSentDuration.
        **/
       let lastSessionResumeTime = Date.now();
+      // The duration is only counted while the game is visible.
+      let isGameVisible =
+        typeof document === 'undefined' ||
+        document.visibilityState !== 'hidden';
       const platform = this.getPlatformInfo();
       // The loading is only measured on the web: the files of an installed game are already on the device.
       const isOnWeb =
@@ -1596,7 +1601,7 @@ namespace gdjs {
         }
 
         const now = Date.now();
-        notYetSentDuration += now - lastSessionResumeTime;
+        if (isGameVisible) notYetSentDuration += now - lastSessionResumeTime;
         lastSessionResumeTime = now;
 
         const hasLoadingDurationToSend =
@@ -1627,26 +1632,28 @@ namespace gdjs {
           })
         );
       };
+      this._sendSessionHit = sendSessionHit;
       if (typeof navigator !== 'undefined' && typeof document !== 'undefined') {
+        const onGameHidden = () => {
+          sendSessionHit();
+          isGameVisible = false;
+        };
+        const onGameVisible = () => {
+          // Skip the duration the game was hidden.
+          lastSessionResumeTime = Date.now();
+          isGameVisible = true;
+        };
         document.addEventListener('visibilitychange', () => {
           if (document.visibilityState === 'visible') {
-            // Skip the duration the game was hidden.
-            lastSessionResumeTime = Date.now();
+            onGameVisible();
           } else {
-            sendSessionHit();
+            onGameHidden();
           }
         });
         window.addEventListener('pagehide', sendSessionHit, false);
         // Cordova events
-        window.addEventListener('pause', sendSessionHit, false);
-        window.addEventListener(
-          'resume',
-          () => {
-            // Skip the duration the game was hidden.
-            lastSessionResumeTime = Date.now();
-          },
-          false
-        );
+        window.addEventListener('pause', onGameHidden, false);
+        window.addEventListener('resume', onGameVisible, false);
 
         // Detect Safari to work around Safari-specific bugs:
         // - https://bugs.webkit.org/show_bug.cgi?id=151610
@@ -1662,6 +1669,14 @@ namespace gdjs {
       }
       this._sessionMetricsInitialized = true;
       this._sessionId = this._sessionId;
+    }
+
+    /**
+     * Send the duration played so far. Called when the game is about to close itself,
+     * as no event tells it then.
+     */
+    sendSessionHit(): void {
+      if (this._sendSessionHit) this._sendSessionHit();
     }
 
     /**

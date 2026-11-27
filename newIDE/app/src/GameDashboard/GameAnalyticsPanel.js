@@ -43,6 +43,7 @@ import {
   getGameAnalytics,
   daysShownForYear,
   minPlayersCountForRates,
+  minNewPlayersCountForRetention,
   defaultGameMetricsBenchmarks,
   getGameVersionAnalytics,
   getGameSourceAnalytics,
@@ -69,9 +70,10 @@ const chartHeight = 260;
 
 const styles = {
   tile: { padding: 16, flex: 1, boxSizing: 'border-box' },
+  // One column next to the charts, and 2 tiles per line when the tiles take the full width.
   tilesColumn: {
-    display: 'flex',
-    flexDirection: 'column',
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(min(220px, 100%), 1fr))',
     gap: 8,
     height: '100%',
   },
@@ -608,6 +610,9 @@ export const GameAnalyticsPanel = ({
                       previousSummary ? previousSummary.playersCount : null
                     )}
                     caption={<Trans>{sessionsCount} sessions</Trans>}
+                    note={
+                      <Trans>A player is counted each day they play.</Trans>
+                    }
                   />
                   <SummaryTile
                     title={<Trans>New players</Trans>}
@@ -641,7 +646,14 @@ export const GameAnalyticsPanel = ({
                     }
                     formatValue={formatPercent}
                     change={null}
-                    caption={d1RetentionDay ? null : notEnoughPlayersCaption}
+                    caption={
+                      d1RetentionDay ? null : (
+                        <Trans>
+                          Shown from {minNewPlayersCountForRetention} new
+                          players
+                        </Trans>
+                      )
+                    }
                     benchmarks={{
                       typical: `${typicalD1RetentionPercent}%`,
                       top: <Trans>over {topD1RetentionPercent}%</Trans>,
@@ -731,8 +743,7 @@ export const GameAnalyticsPanel = ({
                         title={<Trans>How long players stay</Trans>}
                         description={
                           <Trans>
-                            Share of players still playing after each duration,
-                            loading screens included.
+                            Share of players still playing after each duration.
                           </Trans>
                         }
                         legend={<BenchmarksLegend />}
@@ -847,7 +858,7 @@ export const GameAnalyticsPanel = ({
                 </div>
               </Grid>
               {playerPlatforms && (
-                <Grid item xs={12}>
+                <Grid item xs={12} md={4}>
                   <ChartBlock
                     title={<Trans>Devices</Trans>}
                     description={
@@ -866,7 +877,7 @@ export const GameAnalyticsPanel = ({
                 </Grid>
               )}
               {gameSourceAnalytics.length > 0 && (
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} md={playerPlatforms ? 8 : 12}>
                   <ChartBlock
                     title={<Trans>Where players play</Trans>}
                     description={
@@ -886,7 +897,7 @@ export const GameAnalyticsPanel = ({
                 </Grid>
               )}
               {gameVersionAnalytics.length > 1 && (
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12}>
                   <ChartBlock
                     title={<Trans>Versions</Trans>}
                     description={

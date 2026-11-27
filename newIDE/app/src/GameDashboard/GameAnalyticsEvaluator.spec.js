@@ -4,7 +4,11 @@ import {
   getGameVersionAnalytics,
   getGameSourceAnalytics,
 } from './GameAnalyticsEvaluator';
-import { type GameMetrics } from '../Utils/GDevelopServices/Analytics';
+import {
+  type GameMetrics,
+  type GameVersionMetrics,
+  type GameSourceMetrics,
+} from '../Utils/GDevelopServices/Analytics';
 
 const todayDate = new Date('2026-11-20T10:00:00Z');
 
@@ -111,9 +115,11 @@ describe('GameAnalyticsEvaluator', () => {
       30,
       5,
     ]);
-    // Days without players have a rate of 0.
-    expect(gameAnalytics.overTime[0].bounceRatePercent).toBe(0);
-    expect(gameAnalytics.overTime[0].playedDurationPerPlayerInMinutes).toBe(0);
+    // Days without players have no rate.
+    expect(gameAnalytics.overTime[0].bounceRatePercent).toBe(null);
+    expect(gameAnalytics.overTime[0].playedDurationPerPlayerInMinutes).toBe(
+      null
+    );
     expect(gameAnalytics.overTime[5].bounceRatePercent).toBe(20);
     // A day with a few players shows its real rate.
     expect(gameAnalytics.overTime[6].bounceRatePercent).toBe(20);
@@ -127,12 +133,30 @@ describe('GameAnalyticsEvaluator', () => {
       { durationInMinutes: 15, playersPercent: 0 },
     ]);
 
-    // 4 players of the 19th were among the 40 new players of the 18th,
-    // and 2 players of the 20th among the 20 new players of the 19th.
-    expect(gameAnalytics.retentionDays).toEqual([
-      { dayNumber: 1, retentionPercent: 10 },
-      { dayNumber: 2, retentionPercent: 0 },
-    ]);
+    // Retention is not shown under 100 new players.
+    expect(gameAnalytics.retentionDays).toBe(null);
+  });
+
+  it('leaves out the players whose played duration is unknown', () => {
+    const gameMetrics = createFakeGameMetrics('2026-11-20', {
+      playersCount: 100,
+      newPlayersCount: 100,
+      bouncedPlayersCount: 20,
+      d1RetainedPlayersCount: 0,
+    });
+    const { players } = gameMetrics;
+    if (!players) throw new Error('Should have players.');
+    const { summary, playedDurationSteps } = getGameAnalytics(
+      [{ ...gameMetrics, players: { ...players, d0PlayersWithDuration: 80 } }],
+      'week',
+      { todayDate }
+    );
+
+    expect(summary.playersCount).toBe(100);
+    expect(summary.bounceRatePercent).toBe(25);
+    expect(summary.playedDurationPerPlayerInSeconds).toBe(150);
+    if (!playedDurationSteps) throw new Error('Should have steps.');
+    expect(playedDurationSteps[1].playersPercent).toBe(75);
   });
 
   it('gives the same advice as the weekly email', () => {
@@ -142,13 +166,20 @@ describe('GameAnalyticsEvaluator', () => {
     ) =>
       getGameAnalytics(
         [
+          // Today is not finished: the players who came back today are not counted.
           createFakeGameMetrics('2026-11-20', {
+            playersCount: 0,
+            newPlayersCount: 0,
+            bouncedPlayersCount: 0,
+            d1RetainedPlayersCount: 50,
+          }),
+          createFakeGameMetrics('2026-11-19', {
             playersCount: 100,
             newPlayersCount: 50,
             bouncedPlayersCount,
             d1RetainedPlayersCount,
           }),
-          createFakeGameMetrics('2026-11-19', {
+          createFakeGameMetrics('2026-11-18', {
             playersCount: 100,
             newPlayersCount: 100,
             bouncedPlayersCount,
@@ -317,7 +348,7 @@ describe('GameAnalyticsEvaluator', () => {
       version: string,
       playersCount: number,
       bouncedPlayersCount: number
-    ) => ({
+    ): GameVersionMetrics => ({
       gameId: 'fake-game-id',
       date,
       version,
@@ -367,7 +398,7 @@ describe('GameAnalyticsEvaluator', () => {
       source: string,
       playersCount: number,
       bouncedPlayersCount: number
-    ) => ({
+    ): GameSourceMetrics => ({
       gameId: 'fake-game-id',
       date,
       source,

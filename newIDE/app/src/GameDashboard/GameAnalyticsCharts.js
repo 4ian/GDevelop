@@ -135,7 +135,12 @@ const ChartTooltip = ({
   benchmarks,
   notes,
 }: {|
-  payload: ?Array<{ name: string, value: number, color?: string, ... }>,
+  payload: ?Array<{
+    name: string,
+    value: number | null,
+    color?: string,
+    ...
+  }>,
   title: ?string,
   customStyle: Object,
   formatValue: (value: number) => string,
@@ -150,12 +155,14 @@ const ChartTooltip = ({
             {title}
           </Text>
         )}
-        {payload.map(({ name, value, color }, index) => (
-          <Text noMargin key={index}>
-            <span style={{ ...squareGlyphStyle, backgroundColor: color }} />
-            {name}: <b>{formatValue(value)}</b>
-          </Text>
-        ))}
+        {payload.map(({ name, value, color }, index) =>
+          value === null ? null : (
+            <Text noMargin key={index}>
+              <span style={{ ...squareGlyphStyle, backgroundColor: color }} />
+              {name}: <b>{formatValue(value)}</b>
+            </Text>
+          )
+        )}
         {benchmarks && (
           <Text noMargin>
             <BenchmarkGlyph kind="typical" />

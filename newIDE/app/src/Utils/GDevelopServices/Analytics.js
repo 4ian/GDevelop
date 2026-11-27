@@ -28,6 +28,8 @@ export type GameMetrics = {
     d0Players: number,
     /** Number of new players for this day. */
     d0NewPlayers: number,
+    /** Number of players whose played duration is known for this day. Not set before it was counted. */
+    d0PlayersWithDuration?: ?number,
     /** Number of players who played the game less than 1 minute for this day. */
     d0PlayersBelow60s: ?number,
     /** Number of players who played the game less than 3 minutes for this day. */
@@ -131,6 +133,8 @@ export type GameVersionMetrics = {|
   /** Number of players for this day whose first session of the day was on this version. */
   d0Players: number,
   d0SessionsDurationTotal: number,
+  /** Number of these players whose played duration is known for this day. Not set before it was counted. */
+  d0PlayersWithDuration?: ?number,
   /** Number of these players who played the game less than 1 minute for this day. */
   d0PlayersBelow60s: number,
 |};
@@ -169,6 +173,8 @@ export type GameSourceMetrics = {|
   /** Number of players for this day whose first session of the day was on this source. */
   d0Players: number,
   d0SessionsDurationTotal: number,
+  /** Number of these players whose played duration is known for this day. Not set before it was counted. */
+  d0PlayersWithDuration?: ?number,
   /** Number of these players who played the game less than 1 minute for this day. */
   d0PlayersBelow60s: number,
 |};

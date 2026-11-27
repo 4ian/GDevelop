@@ -79,5 +79,6 @@ app.on('ready', createWindow);
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
-  app.quit();
+  // The game sends its played duration when its window closes: quitting right away would cancel the request.
+  setTimeout(() => app.quit(), 1000);
 });

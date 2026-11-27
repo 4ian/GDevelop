@@ -66,6 +66,7 @@ import ResponsiveFlatButton from '../../../UI/ResponsiveFlatButton';
 import propertiesMapToSchema from '../../../PropertiesEditor/PropertiesMapToSchema';
 import { renameObjectPointReferences } from '../../../Utils/ObjectAnimationsRefactoring';
 import { isDefaultVariantReplacedByUpdates } from '../../../Utils/Extension/ExtensionOrigin';
+import { getObjectTypeIcon } from '../../../ObjectsRendering/ObjectTypeIcons';
 
 const gd: libGDevelop = global.gd;
 
@@ -645,7 +646,10 @@ const CustomObjectPropertiesEditor = (props: Props): React.Node => {
                                 gd.JsPlatform.get(),
                                 childObjectConfiguration.getType()
                               );
-                              const iconUrl = objectMetadata.getIconFilename();
+                              const iconUrl = getObjectTypeIcon(
+                                childObjectConfiguration.getType(),
+                                objectMetadata.getIconFilename()
+                              );
                               const tutorialIds = getObjectTutorialIds(
                                 childObjectConfiguration.getType()
                               );

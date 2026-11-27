@@ -2,6 +2,7 @@
 import { mapFor } from '../Utils/MapFor';
 import flatten from 'lodash/flatten';
 import { shouldHideExtension } from '../Version';
+import { getObjectTypeIcon } from '../ObjectsRendering/ObjectTypeIcons';
 
 const gd: libGDevelop = global.gd;
 
@@ -165,7 +166,10 @@ export const enumerateObjectTypes = (
             name: objectMetadata.getName(),
             fullName: objectMetadata.getFullName(),
             description: objectMetadata.getDescription(),
-            iconFilename: objectMetadata.getIconFilename(),
+            iconFilename: getObjectTypeIcon(
+              objectType,
+              objectMetadata.getIconFilename()
+            ),
             category: objectMetadata.getCategory() || 'General',
             assetStoreTag: objectMetadata.getAssetStoreTag(),
             isRenderedIn3D: objectMetadata.isRenderedIn3D(),

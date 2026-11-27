@@ -1,6 +1,8 @@
 // @flow
 import * as React from 'react';
 import { CorsAwareImage } from './CorsAwareImage';
+import ObjectTypeIcon from './ObjectTypeIcon';
+import { isObjectTypeIcon } from '../ObjectsRendering/ObjectTypeIcons';
 
 export const iconWithBackgroundStyle = {
   background: 'linear-gradient(45deg, #FFFFFF33, #FFFFFF)',
@@ -30,6 +32,15 @@ export const IconContainer = ({
   alt,
   size,
 }: Props): React.MixedElement => {
+  if (isObjectTypeIcon(src)) {
+    // Object type icons are designed for both themes: no background needed.
+    return (
+      <span style={styles.iconBackground}>
+        <ObjectTypeIcon src={src} width={size} height={size} title={alt} />
+      </span>
+    );
+  }
+
   const padding = size > 24 ? 4 : 2;
   return (
     <span style={styles.iconBackground}>

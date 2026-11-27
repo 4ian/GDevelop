@@ -142,6 +142,7 @@ export const ExampleStoreStateProvider = ({
     excludedTiers,
     defaultFirstSearchItemIds: firstExampleIds,
     shuffleResults: false,
+    nameWeight: 8,
   });
 
   const exampleStoreState = React.useMemo(

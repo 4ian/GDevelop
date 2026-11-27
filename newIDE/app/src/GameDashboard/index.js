@@ -14,6 +14,7 @@ import {
   type MarketingPlan,
   type GameUpdatePayload,
   updateGame,
+  getGame,
   getGameUrl,
   getPublicGame,
   setGameSlug,
@@ -398,6 +399,12 @@ const GameDashboard = ({
         });
         return false;
       }
+      // Fetch the game again, as the slug is not part of the first update.
+      updatedGame = await getGame(
+        getAuthorizationHeader,
+        profile.id,
+        publicGame.id
+      );
       _onGameUpdated(updatedGame);
     } catch (error) {
       console.error(

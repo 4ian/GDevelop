@@ -17,10 +17,6 @@ import GridList from '@material-ui/core/GridList';
 import { getExampleAndTemplateTiles } from '../../MainFrame/EditorContainers/HomePage/CreateSection/utils';
 import BackgroundText from '../../UI/BackgroundText';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
-import {
-  isLinkedToStartingPointExampleShortHeader,
-  isStartingPointExampleShortHeader,
-} from '../../ProjectCreation/EmptyAndStartingPointProjects';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import {
   useResponsiveWindowSize,
@@ -51,22 +47,45 @@ const gameFilter = (
   return true;
 };
 
-const noStartingPointFilter = (
-  allExampleShortHeaders: ExampleShortHeader[],
-  exampleShortHeader: ExampleShortHeader
-) =>
-  !isStartingPointExampleShortHeader(exampleShortHeader) &&
-  !isLinkedToStartingPointExampleShortHeader(
-    allExampleShortHeaders,
-    exampleShortHeader
+// Search in both examples and game templates stores.
+export const useExampleAndGameTemplateSearch = (): {|
+  searchText: string,
+  setSearchText: (searchText: string) => void,
+|} => {
+  const {
+    searchText: exampleStoreSearchText,
+    setSearchText: setExampleStoreSearchText,
+  } = React.useContext(ExampleStoreContext);
+  const {
+    exampleStore: { setSearchText: setGameTemplateStoreSearchText },
+  } = React.useContext(PrivateGameTemplateStoreContext);
+  const [localSearchText, setLocalSearchText] = React.useState(
+    exampleStoreSearchText
   );
+
+  const setSearchText = React.useCallback(
+    (searchText: string) => {
+      if (searchText.length < 2) {
+        // Prevent searching with less than 2 characters, as it does not return any results.
+        setExampleStoreSearchText('');
+        setGameTemplateStoreSearchText('');
+      } else {
+        setExampleStoreSearchText(searchText);
+        setGameTemplateStoreSearchText(searchText);
+      }
+      setLocalSearchText(searchText);
+    },
+    [setExampleStoreSearchText, setGameTemplateStoreSearchText]
+  );
+
+  return { searchText: localSearchText, setSearchText };
+};
 
 type Props = {|
   onSelectExampleShortHeader: ExampleShortHeader => void,
   onSelectPrivateGameTemplateListingData: PrivateGameTemplateListingData => void,
   i18n: I18nType,
   onlyShowGames?: boolean,
-  hideStartingPoints?: boolean,
   getColumnsFromWindowSize: (
     windowSize: WindowSizeType,
     isLandscape: boolean
@@ -83,7 +102,6 @@ const ExampleStore = ({
   onSelectPrivateGameTemplateListingData,
   i18n,
   onlyShowGames,
-  hideStartingPoints,
   getColumnsFromWindowSize,
   hideSearch,
   limitRowsTo,
@@ -97,40 +115,20 @@ const ExampleStore = ({
 
   const { receivedGameTemplates } = React.useContext(AuthenticatedUserContext);
   const {
-    exampleShortHeaders: allExampleShortHeaders,
     exampleShortHeadersSearchResults,
     fetchExamplesAndFilters,
     searchText: exampleStoreSearchText,
-    setSearchText: setExampleStoreSearchText,
   } = React.useContext(ExampleStoreContext);
   const {
     fetchGameTemplates,
-    exampleStore: {
-      privateGameTemplateListingDatasSearchResults,
-      setSearchText: setGameTemplateStoreSearchText,
-    },
+    exampleStore: { privateGameTemplateListingDatasSearchResults },
   } = React.useContext(PrivateGameTemplateStoreContext);
-  const [localSearchText, setLocalSearchText] = React.useState(
-    exampleStoreSearchText
-  );
+  const {
+    searchText: localSearchText,
+    setSearchText,
+  } = useExampleAndGameTemplateSearch();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const columnsCount = getColumnsFromWindowSize(windowSize, isLandscape);
-
-  // We search in both examples and game templates stores.
-  const setSearchText = React.useCallback(
-    (searchText: string) => {
-      if (searchText.length < 2) {
-        // Prevent searching with less than 2 characters, as it does not return any results.
-        setExampleStoreSearchText('');
-        setGameTemplateStoreSearchText('');
-      } else {
-        setExampleStoreSearchText(searchText);
-        setGameTemplateStoreSearchText(searchText);
-      }
-      setLocalSearchText(searchText);
-    },
-    [setExampleStoreSearchText, setGameTemplateStoreSearchText]
-  );
 
   const fetchGameTemplatesAndExamples = React.useCallback(
     () => {
@@ -159,14 +157,9 @@ const ExampleStore = ({
               )
             : [],
         exampleShortHeaders: exampleShortHeadersSearchResults
-          ? exampleShortHeadersSearchResults
-              .filter(({ item }) => !onlyShowGames || gameFilter(item))
-              .filter(
-                ({ item }) =>
-                  !allExampleShortHeaders ||
-                  !hideStartingPoints ||
-                  noStartingPointFilter(allExampleShortHeaders, item)
-              )
+          ? exampleShortHeadersSearchResults.filter(
+              ({ item }) => !onlyShowGames || gameFilter(item)
+            )
           : [],
         onSelectPrivateGameTemplateListingData: privateGameTemplateListingData => {
           const priceForUsageType = privateGameTemplateListingData.prices.find(
@@ -204,8 +197,6 @@ const ExampleStore = ({
       i18n,
       gdevelopTheme,
       onlyShowGames,
-      hideStartingPoints,
-      allExampleShortHeaders,
       hidePremiumTemplates,
       exampleStoreSearchText,
       disabled,

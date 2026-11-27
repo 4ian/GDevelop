@@ -160,7 +160,7 @@ export const transformCloudProjectsIntoFileMetadataWithStorageProviderName = (
     .filter(Boolean);
 };
 
-const formatItemForGrid = ({
+export const formatItemForGrid = ({
   item,
   onSelectGameTemplate,
   onSelectExample,

@@ -18,7 +18,7 @@ export type ObjectTypeIconsStyle =
   | 'MonoFil'
   | 'OutlineMono'
   | 'FillOutline';
-export const OBJECT_TYPE_ICONS_STYLE: ObjectTypeIconsStyle = 'Fill';
+export const OBJECT_TYPE_ICONS_STYLE: ObjectTypeIconsStyle = 'OutlineMono';
 
 export const isObjectTypeIconsStyleTinted = (
   style: ObjectTypeIconsStyle

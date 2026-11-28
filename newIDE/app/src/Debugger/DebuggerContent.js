@@ -36,6 +36,7 @@ type Props = {|
   onPause: () => void,
   onRefresh: () => void,
   onStartProfiler: () => void,
+  canStartProfiler: boolean,
   onStopProfiler: () => void,
   profilerOutput: ?ProfilerOutput,
   profilingInProgress: boolean,
@@ -108,6 +109,7 @@ export default class DebuggerContent extends React.Component<Props, State> {
       onCall,
       onEdit,
       onStartProfiler,
+      canStartProfiler,
       onStopProfiler,
       profilerOutput,
       profilingInProgress,
@@ -227,6 +229,7 @@ export default class DebuggerContent extends React.Component<Props, State> {
         title: t`Profiler`,
         renderEditor: () => (
           <Profiler
+            canStartProfiler={canStartProfiler}
             onStart={onStartProfiler}
             onStop={onStopProfiler}
             profilerOutput={profilerOutput}

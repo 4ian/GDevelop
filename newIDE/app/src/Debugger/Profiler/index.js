@@ -13,6 +13,7 @@ import LinearProgress from '../../UI/LinearProgress';
 import StatusChip, { StatusDot } from '../../UI/StatusChip';
 import History from '../../UI/CustomSvgIcons/History';
 import classes from './Profiler.module.css';
+import { useIsGameplayTestRunInProgress } from '../../GameplayTests/GameplayTestRunner';
 
 /**
  * Round to at most one decimal, without trailing ".0" on whole numbers.
@@ -124,6 +125,7 @@ const renderStatusChip = (
 };
 
 type Props = {|
+  canStartProfiler: boolean,
   onStart: () => void,
   onStop: () => void,
   profilerOutput: ?ProfilerOutput,
@@ -131,11 +133,14 @@ type Props = {|
 |};
 
 const Profiler = ({
+  canStartProfiler,
   onStart,
   onStop,
   profilerOutput,
   profilingInProgress,
 }: Props): React.Node => {
+  // The panel may already be open when a gameplay test takes control of the game.
+  const isGameplayTestRunInProgress = useIsGameplayTestRunInProgress();
   // While a run is in progress, the numbers of the previous one are not shown:
   // they would look like the ones being measured.
   const shownProfilerOutput = profilingInProgress ? null : profilerOutput;
@@ -149,6 +154,7 @@ const Profiler = ({
           <RaisedButton
             label={<Trans>Stop profiling</Trans>}
             onClick={onStop}
+            disabled={isGameplayTestRunInProgress}
           />
         ) : (
           <RaisedButton
@@ -160,6 +166,7 @@ const Profiler = ({
               )
             }
             onClick={onStart}
+            disabled={!canStartProfiler || isGameplayTestRunInProgress}
             primary={!profilerOutput}
           />
         )}

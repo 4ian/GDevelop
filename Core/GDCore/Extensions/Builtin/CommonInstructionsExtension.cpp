@@ -122,7 +122,11 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
   extension
       .AddCondition("CompareNumbers",
                     _("Compare two numbers"),
-                    _("Compare the two numbers."),
+                    _("Compare the two numbers. It does not pick objects: with an "
+                      "object expression (like Enemy.X()), only the first "
+                      "instance is compared. To compare each instance, use a "
+                      "condition of the object (or a \"For each object\" "
+                      "event)."),
                     _("_PARAM0_ _PARAM1_ _PARAM2_"),
                     "",
                     "res/conditions/egal24_black.png",
@@ -144,7 +148,11 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
   extension
       .AddCondition("CompareStrings",
                     _("Compare two strings"),
-                    _("Compare the two strings."),
+                    _("Compare the two strings. It does not pick objects: with an "
+                      "object expression (like Enemy.X()), only the first "
+                      "instance is compared. To compare each instance, use a "
+                      "condition of the object (or a \"For each object\" "
+                      "event)."),
                     _("_PARAM0_ _PARAM1_ _PARAM2_"),
                     "",
                     "res/conditions/egal24_black.png",

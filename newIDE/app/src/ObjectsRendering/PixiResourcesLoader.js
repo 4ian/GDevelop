@@ -1297,6 +1297,7 @@ export default class PixiResourcesLoader {
     spineName: string
     // $FlowFixMe[value-as-type]
   ): Promise<Spine | null> {
+    if (!spineName) return null;
     const result = await this.getSpineData(project, spineName);
     if (!result.aliases) {
       console.error(

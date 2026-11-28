@@ -253,6 +253,144 @@ describe('gdjs.gameplayTests', () => {
     ).to.be(false);
   });
 
+  describe('assertClose', () => {
+    it('passes when the values are within tolerance, including the boundary', async () => {
+      const runtimeGame = makeRuntimeGame();
+      const result = await runTestScript(
+        runtimeGame,
+        `
+        await harness.goToScene('Scene 1');
+        harness.assertClose(10, 10, 0, 'Equal at zero tolerance');
+        harness.assertClose(10.5, 10, 0.5, 'At the tolerance boundary');
+        harness.assertClose(10, 10.5, 0.5, 'Symmetric at the boundary');
+        `
+      );
+
+      expect(result.status).to.be('passed');
+      expect(result.assertions.length).to.be(3);
+      expect(result.assertions.every((assertion) => assertion.passed)).to.be(
+        true
+      );
+      expect(result.assertions[0].message).to.be('Equal at zero tolerance');
+      expect(result.assertions[1].message).to.be('At the tolerance boundary');
+    });
+
+    it('fails with actual, expected and tolerance in the message and stops the script', async () => {
+      const runtimeGame = makeRuntimeGame();
+      const result = await runTestScript(
+        runtimeGame,
+        `
+        await harness.goToScene('Scene 1');
+        harness.assertClose(12, 10, 0.5, 'Player X');
+        console.log('This must never be logged');
+        `
+      );
+
+      expect(result.status).to.be('failed');
+      expect(result.assertions.length).to.be(1);
+      expect(result.assertions[0].passed).to.be(false);
+      expect(result.assertions[0].message).to.contain('Player X');
+      expect(result.assertions[0].message).to.contain('12');
+      expect(result.assertions[0].message).to.contain('10');
+      expect(result.assertions[0].message).to.contain('0.5');
+      expect(result.errors[0]).to.contain('Player X');
+      expect(result.errors[0]).to.contain('12');
+      expect(result.errors[0]).to.contain('tolerance');
+      expect(
+        result.consoleLogs.some(
+          (log) => log.message.indexOf('never be logged') !== -1
+        )
+      ).to.be(false);
+    });
+
+    it('treats NaN as never close, including to NaN', async () => {
+      const runtimeGame = makeRuntimeGame();
+      const result = await runTestScript(
+        runtimeGame,
+        `
+        await harness.goToScene('Scene 1');
+        harness.assertClose(NaN, NaN, 0, 'NaN vs NaN');
+        `
+      );
+
+      expect(result.status).to.be('failed');
+      expect(result.assertions[0].passed).to.be(false);
+      expect(result.assertions[0].message).to.contain('NaN vs NaN');
+      expect(result.assertions[0].message).to.contain('NaN');
+    });
+
+    it('treats Infinity as not close, even to itself', async () => {
+      const runtimeGame = makeRuntimeGame();
+      const result = await runTestScript(
+        runtimeGame,
+        `
+        await harness.goToScene('Scene 1');
+        harness.assertClose(Infinity, Infinity, 0, 'Infinity vs Infinity');
+        `
+      );
+
+      expect(result.status).to.be('failed');
+      expect(result.assertions[0].passed).to.be(false);
+      expect(result.assertions[0].message).to.contain('Infinity vs Infinity');
+    });
+
+    it('rejects a negative or non-finite tolerance', async () => {
+      const runtimeGame = makeRuntimeGame();
+      const negative = await runTestScript(
+        runtimeGame,
+        `
+        await harness.goToScene('Scene 1');
+        harness.assertClose(1, 1, -1, 'Speed');
+        console.log('This must never be logged');
+        `
+      );
+
+      expect(negative.status).to.be('failed');
+      expect(negative.assertions[0].passed).to.be(false);
+      expect(negative.assertions[0].message).to.contain('Speed');
+      expect(negative.assertions[0].message).to.contain('-1');
+      expect(negative.assertions[0].message).to.contain('tolerance');
+      expect(
+        negative.consoleLogs.some(
+          (log) => log.message.indexOf('never be logged') !== -1
+        )
+      ).to.be(false);
+
+      const infinite = await runTestScript(
+        runtimeGame,
+        `
+        await harness.goToScene('Scene 1');
+        harness.assertClose(1, 1, Infinity, 'Speed');
+        `
+      );
+      expect(infinite.status).to.be('failed');
+      expect(infinite.assertions[0].passed).to.be(false);
+      expect(infinite.assertions[0].message).to.contain('Speed');
+    });
+
+    it('honors MAX_ASSERTIONS like assert', async () => {
+      const runtimeGame = makeRuntimeGame();
+      const result = await runTestScript(
+        runtimeGame,
+        `
+        await harness.goToScene('Scene 1');
+        for (let i = 0; i < 200; i++) harness.assert(true, 'ok ' + i);
+        harness.assertClose(1, 1, 0, 'one too many');
+        console.log('This must never be logged');
+        `
+      );
+
+      expect(result.status).to.be('failed');
+      expect(result.assertions.length).to.be(200);
+      expect(result.errors[0]).to.contain('Too many assertions');
+      expect(
+        result.consoleLogs.some(
+          (log) => log.message.indexOf('never be logged') !== -1
+        )
+      ).to.be(false);
+    });
+  });
+
   describe('screenshots', () => {
     const makeRuntimeGameWithCanvas = () => {
       const runtimeGame = makeRuntimeGame();

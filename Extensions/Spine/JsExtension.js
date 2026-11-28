@@ -310,16 +310,14 @@ module.exports = {
         );
 
         // there is issue with spine selection. mouse events are not triggering during interaction.
-        // create the invisible background rectangle to fill spine range.
+        // create the background rectangle to fill spine range or serve as placeholder.
         this._placeholder = new PIXI.Sprite(
           this._pixiResourcesLoader.getInvalidPIXITexture()
         );
-        this._placeholder.alpha = 0;
+        this._placeholder.alpha = 1;
         this._pixiObject = new PIXI.Container();
         this._pixiObject.addChild(this._placeholder);
         this._pixiContainer.addChild(this._pixiObject);
-
-        this._loadSpine();
       }
 
       static getDefaultSkinName() {
@@ -411,8 +409,10 @@ module.exports = {
           this._spineOriginOffsetY
         );
         const frame = this._placeholder.texture.frame;
-        this._placeholder.scale.x = width / frame.width;
-        this._placeholder.scale.y = height / frame.height;
+        if (frame && frame.width && frame.height) {
+          this._placeholder.scale.x = width / frame.width;
+          this._placeholder.scale.y = height / frame.height;
+        }
       }
 
       /**
@@ -492,6 +492,7 @@ module.exports = {
       onRemovedFromScene() {
         super.onRemovedFromScene();
         this._pixiObject.destroy({ children: true });
+        this._spine = null;
       }
 
       _loadSpine() {
@@ -499,19 +500,43 @@ module.exports = {
           this._associatedObjectConfiguration,
           gd.SpineObjectConfiguration
         );
+        const spineResourceName = object.getSpineResourceName();
+        if (!spineResourceName) {
+          if (this._spine) {
+            this._pixiObject.removeChild(this._spine);
+            this._spine.destroy();
+            this._spine = null;
+          }
+          this._placeholder.alpha = 1;
+          this._animationIndex = -1;
+          return;
+        }
+
         this._pixiResourcesLoader
-          .createSpine(this._project, object.getSpineResourceName())
+          .createSpine(this._project, spineResourceName)
           .then((spineInstance) => {
-            if (this._wasDestroyed) return;
-            if (this._spine) this._pixiObject.removeChild(this._spine);
+            if (this._wasDestroyed) {
+              if (spineInstance) spineInstance.destroy();
+              return;
+            }
+            if (object.getSpineResourceName() !== spineResourceName) {
+              if (spineInstance) spineInstance.destroy();
+              return;
+            }
+
+            if (this._spine) {
+              this._pixiObject.removeChild(this._spine);
+              this._spine.destroy();
+            }
 
             if (!spineInstance) {
               this._spine = null;
-              this._placeholder.alpha = 255;
+              this._placeholder.alpha = 1;
               return;
             }
 
             this._spine = spineInstance;
+            this._animationIndex = -1;
 
             const skinName = object.getSkinName();
             if (skinName) {
@@ -528,6 +553,17 @@ module.exports = {
 
             this._pixiObject.addChild(spineInstance);
             this._placeholder.alpha = 0;
+          })
+          .catch((error) => {
+            console.error('Unable to create Spine instance:', error);
+            if (this._wasDestroyed) return;
+            if (object.getSpineResourceName() !== spineResourceName) return;
+            if (this._spine) {
+              this._pixiObject.removeChild(this._spine);
+              this._spine.destroy();
+              this._spine = null;
+            }
+            this._placeholder.alpha = 1;
           });
       }
     }

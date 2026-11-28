@@ -24,8 +24,8 @@ export type InGameEditorExtensionError = {|
   id: number,
   key: string,
   extensionName: string | null,
-  // `onCreated`, `doStepPostEvents`, `onHotReloading`, `onDestroy`,
-  // `editorCallback` or `toolbar`.
+  // `onCreated`, `doStepPreEvents`, `doStepPostEvents`, `onHotReloading`,
+  // `onDestroy`, `editorCallback` or `toolbar`.
   phase: string,
   // The object or behavior type running the code, if any.
   type: string | null,

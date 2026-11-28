@@ -38,7 +38,13 @@ const LIFECYCLE_FUNCTION_NAMES: { [FunctionOwner]: Array<string> } = {
     'doStepPostEvents',
     'onDestroy',
   ],
-  object: ['onCreated', 'doStepPostEvents', 'onDestroy', 'onHotReloading'],
+  object: [
+    'onCreated',
+    'doStepPreEvents',
+    'doStepPostEvents',
+    'onDestroy',
+    'onHotReloading',
+  ],
 };
 
 export const getLifecycleFunctionNames = (

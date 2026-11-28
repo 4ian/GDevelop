@@ -90,8 +90,9 @@ void EventsBasedObject::UnserializeDefaultVariantFrom(
 
 bool EventsBasedObject::IsObjectLifecycleEventsFunction(
     const gd::String &functionName) {
-  return functionName == "onCreated" || functionName == "doStepPostEvents" ||
-         functionName == "onDestroy" || functionName == "onHotReloading";
+  return functionName == "onCreated" || functionName == "doStepPreEvents" ||
+         functionName == "doStepPostEvents" || functionName == "onDestroy" ||
+         functionName == "onHotReloading";
 }
 
 }  // namespace gd

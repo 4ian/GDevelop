@@ -145,6 +145,7 @@ namespace gdjs {
         // call: the code of the object can be hot-reloaded.
         for (const methodName of [
           'onCreated',
+          'doStepPreEvents',
           'doStepPostEvents',
           'onHotReloading',
           'onDestroy',

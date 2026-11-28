@@ -167,6 +167,7 @@ const LIFECYCLE_DESCRIPTIONS: {
   },
   object: {
     onCreated: 'when the object is created',
+    doStepPreEvents: 'every frame before the scene events',
     doStepPostEvents: 'every frame after the scene events',
     onDestroy: 'when the object is destroyed',
     onHotReloading: 'when the game is hot-reloaded during a preview',

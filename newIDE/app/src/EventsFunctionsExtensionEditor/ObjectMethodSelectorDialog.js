@@ -136,6 +136,22 @@ export default function ObjectMethodSelectorDialog({
             </Subheader>
             <FunctionListItem
               functionType={gd.EventsFunction.Action}
+              functionName="doStepPreEvents"
+              disabled={eventsFunctions.hasEventsFunctionNamed(
+                'doStepPreEvents'
+              )}
+              onChoose={onChoose}
+              description={
+                <Trans>
+                  Events that will be run at every frame (roughly 60 times per
+                  second), for every object, before the events from the events
+                  sheet. Use it to read inputs or to prepare what the events of
+                  the scene will check during the frame.
+                </Trans>
+              }
+            />
+            <FunctionListItem
+              functionType={gd.EventsFunction.Action}
               functionName="onHotReloading"
               disabled={eventsFunctions.hasEventsFunctionNamed(
                 'onHotReloading'

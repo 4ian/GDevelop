@@ -83,6 +83,11 @@ BaseObjectExtension::BaseObjectExtension() {
       "runtimeobject.js");
   // End of compatibility code
   objectConditions["Visible"].SetFunctionName("isVisible");
+  objectActions["SetBlockingPointer"].SetFunctionName("setBlockingPointer");
+  objectConditions["IsBlockingPointer"].SetFunctionName("isBlockingPointer");
+  objectActions["TakeInputFocus"].SetFunctionName("takeInputFocus");
+  objectActions["ReleaseInputFocus"].SetFunctionName("releaseInputFocus");
+  objectConditions["HasInputFocus"].SetFunctionName("hasInputFocus");
   objectConditions["Invisible"].SetFunctionName("isHidden");
   objectConditions["IsEffectEnabled"].SetFunctionName("isEffectEnabled");
   objectActions["Delete"].SetFunctionName("deleteFromScene");
@@ -259,6 +264,8 @@ BaseObjectExtension::BaseObjectExtension() {
       "gdjs.evtTools.object.isTurnedTowardObject3D");
   GetAllConditions()["IsCursorOnObject"].SetFunctionName(
       "gdjs.evtTools.input.cursorOnObject");
+  GetAllConditions()["IsCursorOnPointerBlockingObject"].SetFunctionName(
+      "gdjs.evtTools.input.isCursorOnPointerBlockingObject");
   // Compatibility with GD <= 5.6.251
   GetAllConditions()["SourisSurObjet"].SetFunctionName(
       "gdjs.evtTools.input.cursorOnObject");

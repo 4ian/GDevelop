@@ -208,6 +208,7 @@ module.exports = function (config) {
       `${gdjsRuntimePath}/RuntimeCustomObjectLayer.js`,
       `${gdjsRuntimePath}/timer.js`,
       `${gdjsRuntimePath}/inputmanager.js`,
+      `${gdjsRuntimePath}/inputfocusmanager.js`,
       `${gdjsRuntimePath}/capturemanager.js`,
       `${gdjsRuntimePath}/named-easings-manager.js`,
       `${gdjsRuntimePath}/runtimegame.js`,

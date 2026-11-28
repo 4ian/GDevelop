@@ -796,6 +796,73 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .MarkAsSimple();
 
+  obj.AddAction(
+         "SetBlockingPointer",
+         _("Block the pointer"),
+         _("Make the object block the cursor and the touches while it's "
+           "visible: the objects drawn under it are covered, and the "
+           "condition \"The cursor/touch is on an object\" can ignore them. "
+           "Use it for the buttons and the panels of an interface, or for a "
+           "full screen overlay under a dialog."),
+         _("_PARAM0_ blocks the pointer: _PARAM1_"),
+         _("Mouse and touch"),
+         "res/conditions/surObjet24.png",
+         "res/conditions/surObjet.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("yesorno", _("Block the pointer"))
+      .SetDefaultValue("yes")
+      .MarkAsAdvanced();
+
+  obj.AddCondition("IsBlockingPointer",
+                   _("Blocks the pointer"),
+                   _("Check if the object blocks the cursor and the touches."),
+                   _("_PARAM0_ blocks the pointer"),
+                   _("Mouse and touch"),
+                   "res/conditions/surObjet24.png",
+                   "res/conditions/surObjet.png")
+      .AddParameter("object", _("Object"))
+      .MarkAsAdvanced();
+
+  obj.AddAction(
+         "TakeInputFocus",
+         _("Take the keyboard and gamepad focus"),
+         _("Give the keyboard and gamepad focus to the object (and to the "
+           "objects it contains), above the objects that took it before, like "
+           "a dialog opened over another one. Only the object having the "
+           "focus should react to the keyboard and the gamepad."),
+         _("_PARAM0_ takes the keyboard and gamepad focus"),
+         _("Keyboard and gamepad focus"),
+         "res/conditions/keyboard24.png",
+         "res/conditions/keyboard.png")
+      .AddParameter("object", _("Object"))
+      .MarkAsAdvanced();
+
+  obj.AddAction(
+         "ReleaseInputFocus",
+         _("Release the keyboard and gamepad focus"),
+         _("Give the keyboard and gamepad focus back to the object that had "
+           "it before this object took it (like when a dialog is closed). It's "
+           "also released when the object is deleted."),
+         _("_PARAM0_ releases the keyboard and gamepad focus"),
+         _("Keyboard and gamepad focus"),
+         "res/conditions/keyboard24.png",
+         "res/conditions/keyboard.png")
+      .AddParameter("object", _("Object"))
+      .MarkAsAdvanced();
+
+  obj.AddCondition(
+         "HasInputFocus",
+         _("Has the keyboard and gamepad focus"),
+         _("Check if the object has the keyboard and gamepad focus: no object "
+           "took it, or the last object that took it is this object or "
+           "contains it."),
+         _("_PARAM0_ has the keyboard and gamepad focus"),
+         _("Keyboard and gamepad focus"),
+         "res/conditions/keyboard24.png",
+         "res/conditions/keyboard.png")
+      .AddParameter("object", _("Object"))
+      .MarkAsAdvanced();
+
   obj.AddCondition("Invisible",
                    "Invisibility of an object",
                    "Check if an object is hidden.",
@@ -1288,7 +1355,32 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("yesorno", _("Accurate test (yes by default)"), "", true)
       .SetDefaultValue("yes")
       .AddCodeOnlyParameter("conditionInverted", "")
+      .AddParameter(
+          "yesorno",
+          _("Ignore where it's covered by an object blocking the pointer"),
+          "",
+          true)
+      .SetParameterLongDescription(
+          _("Use it for the buttons of an interface: a dialog (or any object "
+            "blocking the pointer) drawn above them stops them from being "
+            "clicked or touched."))
+      .SetDefaultValue("no")
       .MarkAsSimple();
+
+  extension
+      .AddCondition(
+          "IsCursorOnPointerBlockingObject",
+          _("The cursor/touch is on an object blocking the pointer"),
+          _("Check if the cursor, or a touch, is on a visible object blocking "
+            "the pointer, like a button or a dialog of the interface. Use it "
+            "to ignore the clicks and touches on the interface in the "
+            "gameplay events."),
+          _("The cursor/touch is on an object blocking the pointer"),
+          _("Mouse and touch"),
+          "res/conditions/surObjet24.png",
+          "res/conditions/surObjet.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .MarkAsAdvanced();
 
   // Compatibility with GD <= 5.6.251
   extension.AddDuplicatedCondition("SourisSurObjet", "IsCursorOnObject")

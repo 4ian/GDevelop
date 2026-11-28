@@ -1248,6 +1248,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "libs/rbush.js");
   InsertUnique(includesFiles, "AsyncTasksManager.js");
   InsertUnique(includesFiles, "inputmanager.js");
+  InsertUnique(includesFiles, "inputfocusmanager.js");
   InsertUnique(includesFiles, "jsonmanager.js");
   InsertUnique(includesFiles, "Model3DManager.js");
   InsertUnique(includesFiles, "ResourceLoader.js");

@@ -6,7 +6,7 @@ import {
   getObjectParameterIndex,
 } from '../../InstructionOrExpression/EnumerateInstructions';
 import {
-  createTree,
+  createTreeInListOrder,
   type InstructionTreeNode,
 } from '../../InstructionOrExpression/CreateTree';
 import {
@@ -123,9 +123,8 @@ export const useInstructionEditor = ({
     return {
       chosenObjectName: objectName,
       chosenObjectInstructionsInfo,
-      chosenObjectInstructionsInfoTree: createTree(
-        chosenObjectInstructionsInfo,
-        i18n
+      chosenObjectInstructionsInfoTree: createTreeInListOrder(
+        chosenObjectInstructionsInfo
       ),
     };
   };

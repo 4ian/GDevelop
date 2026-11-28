@@ -40,14 +40,17 @@ export type InstructionOrExpressionTreeNode =
   | InstructionTreeNode
   | EnumeratedExpressionMetadata;
 
-export const createTree = <T: EnumeratedInstructionOrExpressionMetadata>(
-  allExpressions: Array<T>,
-  i18n: I18nType
-): TreeNode<T> => {
+/**
+ * Create the tree of instructions or expressions, keeping the groups in the
+ * order they first appear in the list (used for the instructions of an
+ * object, already ordered by `enumerateObjectAndBehaviorsInstructions`).
+ */
+export const createTreeInListOrder = <
+  T: EnumeratedInstructionOrExpressionMetadata
+>(
+  allExpressions: Array<T>
+): { [string]: TreeNode<T> } => {
   const tree = {};
-  const sortedFreeInstructionsTopLevelGroups = getSortedFreeInstructionsTopLevelGroups(
-    i18n
-  );
   allExpressions.forEach((expressionInfo: T) => {
     let pathInTree = compact(
       expressionInfo.fullGroupName.split(GROUP_DELIMITER)
@@ -65,6 +68,17 @@ export const createTree = <T: EnumeratedInstructionOrExpressionMetadata>(
       };
     });
   });
+  return tree;
+};
+
+export const createTree = <T: EnumeratedInstructionOrExpressionMetadata>(
+  allExpressions: Array<T>,
+  i18n: I18nType
+): TreeNode<T> => {
+  const tree = createTreeInListOrder(allExpressions);
+  const sortedFreeInstructionsTopLevelGroups = getSortedFreeInstructionsTopLevelGroups(
+    i18n
+  );
 
   const sortedTree = Object.keys(tree)
     .sort((a, b) => {
@@ -92,7 +106,7 @@ export const createTree = <T: EnumeratedInstructionOrExpressionMetadata>(
     .reduce((acc, groupName) => {
       acc[groupName] = tree[groupName];
       return acc;
-    }, {});
+    }, ({}: { [string]: TreeNode<T> }));
 
   return sortedTree;
 };

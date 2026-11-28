@@ -442,23 +442,261 @@ export const enumerateAllInstructions = (
   return allInstructions;
 };
 
-const orderFirstInstructionsWithoutGroup = (
-  allInstructions: Array<EnumeratedInstructionMetadata>
-) => {
-  const noGroupInstructions = allInstructions.filter(
-    instructionMetadata => instructionMetadata.fullGroupName.length === 0
-  );
-  const instructionsWithGroups = allInstructions.filter(
-    instructionMetadata => instructionMetadata.fullGroupName.length !== 0
+/**
+ * How the groups of a section of the object instructions list are ordered.
+ * - `declared`: in the order the instructions are given (for events-based
+ *   objects and behaviors, this is the order of their functions, chosen by
+ *   the extension author).
+ * - `specificFirst`: the groups that are specific to the object or behavior
+ *   first, then the groups shared with all objects in the usual order.
+ * - `usual`: the groups shared with all objects in the usual order, then the
+ *   other ones.
+ */
+type GroupsOrder = 'declared' | 'specificFirst' | 'usual';
+
+type InstructionsSection = {|
+  instructions: Array<EnumeratedInstructionMetadata>,
+  groupsOrder: GroupsOrder,
+|};
+
+/**
+ * The groups of the instructions that can be used with any object, from the
+ * most commonly used and high level ones to the most specialized ones.
+ */
+const getUsualObjectGroups = (i18n: I18nType): Array<string> =>
+  [
+    'Animations and images',
+    'Text',
+    'Objects',
+    'Position',
+    'Angle',
+    'Size',
+    'Visibility',
+    'Effects',
+    'Collision',
+    'Mouse and touch',
+    'Variables',
+    'Timers',
+    'Layers and cameras',
+    'Layer',
+    'Movement using forces',
+    'Behaviors',
+  ].map(groupName => (i18n ? i18n._(groupName) : groupName));
+
+const getTopLevelGroupName = (
+  instruction: EnumeratedInstructionMetadata
+): string => instruction.fullGroupName.split(GROUP_DELIMITER)[0];
+
+const getGroupRankInSection = (
+  groupName: string,
+  groupsOrder: GroupsOrder,
+  usualObjectGroups: Array<string>
+): number => {
+  if (groupsOrder === 'declared') return 0;
+
+  const usualIndex = usualObjectGroups.indexOf(groupName);
+  if (groupsOrder === 'specificFirst') return usualIndex;
+  return usualIndex === -1 ? usualObjectGroups.length : usualIndex;
+};
+
+/**
+ * Order the instructions so that their groups come section by section (a group
+ * found in several sections is shown in the first one), and are sorted inside
+ * a section according to its `groupsOrder`. Instructions without a group
+ * always come first.
+ */
+const sortInstructionsBySectionsAndGroups = (
+  sections: Array<InstructionsSection>,
+  i18n: I18nType
+): Array<EnumeratedInstructionMetadata> => {
+  const usualObjectGroups = getUsualObjectGroups(i18n);
+  const groupSortKeys: Map<string, Array<number>> = new Map();
+  const addGroupSortKeys = (isPrivate: boolean) => {
+    sections.forEach(({ instructions, groupsOrder }, sectionIndex) => {
+      instructions.forEach(instruction => {
+        if (instruction.isPrivate !== isPrivate) return;
+        const groupName = getTopLevelGroupName(instruction);
+        if (groupSortKeys.has(groupName)) return;
+
+        groupSortKeys.set(
+          groupName,
+          groupName === ''
+            ? [-1, 0, 0]
+            : [
+                sectionIndex,
+                getGroupRankInSection(
+                  groupName,
+                  groupsOrder,
+                  usualObjectGroups
+                ),
+                groupSortKeys.size,
+              ]
+        );
+      });
+    });
+  };
+  // Private instructions are only visible inside their extension: they must
+  // not move a group that is otherwise made of public instructions.
+  addGroupSortKeys(false);
+  addGroupSortKeys(true);
+
+  const compareGroups = (groupA: string, groupB: string): number => {
+    const sortKeyA = groupSortKeys.get(groupA) || [];
+    const sortKeyB = groupSortKeys.get(groupB) || [];
+    for (let index = 0; index < sortKeyA.length; index++) {
+      if (sortKeyA[index] !== sortKeyB[index])
+        return sortKeyA[index] - sortKeyB[index];
+    }
+    return 0;
+  };
+
+  // The sort is stable: inside a group, instructions keep the sections order.
+  return sections
+    .flatMap(({ instructions }) => instructions)
+    .sort((instructionA, instructionB) =>
+      compareGroups(
+        getTopLevelGroupName(instructionA),
+        getTopLevelGroupName(instructionB)
+      )
+    );
+};
+
+const putInGroupIfWithoutGroup = (
+  instructions: Array<EnumeratedInstructionMetadata>,
+  groupName: string
+): Array<EnumeratedInstructionMetadata> =>
+  instructions.map(instruction =>
+    instruction.fullGroupName
+      ? instruction
+      : { ...instruction, fullGroupName: groupName }
   );
 
-  return [...noGroupInstructions, ...instructionsWithGroups];
+/**
+ * Sort the instructions of an events-based object or behavior in the order of
+ * the functions declared by the extension author.
+ * Instructions not generated from a function (like the ones for properties)
+ * are put at the end.
+ */
+const sortByEventsFunctionsOrder = (
+  instructions: Array<EnumeratedInstructionMetadata>,
+  eventsFunctionsContainer: gdEventsFunctionsContainer
+): Array<EnumeratedInstructionMetadata> => {
+  const getEventsFunctionPosition = (functionName: string): number =>
+    eventsFunctionsContainer.hasEventsFunctionNamed(functionName)
+      ? eventsFunctionsContainer.getEventsFunctionPosition(
+          eventsFunctionsContainer.getEventsFunction(functionName)
+        )
+      : -1;
+  const getInstructionPosition = (
+    instruction: EnumeratedInstructionMetadata
+  ): number => {
+    const instructionName = instruction.type.split('::').pop() || '';
+    const position = getEventsFunctionPosition(instructionName);
+    if (position !== -1) return position;
+
+    // Actions of expression-and-condition functions are named "Set" + the
+    // function name.
+    if (instructionName.startsWith('Set')) {
+      const getterPosition = getEventsFunctionPosition(
+        instructionName.substring(3)
+      );
+      if (getterPosition !== -1) return getterPosition;
+    }
+    return Number.MAX_SAFE_INTEGER;
+  };
+
+  return [...instructions].sort(
+    (instructionA, instructionB) =>
+      getInstructionPosition(instructionA) -
+      getInstructionPosition(instructionB)
+  );
+};
+
+const enumerateBehaviorInstructions = (
+  isCondition: boolean,
+  behaviorType: string,
+  objectType: string,
+  objectBehaviorTypes: Set<string>,
+  project: gdProject,
+  i18n: I18nType
+): Array<EnumeratedInstructionMetadata> => {
+  const extensionAndBehaviorMetadata = gd.MetadataProvider.getExtensionAndBehaviorMetadata(
+    gd.JsPlatform.get(),
+    behaviorType
+  );
+  const extension = extensionAndBehaviorMetadata.getExtension();
+  const behaviorMetadata = extensionAndBehaviorMetadata.getMetadata();
+  const scope = {
+    extension: { name: extension.getName() },
+    behaviorMetadata: {
+      name: behaviorMetadata.getName(),
+      isPrivate: behaviorMetadata.isPrivate(),
+    },
+  };
+  const prefix = '';
+
+  const behaviorInstructions = enumerateExtensionInstructions(
+    prefix,
+    isCondition
+      ? extension.getAllConditionsForBehavior(behaviorType)
+      : extension.getAllActionsForBehavior(behaviorType),
+    // $FlowFixMe[incompatible-type]
+    scope,
+    i18n,
+    // Allow behaviors to have some of their instruction to be restricted
+    // to some type of object.
+    objectType,
+    objectBehaviorTypes
+  );
+
+  // Free functions can require a behavior even if this behavior is from
+  // another extension.
+  const freeBehaviorInstructions: Array<EnumeratedInstructionMetadata> = [];
+  const allExtensions = gd
+    .asPlatform(gd.JsPlatform.get())
+    .getAllPlatformExtensions();
+  for (let i = 0; i < allExtensions.size(); ++i) {
+    const extension = allExtensions.at(i);
+    if (shouldHideExtension(project, extension)) {
+      continue;
+    }
+
+    freeBehaviorInstructions.push(
+      ...enumerateExtraBehaviorInstructions(
+        isCondition,
+        extension,
+        behaviorType,
+        prefix,
+        // $FlowFixMe[incompatible-type]
+        scope,
+        project,
+        i18n
+      )
+    );
+  }
+
+  return [
+    ...(project.hasEventsBasedBehavior(behaviorType)
+      ? sortByEventsFunctionsOrder(
+          behaviorInstructions,
+          project.getEventsBasedBehavior(behaviorType).getEventsFunctions()
+        )
+      : behaviorInstructions),
+    ...freeBehaviorInstructions,
+  ];
 };
 
 /**
  * List all the instructions that can be used for the given object,
  * in the given context. This includes instructions for the behaviors
  * attached to the object.
+ *
+ * Instructions are ordered from the most specific to the most generic:
+ * - the instructions of the object itself,
+ * - the instructions of the behaviors added to the object,
+ * - the instructions that can be used with any object (including the ones of
+ *   the default behaviors, the "capabilities", of the object),
+ * - the instructions from other extensions that can be used with any object.
  */
 export const enumerateObjectAndBehaviorsInstructions = (
   isCondition: boolean,
@@ -468,8 +706,6 @@ export const enumerateObjectAndBehaviorsInstructions = (
   project: gdProject,
   i18n: I18nType
 ): Array<EnumeratedInstructionMetadata> => {
-  let allInstructions: Array<EnumeratedInstructionMetadata> = [];
-
   const objectType: string = gd.getTypeOfObject(
     globalObjectsContainer,
     objectsContainer,
@@ -484,15 +720,31 @@ export const enumerateObjectAndBehaviorsInstructions = (
       true
     )
     .toJSArray();
-  const objectBehaviorTypes = new Set(
-    objectBehaviorNames.map(behaviorName =>
-      gd.getTypeOfBehavior(
-        globalObjectsContainer,
-        objectsContainer,
-        behaviorName,
-        false
-      )
-    )
+  const getBehaviorType = (behaviorName: string): string =>
+    gd.getTypeOfBehavior(
+      globalObjectsContainer,
+      objectsContainer,
+      behaviorName,
+      false
+    );
+  const objectBehaviorTypes = new Set(objectBehaviorNames.map(getBehaviorType));
+  const isDefaultBehavior = (behaviorName: string): boolean =>
+    gd.hasDefaultBehavior(
+      globalObjectsContainer,
+      objectsContainer,
+      objectName,
+      behaviorName,
+      true
+    );
+  const addedBehaviorTypes = new Set(
+    objectBehaviorNames
+      .filter(behaviorName => !isDefaultBehavior(behaviorName))
+      .map(getBehaviorType)
+  );
+  const defaultBehaviorTypes = new Set(
+    objectBehaviorNames
+      .filter(behaviorName => isDefaultBehavior(behaviorName))
+      .map(getBehaviorType)
   );
 
   // Enumerate instructions of the object.
@@ -500,10 +752,10 @@ export const enumerateObjectAndBehaviorsInstructions = (
     gd.JsPlatform.get(),
     objectType
   );
-  const extension = extensionAndObjectMetadata.getExtension();
+  const objectExtension = extensionAndObjectMetadata.getExtension();
   const objectMetadata = extensionAndObjectMetadata.getMetadata();
   const scope = {
-    extension: { name: extension.getName() },
+    extension: { name: objectExtension.getName() },
     objectMetadata: {
       name: objectMetadata.getName(),
       isPrivate: objectMetadata.isPrivate(),
@@ -511,21 +763,40 @@ export const enumerateObjectAndBehaviorsInstructions = (
   };
   const prefix = '';
 
-  // Free instructions
-  allInstructions = [
-    ...allInstructions,
-    ...enumerateExtensionInstructions(
+  const ownObjectInstructions = enumerateExtensionInstructions(
+    prefix,
+    isCondition
+      ? objectExtension.getAllConditionsForObject(objectType)
+      : objectExtension.getAllActionsForObject(objectType),
+    // $FlowFixMe[incompatible-type]
+    scope,
+    i18n
+  );
+  const isEventsBasedObject = project.hasEventsBasedObject(objectType);
+
+  // Enumerate instructions of the base object that the object "inherits" from.
+  const baseObjectType = ''; /* An empty string means the base object */
+  let baseObjectInstructions: Array<EnumeratedInstructionMetadata> = [];
+  if (objectType !== baseObjectType) {
+    const baseExtensionAndObjectMetadata = gd.MetadataProvider.getExtensionAndObjectMetadata(
+      gd.JsPlatform.get(),
+      baseObjectType
+    );
+    const baseObjectExtension = baseExtensionAndObjectMetadata.getExtension();
+
+    baseObjectInstructions = enumerateExtensionInstructions(
       prefix,
       isCondition
-        ? extension.getAllConditionsForObject(objectType)
-        : extension.getAllActionsForObject(objectType),
+        ? baseObjectExtension.getAllConditionsForObject(baseObjectType)
+        : baseObjectExtension.getAllActionsForObject(baseObjectType),
       // $FlowFixMe[incompatible-type]
       scope,
       i18n
-    ),
-  ];
+    );
+  }
 
-  // Free object instructions
+  // Free instructions from all extensions that take an object as first parameter.
+  const extraObjectInstructions: Array<EnumeratedInstructionMetadata> = [];
   const allExtensions = gd
     .asPlatform(gd.JsPlatform.get())
     .getAllPlatformExtensions();
@@ -539,106 +810,66 @@ export const enumerateObjectAndBehaviorsInstructions = (
       },
     };
 
-    allInstructions = [
-      ...allInstructions,
-      ...enumerateExtraObjectInstructions(
-        isCondition,
-        extension,
-        objectType,
-        objectBehaviorTypes,
-        // $FlowFixMe[incompatible-type]
-        scope,
-        project,
-        i18n
-      ),
-    ];
-  }
-
-  // Enumerate instructions of the base object that the object "inherits" from.
-  const baseObjectType = ''; /* An empty string means the base object */
-  if (objectType !== baseObjectType) {
-    const baseExtensionAndObjectMetadata = gd.MetadataProvider.getExtensionAndObjectMetadata(
-      gd.JsPlatform.get(),
-      baseObjectType
-    );
-    const baseObjectExtension = baseExtensionAndObjectMetadata.getExtension();
-
-    allInstructions = [
-      ...allInstructions,
-      ...enumerateExtensionInstructions(
-        prefix,
-        isCondition
-          ? baseObjectExtension.getAllConditionsForObject(baseObjectType)
-          : baseObjectExtension.getAllActionsForObject(baseObjectType),
-        // $FlowFixMe[incompatible-type]
-        scope,
-        i18n
-      ),
-    ];
-  }
-
-  // Enumerate behaviors instructions.
-  for (let i = 0; i < allExtensions.size(); ++i) {
-    const extension = allExtensions.at(i);
-    const behaviorTypes = extension
-      .getBehaviorsTypes()
-      .toJSArray()
-      .filter(behaviorType => objectBehaviorTypes.has(behaviorType));
-
-    // eslint-disable-next-line
-    behaviorTypes.forEach(behaviorType => {
-      const behaviorMetadata = extension.getBehaviorMetadata(behaviorType);
-      const scope = {
-        extension: { name: extension.getName() },
-        behaviorMetadata: {
-          name: behaviorMetadata.getName(),
-          isPrivate: behaviorMetadata.isPrivate(),
-        },
-      };
-
-      // Free functions can require a behavior even if this behavior is from
-      // another extension.
-      const freeBehaviorInstructions: Array<EnumeratedInstructionMetadata> = [];
-      for (let i = 0; i < allExtensions.size(); ++i) {
-        const extension = allExtensions.at(i);
-        if (shouldHideExtension(project, extension)) {
-          continue;
-        }
-
-        freeBehaviorInstructions.push(
-          ...enumerateExtraBehaviorInstructions(
-            isCondition,
-            extension,
-            behaviorType,
-            prefix,
-            // $FlowFixMe[incompatible-type]
-            scope,
-            project,
-            i18n
-          )
-        );
-      }
-
-      // Show them at the top of the list.
-      allInstructions = [
-        ...enumerateExtensionInstructions(
-          prefix,
-          isCondition
-            ? extension.getAllConditionsForBehavior(behaviorType)
-            : extension.getAllActionsForBehavior(behaviorType),
+    extraObjectInstructions.push(
+      ...putInGroupIfWithoutGroup(
+        enumerateExtraObjectInstructions(
+          isCondition,
+          extension,
+          objectType,
+          objectBehaviorTypes,
           // $FlowFixMe[incompatible-type]
           scope,
-          i18n,
-          // Allow behaviors to have some of their instruction to be restricted
-          // to some type of object.
-          objectType,
-          objectBehaviorTypes
+          project,
+          i18n
         ),
-        ...freeBehaviorInstructions,
-        ...allInstructions,
-      ];
-    });
+        extension.getFullName()
+      )
+    );
   }
+
+  const enumerateInstructionsOfBehavior = (behaviorType: string) =>
+    enumerateBehaviorInstructions(
+      isCondition,
+      behaviorType,
+      objectType,
+      objectBehaviorTypes,
+      project,
+      i18n
+    );
+
+  const sections: Array<InstructionsSection> = [
+    {
+      instructions: isEventsBasedObject
+        ? sortByEventsFunctionsOrder(
+            ownObjectInstructions,
+            project.getEventsBasedObject(objectType).getEventsFunctions()
+          )
+        : ownObjectInstructions,
+      groupsOrder: isEventsBasedObject ? 'declared' : 'specificFirst',
+    },
+    ...[...addedBehaviorTypes].map(behaviorType => ({
+      instructions: putInGroupIfWithoutGroup(
+        enumerateInstructionsOfBehavior(behaviorType),
+        gd.MetadataProvider.getBehaviorMetadata(
+          gd.JsPlatform.get(),
+          behaviorType
+        ).getFullName()
+      ),
+      groupsOrder: project.hasEventsBasedBehavior(behaviorType)
+        ? 'declared'
+        : 'specificFirst',
+    })),
+    {
+      instructions: [
+        ...[...defaultBehaviorTypes].flatMap(enumerateInstructionsOfBehavior),
+        ...baseObjectInstructions,
+        ...extraObjectInstructions,
+      ],
+      groupsOrder: 'usual',
+    },
+  ];
+
+  let allInstructions = sortInstructionsBySectionsAndGroups(sections, i18n);
 
   // 'CreateByName' action only makes sense for groups.
   if (
@@ -650,7 +881,7 @@ export const enumerateObjectAndBehaviorsInstructions = (
     );
   }
 
-  return orderFirstInstructionsWithoutGroup(allInstructions);
+  return allInstructions;
 };
 
 /**

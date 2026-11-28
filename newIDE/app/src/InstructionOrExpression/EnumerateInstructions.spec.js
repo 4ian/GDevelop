@@ -1,6 +1,7 @@
 // @flow
 import { makeTestExtensions } from '../fixtures/TestExtensions';
-import { createTree } from './CreateTree';
+import { createTree, createTreeInListOrder } from './CreateTree';
+import { type EnumeratedInstructionMetadata } from './EnumeratedInstructionOrExpressionMetadata';
 import {
   enumerateAllInstructions,
   enumerateObjectAndBehaviorsInstructions,
@@ -10,6 +11,10 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
+import {
+  reloadProjectEventsFunctionsExtensionMetadata,
+  type EventsFunctionCodeWriter,
+} from '../EventsFunctionsExtensionsLoader';
 
 const gd: libGDevelop = global.gd;
 
@@ -18,8 +23,34 @@ const gd: libGDevelop = global.gd;
 // $FlowFixMe[cannot-resolve-name]
 const makeFakeI18n = (fakeI18n): I18nType => ({
   ...fakeI18n,
-  _: message => message.id,
+  _: message => (typeof message === 'string' ? message : message.id),
 });
+
+const fakeEventsFunctionCodeWriter: EventsFunctionCodeWriter = {
+  getIncludeFileFor: (functionName: string) => `fake-${functionName}.js`,
+  writeFunctionCode: () => Promise.resolve(),
+  writeBehaviorCode: () => Promise.resolve(),
+  writeObjectCode: () => Promise.resolve(),
+};
+
+const addEventsFunction = (
+  eventsFunctionsContainer: gdEventsFunctionsContainer,
+  name: string,
+  group: string
+): gdEventsFunction => {
+  const eventsFunction = eventsFunctionsContainer.insertNewEventsFunction(
+    name,
+    eventsFunctionsContainer.getEventsFunctionsCount()
+  );
+  eventsFunction.setFunctionType(gd.EventsFunction.Action);
+  eventsFunction.setFullName(name);
+  eventsFunction.setGroup(group);
+  return eventsFunction;
+};
+
+const getTopLevelGroupNames = (
+  instructions: Array<EnumeratedInstructionMetadata>
+): Array<string> => Object.keys(createTreeInListOrder(instructions));
 
 describe('EnumerateInstructions', () => {
   it('can enumerate instructions being conditions', () => {
@@ -296,6 +327,135 @@ describe('EnumerateInstructions', () => {
         }),
       ])
     );
+    project.delete();
+  });
+
+  it('orders the instructions of an object from the most specific to the most generic', () => {
+    makeTestExtensions(gd);
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Scene', 0);
+    const object = layout
+      .getObjects()
+      .insertNewObject(project, 'Sprite', 'MySpriteObject', 0);
+    object.addNewBehavior(
+      project,
+      'PlatformBehavior::PlatformerObjectBehavior',
+      'PlatformerObject'
+    );
+
+    const spriteActions = enumerateObjectAndBehaviorsInstructions(
+      false,
+      project.getObjects(),
+      layout.getObjects(),
+      'MySpriteObject',
+      project,
+      makeFakeI18n()
+    );
+
+    // The groups of the Sprite, then of its behavior, then the ones of all
+    // objects (including the default behaviors of the Sprite).
+    expect(getTopLevelGroupNames(spriteActions).slice(0, 9)).toEqual([
+      'Animations and images',
+      'Effects',
+      'Platformer configuration',
+      'Platformer state',
+      'Platformer controls',
+      'Objects',
+      'Position',
+      'Angle',
+      'Size',
+    ]);
+    // A capability instruction is shown with the Sprite ones in the same group.
+    expect(
+      spriteActions
+        .filter(
+          instruction => instruction.fullGroupName === 'Animations and images'
+        )
+        .map(instruction => instruction.type)
+    ).toEqual(
+      expect.arrayContaining([
+        'ChangeSprite',
+        'AnimatableCapability::AnimatableBehavior::SetName',
+      ])
+    );
+    project.delete();
+  });
+
+  it('orders the instructions of a custom object and a custom behavior as declared in their extension', () => {
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const extension = project.insertNewEventsFunctionsExtension('MyExt', 0);
+    extension.setFullName('My extension');
+
+    const eventsBasedObject = extension
+      .getEventsBasedObjects()
+      .insertNew('MyShop', 0);
+    const objectFunctions = eventsBasedObject.getEventsFunctions();
+    addEventsFunction(objectFunctions, 'Open', 'Shop');
+    addEventsFunction(objectFunctions, 'AddItem', 'Items');
+    addEventsFunction(objectFunctions, 'Close', 'Shop');
+    gd.WholeProjectRefactorer.ensureObjectEventsFunctionsProperParameters(
+      extension,
+      eventsBasedObject
+    );
+
+    const eventsBasedBehavior = extension
+      .getEventsBasedBehaviors()
+      .insertNew('MyBehavior', 0);
+    eventsBasedBehavior.setFullName('My behavior');
+    addEventsFunction(eventsBasedBehavior.getEventsFunctions(), 'Shake', '');
+    gd.WholeProjectRefactorer.ensureBehaviorEventsFunctionsProperParameters(
+      extension,
+      eventsBasedBehavior
+    );
+
+    // A free function that can be used with any object.
+    const maskFunction = addEventsFunction(
+      extension.getEventsFunctions(),
+      'Mask',
+      ''
+    );
+    maskFunction
+      .getParameters()
+      .addNewParameter('Object')
+      .setType('objectList');
+
+    reloadProjectEventsFunctionsExtensionMetadata(
+      project,
+      extension,
+      fakeEventsFunctionCodeWriter,
+      makeFakeI18n()
+    );
+    const layout = project.insertNewLayout('Scene', 0);
+    const object = layout
+      .getObjects()
+      .insertNewObject(project, 'MyExt::MyShop', 'MyShopObject', 0);
+    object.addNewBehavior(project, 'MyExt::MyBehavior', 'MyBehavior');
+
+    const shopActions = enumerateObjectAndBehaviorsInstructions(
+      false,
+      project.getObjects(),
+      layout.getObjects(),
+      'MyShopObject',
+      project,
+      makeFakeI18n()
+    );
+
+    const groupNames = getTopLevelGroupNames(shopActions);
+    expect(groupNames.slice(0, 4)).toEqual([
+      'Shop',
+      'Items',
+      // The behavior instructions without a group are in a group named after it.
+      'My behavior',
+      'Objects',
+    ]);
+    // Free instructions of extensions without a group are in a group named
+    // after their extension, after the instructions of all objects.
+    expect(groupNames[groupNames.length - 1]).toBe('My extension');
+    expect(
+      shopActions
+        .filter(instruction => instruction.fullGroupName === 'Shop')
+        .map(instruction => instruction.type)
+    ).toEqual(['MyExt::MyShop::Open', 'MyExt::MyShop::Close']);
     project.delete();
   });
 });

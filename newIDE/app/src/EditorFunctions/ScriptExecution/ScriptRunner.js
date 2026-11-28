@@ -271,12 +271,20 @@ export const executeScript = async ({
         if (meta && Array.isArray(meta.newExternalLayoutNames)) {
           newExternalLayoutNames.push(...meta.newExternalLayoutNames);
         }
+        // Like standalone calls, honor explicit mutation metadata: a failed
+        // call may have applied changes, and a successful call may be a no-op.
+        const didModifyProject =
+          meta && typeof meta.didModifyProject === 'boolean'
+            ? meta.didModifyProject || undefined
+            : modifiesProject && success
+            ? true
+            : undefined;
         functionCallRecords.push({
           functionName: name,
           args,
           success: !!success,
           output,
-          didModifyProject: modifiesProject && success ? true : undefined,
+          didModifyProject,
         });
         if (!success) {
           throw new FunctionCallFailedError(

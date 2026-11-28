@@ -852,6 +852,7 @@ namespace gdjs {
       }
       this.destroyCallbacks.forEach((c) => c());
       this.clearEffects();
+      this.getRuntimeScene().getInputFocusManager().onObjectDeleted(this);
     }
 
     /**
@@ -3016,17 +3017,66 @@ namespace gdjs {
     }
 
     /**
+     * Make the object block the pointer (the cursor and the touches): the
+     * objects drawn under it are covered where it is.
+     */
+    setBlockingPointer(enable: boolean): void {
+      this.getRuntimeScene()
+        .getInputFocusManager()
+        .setBlockingPointer(this, enable);
+    }
+
+    /**
+     * Return true if the object blocks the pointer.
+     */
+    isBlockingPointer(): boolean {
+      return this.getRuntimeScene()
+        .getInputFocusManager()
+        .isBlockingPointer(this);
+    }
+
+    /**
+     * Give the keyboard and gamepad focus to the object (and the objects it
+     * contains), above the objects that took it before.
+     */
+    takeInputFocus(): void {
+      this.getRuntimeScene().getInputFocusManager().takeFocus(this);
+    }
+
+    /**
+     * Give the keyboard and gamepad focus back to the object that had it
+     * before this one took it.
+     */
+    releaseInputFocus(): void {
+      this.getRuntimeScene().getInputFocusManager().releaseFocus(this);
+    }
+
+    /**
+     * Return true if no object took the keyboard and gamepad focus, or if the
+     * last object that took it is this object or contains it.
+     */
+    hasInputFocus(): boolean {
+      return this.getRuntimeScene().getInputFocusManager().hasFocus(this);
+    }
+
+    /**
      * Return true if the cursor, or any touch, is on the object.
      *
+     * @param ignoreCovered If true, the cursor or a touch is not counted where
+     * the object is covered by an object blocking the pointer.
      * @return true if the cursor, or any touch, is on the object.
      */
-    cursorOnObject(): boolean {
+    cursorOnObject(ignoreCovered: boolean = false): boolean {
       const workingPoint: FloatPoint = gdjs.staticArray(
         RuntimeObject.prototype.cursorOnObject
       ) as FloatPoint;
       workingPoint.length = 2;
       const instanceContainer = this.getInstanceContainer();
       const inputManager = instanceContainer.getGame().getInputManager();
+      const inputFocusManager =
+        ignoreCovered === true
+          ? this.getRuntimeScene().getInputFocusManager()
+          : null;
       const layer = instanceContainer.getLayer(this.layer);
       const mousePos = layer.convertCoords(
         inputManager.getCursorX(),
@@ -3034,18 +3084,27 @@ namespace gdjs {
         0,
         workingPoint
       );
-      if (this.insideObject(mousePos[0], mousePos[1])) {
+      if (
+        this.insideObject(mousePos[0], mousePos[1]) &&
+        (!inputFocusManager ||
+          !inputFocusManager.isCoveredAt(
+            this,
+            inputManager.getCursorX(),
+            inputManager.getCursorY()
+          ))
+      ) {
         return true;
       }
       const touchIds = inputManager.getAllTouchIdentifiers();
       for (let i = 0; i < touchIds.length; ++i) {
-        const touchPos = layer.convertCoords(
-          inputManager.getTouchX(touchIds[i]),
-          inputManager.getTouchY(touchIds[i]),
-          0,
-          workingPoint
-        );
-        if (this.insideObject(touchPos[0], touchPos[1])) {
+        const touchX = inputManager.getTouchX(touchIds[i]);
+        const touchY = inputManager.getTouchY(touchIds[i]);
+        const touchPos = layer.convertCoords(touchX, touchY, 0, workingPoint);
+        if (
+          this.insideObject(touchPos[0], touchPos[1]) &&
+          (!inputFocusManager ||
+            !inputFocusManager.isCoveredAt(this, touchX, touchY))
+        ) {
           return true;
         }
       }

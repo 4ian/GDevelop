@@ -40,6 +40,7 @@ namespace gdjs {
     _lastId: integer = 0;
     _name: string = '';
     _timeManager: TimeManager;
+    private _inputFocusManager = new gdjs.InputFocusManager();
     _gameStopRequested: boolean = false;
     _requestedScene: string = '';
     _resourcesUnloading: 'at-scene-exit' | 'never' | 'inherit' = 'inherit';
@@ -770,6 +771,14 @@ namespace gdjs {
      */
     getTimeManager(): gdjs.TimeManager {
       return this._timeManager;
+    }
+
+    /**
+     * Get the manager of the objects blocking the pointer and of the keyboard
+     * and gamepad focus.
+     */
+    getInputFocusManager(): gdjs.InputFocusManager {
+      return this._inputFocusManager;
     }
 
     /**

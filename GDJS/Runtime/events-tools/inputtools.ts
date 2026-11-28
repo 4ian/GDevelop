@@ -394,22 +394,39 @@ namespace gdjs {
           .isMouseInsideCanvas();
       };
 
-      const _cursorIsOnObject = function (obj: gdjs.RuntimeObject) {
-        return obj.cursorOnObject();
+      const _cursorIsOnObject = function (
+        obj: gdjs.RuntimeObject,
+        ignoreCovered: boolean
+      ) {
+        return obj.cursorOnObject(ignoreCovered);
       };
 
       export const cursorOnObject = function (
         objectsLists: Hashtable<gdjs.RuntimeObject[]>,
         instanceContainer: gdjs.RuntimeInstanceContainer,
         accurate: boolean,
-        inverted: boolean
+        inverted: boolean,
+        ignoreCovered?: boolean
       ) {
         return gdjs.evtTools.object.pickObjectsIf(
           _cursorIsOnObject,
           objectsLists,
           inverted,
-          null
+          !!ignoreCovered
         );
+      };
+
+      /**
+       * Check if the cursor, or a touch, is on a visible object blocking the
+       * pointer (like a button or a dialog of the interface).
+       */
+      export const isCursorOnPointerBlockingObject = function (
+        instanceContainer: gdjs.RuntimeInstanceContainer
+      ): boolean {
+        return instanceContainer
+          .getScene()
+          .getInputFocusManager()
+          .isPointerBlocked(instanceContainer.getGame().getInputManager());
       };
 
       export const getTouchX = function (

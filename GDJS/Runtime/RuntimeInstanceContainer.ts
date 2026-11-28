@@ -781,6 +781,16 @@ namespace gdjs {
     }
 
     /**
+     * Get the position of a layer in the drawing order (the layers with a
+     * greater index are drawn above).
+     * @param name The name of the layer
+     * @returns The index of the layer, or the one of the base layer if not found
+     */
+    getLayerIndex(name: string): integer {
+      return this._orderedLayers.indexOf(this.getLayer(name));
+    }
+
+    /**
      * Check if a layer exists
      * @param name The name of the layer
      */

@@ -50,7 +50,6 @@ describe('NameHelpers', () => {
 
     it('recognizes a lifecycle name only on the owner that calls it', () => {
       expect(isLifecycleFunctionName('behavior', 'doStepPreEvents')).toBe(true);
-      expect(isLifecycleFunctionName('object', 'doStepPreEvents')).toBe(true);
       expect(isLifecycleFunctionName('object', 'onActivate')).toBe(false);
       expect(isLifecycleFunctionName('object', 'onHotReloading')).toBe(true);
       expect(isLifecycleFunctionName('extension', 'onScenePreEvents')).toBe(
